@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0354E2CC36AF91E54DA9B198 /* Engines in Resources */ = {isa = PBXBuildFile; fileRef = 5A8CF114A40AE23BFE876D5F /* Engines */; };
+		8480D80C7488CE9F97082B4C /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7568E5457EE5E24D8953FF2B /* AppModel.swift */; };
+		ED4492422D0D979AE2A9189E /* ChatAnalyzerResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DADABDB144FA4BFC4AF752 /* ChatAnalyzerResultsView.swift */; };
+		F336BA1D8687CE0167374654 /* ChatAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4207888316412A838204F61 /* ChatAnalyzerView.swift */; };
+		57429057F44762DE3EEEAF66 /* ChatAnalyzerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B568424B5D1C32C31D502F5 /* ChatAnalyzerViewModel.swift */; };
+		96592554B719FC6DBCCBE43B /* ContextualHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49AEAD39724A0DF3F0018A20 /* ContextualHelp.swift */; };
+		E1D4F9302C61218333CB66BC /* InteractiveChartSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9FAA3C7C9FFA6F72C86681 /* InteractiveChartSupport.swift */; };
+		3EC5D4A16577BD045420CA86 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2704D126067FC864A34CC860 /* DashboardView.swift */; };
+		1F13D3D5FA919070D2975D62 /* GlobalHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D09184D51179CDE91ED83F3 /* GlobalHistoryView.swift */; };
+		649879F0573C63038D3BCA83 /* OrganizerHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4475263D322BA32A19E8DD /* OrganizerHistoryView.swift */; };
+		168A98E38909340296AFD59E /* OrganizerPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D4D408A8CD43603353DF76 /* OrganizerPlanView.swift */; };
+		403FFD158F8A1734E62A1198 /* OrganizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F3BCF1C20BBA11DA887F40 /* OrganizerView.swift */; };
+		D6BD1BFB3E56F89075549ABA /* OrganizerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8E51415A3637D96801E267 /* OrganizerViewModel.swift */; };
+		9C459C6DB287F097138E0C7E /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E6A48249857C83329C14CB /* RootView.swift */; };
+		DA28470E8ED148872728E123 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4E5B163B8AFCDE871BADED /* SettingsView.swift */; };
+		88F81196AB76F5625792E719 /* UniversalConverterHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F875420C4F7EAD56E33375 /* UniversalConverterHelp.swift */; };
+		31AF62DFA2D049C3A7016495 /* UniversalConverterSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 625CD62198103E2A5EA93AC8 /* UniversalConverterSettingsView.swift */; };
+		51E30E4F31C88F958421F98A /* UniversalConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC72F31053FA84CA9D7166C3 /* UniversalConverterView.swift */; };
+		76896E7CAF50279C375ABFF2 /* UniversalConverterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A308CF4706C240BAA6231B4 /* UniversalConverterViewModel.swift */; };
+		00EE68DC59DBF7E9721FBD8C /* YouTubeDownloaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC965F792A82DFD303810D7 /* YouTubeDownloaderView.swift */; };
+		E1A688BDC2493F10A80F39CC /* YouTubeDownloaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BA2F74B00E4E2EB5EED0BA0 /* YouTubeDownloaderViewModel.swift */; };
+		4F6AC939F8B8A503AD839C89 /* ZEUVEApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F8BFEA66E2E29E730E8441 /* ZEUVEApp.swift */; };
+		404A0F19E15800281C5BC1C0 /* ZEUVECore in Frameworks */ = {isa = PBXBuildFile; productRef = 409E44595248795F86FC7F90 /* ZEUVECore */; };
+		477129AAF615C6DD899BE031 /* ZEUVEStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7091E7C58F7EEFDE86B70B83 /* ZEUVEStorage */; };
+		D9D7F6686A4A480C943741F4 /* ZEUVEOperations in Frameworks */ = {isa = PBXBuildFile; productRef = ED80ED4EC2B0B0AB582FE05F /* ZEUVEOperations */; };
+		A31FB53252ADC6A6A6399AA9 /* ZEUVEEngines in Frameworks */ = {isa = PBXBuildFile; productRef = 6D8C9527002E0D943BD80F7C /* ZEUVEEngines */; };
+		DFA297719D4EBE9B26719F7E /* OrganizerModule in Frameworks */ = {isa = PBXBuildFile; productRef = 9C40C395B65675CF2A76A7F4 /* OrganizerModule */; };
+		7111BFF56EB62776A0C2C3CF /* YouTubeDownloaderModule in Frameworks */ = {isa = PBXBuildFile; productRef = 47365920815A412F048C0CED /* YouTubeDownloaderModule */; };
+		61676469858611245E80E90F /* ChatAnalyzerModule in Frameworks */ = {isa = PBXBuildFile; productRef = CD79C3A5B5C0E3E71B8DDCA5 /* ChatAnalyzerModule */; };
+		4D4E90E01CBE0D3970B0E7AF /* UniversalConverterModule in Frameworks */ = {isa = PBXBuildFile; productRef = 2621CE5C8CB6DE8C909249D2 /* UniversalConverterModule */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		7568E5457EE5E24D8953FF2B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppModel.swift"; sourceTree = "<group>"; };
+		D3DADABDB144FA4BFC4AF752 /* ChatAnalyzerResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatAnalyzer/ChatAnalyzerResultsView.swift"; sourceTree = "<group>"; };
+		D4207888316412A838204F61 /* ChatAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatAnalyzer/ChatAnalyzerView.swift"; sourceTree = "<group>"; };
+		6B568424B5D1C32C31D502F5 /* ChatAnalyzerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatAnalyzer/ChatAnalyzerViewModel.swift"; sourceTree = "<group>"; };
+		49AEAD39724A0DF3F0018A20 /* ContextualHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/ContextualHelp.swift"; sourceTree = "<group>"; };
+		1F9FAA3C7C9FFA6F72C86681 /* InteractiveChartSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/InteractiveChartSupport.swift"; sourceTree = "<group>"; };
+		2704D126067FC864A34CC860 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashboardView.swift"; sourceTree = "<group>"; };
+		7D09184D51179CDE91ED83F3 /* GlobalHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "History/GlobalHistoryView.swift"; sourceTree = "<group>"; };
+		DC4475263D322BA32A19E8DD /* OrganizerHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Organizer/OrganizerHistoryView.swift"; sourceTree = "<group>"; };
+		46D4D408A8CD43603353DF76 /* OrganizerPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Organizer/OrganizerPlanView.swift"; sourceTree = "<group>"; };
+		C3F3BCF1C20BBA11DA887F40 /* OrganizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Organizer/OrganizerView.swift"; sourceTree = "<group>"; };
+		1E8E51415A3637D96801E267 /* OrganizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Organizer/OrganizerViewModel.swift"; sourceTree = "<group>"; };
+		11E6A48249857C83329C14CB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RootView.swift"; sourceTree = "<group>"; };
+		9C4E5B163B8AFCDE871BADED /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
+		76F875420C4F7EAD56E33375 /* UniversalConverterHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniversalConverter/UniversalConverterHelp.swift"; sourceTree = "<group>"; };
+		625CD62198103E2A5EA93AC8 /* UniversalConverterSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniversalConverter/UniversalConverterSettingsView.swift"; sourceTree = "<group>"; };
+		DC72F31053FA84CA9D7166C3 /* UniversalConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniversalConverter/UniversalConverterView.swift"; sourceTree = "<group>"; };
+		1A308CF4706C240BAA6231B4 /* UniversalConverterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniversalConverter/UniversalConverterViewModel.swift"; sourceTree = "<group>"; };
+		EAC965F792A82DFD303810D7 /* YouTubeDownloaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YouTubeDownloader/YouTubeDownloaderView.swift"; sourceTree = "<group>"; };
+		2BA2F74B00E4E2EB5EED0BA0 /* YouTubeDownloaderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YouTubeDownloader/YouTubeDownloaderViewModel.swift"; sourceTree = "<group>"; };
+		A8F8BFEA66E2E29E730E8441 /* ZEUVEApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZEUVEApp.swift"; sourceTree = "<group>"; };
+		D957E19B16B69713B7749A90 /* ZEUVE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZEUVE.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A8CF114A40AE23BFE876D5F /* Engines */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/Engines; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		69680EDE0CF9B24DB8DBFE04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				404A0F19E15800281C5BC1C0 /* ZEUVECore in Frameworks */,
+				477129AAF615C6DD899BE031 /* ZEUVEStorage in Frameworks */,
+				D9D7F6686A4A480C943741F4 /* ZEUVEOperations in Frameworks */,
+				A31FB53252ADC6A6A6399AA9 /* ZEUVEEngines in Frameworks */,
+				DFA297719D4EBE9B26719F7E /* OrganizerModule in Frameworks */,
+				7111BFF56EB62776A0C2C3CF /* YouTubeDownloaderModule in Frameworks */,
+				61676469858611245E80E90F /* ChatAnalyzerModule in Frameworks */,
+				4D4E90E01CBE0D3970B0E7AF /* UniversalConverterModule in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		870B3294C0CBD48AF6BBCC1B = {
+			isa = PBXGroup;
+			children = (
+				3C3B0F03DC089F93B8457928 /* App */,
+				615B463D1028E4E24B674CF7 /* Products */,
+				5A8CF114A40AE23BFE876D5F /* Engines */,
+			);
+			sourceTree = "<group>";
+		};
+		3C3B0F03DC089F93B8457928 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7568E5457EE5E24D8953FF2B /* AppModel.swift */,
+				D3DADABDB144FA4BFC4AF752 /* ChatAnalyzerResultsView.swift */,
+				D4207888316412A838204F61 /* ChatAnalyzerView.swift */,
+				6B568424B5D1C32C31D502F5 /* ChatAnalyzerViewModel.swift */,
+				49AEAD39724A0DF3F0018A20 /* ContextualHelp.swift */,
+				1F9FAA3C7C9FFA6F72C86681 /* InteractiveChartSupport.swift */,
+				2704D126067FC864A34CC860 /* DashboardView.swift */,
+				7D09184D51179CDE91ED83F3 /* GlobalHistoryView.swift */,
+				DC4475263D322BA32A19E8DD /* OrganizerHistoryView.swift */,
+				46D4D408A8CD43603353DF76 /* OrganizerPlanView.swift */,
+				C3F3BCF1C20BBA11DA887F40 /* OrganizerView.swift */,
+				1E8E51415A3637D96801E267 /* OrganizerViewModel.swift */,
+				11E6A48249857C83329C14CB /* RootView.swift */,
+				9C4E5B163B8AFCDE871BADED /* SettingsView.swift */,
+				76F875420C4F7EAD56E33375 /* UniversalConverterHelp.swift */,
+				625CD62198103E2A5EA93AC8 /* UniversalConverterSettingsView.swift */,
+				DC72F31053FA84CA9D7166C3 /* UniversalConverterView.swift */,
+				1A308CF4706C240BAA6231B4 /* UniversalConverterViewModel.swift */,
+				EAC965F792A82DFD303810D7 /* YouTubeDownloaderView.swift */,
+				2BA2F74B00E4E2EB5EED0BA0 /* YouTubeDownloaderViewModel.swift */,
+				A8F8BFEA66E2E29E730E8441 /* ZEUVEApp.swift */,
+			);
+			name = App;
+			path = Sources/ZEUVEApp;
+			sourceTree = SOURCE_ROOT;
+		};
+		615B463D1028E4E24B674CF7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D957E19B16B69713B7749A90 /* ZEUVE.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0E8A3AD980EC179856012B7E /* ZEUVE */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7DE97F2CECB2601227982F09 /* Build configuration list for PBXNativeTarget "ZEUVE" */;
+			buildPhases = (
+				F612CD2E22E187AC48B5913C /* Sources */,
+				69680EDE0CF9B24DB8DBFE04 /* Frameworks */,
+				86F6FE2DD6E869C1842A14B3 /* Resources */,
+				88DC25BD9FEFE025314AF292 /* Firmar motores incluidos */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = ZEUVE;
+			packageProductDependencies = (
+				409E44595248795F86FC7F90 /* ZEUVECore */,
+				7091E7C58F7EEFDE86B70B83 /* ZEUVEStorage */,
+				ED80ED4EC2B0B0AB582FE05F /* ZEUVEOperations */,
+				6D8C9527002E0D943BD80F7C /* ZEUVEEngines */,
+				9C40C395B65675CF2A76A7F4 /* OrganizerModule */,
+				47365920815A412F048C0CED /* YouTubeDownloaderModule */,
+				CD79C3A5B5C0E3E71B8DDCA5 /* ChatAnalyzerModule */,
+				2621CE5C8CB6DE8C909249D2 /* UniversalConverterModule */,
+			);
+			productName = ZEUVE;
+			productReference = D957E19B16B69713B7749A90 /* ZEUVE.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		98F54143AB4E86B28C3AFEE0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					0E8A3AD980EC179856012B7E = { CreatedOnToolsVersion = 16.0; };
+				};
+			};
+			buildConfigurationList = 6650A2B5E24FA7522CE6B81C /* Build configuration list for PBXProject "ZEUVE" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = es;
+			hasScannedForEncodings = 0;
+			knownRegions = (es, Base);
+			mainGroup = 870B3294C0CBD48AF6BBCC1B;
+			packageReferences = (6966156A0CDB949B3DB248D1 /* XCLocalSwiftPackageReference "." */);
+			productRefGroup = 615B463D1028E4E24B674CF7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0E8A3AD980EC179856012B7E /* ZEUVE */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		86F6FE2DD6E869C1842A14B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0354E2CC36AF91E54DA9B198 /* Engines in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		88DC25BD9FEFE025314AF292 /* Firmar motores incluidos */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ("$(SRCROOT)/Resources/Engines/engines.json");
+			name = "Firmar motores incluidos";
+			outputPaths = ();
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/Scripts/sign_embedded_engines.sh\" \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\" \"${EXPANDED_CODE_SIGN_IDENTITY:-}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F612CD2E22E187AC48B5913C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8480D80C7488CE9F97082B4C /* AppModel.swift in Sources */,
+				ED4492422D0D979AE2A9189E /* ChatAnalyzerResultsView.swift in Sources */,
+				F336BA1D8687CE0167374654 /* ChatAnalyzerView.swift in Sources */,
+				57429057F44762DE3EEEAF66 /* ChatAnalyzerViewModel.swift in Sources */,
+				96592554B719FC6DBCCBE43B /* ContextualHelp.swift in Sources */,
+				E1D4F9302C61218333CB66BC /* InteractiveChartSupport.swift in Sources */,
+				3EC5D4A16577BD045420CA86 /* DashboardView.swift in Sources */,
+				1F13D3D5FA919070D2975D62 /* GlobalHistoryView.swift in Sources */,
+				649879F0573C63038D3BCA83 /* OrganizerHistoryView.swift in Sources */,
+				168A98E38909340296AFD59E /* OrganizerPlanView.swift in Sources */,
+				403FFD158F8A1734E62A1198 /* OrganizerView.swift in Sources */,
+				D6BD1BFB3E56F89075549ABA /* OrganizerViewModel.swift in Sources */,
+				9C459C6DB287F097138E0C7E /* RootView.swift in Sources */,
+				DA28470E8ED148872728E123 /* SettingsView.swift in Sources */,
+				88F81196AB76F5625792E719 /* UniversalConverterHelp.swift in Sources */,
+				31AF62DFA2D049C3A7016495 /* UniversalConverterSettingsView.swift in Sources */,
+				51E30E4F31C88F958421F98A /* UniversalConverterView.swift in Sources */,
+				76896E7CAF50279C375ABFF2 /* UniversalConverterViewModel.swift in Sources */,
+				00EE68DC59DBF7E9721FBD8C /* YouTubeDownloaderView.swift in Sources */,
+				E1A688BDC2493F10A80F39CC /* YouTubeDownloaderViewModel.swift in Sources */,
+				4F6AC939F8B8A503AD839C89 /* ZEUVEApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D12546C7310DEE778E55E187 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA23A758EC6A71B7321371F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		E1698793B8B09B32821D3120 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 26;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ZEUVE;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.7.5;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zeuve.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		FFACE85B9B63AB569355131D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 26;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ZEUVE;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.7.5;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zeuve.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6650A2B5E24FA7522CE6B81C /* Build configuration list for PBXProject "ZEUVE" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (D12546C7310DEE778E55E187 /* Debug */, AA23A758EC6A71B7321371F8 /* Release */);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7DE97F2CECB2601227982F09 /* Build configuration list for PBXNativeTarget "ZEUVE" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (E1698793B8B09B32821D3120 /* Debug */, FFACE85B9B63AB569355131D /* Release */);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		6966156A0CDB949B3DB248D1 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = .;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		409E44595248795F86FC7F90 /* ZEUVECore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ZEUVECore;
+		};
+		7091E7C58F7EEFDE86B70B83 /* ZEUVEStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ZEUVEStorage;
+		};
+		ED80ED4EC2B0B0AB582FE05F /* ZEUVEOperations */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ZEUVEOperations;
+		};
+		6D8C9527002E0D943BD80F7C /* ZEUVEEngines */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ZEUVEEngines;
+		};
+		9C40C395B65675CF2A76A7F4 /* OrganizerModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OrganizerModule;
+		};
+		47365920815A412F048C0CED /* YouTubeDownloaderModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = YouTubeDownloaderModule;
+		};
+		CD79C3A5B5C0E3E71B8DDCA5 /* ChatAnalyzerModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ChatAnalyzerModule;
+		};
+		2621CE5C8CB6DE8C909249D2 /* UniversalConverterModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UniversalConverterModule;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+	};
+	rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
+}

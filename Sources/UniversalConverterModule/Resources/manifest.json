@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "identifier": "com.zeuve.universal-converter",
+  "name": "Conversor universal",
+  "summary": "Convierte imágenes, audio, vídeo, PDF, texto, datos y libros electrónicos de forma local, segura y con prioridad de calidad.",
+  "version": "0.2.2",
+  "minimumZEUVEVersion": "0.7.0",
+  "moduleAPI": "1.0",
+  "technology": "mixed",
+  "executionMode": "builtIn",
+  "permissions": [
+    "readUserSelectedFiles",
+    "writeUserSelectedFolder",
+    "persistentFolderAccess",
+    "executeBundledTools",
+    "openExternalApplications"
+  ],
+  "capabilities": [
+    "preview",
+    "progress",
+    "cancellation",
+    "history",
+    "presets",
+    "favorites",
+    "dragAndDrop",
+    "diagnostics"
+  ],
+  "presentation": {
+    "systemImage": "arrow.triangle.2.circlepath",
+    "category": "Archivos",
+    "order": 15
+  }
+}

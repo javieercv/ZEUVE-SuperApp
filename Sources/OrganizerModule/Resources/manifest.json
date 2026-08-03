@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "identifier": "com.zeuve.organizer",
+  "name": "Organizador de archivos",
+  "summary": "Clasifica, revisa y organiza archivos de forma segura.",
+  "version": "0.1.4",
+  "minimumZEUVEVersion": "0.1.0",
+  "moduleAPI": "1.0",
+  "technology": "swift",
+  "executionMode": "builtIn",
+  "permissions": [
+    "readUserSelectedFiles",
+    "writeUserSelectedFolder",
+    "openExternalApplications"
+  ],
+  "capabilities": [
+    "preview",
+    "progress",
+    "cancellation",
+    "history",
+    "undo",
+    "dragAndDrop"
+  ],
+  "presentation": {
+    "systemImage": "folder.badge.gearshape",
+    "category": "Archivos",
+    "order": 10
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "identifier": "com.zeuve.youtube-downloader",
+  "name": "Descargador de YouTube",
+  "summary": "Analiza y descarga vídeos, audio y listas de reproducción con control de calidad.",
+  "version": "0.4.1",
+  "minimumZEUVEVersion": "0.2.0",
+  "moduleAPI": "1.0",
+  "technology": "mixed",
+  "executionMode": "builtIn",
+  "permissions": [
+    "readUserSelectedFiles",
+    "writeUserSelectedFolder",
+    "persistentFolderAccess",
+    "networkAccess",
+    "executeBundledTools",
+    "clipboard",
+    "openExternalApplications"
+  ],
+  "capabilities": [
+    "preview",
+    "progress",
+    "cancellation",
+    "history",
+    "presets",
+    "favorites",
+    "dragAndDrop",
+    "diagnostics"
+  ],
+  "presentation": {
+    "systemImage": "arrow.down.circle",
+    "category": "Internet",
+    "order": 20
+  }
+}

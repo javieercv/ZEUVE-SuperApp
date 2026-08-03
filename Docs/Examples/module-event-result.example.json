@@ -1,0 +1,12 @@
+{
+  "protocolVersion": "1.0",
+  "requestID": "8F20D208-E632-4A61-8B50-923C065FC125",
+  "kind": "result",
+  "sequence": 2,
+  "payload": {
+    "processed": 40,
+    "succeeded": 39,
+    "failed": 1,
+    "outputFolder": "/Users/usuario/Documents/Salida"
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "engines": [
+    {
+      "name": "yt-dlp",
+      "executable": "yt-dlp_macos",
+      "relativePath": "yt-dlp/yt-dlp_macos",
+      "version": "2026.06.09",
+      "architecture": "universal",
+      "sha256": "4eefb498e76f8a425bec30ba3ee2079b01542ca39ca1fb61b79966450794cc13",
+      "source": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.06.09/yt-dlp_macos.zip",
+      "licenseFile": "licenses/yt-dlp/LICENSE",
+      "purpose": "Analizar y descargar contenido autorizado de YouTube.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "size": 12143200,
+      "requirement": "required",
+      "bundleSHA256": "18d76939eb25aedd470fe03a2efaced1b3532dda33426477a9bf9e757584be49",
+      "bundleSize": 125261318,
+      "bundleFileCount": 143
+    },
+    {
+      "name": "deno",
+      "executable": "deno",
+      "relativePath": "deno/deno",
+      "version": "2.9.0",
+      "architecture": "arm64",
+      "sha256": "a817b1c193d34b58375e92f4e5c0c5f5de1914bf03f9690b5491eddc7b7d4fa5",
+      "source": "https://github.com/denoland/deno/releases/download/v2.9.0/deno-aarch64-apple-darwin.zip",
+      "licenseFile": "licenses/deno/LICENSE.md",
+      "purpose": "Ejecutar los desafíos JavaScript requeridos por YouTube a petición de yt-dlp.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "size": 82565888,
+      "requirement": "required"
+    },
+    {
+      "name": "ffmpeg",
+      "executable": "ffmpeg",
+      "relativePath": "ffmpeg/ffmpeg",
+      "version": "8.1.2",
+      "architecture": "arm64",
+      "sha256": "2f17ed926922ff3c254f4e93e8a31d1f9120bb32357571758a37a8b6b4f28666",
+      "source": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+      "licenseFile": "licenses/ffmpeg/COPYING.GPLv2",
+      "purpose": "Unir, remultiplexar y convertir audio, vídeo, metadatos y subtítulos.",
+      "diagnosticArguments": [
+        "-version"
+      ],
+      "size": 22595480,
+      "requirement": "required"
+    },
+    {
+      "name": "ffprobe",
+      "executable": "ffprobe",
+      "relativePath": "ffmpeg/ffprobe",
+      "version": "8.1.2",
+      "architecture": "arm64",
+      "sha256": "7c6b197b6a808180cdc5f911df196a37447a7f4d1997605a7d32b704c1587f72",
+      "source": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+      "licenseFile": "licenses/ffmpeg/COPYING.GPLv2",
+      "purpose": "Inspeccionar y validar resultados multimedia.",
+      "diagnosticArguments": [
+        "-version"
+      ],
+      "size": 22403688,
+      "requirement": "required"
+    },
+    {
+      "name": "pandoc",
+      "executable": "pandoc",
+      "relativePath": "pandoc/bin/pandoc",
+      "version": "3.10",
+      "architecture": "arm64",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source": "https://github.com/jgm/pandoc/releases/download/3.10/pandoc-3.10-arm64-macOS.zip",
+      "licenseFile": "licenses/pandoc/NOT_PROVIDED.txt",
+      "purpose": "Convertir texto, Markdown, HTML y EPUB de forma local.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "size": 0,
+      "requirement": "optional"
+    },
+    {
+      "name": "calibre",
+      "executable": "ebook-convert",
+      "relativePath": "calibre/Calibre.app/Contents/MacOS/ebook-convert",
+      "version": "9.11.0",
+      "architecture": "universal",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source": "https://download.calibre-ebook.com/9.11.0/calibre-9.11.0.dmg",
+      "licenseFile": "licenses/calibre/NOT_PROVIDED.txt",
+      "purpose": "Convertir libros electrónicos de forma local mediante ebook-convert.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "size": 0,
+      "requirement": "optional"
+    },
+    {
+      "name": "ghostscript",
+      "executable": "gs",
+      "relativePath": "ghostscript/bin/gs",
+      "version": "10.07.1",
+      "architecture": "arm64",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10071/ghostscript-10.07.1.tar.xz",
+      "licenseFile": "licenses/ghostscript/NOT_PROVIDED.txt",
+      "purpose": "Interpretar EPS y convertirlo de forma local con modo seguro.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "size": 0,
+      "requirement": "optional"
+    }
+  ]
+}

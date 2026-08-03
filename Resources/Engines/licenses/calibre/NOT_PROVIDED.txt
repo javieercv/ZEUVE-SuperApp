@@ -1,0 +1,3 @@
+Este motor opcional no está incluido todavía en esta copia del proyecto.
+Debe prepararse en un Mac Apple Silicon mediante Scripts/prepare_engines_macos.sh.
+El script sustituirá este aviso por la licencia oficial y generará hashes y tamaños reales.

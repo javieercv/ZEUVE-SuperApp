@@ -1,0 +1,12 @@
+{
+  "protocolVersion": "1.0",
+  "requestID": "8F20D208-E632-4A61-8B50-923C065FC125",
+  "kind": "progress",
+  "sequence": 1,
+  "payload": {
+    "completed": 12,
+    "total": 40,
+    "phase": "Analizando archivos",
+    "currentItem": "documento.pdf"
+  }
+}
