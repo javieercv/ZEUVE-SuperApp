@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "engines": [
+    {
+      "name": "yt-dlp",
+      "executable": "yt-dlp_macos",
+      "relativePath": "yt-dlp/yt-dlp_macos",
+      "version": "2026.08.19",
+      "architecture": "universal",
+      "sha256": "4f54eb67e4e96c7c3ffa49dd5deb81bc348bbb495080889b47d157d5c6d74443",
+      "source": "local-bundle:yt-dlp/yt-dlp_macos",
+      "licenseFile": "licenses/yt-dlp/LICENSE",
+      "purpose": "Analizar y descargar contenido público o autorizado de plataformas compatibles.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "size": 10596144,
+      "requirement": "required",
+      "bundleSHA256": "cf470f85a034067963bec05223087297de658224753a6fc2dd92e33e89b23d37",
+      "bundleSize": 130010634,
+      "bundleFileCount": 134
+    },
+    {
+      "name": "deno",
+      "executable": "deno",
+      "relativePath": "deno/deno",
+      "version": "2.9.0",
+      "architecture": "arm64",
+      "sha256": "a817b1c193d34b58375e92f4e5c0c5f5de1914bf03f9690b5491eddc7b7d4fa5",
+      "source": "local-bundle:deno/deno",
+      "licenseFile": "licenses/deno/LICENSE.md",
+      "purpose": "Ejecutar los desafíos JavaScript requeridos por YouTube a petición de yt-dlp.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "size": 82565888,
+      "requirement": "required"
+    },
+    {
+      "name": "ffmpeg",
+      "executable": "ffmpeg",
+      "relativePath": "ffmpeg/ffmpeg",
+      "version": "8.1.2",
+      "architecture": "arm64",
+      "sha256": "024568f6118b1a42b0631bca301b42642d1b4b52c6cde399752d0232bbd1fcda",
+      "source": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+      "licenseFile": "licenses/ffmpeg/COPYING.GPLv2",
+      "purpose": "Convertir audio, vídeo, animaciones, secuencias, metadatos y subtítulos.",
+      "diagnosticArguments": [
+        "-version"
+      ],
+      "size": 24318536,
+      "requirement": "required"
+    },
+    {
+      "name": "ffprobe",
+      "executable": "ffprobe",
+      "relativePath": "ffmpeg/ffprobe",
+      "version": "8.1.2",
+      "architecture": "arm64",
+      "sha256": "f5545fad1032835f08746a545dcbc37da9f937e3bcd24a14a6c735eb3c596686",
+      "source": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+      "licenseFile": "licenses/ffmpeg/COPYING.GPLv2",
+      "purpose": "Inspeccionar y validar resultados multimedia.",
+      "diagnosticArguments": [
+        "-version"
+      ],
+      "size": 24143272,
+      "requirement": "required"
+    },
+    {
+      "name": "gallery-dl",
+      "relativePath": "gallery-dl/gallery-dl",
+      "executable": "gallery-dl",
+      "licenseFile": "licenses/gallery-dl/LICENSE",
+      "version": "1.32.9",
+      "source": "https://pypi.org/project/gallery-dl/1.32.9/",
+      "purpose": "Analizar y descargar fotografías, vídeos, carruseles, álbumes y galerías compatibles.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "sha256": "e53ed89ee9d65281a2d905f37af795e923706d127eef11aa8ecb399fc670befe",
+      "size": 14194784,
+      "architecture": "arm64",
+      "requirement": "required"
+    },
+    {
+      "name": "instaloader-zeuve",
+      "relativePath": "instaloader/instaloader-zeuve",
+      "executable": "instaloader-zeuve",
+      "licenseFile": "licenses/instaloader/LICENSE",
+      "version": "4.15.3-zeuve.2",
+      "source": "https://pypi.org/project/instaloader/4.15.3/",
+      "purpose": "Resolver publicaciones públicas y catalogar contenido de Instagram, con sesión solo cuando sea necesaria.",
+      "diagnosticArguments": [
+        "--version"
+      ],
+      "sha256": "222697495f88e4d5e193dfea7315a60403080dff239d5fc582c6eab72536bb87",
+      "size": 11825632,
+      "architecture": "arm64",
+      "requirement": "required"
+    }
+  ]
+}

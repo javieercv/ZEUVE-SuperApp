@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "identifier": "com.zeuve.multimedia-inspector",
+  "name": "Inspector multimedia",
+  "summary": "Inspección técnica, reproducción multimedia amplia y edición estructural segura para audio y vídeo.",
+  "version": "0.7.0",
+  "minimumZEUVEVersion": "0.13.0",
+  "moduleAPI": "1.0",
+  "technology": "mixed",
+  "executionMode": "builtIn",
+  "permissions": [
+    "readUserSelectedFiles",
+    "writeUserSelectedFolder",
+    "executeBundledTools",
+    "openExternalApplications"
+  ],
+  "capabilities": [
+    "preview",
+    "progress",
+    "cancellation",
+    "history",
+    "undo",
+    "dragAndDrop",
+    "diagnostics",
+    "presets",
+    "favorites"
+  ],
+  "presentation": {
+    "systemImage": "waveform.path.ecg",
+    "category": "Multimedia",
+    "order": 60
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "protocolVersion": "1.0",
+  "requestID": "8F20D208-E632-4A61-8B50-923C065FC125",
+  "moduleID": "com.zeuve.example",
+  "action": "analyze",
+  "payload": {
+    "inputPaths": ["/Users/usuario/Documents/Entrada"],
+    "mode": "simple",
+    "preserveMetadata": true
+  }
+}

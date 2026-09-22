@@ -1,0 +1,112 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2986 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 54 790 Tm (Informe de corrección de build - ZEUVE 0.12.4) Tj
+1 0 0 1 54 775 Tm () Tj
+1 0 0 1 54 760 Tm (Fecha: 7 de septiembre de 2026) Tj
+1 0 0 1 54 745 Tm () Tj
+1 0 0 1 54 730 Tm (Resumen) Tj
+1 0 0 1 54 715 Tm (Se corrigió un error de compilación en el módulo Analizador de chats.) Tj
+1 0 0 1 54 700 Tm (El proyecto vuelve a compilar correctamente con Xcode.) Tj
+1 0 0 1 54 685 Tm () Tj
+1 0 0 1 54 670 Tm (Archivo afectado) Tj
+1 0 0 1 54 655 Tm (Sources/ChatAnalyzerModule/Analysis/ChatStoreAnalytics.swift) Tj
+1 0 0 1 54 640 Tm () Tj
+1 0 0 1 54 625 Tm (Ubicación exacta) Tj
+1 0 0 1 54 610 Tm (Función: ChatStoreAnalytics.participantsSnapshot\(...\)) Tj
+1 0 0 1 54 595 Tm (Línea afectada originalmente: 161) Tj
+1 0 0 1 54 580 Tm () Tj
+1 0 0 1 54 565 Tm (Qué fallaba exactamente) Tj
+1 0 0 1 54 550 Tm (Swift 6 mostraba el error:) Tj
+1 0 0 1 54 535 Tm (The compiler is unable to type-check this expression in reasonable time; try breaking up) Tj
+1 0 0 1 54 520 Tm (the expression into distinct sub-expressions) Tj
+1 0 0 1 54 505 Tm () Tj
+1 0 0 1 54 490 Tm (La expresión problemática construía y ordenaba las estadísticas de participantes en una) Tj
+1 0 0 1 54 475 Tm (sola cadena:) Tj
+1 0 0 1 54 460 Tm (let statistics = accumulators.map { name, accumulator in) Tj
+1 0 0 1 54 445 Tm (    accumulator.statistics\(name: name, totalPersonal: totalPersonal\)) Tj
+1 0 0 1 54 430 Tm (}.sorted { $0.messages == $1.messages ? $0.name < $1.name : $0.messages > $1.messages }) Tj
+1 0 0 1 54 415 Tm () Tj
+1 0 0 1 54 400 Tm (El problema no era un fallo de lógica del Analizador, sino un problema de inferencia y) Tj
+1 0 0 1 54 385 Tm (comprobación de tipos del compilador.) Tj
+1 0 0 1 54 370 Tm (La combinación de map, cierre destructurado, retorno ParticipantStatistics y sorted con) Tj
+1 0 0 1 54 355 Tm (una expresión ternaria hacía que Swift no pudiera resolver la expresión en tiempo) Tj
+1 0 0 1 54 340 Tm (razonable.) Tj
+1 0 0 1 54 325 Tm () Tj
+1 0 0 1 54 310 Tm (Cómo se solucionó exactamente) Tj
+1 0 0 1 54 295 Tm (Se sustituyó la cadena única por pasos explícitos:) Tj
+1 0 0 1 54 280 Tm (var statistics: [ParticipantStatistics] = []) Tj
+1 0 0 1 54 265 Tm (statistics.reserveCapacity\(accumulators.count\)) Tj
+1 0 0 1 54 250 Tm (for \(name, accumulator\) in accumulators {) Tj
+1 0 0 1 54 235 Tm (    statistics.append\(accumulator.statistics\(name: name, totalPersonal: totalPersonal\)\)) Tj
+1 0 0 1 54 220 Tm (}) Tj
+1 0 0 1 54 205 Tm (statistics.sort {) Tj
+1 0 0 1 54 190 Tm (    if $0.messages == $1.messages {) Tj
+1 0 0 1 54 175 Tm (        return $0.name < $1.name) Tj
+1 0 0 1 54 160 Tm (    }) Tj
+1 0 0 1 54 145 Tm (    return $0.messages > $1.messages) Tj
+1 0 0 1 54 130 Tm (}) Tj
+1 0 0 1 54 115 Tm () Tj
+1 0 0 1 54 100 Tm (Equivalencia funcional) Tj
+1 0 0 1 54 85 Tm (El comportamiento se mantiene igual:) Tj
+1 0 0 1 54 70 Tm (- se generan las mismas estadísticas por participante;) Tj
+1 0 0 1 54 55 Tm (- se usa el mismo cálculo de ParticipantStatistics;) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 914 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 54 790 Tm (- se ordena por número de mensajes de mayor a menor;) Tj
+1 0 0 1 54 775 Tm (- en empate, se ordena alfabéticamente por nombre.) Tj
+1 0 0 1 54 760 Tm () Tj
+1 0 0 1 54 745 Tm (Alcance del cambio) Tj
+1 0 0 1 54 730 Tm (Solo se modificó ChatStoreAnalytics.swift.) Tj
+1 0 0 1 54 715 Tm (No se modificó la interfaz, privacidad, red, persistencia, arquitectura, dependencias ni) Tj
+1 0 0 1 54 700 Tm (comportamiento funcional.) Tj
+1 0 0 1 54 685 Tm () Tj
+1 0 0 1 54 670 Tm (Validación realizada) Tj
+1 0 0 1 54 655 Tm (1. XcodeRefreshCodeIssuesInFile sobre ChatStoreAnalytics.swift: sin errores.) Tj
+1 0 0 1 54 640 Tm (2. BuildProject: compilación completada correctamente.) Tj
+1 0 0 1 54 625 Tm (3. Tiempo de build informado por Xcode: 13.681 s.) Tj
+1 0 0 1 54 610 Tm () Tj
+1 0 0 1 54 595 Tm (Estado final) Tj
+1 0 0 1 54 580 Tm (El proyecto compila correctamente tras la corrección.) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000003285 00000 n 
+0000003411 00000 n 
+0000004376 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+4446
+%%EOF

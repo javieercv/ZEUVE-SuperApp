@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "identifier": "com.zeuve.instagram-followers",
+  "name": "Comparador de seguidores de Instagram",
+  "summary": "Compara localmente seguidores y cuentas seguidas a partir de una exportación de Instagram.",
+  "version": "0.1.0",
+  "minimumZEUVEVersion": "0.8.0",
+  "moduleAPI": "1.0",
+  "technology": "swift",
+  "executionMode": "builtIn",
+  "permissions": [
+    "readUserSelectedFiles",
+    "writeUserSelectedFolder",
+    "openExternalApplications"
+  ],
+  "capabilities": [
+    "preview",
+    "progress",
+    "cancellation",
+    "history",
+    "dragAndDrop"
+  ],
+  "presentation": {
+    "systemImage": "person.2.badge.gearshape",
+    "category": "Análisis",
+    "order": 35
+  }
+}

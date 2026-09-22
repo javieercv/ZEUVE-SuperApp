@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "identifier": "com.zeuve.chat-analyzer",
+  "name": "Analizador de chats",
+  "summary": "Analiza conversaciones exportadas de WhatsApp e Instagram de forma privada y local.",
+  "version": "0.1.6",
+  "minimumZEUVEVersion": "0.5.0",
+  "moduleAPI": "1.0",
+  "technology": "swift",
+  "executionMode": "builtIn",
+  "permissions": [
+    "readUserSelectedFiles"
+  ],
+  "capabilities": [
+    "preview",
+    "progress",
+    "cancellation",
+    "history",
+    "dragAndDrop"
+  ],
+  "presentation": {
+    "systemImage": "bubble.left.and.bubble.right",
+    "category": "Análisis",
+    "order": 30
+  }
+}

@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Swift Package Manager / build products
+.build/
+DerivedData/
+*.dSYM/
+__pycache__/
+*.py[cod]
+
+# Xcode user-specific state
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# SwiftPM's local Xcode integration
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+.swiftpm/xcode/xcuserdata/

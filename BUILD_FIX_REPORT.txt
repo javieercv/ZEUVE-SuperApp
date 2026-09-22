@@ -1,0 +1,57 @@
+Informe de correccion de build - ZEUVE 0.15.0.0
+Fecha: 2026-09-08
+
+Resumen
+Se ha corregido el fallo que impedia compilar el proyecto desde Xcode.
+
+Problema encontrado
+El build fallaba en:
+
+Sources/ZEUVEApp/MultimediaInspector/Spectrogram/SpectrogramView.swift:69
+
+Errores informados por Xcode:
+- Value of type 'MultimediaInspectorViewModel' has no dynamic member 'preferences' using key path from root type 'MultimediaInspectorViewModel'
+- Referencing subscript 'subscript(dynamicMember:)' requires wrapper 'ObservedObject<MultimediaInspectorViewModel>.Wrapper'
+- Instance method 'tag(_:includeOptional:)' requires that 'Binding<Subject.Element>' conform to 'Hashable'
+
+Causa
+La vista del espectrograma intentaba leer:
+
+model.preferences.allowedFFTSizes
+
+En esta version del ViewModel no existe una propiedad publica llamada 'preferences'. Las preferencias cargadas se exponen para la interfaz mediante:
+
+model.defaultPreferences
+
+Cambio realizado
+En Sources/ZEUVEApp/MultimediaInspector/Spectrogram/SpectrogramView.swift se ha cambiado el origen de los tamanos FFT permitidos:
+
+Antes:
+ForEach(model.preferences.allowedFFTSizes, id: \.self) { Text(String($0)).tag($0) }
+
+Despues:
+ForEach(model.defaultPreferences.allowedFFTSizes, id: \.self) { Text(String($0)).tag($0) }
+
+Alcance del cambio
+- No se han cambiado arquitectura, dependencias, motores, red, privacidad, persistencia ni empaquetado.
+- No se ha cambiado el comportamiento visible previsto del selector FFT.
+- No se han modificado archivos originales del usuario ni rutas de salida.
+- No se han anadido TODOs, stubs ni codigo temporal.
+
+Validacion realizada
+1. Se ejecuto BuildProject antes de corregir.
+   Resultado: fallo confirmado en SpectrogramView.swift:69.
+
+2. Se ejecuto BuildProject despues de corregir.
+   Resultado: compilacion correcta.
+
+Log de build correcto:
+/var/folders/16/hrvl56ld07z1tr7mx5lw91180000gn/T/ActionArtifacts/8BBCF468-FD49-4BBC-B2F7-F7A8B51E9BEE/BuildProject/BuildProject-Log-20260908-225312.txt
+
+Incidencias durante la validacion
+- El comando 'rg' no estaba disponible en el entorno de terminal.
+- La comprobacion rapida XcodeRefreshCodeIssuesInFile no encontro el archivo usando la ruta logica 'ZEUVE/App/MultimediaInspector/Spectrogram/SpectrogramView.swift', por lo que se uso BuildProject como validacion principal.
+- 'git diff' no se pudo usar desde esta carpeta porque el comando informo que no era un repositorio Git en esa ruta.
+
+Estado final
+El proyecto compila correctamente con BuildProject tras esta correccion.
