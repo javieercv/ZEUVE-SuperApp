@@ -17,7 +17,7 @@ Esta carpeta separa la documentación operativa —la que se consulta para dise�
 
 - [Fundamentos](Fundamentos/): arquitectura, alcance funcional, seguridad, compilación, pruebas y contexto de trabajo.
 - [Desarrollo de módulos](Modulos/Desarrollo/): guía, API, checklist, ejemplos documentados e instrucciones para asistentes.
-- [Documentación funcional de módulos](Modulos/Funcionales/): Organizador/limpiador, descargador, conversor, analizador de chats, comparador de Instagram e Inspector multimedia.
+- [Documentación funcional de módulos](Modulos/Funcionales/): [Organizador](Modulos/Funcionales/ORGANIZER.md), [Limpiador](Modulos/Funcionales/CLEANER.md), [Descargador universal](Modulos/Funcionales/UNIVERSAL_DOWNLOADER.md), [Conversor universal](Modulos/Funcionales/UNIVERSAL_CONVERTER.md), [Analizador de chats](Modulos/Funcionales/CHAT_ANALYZER.md), [Comparador de Instagram](Modulos/Funcionales/INSTAGRAM_FOLLOWERS_COMPARATOR.md) e [Inspector multimedia](Modulos/Funcionales/MULTIMEDIA_INSPECTOR.md).
 - [Motores](Motores/): gestión y empaquetado de motores, además de las rutas legacy que se mantienen como referencia de compatibilidad.
 
 ## Histórico
