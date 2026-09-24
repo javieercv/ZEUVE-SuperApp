@@ -1,6 +1,6 @@
 # Documentación de ZEUVE
 
-Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.3.0— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
+Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.4.0— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
 
 Si una afirmación histórica contradice una fuente vigente o el código actual, no se reescribe el histórico: se usa la fuente vigente y se corrige cualquier documentación viva desactualizada.
 
@@ -63,6 +63,8 @@ La instantánea empaquetable concreta se define en `../Resources/Engines/engines
 ## Histórico
 
 `Historico/` conserva lo que se entregó, implementó o probó en cada versión. No se actualiza para hacerlo coincidir con el presente y no debe usarse como especificación vigente cuando exista una fuente equivalente en `Fundamentos/`, `Modulos/` o `Motores/`.
+
+Evidencia de la entrega actual: [implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.4.0.md), [pruebas y recorrido de 38 puntos](Historico/Pruebas/TEST_RESULTS_0.20.4.0.md) y [entrega](Historico/Entregas/DELIVERY_0.20.4.0.md).
 
 - [`Historico/Entregas/`](Historico/Entregas/): notas de entrega.
 - [`Historico/Implementacion/`](Historico/Implementacion/): informes de implementación.

@@ -2,7 +2,7 @@
 
 ## Distribución actual
 
-La estructura exacta debe coincidir con `Resources/Engines/engines.json`. En 0.20.3.0 incluye al menos:
+La estructura exacta debe coincidir con `Resources/Engines/engines.json`. En 0.20.4.0 incluye al menos:
 
 ```text
 ZEUVE.app/Contents/Resources/Engines/

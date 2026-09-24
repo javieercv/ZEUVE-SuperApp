@@ -18,6 +18,7 @@ final class CleanerViewModel: ObservableObject {
     @Published var lastHistoryID: UUID?
     @Published var spaceRoot: URL
     @Published var spaceTree: CleanerStorageNode?
+    @Published var spaceEmptyMessage: String?
     @Published var spaceMinimumMB: Int = 0
     @Published var conservedPaths: [String] = []
 
@@ -115,10 +116,11 @@ final class CleanerViewModel: ObservableObject {
     }
 
     func conserve(_ candidate: CleanerCandidate, value: Bool = true) {
+        guard let repository else { errorMessage = "No se pudo guardar la decisión de conservar."; return }
         do {
-            try repository?.keep(path: candidate.url.path, value: value)
-            if value { setSelected(false, candidateID: candidate.id) }
-            conservedPaths = ((try? repository?.keptPaths()) ?? []).sorted()
+            try repository.keep(path: candidate.url.path, value: value)
+            if value { plan = CleanerPlanner.markingKept(candidate.id, in: plan) }
+            conservedPaths = (try repository.keptPaths()).sorted()
             resultMessage = value ? "Elemento marcado como Conservado." : "Se ha revocado la decisión de conservar."
         } catch { errorMessage = error.localizedDescription }
     }
@@ -159,9 +161,10 @@ final class CleanerViewModel: ObservableObject {
         do {
             let output = try await executionService.execute(plan: plan, mode: preferences.deletionMode, kind: kind ?? (shouldRefresh ? "cleaning" : "uninstall"))
             let summary = output.summary
-            if preferences.deletionMode == .trash && summary.removedCount > 0 && undoService != nil { lastHistoryID = output.historyID }
+            if output.undoAvailable && undoService != nil { lastHistoryID = output.historyID }
             executionSummary = summary
             resultMessage = "\(summary.removedCount) eliminados · \(summary.skippedCount) omitidos · \(summary.failedCount) fallidos."
+            if let warning = output.historyWarning { resultMessage = "\(resultMessage ?? "") \(warning)" }
             plan = CleanerRemovalPlan(candidates: [])
             analysis = nil
             uninstallAnalysis = nil
@@ -187,7 +190,7 @@ final class CleanerViewModel: ObservableObject {
             let summary = try await undoService.undo(historyID: historyID)
             resultMessage = "\(summary.restoredCount) elementos restaurados; \(summary.skippedCount + summary.failedCount) no se pudieron restaurar."
             executionSummary = nil
-            if summary.restoredCount > 0 { lastHistoryID = nil }
+            if try !undoService.hasPendingItems(historyID: historyID) { lastHistoryID = nil }
         } catch { errorMessage = error.localizedDescription }
     }
 
@@ -267,10 +270,12 @@ final class CleanerViewModel: ObservableObject {
                 spaceScanTask = nil
                 if await coordinator.shouldCancel(id: operationID) {
                     resultMessage = "Análisis de espacio cancelado."
-                } else if minimum > 0, let node {
-                    spaceTree = Self.filter(node: node, minimum: minimum)
+                } else if let node {
+                    spaceTree = minimum > 0 ? Self.filter(node: node, minimum: minimum) : node
+                    spaceEmptyMessage = spaceTree == nil ? "Ningún elemento de esta carpeta supera el tamaño mínimo elegido. Reduce el mínimo y vuelve a analizar." : nil
                 } else {
-                    spaceTree = node
+                    spaceTree = nil
+                    spaceEmptyMessage = "No se pudo analizar esta carpeta. Comprueba que sigue disponible y que ZEUVE tiene acceso."
                 }
                 spaceRoot = target
                 try? await coordinator.finish(id: operationID)

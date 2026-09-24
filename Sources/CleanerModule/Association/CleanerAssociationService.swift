@@ -51,7 +51,7 @@ public final class CleanerAssociationService: @unchecked Sendable {
                 var app: CleanerAppInventoryItem?; var evidences: [CleanerEvidence] = []
                 if let exact = historicalApps.first(where: { item in
                     guard let bundleID = item.identity.bundleID else { return false }
-                    return matchNames.contains { $0 == bundleID || $0.hasPrefix(bundleID) }
+                    return matchNames.contains(bundleID)
                 }) {
                     app = exact; evidences.append(.init(strength: .strong, explanation: "Coincide con el Bundle ID observado de la aplicación."))
                 } else if let exact = historicalApps.first(where: { item in item.identity.appGroups.contains(rawName) }) {

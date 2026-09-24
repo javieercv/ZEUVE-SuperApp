@@ -114,6 +114,46 @@ final class CleanerModuleTests: XCTestCase {
         XCTAssertFalse(result.candidates.first?.selected ?? true)
     }
 
+    func testConserveImmediatelyRemovesSelectionAndBlocksReselection() throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let candidate = CleanerCandidate(url: root.appendingPathComponent("cache"), category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "fixture", selected: true)
+        let kept = CleanerPlanner.markingKept(candidate.id, in: .init(candidates: [candidate]))
+        XCTAssertEqual(kept.candidates.first?.status, .keptByUser)
+        XCTAssertTrue(kept.selectedCandidates.isEmpty)
+        XCTAssertFalse(CleanerPlanner.canSelect(kept.candidates[0]))
+        XCTAssertTrue(CleanerPlanner.settingSelection(true, candidateID: candidate.id, in: kept).selectedCandidates.isEmpty)
+    }
+
+    func testBundleIDPrefixDoesNotCreateStrongAssociation() throws {
+        let home = try tempDirectory(); defer { try? FileManager.default.removeItem(at: home) }
+        let caches = home.appendingPathComponent("Library/Caches")
+        try FileManager.default.createDirectory(at: caches, withIntermediateDirectories: true)
+        let unrelated = caches.appendingPathComponent("com.test.applicationExtra")
+        try FileManager.default.createDirectory(at: unrelated, withIntermediateDirectories: true)
+        var app = CleanerAppInventoryItem(identity: .init(bundleID: "com.test.application", name: "Application", path: "/missing/Application.app"))
+        app.availability = .missing
+        let result = CleanerAssociationService(homeDirectory: home, systemLibraryRoot: nil).scan(installedApps: [], historicalApps: [app], keptPaths: [], runningBundleIDs: [])
+        XCTAssertTrue(result.candidates.isEmpty, "Un prefijo sin identidad propia no debe atribuirse a la app")
+    }
+
+    func testUnsignedUninstallDoesNotIncludeOtherUnsignedApplicationData() throws {
+        let home = try tempDirectory(); defer { try? FileManager.default.removeItem(at: home) }
+        let caches = home.appendingPathComponent("Library/Caches")
+        try FileManager.default.createDirectory(at: caches, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: caches.appendingPathComponent("Alpha"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: caches.appendingPathComponent("Beta"), withIntermediateDirectories: true)
+        let appRoot = home.appendingPathComponent("Applications")
+        try FileManager.default.createDirectory(at: appRoot, withIntermediateDirectories: true)
+        let appURL = appRoot.appendingPathComponent("Alpha.app")
+        try FileManager.default.createDirectory(at: appURL, withIntermediateDirectories: true)
+        let alpha = CleanerAppInventoryItem(identity: .init(bundleID: nil, name: "Alpha", path: appURL.path))
+        let beta = CleanerAppInventoryItem(identity: .init(bundleID: nil, name: "Beta", path: appRoot.appendingPathComponent("Beta.app").path))
+        let analyzer = CleanerUninstallAnalyzer(identityProvider: TestIdentityProvider(paths: [:]), associationService: CleanerAssociationService(homeDirectory: home, systemLibraryRoot: nil))
+        let result = analyzer.analyze(application: alpha, historicalApps: [alpha, beta], keptPaths: [], safeSelection: false)
+        XCTAssertTrue(result.plan.candidates.contains { $0.url.lastPathComponent == "Alpha" })
+        XCTAssertFalse(result.plan.candidates.contains { $0.url.lastPathComponent == "Beta" })
+    }
+
     func testBrokenLaunchItemIsDetectedWithoutTouchingRealLaunchAgents() throws {
         let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
         let plist = root.appendingPathComponent("broken.plist")
@@ -129,6 +169,17 @@ final class CleanerModuleTests: XCTestCase {
         try FileManager.default.setAttributes([.modificationDate: Date(timeIntervalSinceNow: -120 * 86_400)], ofItemAtPath: installer.path)
         let candidate = try XCTUnwrap(CleanerInstallerScanner().scan(roots: [root], olderThanDays: 90).first)
         XCTAssertEqual(candidate.category, .installer); XCTAssertEqual(candidate.confidence, .low); XCTAssertFalse(candidate.canBeSafelyPreselected)
+    }
+
+    func testOverlappingInstallerRootsDoNotDuplicateCandidates() throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let nested = root.appendingPathComponent("nested")
+        try FileManager.default.createDirectory(at: nested, withIntermediateDirectories: true)
+        let installer = nested.appendingPathComponent("old.dmg")
+        try Data("fixture".utf8).write(to: installer)
+        try FileManager.default.setAttributes([.modificationDate: Date(timeIntervalSinceNow: -120 * 86_400)], ofItemAtPath: installer.path)
+        let candidates = CleanerInstallerScanner().scan(roots: [root, nested], olderThanDays: 90)
+        XCTAssertEqual(candidates.count, 1)
     }
 
     func testXcodeScannerExcludesArchivesAndAvoidsOverlappingDerivedDataRoot() throws {
@@ -167,6 +218,103 @@ final class CleanerModuleTests: XCTestCase {
         try Data("new object".utf8).write(to: file)
         let conflicted = try await undo.undo(historyID: execution2.historyID); XCTAssertEqual(conflicted.results.first?.status, .restoreConflict)
         XCTAssertEqual(try String(contentsOf: file, encoding: .utf8), "new object")
+    }
+
+    func testLateConserveDecisionSkipsPreviouslySelectedCandidate() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite"))
+        let repo = try CleanerRepository(database: db)
+        let file = root.appendingPathComponent("cache")
+        try Data("keep".utf8).write(to: file)
+        let fingerprint = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+        let candidate = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "fixture", selected: true, fingerprint: fingerprint)
+        try repo.keep(path: file.path, value: true)
+        let output = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: nil).execute(plan: .init(candidates: [candidate]), mode: .permanent)
+        XCTAssertEqual(output.summary.skippedCount, 1)
+        XCTAssertEqual(try Data(contentsOf: file), Data("keep".utf8))
+    }
+
+    func testPermanentRemovalAffectsOnlySelectedDisposableFixture() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let selected = root.appendingPathComponent("selected")
+        let untouched = root.appendingPathComponent("untouched")
+        try Data("remove".utf8).write(to: selected)
+        try Data("keep".utf8).write(to: untouched)
+        let fingerprint = try XCTUnwrap(CleanerFileInspection.fingerprint(at: selected))
+        let candidate = CleanerCandidate(url: selected, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "fixture", selected: true, fingerprint: fingerprint)
+        let output = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: nil, history: nil).execute(plan: .init(candidates: [candidate]), mode: .permanent)
+        XCTAssertEqual(output.summary.removedCount, 1)
+        XCTAssertFalse(output.undoAvailable)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: selected.path))
+        XCTAssertEqual(try Data(contentsOf: untouched), Data("keep".utf8))
+    }
+
+    func testPartialUndoKeepsRemainingItemAvailableForRetry() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite"))
+        let repo = try CleanerRepository(database: db)
+        let history = try HistoryRepository(database: db)
+        let mutator = TestTrashMutator(trashRoot: root.appendingPathComponent("TestTrash"))
+        let files = [root.appendingPathComponent("one"), root.appendingPathComponent("two")]
+        var candidates: [CleanerCandidate] = []
+        for (index, file) in files.enumerated() {
+            try Data("original-\(index)".utf8).write(to: file)
+            let fingerprint = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+            candidates.append(.init(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "fixture", selected: true, fingerprint: fingerprint))
+        }
+        let output = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: candidates), mode: .trash)
+        XCTAssertEqual(output.summary.removedCount, 2)
+        try Data("conflict".utf8).write(to: files[0])
+        let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator)
+        let partial = try await undo.undo(historyID: output.historyID)
+        XCTAssertEqual(partial.restoredCount, 1)
+        XCTAssertTrue(try undo.hasPendingItems(historyID: output.historyID))
+        XCTAssertEqual(try Data(contentsOf: files[0]), Data("conflict".utf8))
+        try FileManager.default.removeItem(at: files[0])
+        let completed = try await undo.undo(historyID: output.historyID)
+        XCTAssertEqual(completed.restoredCount, 1)
+        XCTAssertFalse(try undo.hasPendingItems(historyID: output.historyID))
+        XCTAssertEqual(try Data(contentsOf: files[0]), Data("original-0".utf8))
+        XCTAssertEqual(try Data(contentsOf: files[1]), Data("original-1".utf8))
+    }
+
+    func testHistoryFailureDoesNotHideCompletedTrashMoveOrUndo() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite"))
+        let repo = try CleanerRepository(database: db)
+        let history = try HistoryRepository(database: db)
+        try db.execute("CREATE TRIGGER qa_history_failure BEFORE INSERT ON operation_history BEGIN SELECT RAISE(ABORT, 'qa history failure'); END")
+        let file = root.appendingPathComponent("cache")
+        try Data("fixture".utf8).write(to: file)
+        let fp = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+        let candidate = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "fixture", selected: true, fingerprint: fp)
+        let mutator = TestTrashMutator(trashRoot: root.appendingPathComponent("TestTrash"))
+        let output = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [candidate]), mode: .trash)
+        XCTAssertEqual(output.summary.removedCount, 1)
+        XCTAssertTrue(output.undoAvailable)
+        XCTAssertNotNil(output.historyWarning)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
+        let undone = try await CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator).undo(historyID: output.historyID)
+        XCTAssertEqual(undone.restoredCount, 1)
+        XCTAssertEqual(try Data(contentsOf: file), Data("fixture".utf8))
+    }
+
+    func testUndoRegistrationFailureRollsTrashMoveBack() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite"))
+        let repo = try CleanerRepository(database: db)
+        let history = try HistoryRepository(database: db)
+        try db.execute("CREATE TRIGGER qa_undo_failure BEFORE INSERT ON cleaner_undo_items BEGIN SELECT RAISE(ABORT, 'qa undo failure'); END")
+        let file = root.appendingPathComponent("cache")
+        try Data("fixture".utf8).write(to: file)
+        let fp = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+        let candidate = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "fixture", selected: true, fingerprint: fp)
+        let trash = root.appendingPathComponent("TestTrash")
+        let output = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: TestTrashMutator(trashRoot: trash)).execute(plan: .init(candidates: [candidate]), mode: .trash)
+        XCTAssertEqual(output.summary.failedCount, 1)
+        XCTAssertFalse(output.undoAvailable)
+        XCTAssertEqual(try Data(contentsOf: file), Data("fixture".utf8))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: trash.path).count, 0)
     }
 
     func testSystemTrashAndUndoRestoreDisposableFileIntact() async throws {

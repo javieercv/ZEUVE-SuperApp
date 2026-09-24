@@ -49,6 +49,7 @@ public final class CleanerRepository: @unchecked Sendable {
         else { try database.execute("DELETE FROM cleaner_user_decisions WHERE path=?",bindings:[.text(path)]) }
     }
     public func keptPaths() throws -> Set<String> { Set(try database.query("SELECT path FROM cleaner_user_decisions WHERE decision='keep'").compactMap{try? $0.string("path")}) }
+    public func isKept(path:String)throws->Bool{!((try database.query("SELECT path FROM cleaner_user_decisions WHERE path=? AND decision='keep' LIMIT 1",bindings:[.text(path)])).isEmpty)}
 
     public func saveScanMetadata(_ summary: CleanerScanSummary) throws { try database.execute("INSERT INTO cleaner_scan_metadata(id,created_at,coverage,logical_size,allocated_size,issue_count) VALUES(?,?,?,?,?,?)",bindings:[.text(UUID().uuidString),.text(Self.date(summary.finishedAt)),.text(summary.coverage.rawValue),.integer(summary.scannedLogicalBytes),.integer(summary.potentialRecoverableBytes),.integer(Int64(summary.inaccessibleLocations))]) }
 

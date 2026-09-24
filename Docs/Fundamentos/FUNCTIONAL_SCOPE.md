@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.3.0
+# Alcance funcional vigente — ZEUVE 0.20.4.0
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 
@@ -64,7 +64,7 @@ Calibre, Ghostscript y LibreOffice no forman parte del producto actual. Ebook/EP
 
 No es un editor temporal/creativo y no recodifica audio/vídeo dentro del Inspector; una transformación que exige transcode pertenece al Conversor.
 
-## Limpiador 0.1.1
+## Limpiador 0.1.2
 
 - Inventario local de aplicaciones y asociaciones/residuos.
 - Análisis de cachés/logs/tmp, restos, instaladores y contenido regenerable de desarrollo según reglas conservadoras.

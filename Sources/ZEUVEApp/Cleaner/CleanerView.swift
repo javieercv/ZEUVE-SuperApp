@@ -185,7 +185,7 @@ struct CleanerView: View {
             if let tree = model.spaceTree {
                 ScrollView { SpaceNodeView(node: tree).padding(16) }
             } else {
-                ContentUnavailableView("Explorador de espacio", systemImage: "externaldrive.fill", description: Text("Elige una carpeta o analiza tu carpeta de usuario. Los enlaces simbólicos no se siguen."))
+                ContentUnavailableView(model.spaceEmptyMessage == nil ? "Explorador de espacio" : "Sin resultados de espacio", systemImage: "externaldrive.fill", description: Text(model.spaceEmptyMessage ?? "Elige una carpeta o analiza tu carpeta de usuario. Los enlaces simbólicos no se siguen."))
             }
         }
     }

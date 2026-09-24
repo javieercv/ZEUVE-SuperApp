@@ -1,4 +1,4 @@
-# Contexto operativo para agentes — ZEUVE 0.20.3.0
+# Contexto operativo para agentes — ZEUVE 0.20.4.0
 
 Este documento es un mapa rápido. No sustituye a `SUPERAPP_PROJECT_RULES.md`, `PROJECT_DECISIONS.md` ni a la documentación funcional concreta.
 
@@ -15,8 +15,8 @@ No existe una dependencia de contexto en `../../.agents/skills/` ni debe suponer
 
 ## Estado de producto
 
-- ZEUVE: `0.20.3.0`.
-- Marketing: `0.20.3`.
+- ZEUVE: `0.20.4.0`.
+- Marketing: `0.20.4`.
 - Build: `69`.
 - Plataforma: macOS 14+ Apple Silicon.
 - Swift 6; SwiftUI + AppKit; Hardened Runtime; sin App Sandbox en esta fase.
@@ -31,7 +31,7 @@ No existe una dependencia de contexto en `../../.agents/skills/` ni debe suponer
 | `com.zeuve.universal-converter` | 0.3.0 | ⌘4 |
 | `com.zeuve.instagram-followers` | 0.1.0 | ⌘5 |
 | `com.zeuve.multimedia-inspector` | 0.7.2 | ⌘6 |
-| `com.zeuve.cleaner` | 0.1.1 | ⌘7 |
+| `com.zeuve.cleaner` | 0.1.2 | ⌘7 |
 
 Historial usa ⌘8 por defecto. `BuiltInModuleCatalog` conserva IDs/defaults; `NavigationPreferences` determina orden y atajos efectivos personalizados.
 

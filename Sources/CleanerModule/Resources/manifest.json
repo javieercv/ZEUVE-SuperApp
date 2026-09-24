@@ -3,7 +3,7 @@
   "identifier": "com.zeuve.cleaner",
   "name": "Limpiador",
   "summary": "Analiza almacenamiento, residuos de aplicaciones y elementos regenerables con limpieza revisable y segura.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "minimumZEUVEVersion": "0.20.0",
   "moduleAPI": "1.0",
   "technology": "swift",

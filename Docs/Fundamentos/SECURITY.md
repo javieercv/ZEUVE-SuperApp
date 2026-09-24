@@ -1,4 +1,4 @@
-# Seguridad y privacidad — ZEUVE 0.20.3.0
+# Seguridad y privacidad — ZEUVE 0.20.4.0
 
 ## Principio general
 
@@ -70,4 +70,4 @@ Las importaciones deben impedir path traversal, rutas absolutas, colisiones norm
 
 ## Plataforma
 
-La app usa Hardened Runtime. No está dentro de App Sandbox en 0.20.3.0; por ello las protecciones de alcance, validación, permisos internos y UI no pueden delegarse al sandbox.
+La app usa Hardened Runtime. No está dentro de App Sandbox en 0.20.4.0; por ello las protecciones de alcance, validación, permisos internos y UI no pueden delegarse al sandbox.

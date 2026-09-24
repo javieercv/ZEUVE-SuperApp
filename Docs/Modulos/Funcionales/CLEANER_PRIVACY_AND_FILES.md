@@ -36,6 +36,8 @@ Los recorridos recursivos no siguen symlinks. Si el propio enlace es candidato, 
 
 Preferences, Application Support, Containers, Group Containers, bases de datos, partidas, documentos, configuraciones y plugins se consideran potencialmente persistentes. No forman parte de la selección automática segura.
 
+Una decisión «Conservar» se aplica al plan visible y se revalida desde SQLite justo antes de cualquier retirada, incluso si el plan se formó antes de tomar esa decisión.
+
 Los App Groups compartidos por otra aplicación instalada se bloquean. Si una aplicación estaba en un volumen externo actualmente ausente, se clasifica como `Aplicación actualmente no disponible` y sus datos no se convierten automáticamente en residuos.
 
 ## Papelera, permanente y revalidación

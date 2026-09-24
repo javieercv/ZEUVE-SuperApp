@@ -6,7 +6,7 @@ Versión de protocolo: `1.0`.
 
 ## 1. Alcance actual
 
-ZEUVE 0.20.3.0 registra siete módulos oficiales incorporados mediante `ModuleRegistry`: Organizador, Descargador universal, Analizador de chats, Conversor universal, Comparador de seguidores de Instagram, Inspector multimedia y Limpiador.
+ZEUVE 0.20.4.0 registra siete módulos oficiales incorporados mediante `ModuleRegistry`: Organizador, Descargador universal, Analizador de chats, Conversor universal, Comparador de seguidores de Instagram, Inspector multimedia y Limpiador.
 
 El contrato también define mensajes para procesos aislados, pero la instalación e importación de módulos externos todavía no está implementada. No debe presentarse esa función como disponible.
 
@@ -73,7 +73,7 @@ Este campo describe; no concede permisos ni decide por sí solo el aislamiento.
 
 ### `builtIn`
 
-Módulo oficial integrado en el proyecto y enlazado a la app. Es el único modo funcional para módulos completos en ZEUVE 0.20.3.0.
+Módulo oficial integrado en el proyecto y enlazado a la app. Es el único modo funcional para módulos completos en ZEUVE 0.20.4.0.
 
 ### `isolatedProcess`
 

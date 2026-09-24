@@ -6,6 +6,8 @@ import ZEUVEOperations
 public struct CleanerExecutionOutput: Sendable {
     public let summary: CleanerExecutionSummary
     public let historyID: UUID
+    public let undoAvailable: Bool
+    public let historyWarning: String?
 }
 
 public final class CleanerExecutionService: @unchecked Sendable {
@@ -36,6 +38,7 @@ public final class CleanerExecutionService: @unchecked Sendable {
         )
         var results: [CleanerItemExecutionResult] = []
         var deletedBytes: Int64 = 0
+        var recordedUndoItems = 0
         var blockedBundleIDs = Set<String>()
         var blockedAppNames = Set<String>()
         if kind == "uninstall" {
@@ -71,8 +74,21 @@ public final class CleanerExecutionService: @unchecked Sendable {
                     continue
                 }
 
+                let kept: Bool
+                do { kept = try cleanerRepository?.isKept(path: candidate.url.path) ?? false }
+                catch {
+                    results.append(.init(sourcePath: candidate.url.path, status: .failed, message: "No se pudo revalidar la decisión «Conservar»."))
+                    if kind == "uninstall", candidate.category == .application {
+                        if let bundleID = candidate.associatedBundleID { blockedBundleIDs.insert(bundleID) }
+                        if let name = candidate.associatedAppName { blockedAppNames.insert(name) }
+                    }
+                    continue
+                }
+
                 let failure: CleanerItemExecutionResult?
-                if !fileManager.fileExists(atPath: candidate.url.path) {
+                if kept || candidate.status == .keptByUser {
+                    failure = .init(sourcePath: candidate.url.path, status: .unavailable, message: "Omitido por la decisión «Conservar».")
+                } else if !fileManager.fileExists(atPath: candidate.url.path) {
                     failure = .init(sourcePath: candidate.url.path, status: .unavailable, message: "El elemento ya no existe.")
                 } else if candidate.requiresAdministrator || candidate.applicationRunning || candidate.isShared {
                     failure = .init(sourcePath: candidate.url.path, status: .permissionDenied, message: "Bloqueado por una guarda de seguridad.")
@@ -110,13 +126,27 @@ public final class CleanerExecutionService: @unchecked Sendable {
                     if mode == .trash {
                         let trashURL = try mutator.moveToTrash(candidate.url)
                         let undoFingerprint = CleanerFileInspection.fingerprint(at: trashURL, fileManager: fileManager) ?? current
-                        try cleanerRepository?.addUndoItem(.init(
-                            historyID: operationID,
-                            originalURL: candidate.url,
-                            trashURL: trashURL,
-                            fingerprint: undoFingerprint
-                        ))
-                        results.append(.init(sourcePath: candidate.url.path, trashPath: trashURL.path, status: .removed))
+                        if let cleanerRepository {
+                            do {
+                                try cleanerRepository.addUndoItem(.init(historyID: operationID, originalURL: candidate.url, trashURL: trashURL, fingerprint: undoFingerprint))
+                                recordedUndoItems += 1
+                                results.append(.init(sourcePath: candidate.url.path, trashPath: trashURL.path, status: .removed))
+                            } catch {
+                                let stillInTrash = CleanerFileInspection.fingerprint(at: trashURL, fileManager: fileManager) == undoFingerprint
+                                if stillInTrash && !fileManager.fileExists(atPath: candidate.url.path),
+                                   (try? mutator.restore(trashURL, to: candidate.url)) != nil {
+                                    results.append(.init(sourcePath: candidate.url.path, status: .failed, message: "No se pudo registrar Deshacer; el elemento volvió a su ubicación original."))
+                                    if kind == "uninstall", candidate.category == .application {
+                                        if let bundleID = candidate.associatedBundleID { blockedBundleIDs.insert(bundleID) }
+                                        if let name = candidate.associatedAppName { blockedAppNames.insert(name) }
+                                    }
+                                    continue
+                                }
+                                results.append(.init(sourcePath: candidate.url.path, trashPath: trashURL.path, status: .removed, message: "Se movió a Papelera, pero no se pudo registrar Deshacer. Restáuralo manualmente desde Finder si lo necesitas."))
+                            }
+                        } else {
+                            results.append(.init(sourcePath: candidate.url.path, trashPath: trashURL.path, status: .removed, message: "Se movió a Papelera sin registro de Deshacer disponible."))
+                        }
                     } else {
                         try mutator.removePermanently(candidate.url)
                         results.append(.init(sourcePath: candidate.url.path, status: .removed))
@@ -135,9 +165,12 @@ public final class CleanerExecutionService: @unchecked Sendable {
             }
 
             let summary = CleanerExecutionSummary(results: results, deletedLogicalBytes: deletedBytes, deletionMode: mode)
-            try saveHistory(id: operationID, kind: kind, summary: summary, undo: mode == .trash && summary.removedCount > 0)
+            let undoAvailable = mode == .trash && recordedUndoItems > 0
+            var historyWarning: String?
+            do { try saveHistory(id: operationID, kind: kind, summary: summary, undo: undoAvailable) }
+            catch { historyWarning = "La operación terminó, pero no se pudo guardar en el historial global." }
             try await coordinator.finish(id: operationID)
-            return .init(summary: summary, historyID: operationID)
+            return .init(summary: summary, historyID: operationID, undoAvailable: undoAvailable, historyWarning: historyWarning)
         } catch {
             try? await coordinator.finish(id: operationID)
             throw error

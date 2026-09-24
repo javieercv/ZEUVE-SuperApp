@@ -21,5 +21,8 @@ public enum CleanerPlanner{
         return .init(candidates:plan.candidates.map{$0.id == application.id ? $0:copy($0,selected:$0.canBeSafelyPreselected)})
     }
     public static func canSelect(_ c:CleanerCandidate)->Bool{!c.isShared && !c.requiresAdministrator && !c.applicationRunning && c.status != .applicationUnavailable && c.status != .keptByUser}
-    public static func copy(_ c:CleanerCandidate,selected:Bool)->CleanerCandidate{.init(id:c.id,url:c.url,category:c.category,associatedAppName:c.associatedAppName,associatedBundleID:c.associatedBundleID,evidences:c.evidences,confidence:c.confidence,status:c.status,risk:c.risk,logicalSize:c.logicalSize,allocatedSize:c.allocatedSize,containsPotentialUserData:c.containsPotentialUserData,isShared:c.isShared,requiresAdministrator:c.requiresAdministrator,applicationRunning:c.applicationRunning,consequence:c.consequence,selected:selected,fingerprint:c.fingerprint)}
+    public static func markingKept(_ candidateID:UUID,in plan:CleanerRemovalPlan)->CleanerRemovalPlan{
+        .init(candidates:plan.candidates.map{$0.id == candidateID ? copy($0,selected:false,status:.keptByUser):$0})
+    }
+    public static func copy(_ c:CleanerCandidate,selected:Bool,status:CleanerResidueStatus? = nil)->CleanerCandidate{.init(id:c.id,url:c.url,category:c.category,associatedAppName:c.associatedAppName,associatedBundleID:c.associatedBundleID,evidences:c.evidences,confidence:c.confidence,status:status ?? c.status,risk:c.risk,logicalSize:c.logicalSize,allocatedSize:c.allocatedSize,containsPotentialUserData:c.containsPotentialUserData,isShared:c.isShared,requiresAdministrator:c.requiresAdministrator,applicationRunning:c.applicationRunning,consequence:c.consequence,selected:selected,fingerprint:c.fingerprint)}
 }

@@ -1,8 +1,8 @@
-# Limpiador 0.1.1 — ZEUVE 0.20.3.0
+# Limpiador 0.1.2 — ZEUVE 0.20.4.0
 
 ## Estado
 
-`CleanerModule` 0.1.1 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner`, su ZEUVE mínimo declarado es `0.20.0` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
+`CleanerModule` 0.1.2 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner`, su ZEUVE mínimo declarado es `0.20.0` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
 
 ## Objetivo
 
@@ -34,7 +34,7 @@ El historial de inventario se guarda localmente en SQLite por aplicación y raí
 
 La confianza de asociación es `Alta`, `Media` o `Baja`; el estado de residuo y el riesgo de eliminación son dimensiones distintas. No se usan porcentajes de confianza.
 
-Las evidencias fuertes incluyen Bundle ID, App Groups e identidad histórica observada. Las coincidencias de nombre son heurísticas y nunca bastan por sí solas para una selección automática.
+Las evidencias fuertes incluyen coincidencia exacta de Bundle ID, App Groups e identidad histórica observada. Un nombre que solo comienza por un Bundle ID no establece asociación. Las coincidencias de nombre son heurísticas y nunca bastan por sí solas para una selección automática.
 
 Guardas relevantes: múltiples copias de la aplicación, proceso activo, volumen externo ausente, App Group compartido, decisión `Conservar`, datos persistentes, falta de permisos y cambios posteriores al análisis.
 
@@ -44,7 +44,7 @@ Guardas relevantes: múltiples copias de la aplicación, proceso activo, volumen
 
 La selección automática segura se limita a categorías regenerables con asociación alta, riesgo bajo y sin guardas. Incluye cachés/logs compatibles y datos regenerables de Xcode. `Archives` de Xcode no se escanea como caché y no se autoselecciona.
 
-Los instaladores `.dmg`, `.pkg` y `.xip` se detectan inicialmente en `~/Downloads` y ubicaciones adicionales, con umbral configurable de 90 días. La antigüedad es solo una heurística y nunca implica selección automática.
+Los instaladores `.dmg`, `.pkg` y `.xip` se detectan inicialmente en `~/Downloads` y ubicaciones adicionales, con umbral configurable de 90 días. Las ubicaciones solapadas se deduplican por ruta. La antigüedad es solo una heurística y nunca implica selección automática.
 
 ## Desinstalación
 
@@ -56,13 +56,17 @@ Antes de ejecutar se revalidan existencia, tipo, fingerprint y guardas. Si la ap
 
 En un plan de desinstalación, «Seleccionar elementos seguros» conserva la selección explícita de la `.app` y solo añade asociados regenerables elegibles. Si se desmarca la aplicación, se desmarcan sus asociados y no pueden volver a seleccionarse hasta seleccionar la aplicación. Los datos persistentes siguen disponibles para revisión individual, siempre sin selección automática.
 
+Si la app no tiene Bundle ID, su plan solo incluye asociaciones heurísticas con el mismo nombre de aplicación; otras apps sin identificador quedan fuera.
+
 ## Ejecución y Undo
 
 El modo predeterminado es **Mover a Papelera** con la API nativa `FileManager.trashItem`. Se registra la ubicación original, la ubicación real devuelta por macOS y un `CleanerFileFingerprint` específico.
 
-El Undo solo restaura cuando el objeto sigue verificable y la ruta original está libre. Nunca sobrescribe silenciosamente un objeto nuevo. El borrado permanente es opt-in, requiere confirmación en UI y no ofrece Undo.
+El Undo solo restaura cuando el objeto sigue verificable y la ruta original está libre. Nunca sobrescribe silenciosamente un objeto nuevo. Una restauración parcial mantiene los elementos pendientes para otro intento. El borrado permanente es opt-in, requiere confirmación en UI y no ofrece Undo.
 
 La confirmación previa enumera las rutas seleccionadas, cantidad, tamaño y modo de eliminación. El resultado distingue eliminados, omitidos y fallidos con detalle por elemento. Tras ejecutar se actualiza el análisis y se deja la nueva selección vacía; «Deshacer» solo aparece si hubo al menos un movimiento recuperable a Papelera.
+
+«Conservar» desmarca y bloquea el elemento inmediatamente; la decisión persistida se vuelve a comprobar al ejecutar. Si no se puede registrar Deshacer después de mover a Papelera, se intenta devolver el elemento a su ruta original; si no es posible, el resultado informa del movimiento real y de la restauración manual. Un fallo al guardar el historial global se muestra como aviso sin ocultar una operación de archivos ya completada.
 
 Las operaciones completas de análisis, limpieza, desinstalación, exploración pesada y restauración comparten `OperationCoordinator`.
 

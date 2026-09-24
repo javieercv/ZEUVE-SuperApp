@@ -1,5 +1,12 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.4.0 — 2026-09-24
+
+- Limpiador 0.1.2: asociación de residuos por Bundle ID exacto, instaladores sin duplicados entre raíces solapadas y análisis de desinstalación de apps sin identificador limitado al nombre correspondiente.
+- «Conservar» se aplica al plan actual y se revalida al ejecutar. El movimiento a Papelera y su registro de Deshacer se tratan por separado; si falla el registro se intenta restaurar el elemento a su ubicación original y se informa del resultado real. Un fallo del historial global no convierte una limpieza ya realizada en error aparente.
+- Deshacer parcial mantiene disponibles los elementos pendientes. Espacio explica cuando el tamaño mínimo filtra todos los resultados.
+- Se añaden pruebas de regresión de esas rutas. Sin cambios de red, dependencias, permisos, motores o esquema SQLite. ZEUVE marketing 0.20.4, build 70.
+
 ## 0.20.3.0 — 2026-09-24
 
 - Limpiador pasa a 0.1.1: inventario cancelable, medición de tamaños más rápida y búsqueda de Spotlight acotada a 30 segundos.
