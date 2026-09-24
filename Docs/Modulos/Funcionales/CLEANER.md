@@ -1,8 +1,8 @@
-# Limpiador
+# Limpiador 0.1.1 — ZEUVE 0.20.3.0
 
 ## Estado
 
-`CleanerModule` 0.1.1 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
+`CleanerModule` 0.1.1 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner`, su ZEUVE mínimo declarado es `0.20.0` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
 
 ## Objetivo
 
@@ -81,3 +81,7 @@ Las preferencias normales se guardan mediante `SettingsRepository`. Borrar el in
 ## Fuera de alcance V1
 
 No hay helper privilegiado, `sudo`, shell, Homebrew cleaner, KEXT/System Extension removal, snapshots APFS, limpieza de Keychain, monitor residente, IA de borrado ni receipts PKG avanzados como requisito.
+
+## Documentación relacionada
+
+- [Privacidad y archivos del Limpiador](CLEANER_PRIVACY_AND_FILES.md)

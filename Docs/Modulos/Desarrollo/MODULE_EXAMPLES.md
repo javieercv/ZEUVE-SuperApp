@@ -15,9 +15,11 @@ Sources/OrganizerModule/
 ├── OrganizerHistoryService.swift
 ├── OrganizerCSVExporter.swift
 ├── OrganizerModuleDefinition.swift
+├── OrganizerStorageKeys.swift
 └── Resources/manifest.json
 
 Sources/ZEUVEApp/Organizer/
+├── OrganizerHelp.swift
 ├── OrganizerViewModel.swift
 ├── OrganizerView.swift
 ├── OrganizerPlanView.swift

@@ -6,7 +6,7 @@ Versión de protocolo: `1.0`.
 
 ## 1. Alcance actual
 
-ZEUVE 0.20.0.0 registra módulos oficiales incorporados mediante `ModuleRegistry`: Organizador, Descargador universal, Analizador de chats, Conversor universal, Comparador de seguidores de Instagram, Inspector multimedia y Limpiador.
+ZEUVE 0.20.3.0 registra siete módulos oficiales incorporados mediante `ModuleRegistry`: Organizador, Descargador universal, Analizador de chats, Conversor universal, Comparador de seguidores de Instagram, Inspector multimedia y Limpiador.
 
 El contrato también define mensajes para procesos aislados, pero la instalación e importación de módulos externos todavía no está implementada. No debe presentarse esa función como disponible.
 
@@ -73,7 +73,7 @@ Este campo describe; no concede permisos ni decide por sí solo el aislamiento.
 
 ### `builtIn`
 
-Módulo oficial integrado en el proyecto y enlazado a la app. Es el único modo funcional para módulos completos en ZEUVE 0.10.0.
+Módulo oficial integrado en el proyecto y enlazado a la app. Es el único modo funcional para módulos completos en ZEUVE 0.20.3.0.
 
 ### `isolatedProcess`
 
@@ -129,15 +129,17 @@ No declares una capacidad que solo esté parcialmente implementada.
 
 Si dos módulos tienen el mismo orden, `ModuleRegistry.all()` los ordena por nombre.
 
+En los módulos built-in, `presentation.order` expresa el orden de fábrica del manifest; no es necesariamente el orden visible efectivo. `BuiltInModuleCatalog` y `NavigationPreferences` aplican los defaults y la personalización del usuario para Sidebar, Inicio y comandos.
+
 ## 8. Ejemplo de manifiesto
 
 ```json
 {
   "schemaVersion": 1,
-  "identifier": "com.zeuve.organizer",
-  "name": "Organizador de archivos",
-  "summary": "Clasifica, revisa y organiza archivos de forma segura.",
-  "version": "0.2.0",
+  "identifier": "com.zeuve.example-analysis",
+  "name": "Analizador de ejemplo",
+  "summary": "Ejemplo ficticio del contrato de módulos.",
+  "version": "0.1.0",
   "minimumZEUVEVersion": "0.1.0",
   "moduleAPI": "1.0",
   "technology": "swift",
@@ -155,9 +157,9 @@ Si dos módulos tienen el mismo orden, `ModuleRegistry.all()` los ordena por nom
     "dragAndDrop"
   ],
   "presentation": {
-    "systemImage": "folder.badge.gearshape",
-    "category": "Archivos",
-    "order": 10
+    "systemImage": "doc.text.magnifyingglass",
+    "category": "Análisis",
+    "order": 90
   }
 }
 ```

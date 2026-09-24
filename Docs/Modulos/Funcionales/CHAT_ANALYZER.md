@@ -1,10 +1,11 @@
-# Analizador de chats — ZEUVE 0.7.5
+# Analizador de chats 0.1.6 — ZEUVE 0.20.3.0
 
 ## Identidad
 
 - Nombre visible: `Analizador de chats`.
 - Identificador: `com.zeuve.chat-analyzer`.
 - Versión del módulo: `0.1.6`.
+- ZEUVE mínimo declarado: `0.5.0`.
 - Tecnología: Swift 6 y SwiftUI.
 - Modo: módulo oficial `builtIn`.
 - Plataforma: macOS 14 o posterior, Apple Silicon ARM64.

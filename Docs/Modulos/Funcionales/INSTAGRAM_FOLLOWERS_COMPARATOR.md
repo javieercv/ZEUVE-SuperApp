@@ -1,10 +1,11 @@
-# Comparador de seguidores de Instagram — ZEUVE 0.8.0
+# Comparador de seguidores de Instagram 0.1.0 — ZEUVE 0.20.3.0
 
 ## Identidad
 
 - Nombre visible: **Comparador de seguidores de Instagram**.
 - Identificador: `com.zeuve.instagram-followers`.
 - Versión del módulo: `0.1.0`.
+- ZEUVE mínimo declarado: `0.8.0`.
 - Tecnología: Swift 6 y SwiftUI.
 - Ejecución: módulo oficial `builtIn`.
 - Dependencias nuevas: ninguna.

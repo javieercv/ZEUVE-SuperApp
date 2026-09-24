@@ -44,7 +44,7 @@ La búsqueda histórica es manual y envía el nombre o URL pública del perfil a
 
 ## Navegador opcional
 
-En 0.7.3 el fallback automatizado se encuentra temporalmente deshabilitado: no aparece en Ajustes y no participa en el routing. Se conserva únicamente la compatibilidad de lectura de la preferencia histórica, que se normaliza a desactivada. No se descarga, instala ni ejecuta un navegador automatizado y no cambia ninguna política de CAPTCHA, DRM o controles de acceso.
+En 0.7.3 el fallback automatizado se encuentra temporalmente deshabilitado y no participa en el routing. Ajustes conserva una sección informativa heredada llamada «Navegador opcional», pero no ofrece un selector, instalador ni activación funcional del navegador. Se conserva únicamente la compatibilidad de lectura de la preferencia histórica, que se normaliza a desactivada. No se descarga, instala ni ejecuta un navegador automatizado y no cambia ninguna política de CAPTCHA, DRM o controles de acceso.
 
 ## Registros e historial
 

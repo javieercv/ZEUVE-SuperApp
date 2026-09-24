@@ -406,13 +406,14 @@ No debes dedicar tiempo a análisis legales extensos de licencias salvo que yo l
 16. DEPENDENCIAS Y PROGRAMAS EXTERNOS
 Puedes proponer programas y dependencias externas como:
 FFmpeg.
-LibreOffice.
-Ghostscript.
+Pandoc.
+Deno.
 Utilidades de procesamiento.
 Librerías de Python.
 Binarios de código abierto.
 Herramientas de conversión.
 Motores locales.
+Las dependencias retiradas del producto, como Calibre, Ghostscript o LibreOffice, no deben reintroducirse por inercia: requieren una nueva aprobación de alcance.
 Debes pedirme permiso antes de añadir una dependencia cuando:
 Aumente considerablemente el tamaño del proyecto.
 Aumente considerablemente el tamaño de la aplicación.
@@ -458,7 +459,7 @@ Resumen de los cambios.
 Gestión de conflictos.
 Posibilidad de cancelar.
 Posibilidad de deshacer cuando sea técnicamente viable.
-Una operación nunca debe modificar archivos que se encuentren fuera de las carpetas seleccionadas por el usuario.
+Una operación nunca debe modificar archivos que se encuentren fuera de las carpetas seleccionadas por el usuario, salvo una excepción de mantenimiento explícitamente aprobada que declare el permiso específico correspondiente. `scanLocalStorage` solo amplía el **análisis** del Limpiador; no autoriza modificaciones. Cualquier retirada fuera de una selección directa exige `removeLocalItems`, plan visible, selección explícita y revalidación.
 
 18. CONFLICTOS DE NOMBRES Y SOBRESCRITURA
 Cuando ya exista un archivo con el mismo nombre, la aplicación debe preguntar al usuario qué desea hacer.
@@ -1018,9 +1019,10 @@ No debe quedar documentación desactualizada que contradiga el funcionamiento re
 47. ENTREGA DEL PROYECTO
 La entrega debe contener siempre el proyecto completo actualizado.
 El proyecto se mantiene y actualiza directamente en la carpeta activa existente, conservando su nombre `ZEUVE_*`. No debes crear otra carpeta con un nombre de versión distinto. Puedes crear copias de respaldo recuperables, pero debe existir una única carpeta claramente actualizada como proyecto vigente.
-Regla de entrega según el entorno de ejecución:
-- Si estás trabajando directamente en mi ordenador (por ejemplo, mediante Codex o un entorno local con acceso a la carpeta activa real), no debes generar un ZIP nuevo salvo que yo lo solicite expresamente; la carpeta activa actualizada constituye la entrega principal.
-- Si estás trabajando desde ChatGPT web, un entorno remoto o cualquier entorno que no sea mi ordenador, **siempre que se haya modificado cualquier archivo del proyecto es obligatorio generar y proporcionarme, antes de dar la tarea por finalizada, un ZIP limpio del proyecto completo actualizado**, salvo que yo indique expresamente lo contrario. Esta obligación es automática: no debes esperar a que yo solicite el ZIP ni interpretar que la entrega de una carpeta interna del entorno remoto es suficiente, porque yo no tengo acceso directo a ella.
+Regla de entrega:
+- Mantén actualizada la carpeta activa existente como resultado principal.
+- No generes ni empaquetes un ZIP nuevo salvo que yo lo solicite expresamente, con independencia de si el trabajo se realiza en local o en un entorno remoto.
+- Si el entorno remoto impide entregarme directamente la carpeta activa, indícalo con claridad en vez de crear por defecto una segunda copia versionada del proyecto.
 No debes entregar únicamente:
 Los archivos modificados.
 Un parche.
@@ -1095,7 +1097,7 @@ Dependencia del entorno.
 Riesgo conocido.
 Comportamiento que requiera revisión.
 8. Entrega
-Mantener actualizada la carpeta activa original. Si trabajas directamente en mi ordenador, proporcionar un ZIP completo únicamente cuando yo lo solicite expresamente. Si trabajas desde ChatGPT web o desde un entorno remoto que no sea mi ordenador, **toda modificación del proyecto debe terminar obligatoriamente con un ZIP limpio del proyecto completo actualizado, sin esperar a que yo lo pida**, salvo que yo indique expresamente lo contrario.
+Mantener actualizada la carpeta activa original. Proporcionar un ZIP completo únicamente cuando yo lo solicite expresamente. Si el entorno no permite entregar directamente la carpeta activa, declarar esa limitación sin crear por defecto una carpeta o paquete versionado paralelo.
 Primero debes ofrecer el resumen corto y después la explicación detallada.
 
 49. HONESTIDAD SOBRE LAS PRUEBAS
@@ -1298,7 +1300,7 @@ El código fuente.
 Las pruebas permanentes.
 La documentación.
 Los registros de entrega.
-El ZIP final.
+Un ZIP solicitado para la entrega.
 Las pruebas de regresión deberán utilizar ejemplos sintéticos o anonimizados que reproduzcan la estructura y el fallo.
 Los originales deben permanecer intactos y, cuando resulte útil, deberán compararse sus huellas antes y después de las pruebas.
 Los archivos reales temporales deberán excluirse expresamente del empaquetado final.

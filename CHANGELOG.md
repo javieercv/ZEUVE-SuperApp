@@ -1,12 +1,15 @@
-# 0.20.3.0 — 2026-09-24
+# Historial de cambios de ZEUVE
+
+## 0.20.3.0 — 2026-09-24
 
 - Limpiador pasa a 0.1.1: inventario cancelable, medición de tamaños más rápida y búsqueda de Spotlight acotada a 30 segundos.
 - Si Spotlight no completa, el análisis muestra cobertura parcial y conserva la clasificación histórica de aplicaciones sin inferir desinstalaciones.
 - Limpieza muestra también preferencias y datos persistentes sin preseleccionarlos. En desinstalaciones, la app y sus asociados mantienen una selección coherente.
 - La confirmación enumera rutas, cantidad, tamaño y modo. El resultado detalla eliminados, omitidos y fallidos; una limpieza sin movimientos no crea un nuevo Deshacer y el plan se actualiza sin reutilizar selecciones antiguas.
 - Sin dependencias, red, motores, permisos ni migración de almacenamiento. ZEUVE marketing 0.20.3, build 69.
+- Auditoría documental: Fundamentos, documentación funcional, motores, contexto de agentes e índice se sincronizan con el estado real 0.20.3.0; se añade documentación dedicada del Organizador y se separa con más claridad documentación viva e histórica. No cambia comportamiento de producto.
 
-# 0.20.2.0 — 2026-09-24
+## 0.20.2.0 — 2026-09-24
 
 - Inspector multimedia pasa a 0.7.2 y optimiza la respuesta de Play/Pausa, seek y sustituciones sin cambiar identidades, generaciones, resolver de controles ni semántica de pausa.
 - La salida de audio se detiene inmediatamente antes de la limpieza asíncrona de FFmpeg/AVAudioEngine, conservando el playhead capturado.
@@ -14,14 +17,14 @@
 - El monitor del preview deja de sondear durante Pausa y evita republicar estado/frame sin cambios, reduciendo recomposiciones SwiftUI innecesarias.
 - Sin cambios de red, dependencias, motores, privacidad, edición, archivos originales ni opciones visibles. ZEUVE marketing 0.20.2, build 68.
 
-# 0.20.1.0 — 2026-09-23
+## 0.20.1.0 — 2026-09-23
 
 - Inspector multimedia 0.7.1 unifica el transporte por identidad, conserva fuente/frame al pausar vídeo y usa la ventana propietaria para fullscreen.
 - Cancelar edición conserva pausadas solo las sesiones íntegramente originales; las externas, mixtas o no resolubles se detienen.
 - El análisis separa rolloff 99,5 %, banda efectiva y caída persistente, mide cobertura y declara el truncado de anomalías.
 - Informe JSON schema 3 aditivo; ZEUVE marketing 0.20.1, build 67, sin red, motores ni dependencias nuevas.
 
-# 0.20.0.0 — 2026-09-22
+## 0.20.0.0 — 2026-09-22
 
 - Añadida personalización global de orden de módulos y atajos de teclado, compartida por Sidebar, Inicio y comandos, con recorder nativo, validación, `Sin atajo` y restauración.
 - Nuevo **Limpiador 0.1.0**: inventario de apps, residuos, limpieza regenerable, Xcode, instaladores, LaunchItems, espacio, análisis de desinstalación, Papelera/permanente y Undo.
@@ -30,7 +33,7 @@
 - El Limpiador no añade red, motores, dependencias externas, shell, `sudo` ni helper root.
 - ZEUVE pasa a marketing 0.20.0 y build 66.
 
-# 0.19.0.0 — 2026-09-21
+## 0.19.0.0 — 2026-09-21
 
 - Corregido el cierre del Inspector al abrir/cerrar un archivo: restaurar la velocidad de reproducción ya no provoca recursión infinita en su observador `@Published`. Se conservan los límites de 0,5×–2× y una sola actualización de audio/vídeo por asignación.
 - Inspector multimedia pasa a módulo `0.7.0`; ZEUVE usa marketing `0.19.0` y build `65`.
@@ -45,9 +48,7 @@
 - Ajustes centralizados y ayuda contextual cubren las nuevas preferencias; las invariantes de seguridad, hard caps anti-OOM, protección del original, publicación segura y validación FFprobe siguen sin ser desactivables.
 - No se añaden dependencias externas, motores, APIs, telemetría ni permisos de red.
 
-# Changelog
-
-# 0.18.1.0 — 2026-09-21
+## 0.18.1.0 — 2026-09-21
 
 - Inspector multimedia pasa a módulo 0.6.1 y completa la ayuda contextual exigida por las reglas UX del proyecto.
 - Ajustes → Inspector multimedia explica mediante los componentes compartidos `HelpLabel`, `HelpPickerRow`, `HelpToggleRow`, `HelpStepperRow` y `ContextualHelpButton` las opciones técnicas de automatización, reproducción, timeline, waveform, señal, espectrograma/exportación, informes, edición/salida y presets de lote.
@@ -57,7 +58,7 @@
 - Se añade regresión automática para impedir nuevas superficies técnicas del Inspector sin la ayuda contextual aprobada o iconos de información paralelos.
 - Sin cambios de red, motores, dependencias, privacidad, publicación, `OperationCoordinator` ni protección del original.
 
-# 0.18.0.0 — 2026-09-21
+## 0.18.0.0 — 2026-09-21
 
 - Inspector multimedia pasa a módulo 0.6.0 e incorpora un modo de lote para analizar varias selecciones o múltiples archivos arrastrados sin sustituir el flujo individual existente.
 - La cola procesa los archivos estrictamente en secuencia: FFprobe y, según configuración, análisis de señal, sonoridad EBU R128, espectrograma PNG e informe TXT/Markdown/JSON. `OperationCoordinator` sigue siendo la única autoridad de operaciones pesadas.
@@ -68,7 +69,7 @@
 - Cancelar conserva los resultados ya publicados correctamente; existe reintento de fallidos, apertura de la carpeta de resultados y una única entrada agregada de historial sin nombres ni rutas de archivos.
 - No se añaden dependencias, red, APIs, motores ni telemetría; no se incorpora edición estructural masiva por lotes.
 
-# 0.17.0.0 — 2026-09-21
+## 0.17.0.0 — 2026-09-21
 
 - Inspector multimedia pasa a módulo 0.5.0 y completa la edición estructural de capítulos, attachments reales y metadatos multimedia seguros dentro del mismo borrador Undo/Redo.
 - Los capítulos pueden crearse, eliminarse, renombrarse y recolocarse por inicio; la waveform refleja el draft al instante y FFmpeg recibe una fuente FFmetadata temporal propiedad del workspace.
@@ -79,7 +80,7 @@
 - Planner, command builder, cálculo de espacio, ejecución, historial agregado y validación FFprobe se amplían para comprobar la estructura final antes de publicar.
 - No se añaden dependencias, red, APIs, motores ni telemetría; el original permanece protegido.
 
-# 0.16.0.0 — 2026-09-20
+## 0.16.0.0 — 2026-09-20
 
 - Inspector multimedia pasa a módulo 0.4.0 e incorpora evolución temporal EBU R128 sin añadir otra pasada FFmpeg: la misma sonoridad global conserva Momentary, Short-term e Integrated LUFS en una serie acotada.
 - Espectrograma muestra una franja de Short-term LUFS sincronizada con `AudioTimelineViewport`, playhead y seek; el hover expone M/S/I sin relanzar análisis al hacer zoom.
@@ -89,7 +90,7 @@
 - Los informes técnicos pasan a JSON schema 2 e incorporan sonoridad temporal y análisis de señal disponibles; TXT/Markdown ofrecen resumen acotado y todos los formatos siguen omitiendo rutas completas, fingerprints e IDs internos.
 - No se añaden dependencias, red, APIs, motores, telemetría ni cambios sobre los originales.
 
-# 0.15.9.0 — 2026-09-20
+## 0.15.9.0 — 2026-09-20
 
 - Inspector multimedia pasa a módulo 0.3.9 e incorpora un análisis local de señal PCM a resolución completa para silencios y **Posible clipping**.
 - El silencio se calcula por ventanas RMS y solo se considera como tal cuando todos los canales quedan bajo el umbral; valores predeterminados: -60 dBFS durante al menos 0,5 s.
@@ -99,7 +100,7 @@
 - El análisis conserva sample rate y canales originales, procesa PCM `float32` por streaming, es cancelable, verifica fingerprint y respeta `OperationCoordinator`. No añade red, dependencias ni escrituras sobre el original.
 
 
-# 0.15.8.0 — 2026-09-20
+## 0.15.8.0 — 2026-09-20
 
 - Inspector multimedia pasa a módulo 0.3.8 e introduce una única ventana temporal compartida entre waveform y espectrograma.
 - Zoom, desplazamiento lateral y **Vista completa** actúan sobre el mismo intervalo; cuando existe una posición de reproducción válida el zoom se centra en el playhead y todas las superficies siguen usando el mismo reproductor compartido.
@@ -108,7 +109,7 @@
 - Corrección posterior de compilación: la proyección de capítulos del Inspector declara explícitamente el resultado opcional de `compactMap`, evitando el error Swift que rechazaba `nil` al filtrar capítulos sin tiempo válido.
 - Se mantienen sin cambios el análisis automático mono-pista de 0.15.7.0, `MultimediaAudioPreviewService`, la edición/remux, `OperationCoordinator`, privacidad, red, motores, dependencias y protección de archivos originales.
 
-# 0.15.7.0 — 2026-09-20
+## 0.15.7.0 — 2026-09-20
 
 - Inspector multimedia pasa a módulo 0.3.7 y automatiza el análisis complementario cuando FFprobe detecta exactamente una pista de audio.
 - Tras la inspección técnica, una sesión con una sola pista genera primero el espectrograma y, después de liberar `OperationCoordinator`, calcula la sonoridad EBU R128; WAV, MP3, FLAC y vídeos de una sola pista reciben la misma política porque la decisión depende de los streams reales, no de la extensión.
@@ -116,7 +117,7 @@
 - La cadena automática es secuencial y cancelable: cerrar/sustituir la sesión o cancelar el espectrograma impide que una fase posterior se inicie con datos obsoletos. Un fallo del espectrograma no invalida la inspección técnica ni impide intentar la sonoridad.
 - Se mantienen los botones manuales de generación/reanálisis, los ajustes centralizados y todo el reproductor compartido de 0.15.6.0. No se añaden motores, dependencias, red, telemetría ni escrituras sobre el original.
 
-# 0.15.6.0 — 2026-09-20
+## 0.15.6.0 — 2026-09-20
 
 - Inspector multimedia pasa a módulo 0.3.6 y corrige la identidad efímera de las filas de Pistas durante la reproducción.
 - En modo solo lectura, audio y subtítulos ya no se reconstruyen mediante `MediaEditableTrack.from(...)` cada vez que SwiftUI evalúa la vista; el ViewModel materializa las pistas una sola vez por inspección y conserva sus UUID hasta cerrar o sustituir esa sesión.
@@ -124,7 +125,7 @@
 - La caché de identidad se limpia al cerrar/fallar una inspección y se reconstruye al abrir un archivo nuevo o tras publicar un resultado editado.
 - No cambian `MultimediaAudioPreviewService`, el transporte compartido, waveform, espectrograma, motores, dependencias, red, privacidad ni archivos originales.
 
-# 0.15.5.0 — 2026-09-20
+## 0.15.5.0 — 2026-09-20
 
 - Inspector multimedia pasa a módulo 0.3.5 y corrige el botón `Escuchar/Pausar` de Pistas cuando la reproducción se inició desde esa misma fila o desde el reproductor inferior.
 - `requestedPreviewSourceID` se usa únicamente para identificar la fuente durante `.loading`; en `.playing`, `.paused` y `.finished` la identidad activa procede exclusivamente de `previewSourceID`, que es la fuente confirmada por el reproductor.
@@ -132,7 +133,7 @@
 - Se conserva íntegramente lo corregido en 0.15.3.0 y 0.15.4.0: un único reproductor, tiempo compartido, continuidad Play/Pausa al cambiar de pista, seek pausado y layout adaptable del Espectrograma.
 - No cambian `MultimediaAudioPreviewService`, motores, dependencias, red, privacidad, permisos, archivos originales, DSP ni otros módulos.
 
-# 0.15.4.0 — 2026-09-19
+## 0.15.4.0 — 2026-09-19
 
 - Inspector multimedia pasa a módulo 0.3.4 y centraliza en `MultimediaInspectorViewModel` la identidad y el estado de los botones `Escuchar/Pausar` de Pistas y Espectrograma.
 - Durante una transición de preview se prioriza la fuente solicitada, después la fuente confirmada y solo como respaldo la fuente activa interna, evitando que el botón que inició la reproducción vuelva a entrar por una ruta de arranque en vez de pausar.
@@ -140,7 +141,7 @@
 - Se conserva íntegramente lo corregido en 0.15.3.0: posición compartida, continuidad Play/Pausa al cambiar de pista, seek pausado, sustitución A→B→C y layout vertical flexible del Espectrograma.
 - No cambian servicio de audio, dependencias, motores, red, privacidad, permisos, originales, DSP, edición estructural ni otros módulos.
 
-# 0.15.3.0 — 2026-09-19
+## 0.15.3.0 — 2026-09-19
 
 - Inspector multimedia pasa a módulo 0.3.3 y mantiene un único estado de reproducción visible entre Pistas, Espectrograma, waveform y barra inferior.
 - Cambiar de pista conserva el instante y también Play/Pausa. Si la sesión estaba pausada, la nueva fuente queda preparada en pausa sin arrancar FFmpeg ni AVAudioEngine hasta la reanudación.
@@ -243,8 +244,6 @@
 - Los bookmarks de salida del Descargador y Conversor ya no se eliminan por un fallo no concluyente de resolución.
 - Los fallos no críticos de inicialización del logger o del registro compartido de motores dejan una advertencia de arranque segura en lugar de quedar silenciados.
 - Se amplían las regresiones de procesos, logs, bookmarks, ZIP, almacenamiento/analíticas SQLite y verificadores estructurales. No se añaden dependencias, motores, servicios, permisos ni opciones visibles.
-
-# Historial de cambios
 
 ## 0.12.3 — 2026-09-03
 

@@ -1,6 +1,32 @@
 # Decisiones aprobadas de ZEUVE
 
-Fecha de consolidación: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.2.0 el 24 de septiembre de 2026.
+Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.3.0 el 24 de septiembre de 2026.
+
+> **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
+
+## Estado vigente de referencia — ZEUVE 0.20.3.0
+
+Este bloque resume las decisiones actualmente efectivas que más fácilmente pueden confundirse con registros antiguos. No sustituye los detalles de cada sección ni las fuentes vivas.
+
+- Built-ins: Organizador 0.1.4, Descargador 0.7.3, Analizador de chats 0.1.6, Conversor 0.3.0, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.2 y Limpiador 0.1.1.
+- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.3.0.
+- Ajustes: centralizados. Orden de secciones: Organizador 10, Descargador 20, Analizador 30, Conversor 40, Inspector 50 y Limpiador 60; el Comparador no tiene sección propia.
+- Inspector: inspección + preview + análisis + edición estructural segura sin transcode audiovisual; la transformación que requiere recodificación pertenece al Conversor.
+- Limpiador: `scanLocalStorage` autoriza análisis local documentado; cualquier retirada exige `removeLocalItems`, plan visible, selección y revalidación. Papelera es el modo seguro predeterminado y Undo solo aparece cuando es verificable.
+- Motores requeridos por la instantánea actual: yt-dlp, Deno, FFmpeg, FFprobe, gallery-dl e instaloader-zeuve. Pandoc sigue soportado como opcional del Conversor cuando se prepara. Playwright no participa en la ruta efectiva actual. Calibre, Ghostscript y LibreOffice están retirados.
+- Versión: ZEUVE 0.20.3.0, marketing 0.20.3, build 69.
+
+
+## Limpiador 0.1.1 — corrección 0.20.3.0
+
+- El análisis general y las mediciones largas deben atender cancelación de `OperationCoordinator`; cancelar devuelve la UI a un estado utilizable sin esperar a que finalice una consulta ya descartada.
+- Spotlight tiene un límite de 30 segundos y una única salida por fin normal, indisponibilidad, cancelación o timeout. Un resultado incompleto se declara como cobertura parcial.
+- Solo un inventario completo puede marcar aplicaciones históricas como ausentes; cobertura parcial nunca convierte falta de evidencia en prueba de desinstalación.
+- La vista de Limpieza muestra el plan completo, incluidos datos persistentes no seleccionados automáticamente.
+- En desinstalación, seleccionar elementos seguros conserva la `.app` elegida y solo añade asociados regenerables elegibles; desmarcar la app desmarca sus asociados.
+- La confirmación previa enumera rutas, cantidad, tamaño, riesgo y modo. Tras ejecutar se renueva el análisis y la selección queda vacía.
+- Undo solo se ofrece cuando hubo movimientos efectivos y verificables a Papelera.
+- No cambian dependencias, motores, red, permisos ni esquema de almacenamiento.
 
 ## Inspector multimedia 0.7.2 — optimización 0.20.2.0
 
@@ -274,7 +300,7 @@ Fecha de consolidación: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.2.0 el
 - Los motores se almacenan una sola vez bajo `Resources/Engines/` y `engines.json` registra versión, arquitectura, SHA-256, procedencia, licencia, función, diagnóstico, tamaño y obligatoriedad.
 - SHA-256 y tamaño se verifican durante la preparación y antes del empaquetado. Tras firmar, el diagnóstico comprueba existencia, licencia, permisos, arquitectura, dependencias, lanzamiento y versión sin exigir el hash anterior a `codesign`.
 
-## Motores vigentes desde ZEUVE 0.11.0
+## Base de motores tras la simplificación de ZEUVE 0.11.0
 - yt-dlp, Deno, FFmpeg y FFprobe mantienen sus funciones aprobadas.
 - Pandoc 3.10 se conserva para TXT, Markdown y HTML.
 - Calibre y Ghostscript quedan retirados del código, registro, preparación, firma, verificación y empaquetado.

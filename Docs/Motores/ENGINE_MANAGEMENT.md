@@ -35,7 +35,7 @@ El script fija `gallery-dl 1.32.9`, `Instaloader 4.15.3`, `browser-cookie3 0.20.
 
 ## Navegador opcional
 
-`playwright-browser` se conserva en el manifiesto de motores como marcador de compatibilidad futura y sigue declarado como no proporcionado. Desde ZEUVE 0.12.3 no existe una opción visible ni una ruta efectiva que lo ejecute, porque el contrato anterior no estaba implementado de extremo a extremo. No se descarga, instala ni actualiza en segundo plano.
+El navegador Playwright **no participa en la ruta efectiva actual del Descargador**. La instantánea `Resources/Engines/engines.json` no contiene un navegador ejecutable. `prepare_engines_macos.sh` conserva compatibilidad para generar un marcador opcional/no proporcionado, pero no instala un navegador funcional ni habilita un selector o una ruta de ejecución. Ajustes sí conserva una sección informativa heredada llamada «Navegador opcional»; su texto describe una posibilidad futura, no una capacidad efectiva de 0.7.3. No se descarga, instala ni actualiza un navegador en segundo plano.
 
 ## Modificar motores
 

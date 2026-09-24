@@ -89,11 +89,11 @@ El ejecutable raíz y los componentes internos de la distribución oficial desco
 ./Scripts/prepare_engines_macos.sh
 ```
 
-La preparación se realiza en un directorio temporal del sistema sin espacios y con un identificador derivado de la ruta del proyecto. El script no modifica `Resources/Engines` mientras descarga o compila. Primero genera y verifica un staging completo; solo entonces publica los cuatro motores. Si la publicación o la verificación final fallan, restaura el conjunto anterior.
+La preparación se realiza en un directorio temporal del sistema sin espacios y con un identificador derivado de la ruta del proyecto. El script no modifica `Resources/Engines` mientras descarga o compila. Primero genera y verifica un staging completo; solo entonces publica el conjunto obligatorio y los motores opcionales que hayan sido preparados y validados. Si la publicación o la verificación final fallan, restaura el conjunto anterior.
 
 `Scripts/static_pkg_config.py` implementa localmente las consultas que FFmpeg necesita y `prepare_engines_macos.sh` genera `libmp3lame.pc`, ya que LAME 3.100 no lo instala.
 
-Los hashes vigentes se documentan en `ENGINE_HASHES_0.11.5.md`. Los hashes históricos permanecen en sus informes de versión y los valores finales del conjunto quedan en `Resources/Engines/engines.json`.
+`Resources/Engines/engines.json` contiene los hashes/versiones de la instantánea actual. `Docs/Historico/HashesMotores/ENGINE_HASHES_0.11.5.md` y los demás informes de hashes son evidencia histórica y no deben usarse como fuente vigente cuando difieran del manifiesto actual.
 
 ## Verificación
 

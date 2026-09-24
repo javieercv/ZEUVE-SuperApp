@@ -1,7 +1,7 @@
 # Guía de desarrollo de módulos de ZEUVE
 
-Versión de la guía: 1.1  
-Compatible con ZEUVE: 0.13.1.0  
+Versión de la guía: 1.2
+Compatible con ZEUVE: 0.20.3.0
 API de módulos actual: 1.0
 
 ## 1. Objetivo
@@ -131,7 +131,7 @@ Solo cuando exista una necesidad demostrada:
 
 ### Motores externos
 
-FFmpeg, LibreOffice, Pandoc, Deno u otros motores pueden emplearse con autorización. Deben incluirse dentro de la aplicación cuando sea viable y ejecutarse sin shell, con argumentos separados y validados.
+FFmpeg, Pandoc, Deno u otros motores aprobados pueden emplearse con autorización. Calibre, Ghostscript y LibreOffice están retirados y no deben reintroducirse sin una nueva aprobación de alcance. Deben incluirse dentro de la aplicación cuando sea viable y ejecutarse sin shell, con argumentos separados y validados.
 
 Antes de añadir una dependencia importante debe documentarse tamaño, compatibilidad ARM64, funcionamiento offline, permisos, empaquetado y comportamiento cuando no esté disponible.
 

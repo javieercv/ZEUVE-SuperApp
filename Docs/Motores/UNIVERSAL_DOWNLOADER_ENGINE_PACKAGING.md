@@ -1,6 +1,8 @@
 # Empaquetado y firma de motores
 
-## Distribución dentro de la app
+## Distribución actual
+
+La estructura exacta debe coincidir con `Resources/Engines/engines.json`. En 0.20.3.0 incluye al menos:
 
 ```text
 ZEUVE.app/Contents/Resources/Engines/
@@ -9,48 +11,48 @@ ZEUVE.app/Contents/Resources/Engines/
 ├── deno/deno
 ├── ffmpeg/ffmpeg
 ├── ffmpeg/ffprobe
+├── gallery-dl/gallery-dl
+├── instaloader/instaloader-zeuve
 ├── licenses/
 └── engines.json
 ```
 
+No mantengas una lista documental distinta del registry real.
+
 ## Orden de preparación
 
-1. Ejecutar `Scripts/prepare_engines_macos.sh` en un Mac Apple Silicon.
+1. Ejecutar `Scripts/prepare_engines_macos.sh` en Mac Apple Silicon.
 2. Ejecutar `Scripts/verify_engines_macos.sh`.
-3. Ejecutar pruebas Swift.
-4. Generar el proyecto Xcode.
-5. Compilar Debug y Release.
-6. Verificar la firma de cada ejecutable anidado.
-7. Abrir la aplicación y ejecutar pruebas manuales.
-8. Notarizar cuando se disponga de identidad y credenciales aprobadas.
+3. Ejecutar tests/verificadores del proyecto.
+4. Generar/verificar el proyecto Xcode.
+5. Compilar.
+6. Firmar y verificar motores anidados.
+7. Verificar firma profunda de la aplicación.
+8. Ejecutar QA manual en el Mac objetivo.
+9. Notarizar únicamente cuando exista el flujo de distribución aprobado.
 
 ## Firma
 
-La fase `Firmar motores incluidos` llama a `Scripts/sign_embedded_engines.sh` después de copiar los recursos.
+`Scripts/sign_embedded_engines.sh` es la fuente operativa de esta política.
 
-- `yt-dlp/yt-dlp_macos` y su carpeta `_internal` proceden de la distribución oficial descomprimida para macOS. Se conservan sus firmas originales y no se vuelven a firmar parcialmente con la identidad de ZEUVE.
-- Deno conserva su firma oficial y las autorizaciones Hardened Runtime de JIT que necesita V8. FFmpeg y FFprobe se firman con la identidad de ZEUVE y Hardened Runtime.
-- `Scripts/verify_packaged_engines_macos.sh` verifica las cuatro firmas, ejecuta `yt-dlp --version` y evalúa JavaScript con Deno sobre la copia ya incluida en `ZEUVE.app`. La compilación se detiene si cualquiera de esas comprobaciones falla.
-- La aplicación se firma posteriormente por Xcode con Hardened Runtime. La compilación por Terminal parte de un producto limpio y verifica la firma profunda final para impedir que una copia incremental conserve un sello exterior obsoleto.
+- `yt-dlp/yt-dlp_macos`: conserva la firma oficial de su distribución.
+- `deno/deno`: conserva la firma oficial y los entitlements Hardened Runtime/JIT que necesita V8.
+- `ffmpeg/ffmpeg` y `ffmpeg/ffprobe`: se firman con la identidad de ZEUVE.
+- `gallery-dl/gallery-dl` e `instaloader/instaloader-zeuve`: se firman con ZEUVE y `social_engine.entitlements` por la naturaleza de sus bundles PyInstaller.
+- Motores opcionales como Pandoc se omiten si no están presentes y solo se documentan como incluidos cuando el registry lo confirme.
 
-La firma puede modificar los bytes y el tamaño de los motores que se vuelven a firmar. Por decisión aprobada desde 0.2.2, el diagnóstico en ejecución no compara esos dos valores con `engines.json`; la integridad se comprueba antes de firmar mediante `verify_engines_macos.sh`.
+`Scripts/verify_packaged_engines_macos.sh` verifica los ejecutables empaquetados pertinentes y ejecuta diagnósticos reales. La comprobación no está limitada a un número fijo de firmas.
+
+La firma puede cambiar bytes/tamaño de los motores resignados. La integridad de origen se valida antes de firmar mediante la verificación de motores; el diagnóstico en ejecución no debe confundir una firma válida con un hash previo a firma.
 
 ## Dependencias dinámicas
 
-`otool -L` debe mostrar únicamente:
-
-- componentes de `/usr/lib`;
-- frameworks o bibliotecas de `/System/Library`;
-- bibliotecas incluidas dentro de `Resources/Engines` cuando exista una referencia relativa resoluble.
-
-Se rechazan rutas Homebrew, MacPorts, `/usr/local` y dependencias externas no incluidas.
+`otool -L` solo debe mostrar componentes del sistema o librerías incluidas de forma resoluble dentro del paquete. Se rechazan dependencias no empaquetadas de Homebrew, MacPorts, `/usr/local` u otras instalaciones locales.
 
 ## App Sandbox
 
-Permanece desactivado en 0.4.0. No debe activarse durante el empaquetado. La futura decisión exige una prueba específica de bookmarks, cookies, procesos anidados y salida a carpetas seleccionadas.
+Permanece desactivado en la fase actual. Activarlo requiere una decisión específica y pruebas de bookmarks, cookies, procesos anidados, salida a carpetas y motores.
 
-## Entorno actual de esta entrega
+## Validación
 
-El proyecto incorpora la distribución oficial descomprimida de yt-dlp 2026.08.19 y conserva los demás motores de la versión recibida. La integración se ha validado a nivel de código fuera de macOS; la firma, la compilación Xcode y la apertura de `ZEUVE.app` deben comprobarse en un Mac Apple Silicon antes de considerar validado el paquete final.
-
-La integridad de la distribución descomprimida se verifica como un árbol completo mediante `bundleSHA256`, `bundleSize` y `bundleFileCount`, además de la huella individual del ejecutable raíz.
+La preparación, firma, Hardened Runtime y ejecución de binarios ARM64 deben comprobarse en macOS Apple Silicon. Las pruebas portables no sustituyen esa validación.

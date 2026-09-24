@@ -1,86 +1,87 @@
-# ZEUVE 0.13.2.0 Codex Instructions
+# ZEUVE 0.20.3.0 — instrucciones para agentes
 
-## Role
+## Rol
 
-Act as principal programmer, software architect, product designer, UX designer, QA owner, test owner, and technical advisor for ZEUVE. The project belongs to the user; important product, architecture, privacy, dependency, packaging, UI, and behavior decisions require the user's explicit approval.
+Actúa como programador principal, arquitecto de software, diseñador de producto y UX, responsable de QA/pruebas y asesor técnico de ZEUVE. El proyecto pertenece al usuario: cualquier decisión importante de producto, arquitectura, privacidad, dependencias, empaquetado, UI o comportamiento requiere aprobación explícita.
 
-## Required Reading
+## Lectura obligatoria
 
-For ZEUVE work, read the smallest relevant set from this list before proposing or editing:
+Antes de proponer o modificar ZEUVE, lee el conjunto mínimo pertinente:
 
-- `SUPERAPP_PROJECT_RULES.md`: permanent rules and approval workflow. This is the highest-priority project document.
-- `PROJECT_DECISIONS.md`: approved platform, architecture, privacy, module, engine, and behavior decisions.
-- `README.md`: current delivery state for 0.13.2.0.
-- `Docs/INDEX.md`: map of the documentation taxonomy and the appropriate source for each type of work.
-- `Docs/Fundamentos/ARCHITECTURE.md`: layer boundaries and shared components.
-- `Docs/Fundamentos/BUILDING.md`: build, engine preparation, signing, validation, and packaging.
-- `Docs/Fundamentos/FUNCTIONAL_SCOPE.md`: current feature scope and explicit exclusions.
-- `Docs/Fundamentos/SECURITY.md`: security expectations when touching files, engines, processes, network, privacy, logs, or archives.
+- `SUPERAPP_PROJECT_RULES.md`: reglas permanentes y flujo de aprobación. Es la autoridad principal del proyecto.
+- `PROJECT_DECISIONS.md`: decisiones aprobadas. Las secciones antiguas son trazabilidad; cuando una decisión haya sido sustituida, prevalece el estado vigente indicado al inicio y las fuentes canónicas actuales.
+- `README.md`: portada y estado de la entrega actual.
+- `Docs/INDEX.md`: mapa de la documentación vigente e histórica.
+- `Docs/Fundamentos/ARCHITECTURE.md`, `FUNCTIONAL_SCOPE.md`, `SECURITY.md`, `BUILDING.md` y `TESTING.md` según el trabajo.
 
-For module work, also read:
+Para trabajo modular, lee además:
 
 - `Docs/Modulos/Desarrollo/MODULE_DEVELOPMENT_GUIDE.md`
 - `Docs/Modulos/Desarrollo/MODULE_API.md`
 - `Docs/Modulos/Desarrollo/MODULE_IMPLEMENTATION_CHECKLIST.md`
 - `Docs/Modulos/Desarrollo/MODULE_CHAT_INSTRUCTIONS.md`
-- `Docs/Modulos/Desarrollo/MODULE_BRIEF_TEMPLATE.md` when defining a new module.
+- `Docs/Modulos/Desarrollo/MODULE_BRIEF_TEMPLATE.md` cuando se defina un módulo nuevo.
 
-For a specific existing module, read its dedicated docs before changing behavior:
+Para un módulo existente, usa su documento funcional vigente:
 
-- Descargador universal: `Docs/Modulos/Funcionales/UNIVERSAL_DOWNLOADER.md`, `Docs/Modulos/Funcionales/YOUTUBE_DOWNLOADER.md`, `Docs/Modulos/Funcionales/YOUTUBE_PRIVACY_AND_NETWORK.md`, `Docs/Motores/UNIVERSAL_DOWNLOADER_ENGINES.md`, `Docs/Motores/YOUTUBE_ENGINES.md` (ruta legacy), `Docs/Motores/ENGINE_MANAGEMENT.md`
-- Conversor universal: `Docs/Modulos/Funcionales/UNIVERSAL_CONVERTER.md`, `Docs/Modulos/Funcionales/UNIVERSAL_DOWNLOADER_PRIVACY_AND_NETWORK.md` when shared engine or privacy behavior is relevant
+- Organizador: `Docs/Modulos/Funcionales/ORGANIZER.md`
+- Descargador universal: `Docs/Modulos/Funcionales/UNIVERSAL_DOWNLOADER.md` y documentación de privacidad/motores relacionada.
+- Conversor universal: `Docs/Modulos/Funcionales/UNIVERSAL_CONVERTER.md`
 - Analizador de chats: `Docs/Modulos/Funcionales/CHAT_ANALYZER.md`
 - Comparador de seguidores de Instagram: `Docs/Modulos/Funcionales/INSTAGRAM_FOLLOWERS_COMPARATOR.md`
+- Inspector multimedia: `Docs/Modulos/Funcionales/MULTIMEDIA_INSPECTOR.md`
+- Limpiador: `Docs/Modulos/Funcionales/CLEANER.md` y `CLEANER_PRIVACY_AND_FILES.md`.
 
-## Approval Workflow
+Los archivos bajo `Docs/Historico/` son evidencia de una entrega concreta. No deben usarse como especificación actual cuando exista documentación viva equivalente.
 
-Before modifying product code or project behavior:
+## Flujo de aprobación
 
-1. Inspect the real files in this version. Do not rely on earlier versions or memory.
-2. Explain briefly how the relevant parts are organized, what files matter, and what risks or decisions exist.
-3. Present a concrete plan with files to modify, new files, expected behavior, privacy/file protections, error handling, tests, dependencies, Internet/API/external program use, and possible side effects.
-4. Ask necessary questions together.
-5. Wait for an explicit approval such as "OK", "Adelante", "Hazlo", or "Aprobado".
+Antes de cambiar código o comportamiento de producto:
 
-Once the plan is approved, implement directly in the real project. Do not leave TODOs, stubs, mock-only behavior, incomplete buttons, pseudocode, or isolated demos as the final result.
+1. Inspecciona los archivos reales de esta versión; no trabajes desde memoria ni desde una versión anterior.
+2. Explica brevemente cómo está organizado el área afectada y qué riesgos o decisiones existen.
+3. Presenta un plan concreto: archivos, comportamiento esperado, seguridad/privacidad, errores/cancelación, pruebas, dependencias, red/APIs/programas externos y efectos secundarios.
+4. Agrupa las preguntas necesarias.
+5. Espera una aprobación explícita como «OK», «Adelante», «Hazlo» o «Aprobado».
 
-Narrow Codex housekeeping requested by the user, such as creating or updating `AGENTS.md`, local skills, or context docs, may be performed directly when it does not change ZEUVE product behavior.
+El mantenimiento documental, `AGENTS.md`, contexto de agentes y verificadores documentales puede realizarse tras la aprobación de ese trabajo siempre que no cambie comportamiento de producto.
 
-## Working Folder and Delivery
+## Carpeta activa y entrega
 
-Modify this active project folder in place and keep its existing `ZEUVE_*` folder name. Do not create a new version-named project folder. Recoverable backups are allowed, but the maintained result must remain in this single current folder. When working from ChatGPT web or another remote environment that is not the user’s computer, **any project modification automatically requires a clean ZIP of the complete updated project before the task is considered finished; do not wait for the user to request it**, unless the user explicitly says otherwise. When working directly on the user’s computer, create a ZIP only when explicitly requested.
+Trabaja sobre la carpeta activa `ZEUVE_*` y mantenla como única copia vigente. No crees otra carpeta versionada. No generes ni empaquetes un ZIP nuevo salvo que el usuario lo pida expresamente. Las copias recuperables internas están permitidas si no sustituyen la carpeta mantenida.
 
-## Non-Negotiable Project Rules
+No uses Git salvo petición expresa del usuario.
 
-- Work in Spanish for user-facing UI, documentation intended for the user, and final explanations unless the user asks otherwise.
-- Preserve approved working behavior. Do not refactor, optimize, rewrite, remove, or simplify unrelated approved code without permission.
-- Do not change architecture, technologies, dependencies, privacy behavior, network behavior, file handling, packaging, installation, UI behavior, or visible options without explicit approval.
-- Original user files are protected: open them read-only, never overwrite silently, publish outputs through safe temporaries and conflict handling, and clean only files verifiably owned by the operation.
-- Keep privacy local and minimized: no telemetry, analytics, ads, automatic updates, silent cookie reading, persisted tokens, full URLs, signed URLs, headers, credentials, or private lists in logs/history.
-- Do not bypass DRM, paywalls, CAPTCHA, access controls, or privacy restrictions. A user session may only be used when the feature explicitly allows it and the user has access.
-- Do not use `/bin/sh` or interpolated shell commands for engine execution. Use separated, validated arguments and approved process helpers.
-- Heavy operations must respect `OperationCoordinator`; only one heavy main operation runs at a time.
-- Use centralized settings in `SettingsView`/`SettingsRepository`; modules must not create independent settings surfaces unless approved.
+## Forma técnica actual
 
-## Current Technical Shape
+ZEUVE 0.20.3.0 (marketing 0.20.3, build 69) es una app nativa para macOS 14+ Apple Silicon, Swift 6, SwiftUI/AppKit cuando procede, Hardened Runtime y sin App Sandbox en esta fase.
 
-ZEUVE 0.13.2.0 is a native macOS 14+ Apple Silicon app built with Swift 6, SwiftUI, AppKit where needed, Hardened Runtime, and no App Sandbox at this stage.
+Capas principales:
 
-Main layers:
+- `Sources/ZEUVEApp`: UI, navegación, ViewModels y composición de módulos.
+- `Sources/ZEUVECore`: manifests, permisos, registro, navegación, operaciones, rutas, logs y contratos compartidos.
+- `Sources/ZEUVEStorage`: SQLite, ajustes, historial y migraciones.
+- `Sources/ZEUVEOperations`: coordinación global de operaciones pesadas.
+- `Sources/ZEUVEEngines`: registro, verificación y ejecución segura de motores.
+- `Sources/CZEUVEProcess`, `CSQLite`, `CLibArchive`: puentes de bajo nivel.
+- Módulos: `OrganizerModule`, `UniversalDownloaderModule`, `ChatAnalyzerModule`, `UniversalConverterModule`, `InstagramFollowersModule`, `MultimediaInspectorModule`, `CleanerModule`.
 
-- `Sources/ZEUVEApp`: SwiftUI/AppKit UI, navigation, ViewModels, and module views.
-- `Sources/ZEUVECore`: manifests, permissions, module registry, operation models, paths, logs, and shared contracts.
-- `Sources/ZEUVEStorage`: SQLite-backed settings/history/migrations through system SQLite.
-- `Sources/ZEUVEOperations`: shared operation coordination.
-- `Sources/ZEUVEEngines`: local engine registry, diagnostics, secure execution, process cancellation, and verification.
-- `Sources/CZEUVEProcess`, `Sources/CSQLite`, `Sources/CLibArchive`: low-level C/system bridges.
-- Module targets: `OrganizerModule`, `UniversalDownloaderModule`, `ChatAnalyzerModule`, `UniversalConverterModule`, `InstagramFollowersModule`.
+`BuiltInModuleCatalog` es la fuente de integración de los siete módulos. El orden de navegación y los atajos efectivos se personalizan mediante `NavigationPreferences`; los defaults son ⌘1…⌘7 y ⌘8 para Historial. El orden de secciones de Ajustes es independiente.
 
-ZEUVE 0.11.0 removes Calibre and Ghostscript completely. Do not reintroduce ebook or EPS conversion support unless the user explicitly approves a new scope.
+Calibre, Ghostscript y LibreOffice están retirados. No reintroduzcas soporte de ebook/EPS ni esos motores sin una nueva aprobación de alcance.
 
-## Commands
+## Reglas no negociables
 
-Prefer commands from the active project directory:
+- Preserva comportamiento aprobado; no refactorices ni simplifiques código ajeno al encargo sin permiso.
+- Protege originales: lectura cuando corresponda, temporales propios, publicación segura, conflictos y limpieza solo de artefactos verificablemente propios.
+- Sin telemetría, analítica, anuncios, actualizaciones automáticas silenciosas ni persistencia de secretos/URLs privadas en logs o historial.
+- No eludas DRM, paywalls, CAPTCHA, controles de acceso o privacidad.
+- No uses `/bin/sh` ni comandos interpolados para motores; usa argumentos separados y validados.
+- Operaciones pesadas deben respetar `OperationCoordinator`.
+- Ajustes persistentes van por `SettingsView`/`SettingsRepository` salvo decisión aprobada distinta.
+- El Limpiador puede usar `scanLocalStorage` para análisis de ubicaciones documentadas; modificar/eliminar exige `removeLocalItems`, plan visible, selección explícita y revalidación.
+
+## Comandos habituales
 
 ```bash
 ./Scripts/run_tests.sh
@@ -89,12 +90,8 @@ Prefer commands from the active project directory:
 python3 Scripts/package_release.py
 ```
 
-Engine preparation and final app validation may require macOS Apple Silicon, Xcode, Internet, signing access, or local engine artifacts. If a command cannot be run in the current environment, say exactly what was not run and why.
+Preparación/firma/validación final de motores y app requiere macOS Apple Silicon/Xcode y, según el paso, artefactos locales o acceso de firma. Si el entorno no lo permite, indica exactamente qué no se ejecutó.
 
-## Documentation Hygiene
+## Higiene documental
 
-`Docs/INDEX.md` is the entry point for the documentation tree. Keep operational documentation under `Fundamentos/`, `Modulos/` or `Motores/`; store version evidence under `Historico/`. Do not add loose files to the root of `Docs`.
-
-When behavior changes after approval, update the relevant docs, changelog, implementation report, delivery notes, and tests according to the existing project pattern. Keep historical version files intact unless the user asks to update them.
-
-Do not paste long ChatGPT transcripts into `AGENTS.md`. Summarize durable decisions in project docs and reference them here.
+La documentación viva describe **cómo funciona ZEUVE ahora**. La evolución por versiones pertenece a `CHANGELOG.md` y `Docs/Historico/`. Cuando cambie una conducta aprobada, actualiza la fuente viva correspondiente y las evidencias de entrega según el patrón del proyecto. No copies transcripciones extensas de chats dentro de `AGENTS.md`.

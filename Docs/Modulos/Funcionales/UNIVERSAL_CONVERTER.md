@@ -1,4 +1,11 @@
-# Conversor universal — ZEUVE 0.12.1
+# Conversor universal 0.3.0 — ZEUVE 0.20.3.0
+
+## Identidad
+
+- Identificador: `com.zeuve.universal-converter`.
+- Versión del módulo: `0.3.0`.
+- ZEUVE mínimo declarado: `0.7.0`.
+- Funcionamiento local; no declara acceso de red.
 
 ## Alcance
 
@@ -31,7 +38,7 @@ SVG se conserva como imagen vectorial, pero no se ofrece una ruta dependiente de
 
 ## Motores
 
-`ConverterCompatibilityRegistry` solo ofrece rutas cuya disponibilidad está confirmada. Los motores externos actuales del Conversor son FFmpeg/FFprobe y Pandoc. ImageIO y PDFKit son capacidades nativas del sistema.
+`ConverterCompatibilityRegistry` solo ofrece rutas cuya disponibilidad está confirmada. Los motores externos base del Conversor son FFmpeg/FFprobe. Pandoc continúa soportado como motor opcional cuando la preparación vigente lo incorpora. ImageIO y PDFKit son capacidades nativas del sistema.
 
 Calibre y Ghostscript no figuran en `engines.json`, no se localizan en ejecución, no se descargan en la preparación y no se firman ni empaquetan.
 

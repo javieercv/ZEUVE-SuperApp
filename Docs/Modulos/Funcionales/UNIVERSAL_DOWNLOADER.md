@@ -1,11 +1,11 @@
-# Descargador universal 0.7.3
+# Descargador universal 0.7.3 — ZEUVE 0.20.3.0
 
 ## Identidad
 
 - Identificador: `com.zeuve.universal-downloader`.
 - Identificador heredado reconocido: `com.zeuve.youtube-downloader`.
 - Tecnología: Swift 6 con motores locales incluidos u opcionales.
-- Versión mínima de esta entrega: ZEUVE 0.12.4.
+- Versión mínima declarada en el manifest: ZEUVE 0.10.4.
 
 ## Organización interna 0.7.3
 
@@ -32,7 +32,7 @@ El módulo no obliga a utilizar un único extractor. `UniversalEngineRouter` eli
 - `instaloader-zeuve`: resolución directa y catálogo progresivo de Instagram.
 - extractor HTML de ZEUVE: archivos directos, reproductores y manifiestos encontrados en páginas concretas.
 - FFmpeg/FFprobe: unión, remultiplexado y validación multimedia.
-- navegador opcional: reservado como compatibilidad futura; en 0.7.3 no se ofrece en la interfaz ni participa en el routing porque el contrato ejecutable anterior estaba incompleto.
+- navegador opcional: reservado como compatibilidad futura; en 0.7.3 no existe una opción funcional de instalación/activación ni participa en el routing porque el contrato ejecutable anterior estaba incompleto. Ajustes conserva únicamente una sección informativa heredada sobre esta posibilidad.
 
 El orden puede usar motores de respaldo aprobados. No se rastrea un sitio completo desde una página genérica.
 
@@ -226,3 +226,10 @@ El resultado de una descarga tiene prioridad sobre su entrada de historial. Si l
 `UniversalDownloaderView.swift` conserva la composición principal de la herramienta y la tarjeta de ajustes se aloja en `Sources/ZEUVEApp/UniversalDownloader/Views/UniversalDownloaderSettingsCard.swift`. La extracción mantiene exactamente las opciones, textos, bindings, modos simple/avanzado y política de red/acceso ya aprobados; no crea una pantalla ni una configuración nueva.
 
 `UniversalDownloaderViewModel` y `UniversalDownloadAnalysisService` se revisaron durante el saneamiento. Se mantienen como coordinadores porque su estado/tareas y su routing respectivamente forman ciclos cohesivos; no se dividen por un límite arbitrario de líneas ni se altera el orden de motores o fallbacks.
+
+## Documentación relacionada
+
+- [Privacidad y red](UNIVERSAL_DOWNLOADER_PRIVACY_AND_NETWORK.md)
+- [Motores](../../Motores/UNIVERSAL_DOWNLOADER_ENGINES.md)
+- [Empaquetado de motores](../../Motores/UNIVERSAL_DOWNLOADER_ENGINE_PACKAGING.md)
+- [Gestión y overrides](../../Motores/ENGINE_MANAGEMENT.md)

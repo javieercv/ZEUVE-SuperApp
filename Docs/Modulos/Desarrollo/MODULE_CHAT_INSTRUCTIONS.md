@@ -117,7 +117,7 @@ Each official module must have:
 - Name conflicts must be explicit and non-destructive by default.
 - Cancellation must remove incomplete output and temporary files.
 - Reversible moves/renames should support safe undo with conflict and change detection.
-- Never operate outside user-selected locations.
+- Never modify outside user-selected locations unless an explicitly approved maintenance module declares the specific permission. `scanLocalStorage` is analysis-only; mutation still requires `removeLocalItems`, a visible plan, explicit selection, and revalidation.
 
 ## UI AND UX
 

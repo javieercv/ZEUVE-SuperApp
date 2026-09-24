@@ -2,13 +2,13 @@
 
 ## Estado
 
-`OrganizerModule` 0.1.4 forma parte de ZEUVE como módulo built-in para macOS. Su identificador estable es `com.zeuve.organizer`, pertenece a la categoría visible **Archivos** y su atajo predeterminado es `⌘1`.
+`OrganizerModule` 0.1.4 forma parte de ZEUVE como módulo built-in para macOS. Su identificador estable es `com.zeuve.organizer`, su versión mínima de ZEUVE es `0.1.0`, pertenece a la categoría visible **Archivos** y su atajo de fábrica es `⌘1`. El usuario puede personalizar o desactivar ese atajo desde la navegación central.
 
 El módulo trabaja sobre una carpeta elegida explícitamente por el usuario. Genera primero una vista previa completa y solo mueve los elementos seleccionados después de una confirmación.
 
 ## Objetivo
 
-El Organizador clasifica archivos por categoría y formato, permite revisar el plan antes de ejecutarlo y evita sobrescrituras silenciosas.
+El Organizador clasifica archivos por categoría y formato, permite revisar el plan antes de ejecutarlo y evita sobrescrituras silenciosas. No modifica el contenido interno de los archivos.
 
 Su flujo principal es:
 
@@ -21,13 +21,15 @@ vista previa revisable
         ↓
 selección de operaciones
         ↓
+preflight y fingerprints
+        ↓
 confirmación
         ↓
 revalidación
         ↓
 movimiento seguro
         ↓
-historial / deshacer
+historial / deshacer verificable
 ```
 
 ## Interfaz
@@ -49,7 +51,7 @@ La vista principal permite:
 - abrir la carpeta al terminar;
 - deshacer una organización válida desde el resultado o el historial.
 
-Las preferencias persistentes del módulo se administran desde los Ajustes centralizados de ZEUVE. Las opciones de la operación actual permanecen en la herramienta.
+Las preferencias persistentes del módulo se administran desde los Ajustes centralizados de ZEUVE mediante `SettingsRepository` y `OrganizerStorageKeys`. Las opciones de la operación actual permanecen en la herramienta. También se recuerda la última carpeta y hasta cinco carpetas recientes.
 
 ## Niveles de organización
 
@@ -107,7 +109,7 @@ La agrupación puede desactivarse para que cada archivo siga únicamente su clas
 
 ## Carpetas y análisis recursivo
 
-Por defecto se analiza la carpeta seleccionada. La opción **Incluir subcarpetas** permite recorrer también su contenido interno.
+Por defecto se analiza la carpeta seleccionada. La opción **Incluir subcarpetas** permite recorrer también su contenido interno mediante una pila explícita y atendiendo cancelación.
 
 El Organizador:
 
@@ -115,9 +117,18 @@ El Organizador:
 - no recorre paquetes de macOS como aplicaciones, bundles, frameworks o fototecas;
 - evita volver a procesar sus propias carpetas de categorías cuando trabaja recursivamente desde la raíz seleccionada;
 - puede omitir archivos y carpetas ocultos;
-- ignora determinados archivos de sistema y temporales.
+- ignora determinados archivos de sistema y temporales;
+- señala elementos sin permisos de lectura u otros elementos incompatibles cuando corresponde.
 
 Las ubicaciones críticas del sistema, como `/`, `/System`, `/Library`, `/Applications`, `/usr`, `/bin`, `/sbin` y `/private`, no se aceptan como carpetas organizables.
+
+Cada archivo candidato recibe una clasificación por extensión y un destino propuesto. El plan conserva un `FileFingerprint` de la fuente para detectar cambios entre análisis y ejecución.
+
+## Plan y revisión
+
+`OrganizerPlan` conserva la carpeta base, movimientos propuestos, elementos ignorados y su motivo, opciones aplicadas, número de subcarpetas detectadas y fecha de generación.
+
+La interfaz permite seleccionar o deseleccionar operaciones antes de ejecutar. El resumen presenta archivos, categorías, formatos, carpetas a crear, grupos relacionados, conflictos, ignorados y subcarpetas.
 
 ## Conflictos
 
@@ -129,25 +140,29 @@ Las políticas disponibles son:
 - **Omitir**: excluye el archivo conflictivo del plan;
 - **Revisar conflictos**: mantiene el conflicto visible para su revisión antes de ejecutar.
 
-El destino se vuelve a comprobar al ejecutar. Si aparece un archivo nuevo después de generar la vista previa, la operación se detiene antes de sobrescribirlo.
+El destino se vuelve a comprobar al ejecutar. Si aparece un archivo nuevo después de generar la vista previa, la operación se invalida antes de sobrescribirlo.
 
-## Protección de archivos
+## Protección de archivos y ejecución
 
-Cada operación conserva un fingerprint del archivo de origen generado durante la planificación.
+Antes de mover, `OrganizerExecutor` realiza un preflight de todas las operaciones seleccionadas:
 
-Antes de mover archivos, el ejecutor comprueba que el plan sigue siendo válido. Si un origen ha cambiado desde la vista previa, el plan se invalida y no se ejecuta parcialmente.
+- la fuente debe seguir existiendo;
+- su fingerprint debe coincidir;
+- el destino no debe existir.
 
-La ejecución crea únicamente las carpetas necesarias y mueve los archivos seleccionados. No elimina ni reemplaza archivos existentes como mecanismo de resolución de conflictos.
+Durante la ejecución se comprueba cancelación antes de cada movimiento. Las carpetas necesarias se crean de forma controlada dentro de la carpeta base. No se eliminan ni reemplazan archivos existentes como mecanismo de resolución de conflictos.
 
-## Cancelación y rollback
+Si una operación falla después de haber completado movimientos anteriores, el ejecutor intenta **rollback** en orden inverso y elimina únicamente carpetas creadas por la operación que hayan quedado vacías.
 
-El análisis y la ejecución son cancelables y respetan `OperationCoordinator`.
+## OperationCoordinator y cancelación
 
-Si una ejecución se cancela después de haber movido algunos archivos, el Organizador intenta revertir los movimientos completados antes de devolver el control. No deja deliberadamente una operación a medias como estado normal.
+Análisis, ejecución y Undo son cancelables y se integran con `OperationCoordinator`. El trabajo pesado de enumeración y movimiento no se ejecuta deliberadamente en el hilo principal.
+
+Cancelar no convierte un plan parcial en resultado válido ni elimina elementos ajenos a la operación.
 
 ## Historial y deshacer
 
-Las operaciones completadas se integran en el historial de ZEUVE.
+Las operaciones completadas se integran en el historial de ZEUVE mediante `OrganizerHistoryService`.
 
 El Undo es verificable:
 
@@ -157,17 +172,21 @@ El Undo es verificable:
 - conserva carpetas creadas por ZEUVE si contienen elementos ajenos;
 - marca la operación como no deshacible cuando ya no puede revertirse de forma segura.
 
+Undo recorre los movimientos en orden inverso y puede terminar como completo, parcial o no disponible. Si un archivo fue modificado, desapareció o su ubicación original volvió a ocuparse, se omite y se informa.
+
 Un fallo secundario al guardar el historial no convierte en fallida una organización que ya terminó correctamente; se informa mediante una advertencia controlada.
 
 ## CSV de planificación
 
-La vista previa puede exportarse a CSV. El archivo distingue operaciones incluidas y excluidas para que el usuario pueda revisar o conservar el plan fuera de la aplicación.
+La vista previa puede exportarse a CSV mediante `OrganizerCSVExporter`. El archivo distingue operaciones incluidas y excluidas para que el usuario pueda revisar o conservar el plan fuera de la aplicación.
 
 Exportar el plan no mueve archivos ni modifica la carpeta analizada.
 
-## Permisos declarados
+## Privacidad y permisos
 
-El manifiesto del módulo declara únicamente:
+El Organizador trabaja únicamente sobre la carpeta seleccionada por el usuario y no necesita red. No sigue symlinks ni usa shell. El historial no debe convertirse en un inventario privado innecesario más allá de lo requerido para Undo y presentación.
+
+El manifiesto declara únicamente:
 
 - `readUserSelectedFiles`;
 - `writeUserSelectedFolder`;
@@ -175,7 +194,7 @@ El manifiesto del módulo declara únicamente:
 
 No existe acceso de red como parte del Organizador.
 
-## Integración
+## Integración y archivos principales
 
 El módulo utiliza:
 
@@ -185,7 +204,17 @@ El módulo utiliza:
 - `ZEUVEStorage` para preferencias e historial;
 - `BuiltInModuleCatalog` para identidad, navegación, Ajustes, historial y atajo.
 
-Las claves persistentes propias del módulo se concentran en `OrganizerStorageKeys`.
+Archivos principales:
+
+- `Sources/OrganizerModule/OrganizerModels.swift`
+- `Sources/OrganizerModule/ExtensionRules.swift`
+- `Sources/OrganizerModule/OrganizerPlanner.swift`
+- `Sources/OrganizerModule/OrganizerExecutor.swift`
+- `Sources/OrganizerModule/OrganizerHistoryService.swift`
+- `Sources/OrganizerModule/OrganizerCSVExporter.swift`
+- `Sources/OrganizerModule/OrganizerStorageKeys.swift`
+- `Sources/ZEUVEApp/Organizer/`
+- `Tests/OrganizerModuleTests/`
 
 ## Garantías cubiertas por pruebas
 
