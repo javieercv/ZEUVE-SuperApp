@@ -124,7 +124,7 @@ struct MultimediaInspectorView: View {
                 }
             }
             .padding(.horizontal, 20)
-            if model.previewState != .idle {
+            if model.previewState != .idle || !model.videoTracks.isEmpty {
                 MultimediaPreviewPlayerView(model: model).padding(.horizontal, 20)
             }
             if let plan = model.editPlan {

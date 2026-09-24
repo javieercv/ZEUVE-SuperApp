@@ -3,7 +3,7 @@
   "identifier": "com.zeuve.multimedia-inspector",
   "name": "Inspector multimedia",
   "summary": "Inspección técnica, reproducción multimedia amplia y edición estructural segura para audio y vídeo.",
-  "version": "0.7.0",
+  "version": "0.7.2",
   "minimumZEUVEVersion": "0.13.0",
   "moduleAPI": "1.0",
   "technology": "mixed",

@@ -1,10 +1,10 @@
-# ZEUVE 0.20.0.0
+# ZEUVE 0.20.2.0
 
-ZEUVE es una aplicación nativa y modular para macOS 14+ en Apple Silicon. La versión 0.20.0.0 añade personalización global del orden y los atajos de los módulos e incorpora **Limpiador 0.1.0**, una herramienta local de inventario, residuos, limpieza segura, desinstalación asistida y análisis de espacio sin red, `sudo` ni helper privilegiado.
+ZEUVE es una aplicación nativa y modular para macOS 14+ en Apple Silicon. La versión 0.20.2.0 optimiza la respuesta interactiva del **Inspector multimedia 0.7.2** sin alterar las correcciones de transporte de 0.7.1.
 
 ## Estado de esta entrega
 
-La base funcional del Inspector multimedia 0.7.0 se conserva. La novedad transversal es que Sidebar, Inicio y comandos comparten ahora un único orden configurable y atajos validados; el nuevo Limpiador utiliza el mismo catálogo built-in, `OperationCoordinator`, `SettingsRepository` e historial global.
+El Inspector resuelve cada control desde una identidad estable y un transporte compartido, conserva el frame al pausar vídeo, usa la ventana propietaria para fullscreen y distingue sesiones originales de externas al cancelar edición.
 
 El proyecto incluye:
 
@@ -13,7 +13,7 @@ El proyecto incluye:
 - Analizador de chats;
 - Conversor universal;
 - Comparador de seguidores de Instagram;
-- **Inspector multimedia** 0.7.0;
+- **Inspector multimedia** 0.7.2;
 - **Limpiador** 0.1.0.
 
 ### Limpiador 0.1.0
@@ -21,6 +21,14 @@ El proyecto incluye:
 Analiza aplicaciones, residuos, cachés/logs, determinados datos regenerables de Xcode, instaladores antiguos y espacio local mediante un pipeline común y revisable. La selección automática se limita a elementos regenerables de riesgo bajo; datos persistentes, App Groups compartidos y asociaciones inciertas quedan protegidos. Papelera es el modo predeterminado y permite Undo verificable mientras macOS conserve el elemento.
 
 La navegación global puede reordenarse desde Ajustes → General → Herramientas y atajos. Los defaults son `⌘1`…`⌘7` para los siete módulos y `⌘8` para Historial, pero todos los atajos de módulos e Historial pueden cambiarse o desactivarse.
+
+### Inspector multimedia 0.7.2 — respuesta interactiva
+
+El transporte conserva las identidades, generaciones, pausa de vídeo, seek optimista y sustitución atómica ya estabilizados. La salida de audio se corta de inmediato antes de limpiar FFmpeg/AVAudioEngine; los procesos efímeros de preview usan una gracia de cancelación de 50 ms sin cambiar los 2 s globales de otros motores; y el monitor deja de publicar snapshots redundantes cuando la sesión está pausada. Durante reproducción se mantiene la cadencia de 100 ms del playhead.
+
+### Inspector multimedia 0.7.1 — corrección de transporte y análisis
+
+Los controles de Pistas y reproductor comparten identidad solicitada/confirmada y estado global. El análisis distingue rolloff, banda efectiva y caída persistente, incorpora cobertura temporal y hace explícito el recorte de anomalías agrupadas.
 
 ### Inspector multimedia 0.7.0 — macro-bloque final
 
@@ -105,6 +113,8 @@ El mapa de consulta y las reglas para incorporar nueva documentación están en 
 - `Docs/Modulos/Funcionales/CLEANER.md`: arquitectura funcional y comportamiento del Limpiador.
 - `Docs/Modulos/Funcionales/CLEANER_PRIVACY_AND_FILES.md`: privacidad, permisos y garantías de archivos del Limpiador.
 - `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.0.0.md`, `Docs/Historico/Pruebas/TEST_RESULTS_0.20.0.0.md` y `Docs/Historico/Entregas/DELIVERY_0.20.0.0.md`: cierre de la entrega 0.20.0.0.
+- `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.2.0.md`, `Docs/Historico/Pruebas/TEST_RESULTS_0.20.2.0.md` y `Docs/Historico/Entregas/DELIVERY_0.20.2.0.md`: optimización de respuesta del Inspector multimedia 0.7.2.
+- `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.1.0.md`, `Docs/Historico/Pruebas/TEST_RESULTS_0.20.1.0.md` y `Docs/Historico/Entregas/DELIVERY_0.20.1.0.md`: corrección del Inspector multimedia 0.7.1.
 - Los documentos 0.18.1.0 se conservan como histórico del cierre de ayuda contextual.
 - `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.18.0.0.md`: lotes, presets y auditoría de personalización del Inspector.
 - `Docs/Historico/Pruebas/TEST_RESULTS_0.18.0.0.md`: resultados automáticos ejecutados para esta entrega.

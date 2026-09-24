@@ -118,7 +118,8 @@ public actor ExternalProcessRunner {
     public func run(
         _ request: ExternalProcessRequest,
         onStdout: @escaping OutputHandler = { _ in },
-        onStderr: @escaping OutputHandler = { _ in }
+        onStderr: @escaping OutputHandler = { _ in },
+        cancellationGracePeriod: Duration = .seconds(2)
     ) async throws -> ExternalProcessResult {
         guard activePID == nil else { throw ExternalProcessError.runnerBusy }
         guard request.executable.isFileURL,
@@ -184,7 +185,7 @@ public actor ExternalProcessRunner {
             }.value
         } onCancel: {
             Task { [weak self] in
-                await self?.cancelBecauseParentTaskWasCancelled()
+                await self?.cancelBecauseParentTaskWasCancelled(gracePeriod: cancellationGracePeriod)
             }
         }
 
@@ -205,9 +206,9 @@ public actor ExternalProcessRunner {
         return result
     }
 
-    private func cancelBecauseParentTaskWasCancelled() async {
+    private func cancelBecauseParentTaskWasCancelled(gracePeriod: Duration) async {
         do {
-            try await cancel()
+            try await cancel(gracePeriod: gracePeriod)
         } catch {
             // `run` seguirá esperando a waitpid y propagará cancelación. Si el grupo no
             // pudiera terminarse, el registro global conservará la evidencia para diagnóstico.

@@ -29,13 +29,20 @@ final class PreviewServiceSpy {
     func setPlaybackRate(_ rate: Float) async { rates.append(rate) }
 }
 
+enum MultimediaPreviewPlaybackState {
+    case idle, loading, playing, paused, finished, failed
+}
+
 @MainActor
 final class InspectorHarness: ObservableObject {
     let previewService: PreviewServiceSpy? = PreviewServiceSpy()
     var videoPreviewSourceID: String?
     var previewPosition: TimeInterval = 12
-    var videoRestarts: [TimeInterval] = []
-    func restartVideoPreview(at position: TimeInterval) { videoRestarts.append(position) }
+    var previewState: MultimediaPreviewPlaybackState = .playing
+    var videoRestarts: [(TimeInterval, Bool)] = []
+    func replaceSelectedVideoPreview(at position: TimeInterval, shouldPlay: Bool) {
+        videoRestarts.append((position, shouldPlay))
+    }
 __PRODUCTION_OBSERVER__
 }
 
@@ -63,7 +70,10 @@ struct Regression {
                 precondition(model.previewService!.rates.last == Float(expected))
                 precondition(model.videoRestarts.count == previousVideoCount + (hasVideo ? 1 : 0),
                              "Normalizar no debe reiniciar vídeo dos veces")
-                if hasVideo { precondition(model.videoRestarts.last == 12) }
+                if hasVideo {
+                    precondition(model.videoRestarts.last?.0 == 12)
+                    precondition(model.videoRestarts.last?.1 == true)
+                }
             }
         }
         print("PASS: 22 asignaciones; restauración, límites, valores no finitos y sincronización A/V")

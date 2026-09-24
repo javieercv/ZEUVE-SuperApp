@@ -13,11 +13,11 @@ import json
 version = Path('VERSION').read_text().strip()
 parts = version.split('.')
 assert len(parts) == 4 and all(part.isdigit() for part in parts), 'VERSION debe usar MAJOR.MINOR.PATCH.REVISION'
-assert version == '0.20.0.0'
+assert version == '0.20.2.0'
 marketing_version = '.'.join(parts[:3])
 release_revision = parts[3]
 pbx = Path('ZEUVE.xcodeproj/project.pbxproj').read_text()
-for required in [f'MARKETING_VERSION = {marketing_version};', 'CURRENT_PROJECT_VERSION = 66;', f'INFOPLIST_KEY_ZEUVEReleaseRevision = {release_revision};', 'ENABLE_HARDENED_RUNTIME = YES;', 'ZEUVEEngines', 'UniversalDownloaderModule', 'ChatAnalyzerModule', 'UniversalConverterModule', 'InstagramFollowersModule', 'MultimediaInspectorModule', 'CleanerModule', 'Engines in Resources']:
+for required in [f'MARKETING_VERSION = {marketing_version};', 'CURRENT_PROJECT_VERSION = 68;', f'INFOPLIST_KEY_ZEUVEReleaseRevision = {release_revision};', 'ENABLE_HARDENED_RUNTIME = YES;', 'ZEUVEEngines', 'UniversalDownloaderModule', 'ChatAnalyzerModule', 'UniversalConverterModule', 'InstagramFollowersModule', 'MultimediaInspectorModule', 'CleanerModule', 'Engines in Resources']:
     if required not in pbx:
         raise SystemExit('El proyecto Xcode no contiene: ' + required)
 package = Path('Package.swift').read_text()
@@ -57,7 +57,7 @@ assert 'openExternalApplications' in instagram_followers['permissions']
 
 multimedia = json.loads(Path('Sources/MultimediaInspectorModule/Resources/manifest.json').read_text())
 assert multimedia['identifier'] == 'com.zeuve.multimedia-inspector'
-assert multimedia['version'] == '0.7.0'
+assert multimedia['version'] == '0.7.2'
 assert multimedia['minimumZEUVEVersion'] == '0.13.0'
 assert multimedia['technology'] == 'mixed' and multimedia['executionMode'] == 'builtIn'
 assert 'networkAccess' not in multimedia['permissions']

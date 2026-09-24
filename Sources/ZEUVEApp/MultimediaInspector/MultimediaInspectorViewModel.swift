@@ -51,14 +51,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
     @Published private(set) var subtitlePreviewEvents: [MultimediaSubtitlePreviewEvent] = []
     @Published private(set) var isLoadingSubtitlePreview = false
 
-    @Published var selectedVideoStreamIndex: Int? {
-        didSet {
-            guard oldValue != selectedVideoStreamIndex, !suppressPreviewSelectionSideEffects else { return }
-            if previewSourceID != nil || videoPreviewSourceID != nil {
-                restartVideoPreview(at: sessionPreferences.previewTrackSwitchKeepsPosition ? previewPosition : 0)
-            }
-        }
-    }
+    @Published private(set) var selectedVideoSourceID: String?
     @Published var selectedAudioStreamIndex: Int? {
         didSet {
             guard oldValue != selectedAudioStreamIndex else { return }
@@ -102,6 +95,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
     @Published private(set) var videoPreviewFrame: MultimediaVideoPreviewFrame?
     @Published private(set) var videoPreviewState: MultimediaPreviewPlaybackState = .idle
     @Published private(set) var videoPreviewSourceID: String?
+    @Published private(set) var requestedVideoPreviewSourceID: String?
     @Published var previewPlaybackRate: Double = 1 {
         didSet {
             let normalizedRate = min(max(previewPlaybackRate.isFinite ? previewPlaybackRate : 1, 0.5), 2)
@@ -111,7 +105,12 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 return
             }
             Task { [weak self] in await self?.previewService?.setPlaybackRate(Float(normalizedRate)) }
-            if videoPreviewSourceID != nil { restartVideoPreview(at: previewPosition) }
+            if videoPreviewSourceID != nil {
+                replaceSelectedVideoPreview(
+                    at: previewPosition,
+                    shouldPlay: previewState == .playing || previewState == .loading
+                )
+            }
         }
     }
     @Published var previewVolume: Double = 1 {
@@ -180,6 +179,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
     private var previewTask: Task<Void, Never>?
     private var previewMonitorTask: Task<Void, Never>?
     private var videoPreviewTask: Task<Void, Never>?
+    private var videoPreviewOperationID = UUID()
     private var subtitlePreviewTask: Task<Void, Never>?
     private var waveformTask: Task<Void, Never>?
     private var waveformGenerationID = UUID()
@@ -429,7 +429,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 self.fingerprint = fp
                 self.cacheInspectionTracks(result)
                 self.configureDefaultComparisonTracks()
-                self.selectedVideoStreamIndex = result.videoStreams.first?.index
+                self.selectedVideoSourceID = self.inspectionVideoTracks.first.flatMap { self.previewSourceID(for: $0) }
                 self.selectedAudioStreamIndex = result.audioStreams.first(where: Self.isAnalyzableAudioStream)?.index ?? result.audioStreams.first?.index
                 if result.audioStreams.isEmpty, self.selectedTab == .spectrogram {
                     self.selectedTab = .summary
@@ -515,7 +515,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
         activeComparisonSlot = .a
         isCompletingComparisonAnalysis = false
         comparisonAnalysisCurrentTrackID = nil
-        selectedVideoStreamIndex = nil
+        selectedVideoSourceID = nil
         selectedSubtitlePreviewStreamIndex = nil
         subtitlePreviewEvents = []
         selectedAudioStreamIndex = nil
@@ -627,10 +627,61 @@ final class MultimediaInspectorViewModel: ObservableObject {
         discardEditing()
     }
     private func discardEditing() {
-        stopPreview()
+        let ownership = previewSessionOwnership()
         draftHistory = nil
         editPlan = nil
+        if !videoTracks.contains(where: { previewSourceID(for: $0) == selectedVideoSourceID }) {
+            selectedVideoSourceID = videoTracks.first.flatMap { previewSourceID(for: $0) }
+        }
         configureDefaultComparisonTracks()
+        switch ownership {
+        case .noSession:
+            break
+        case .originalOnly:
+            pausePreviewPreservingSession()
+        case .containsExternalOrUnavailable:
+            stopPreview()
+        }
+    }
+
+    private func previewSessionOwnership() -> MultimediaPreviewSessionOwnership {
+        let hasSession = previewState != .idle || previewSourceID != nil || requestedPreviewSourceID != nil ||
+            activePreviewSource != nil || videoPreviewSourceID != nil || requestedVideoPreviewSourceID != nil
+        let sourceIDs = Set([
+            previewSourceID,
+            requestedPreviewSourceID,
+            activePreviewSource?.id,
+            videoPreviewSourceID,
+            requestedVideoPreviewSourceID,
+        ].compactMap { $0 })
+        let originalSourceIDs = Set((inspectionAudioTracks + inspectionVideoTracks).compactMap { previewSourceID(for: $0) })
+        return MultimediaPreviewSessionOwnershipResolver.resolve(
+            hasSession: hasSession,
+            sourceIDs: sourceIDs,
+            originalSourceIDs: originalSourceIDs
+        )
+    }
+
+    private func pausePreviewPreservingSession() {
+        let operationID = previewOperationID
+        let videoOperationID = videoPreviewOperationID
+        let pendingAudio = previewTask
+        let pendingVideo = videoPreviewTask
+        previewMonitorTask?.cancel()
+        previewTask = Task { [weak self] in
+            _ = await pendingAudio?.result
+            _ = await pendingVideo?.result
+            guard let self,
+                  self.previewOperationID == operationID,
+                  self.videoPreviewOperationID == videoOperationID,
+                  !Task.isCancelled else { return }
+            await self.previewService?.pause()
+            await self.videoPreviewService?.pause()
+            guard self.previewOperationID == operationID else { return }
+            await self.refreshPreviewSnapshot(operationID: operationID)
+            if self.previewState == .loading { self.previewState = .paused }
+            self.beginPreviewMonitoring(operationID: operationID)
+        }
     }
 
     func undo() { guard var h = draftHistory else { return }; if h.undo() { draftHistory = h; editPlan = nil; configureDefaultComparisonTracks() } }
@@ -645,8 +696,8 @@ final class MultimediaInspectorViewModel: ObservableObject {
 
     func removeTrack(_ id: UUID, kind: MediaTrackKind) {
         if kind == .audio, let track = audioTracks.first(where: { $0.id == id }), previewSourceID == previewSourceID(for: track) { stopPreview() }
-        if kind == .video, let track = videoTracks.first(where: { $0.id == id }), track.source.streamIndex == selectedVideoStreamIndex {
-            selectedVideoStreamIndex = videoTracks.first(where: { $0.id != id })?.source.streamIndex
+        if kind == .video, let track = videoTracks.first(where: { $0.id == id }), previewSourceID(for: track) == selectedVideoSourceID {
+            selectedVideoSourceID = videoTracks.first(where: { $0.id != id }).flatMap { previewSourceID(for: $0) }
         }
         mutate { draft in
             switch kind {
@@ -1054,24 +1105,37 @@ final class MultimediaInspectorViewModel: ObservableObject {
     }
 
     func previewPlaybackState(for sourceID: String?) -> MultimediaPreviewPlaybackState {
-        guard previewControlMatches(sourceID) else { return .idle }
-        return previewState
+        MultimediaPreviewControlResolver.resolve(
+            targetSourceID: sourceID,
+            requestedSourceID: requestedPreviewSourceID,
+            confirmedSourceID: previewSourceID,
+            transportState: previewState
+        ).state
     }
 
-    private func previewControlMatches(_ sourceID: String?) -> Bool {
-        guard let sourceID else { return false }
-        switch previewState {
-        case .loading:
-            return requestedPreviewSourceID == sourceID
-        case .playing, .paused, .finished:
-            return previewSourceID == sourceID
-        case .idle, .failed:
-            return false
+    func previewPlaybackState(for track: MediaEditableTrack) -> MultimediaPreviewPlaybackState {
+        let targetSourceID = previewSourceID(for: track)
+        if track.kind == .video {
+            return MultimediaPreviewControlResolver.resolve(
+                targetSourceID: targetSourceID,
+                requestedSourceID: requestedVideoPreviewSourceID,
+                confirmedSourceID: videoPreviewSourceID,
+                transportState: previewState
+            ).state
         }
+        return previewPlaybackState(for: targetSourceID)
     }
 
     func previewTrack(_ track: MediaEditableTrack) {
         startPreviewTrack(track, synchronizeSpectrogramSelection: true, toggleIfAlreadyActive: true)
+    }
+
+    func activatePreview(for track: MediaEditableTrack) {
+        guard track.kind == .video else {
+            previewTrack(track)
+            return
+        }
+        activateVideoPreview(for: track, toggleIfAlreadyActive: true)
     }
 
     private func startPreviewTrack(
@@ -1201,47 +1265,63 @@ final class MultimediaInspectorViewModel: ObservableObject {
 
     func togglePreviewPause() {
         guard let previewService else { return }
+        let requestedState = previewState
         let previous = previewTask
         previous?.cancel()
         previewMonitorTask?.cancel()
         let operationID = UUID()
         previewOperationID = operationID
 
+        switch requestedState {
+        case .playing, .loading:
+            previewState = .paused
+            if videoPreviewSourceID != nil || requestedVideoPreviewSourceID != nil {
+                videoPreviewState = .paused
+            }
+        case .paused, .finished:
+            previewState = .loading
+            if videoPreviewSourceID != nil || requestedVideoPreviewSourceID != nil {
+                videoPreviewState = .loading
+            }
+        case .idle, .failed:
+            break
+        }
+
         previewTask = Task { [weak self] in
             _ = await previous?.result
             guard let self, self.previewOperationID == operationID, !Task.isCancelled else { return }
             if self.activePreviewSource == nil, self.videoPreviewSourceID != nil {
-                switch self.previewState {
+                switch requestedState {
                 case .playing, .loading:
-                    await self.videoPreviewService?.stop()
+                    await self.videoPreviewService?.pause()
                     self.videoPreviewState = .paused
                     self.previewState = .paused
                 case .paused:
-                    await self.startVideoPreview(at: self.previewPosition)
+                    self.replaceSelectedVideoPreview(at: self.previewPosition, shouldPlay: true)
                     self.previewState = .loading
                 case .finished:
                     self.previewPosition = 0
-                    await self.startVideoPreview(at: 0)
+                    self.replaceSelectedVideoPreview(at: 0, shouldPlay: true)
                     self.previewState = .loading
                 default:
                     break
                 }
             } else {
-                switch self.previewState {
+                switch requestedState {
                 case .playing, .loading:
                     await previewService.pause()
-                    await self.videoPreviewService?.stop()
+                    await self.videoPreviewService?.pause()
                     self.videoPreviewState = .paused
                 case .paused:
                     do {
                         try await previewService.resume()
-                        await self.startVideoPreview(at: self.previewPosition)
+                        self.replaceSelectedVideoPreview(at: self.previewPosition, shouldPlay: true)
                     } catch { self.errorMessage = Self.clean(error) }
                 case .finished:
                     do {
                         self.previewPosition = 0
                         try await previewService.seek(to: 0)
-                        await self.startVideoPreview(at: 0)
+                        self.replaceSelectedVideoPreview(at: 0, shouldPlay: true)
                     } catch { self.errorMessage = Self.clean(error) }
                 default:
                     break
@@ -1259,7 +1339,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
 
         guard let previewService, activePreviewSource != nil else {
             previewPosition = target
-            if selectedVideoStreamIndex != nil { previewSelectedVideo(at: target) }
+            if selectedVideoSourceID != nil { previewSelectedVideo(at: target, preservePlaybackState: true) }
             else { previewSelectedSpectrogram(at: target) }
             return
         }
@@ -1279,7 +1359,10 @@ final class MultimediaInspectorViewModel: ObservableObject {
             guard let self, self.previewOperationID == operationID, !Task.isCancelled else { return }
             do {
                 try await previewService.seek(to: target, preservePlaybackState: true)
-                await self.startVideoPreview(at: target)
+                self.replaceSelectedVideoPreview(
+                    at: target,
+                    shouldPlay: self.previewState == .playing || self.previewState == .loading
+                )
                 guard self.previewOperationID == operationID else { return }
                 await self.refreshPreviewSnapshot(operationID: operationID)
                 self.beginPreviewMonitoring(operationID: operationID)
@@ -1315,10 +1398,12 @@ final class MultimediaInspectorViewModel: ObservableObject {
         activePreviewSource = nil
         activePreviewChannel = .mix
         videoPreviewSourceID = nil
+        requestedVideoPreviewSourceID = nil
         videoPreviewFrame = nil
         videoPreviewState = .idle
         videoPreviewTask?.cancel()
         videoPreviewTask = nil
+        videoPreviewOperationID = UUID()
 
         previewTask = Task { [weak self] in
             _ = await previous?.result
@@ -1363,11 +1448,14 @@ final class MultimediaInspectorViewModel: ObservableObject {
         activePreviewChannel = channel
         await previewService.setVolume(Float(min(max(previewVolume, 0), 1)))
         await previewService.setPlaybackRate(Float(previewPlaybackRate))
-        if selectedVideoStreamIndex != nil {
-            await startVideoPreview(at: position)
-        }
         await refreshPreviewSnapshot(operationID: operationID)
         guard previewOperationID == operationID else { return }
+        if selectedVideoSourceID != nil {
+            replaceSelectedVideoPreview(
+                at: position,
+                shouldPlay: previewState == .playing || previewState == .loading
+            )
+        }
         prepareWaveform(source: source, channel: channel, ffmpeg: ffmpeg)
         beginPreviewMonitoring(operationID: operationID)
     }
@@ -1402,42 +1490,67 @@ final class MultimediaInspectorViewModel: ObservableObject {
         }
     }
 
-    func previewSelectedVideo(at position: TimeInterval? = nil) {
-        guard selectedVideoStreamIndex != nil else {
-            errorMessage = "Selecciona una pista de vídeo reproducible."
-            return
+    func selectVideoSource(_ sourceID: String?) {
+        guard sourceID == nil || videoTracks.contains(where: { previewSourceID(for: $0) == sourceID }) else { return }
+        guard selectedVideoSourceID != sourceID else { return }
+        selectedVideoSourceID = sourceID
+        guard let track = selectedVideoTrack else { return }
+        let hasSession = previewState != .idle || activePreviewSource != nil || videoPreviewSourceID != nil || requestedVideoPreviewSourceID != nil
+        if hasSession {
+            activateVideoPreview(for: track, toggleIfAlreadyActive: false)
         }
-        let target = max(position ?? previewPosition, 0)
-        let operationID = UUID()
-        previewOperationID = operationID
-        previewPosition = target
-        previewState = .loading
-        previewTask?.cancel()
-        previewMonitorTask?.cancel()
-        previewTask = Task { [weak self] in
-            guard let self, self.previewOperationID == operationID, !Task.isCancelled else { return }
-            do {
-                try await self.startVideoPreviewOnly(at: target)
-                guard self.previewOperationID == operationID else { return }
-                self.beginPreviewMonitoring(operationID: operationID)
-            } catch is CancellationError {
-            } catch {
-                guard self.previewOperationID == operationID else { return }
-                self.previewState = .failed
-                self.errorMessage = Self.clean(error)
+    }
+
+    private func activateVideoPreview(for track: MediaEditableTrack, toggleIfAlreadyActive: Bool) {
+        let targetSourceID = previewSourceID(for: track)
+        let resolution = MultimediaPreviewControlResolver.resolve(
+            targetSourceID: targetSourceID,
+            requestedSourceID: requestedVideoPreviewSourceID,
+            confirmedSourceID: videoPreviewSourceID,
+            transportState: previewState
+        )
+        switch resolution.action {
+        case .pause, .resume, .restart:
+            if toggleIfAlreadyActive { togglePreviewPause() }
+        case .wait:
+            return
+        case .start:
+            guard let targetSourceID else { return }
+            selectedVideoSourceID = targetSourceID
+            let hasSession = previewState != .idle || activePreviewSource != nil || videoPreviewSourceID != nil
+            let retainedPosition = hasSession && sessionPreferences.previewTrackSwitchKeepsPosition ? previewPosition : 0
+            let shouldPlay = !hasSession || !sessionPreferences.previewTrackSwitchKeepsPlaybackState || previewState == .playing || previewState == .loading
+            if activePreviewSource != nil {
+                scheduleVideoPreview(for: track, at: retainedPosition, shouldPlay: shouldPlay)
+            } else {
+                startVideoOnlyPreview(track: track, at: retainedPosition, shouldPlay: shouldPlay)
             }
         }
     }
 
-    private func startVideoPreviewOnly(at position: TimeInterval) async throws {
-        try await startVideoPreview(at: position)
-        guard let videoPreviewService else { throw MultimediaInspectorError.previewUnavailable }
-        let snapshot = await videoPreviewService.snapshot(position: position)
-        videoPreviewSourceID = snapshot.sourceID
-        previewSourceID = snapshot.sourceID
-        previewDuration = snapshot.duration
-        previewTitle = selectedVideoTrack?.title.nonEmpty ?? "Previsualización de vídeo"
-        previewState = snapshot.state
+    func previewSelectedVideo(at position: TimeInterval? = nil, preservePlaybackState: Bool = false) {
+        guard let track = selectedVideoTrack else {
+            errorMessage = "Selecciona una pista de vídeo reproducible."
+            return
+        }
+        let target = max(position ?? previewPosition, 0)
+        let hasSession = previewState != .idle || videoPreviewSourceID != nil || requestedVideoPreviewSourceID != nil
+        let shouldPlay = !preservePlaybackState || !hasSession || previewState == .playing || previewState == .loading
+        startVideoOnlyPreview(track: track, at: target, shouldPlay: shouldPlay)
+    }
+
+    private func startVideoOnlyPreview(track: MediaEditableTrack, at position: TimeInterval, shouldPlay: Bool) {
+        let target = max(position, 0)
+        let operationID = UUID()
+        previewOperationID = operationID
+        previewPosition = target
+        previewState = shouldPlay ? .loading : .paused
+        previewTitle = track.title.nonEmpty ?? "Previsualización de vídeo"
+        previewTask?.cancel()
+        previewTask = nil
+        previewMonitorTask?.cancel()
+        scheduleVideoPreview(for: track, at: target, shouldPlay: shouldPlay)
+        beginPreviewMonitoring(operationID: operationID)
     }
 
     var currentSubtitlePreviewText: String? {
@@ -1490,8 +1603,8 @@ final class MultimediaInspectorViewModel: ObservableObject {
     }
 
     private var selectedVideoTrack: MediaEditableTrack? {
-        guard let index = selectedVideoStreamIndex else { return videoTracks.first }
-        return videoTracks.first(where: { $0.source.streamIndex == index }) ?? videoTracks.first
+        guard let selectedVideoSourceID else { return videoTracks.first }
+        return videoTracks.first(where: { previewSourceID(for: $0) == selectedVideoSourceID })
     }
 
     private func resolveVideoPreviewSource(for track: MediaEditableTrack) async throws -> MultimediaVideoPreviewSource {
@@ -1529,38 +1642,58 @@ final class MultimediaInspectorViewModel: ObservableObject {
         )
     }
 
-    private func startVideoPreview(at position: TimeInterval) async {
-        guard let videoPreviewService, let locator, let track = selectedVideoTrack else { return }
-        do {
-            let source = try await resolveVideoPreviewSource(for: track)
-            let ffmpeg = try await locator.ffmpeg()
-            try await videoPreviewService.start(
-                ffmpeg: ffmpeg, source: source, from: position, limits: sessionPreferences.videoPreviewLimits,
-                decoder: sessionPreferences.videoPreviewDecoder, playbackRate: previewPlaybackRate
-            )
-            videoPreviewSourceID = source.id
-            videoPreviewState = .loading
-            if activePreviewSource == nil {
-                previewSourceID = source.id
-                previewDuration = source.duration
-                previewTitle = source.title
-            }
-        } catch is CancellationError {
-        } catch {
-            videoPreviewState = .failed
-            if errorMessage == nil { errorMessage = Self.clean(error) }
-        }
+    private func replaceSelectedVideoPreview(at position: TimeInterval, shouldPlay: Bool) {
+        guard let track = selectedVideoTrack else { return }
+        scheduleVideoPreview(for: track, at: position, shouldPlay: shouldPlay)
     }
 
-    private func restartVideoPreview(at position: TimeInterval) {
-        videoPreviewTask?.cancel()
-        let shouldRun = previewState == .playing || previewState == .loading || activePreviewSource != nil
-        guard shouldRun else { return }
+    private func scheduleVideoPreview(for track: MediaEditableTrack, at position: TimeInterval, shouldPlay: Bool) {
+        guard let targetSourceID = previewSourceID(for: track) else { return }
+        let previous = videoPreviewTask
+        previous?.cancel()
+        let operationID = UUID()
+        videoPreviewOperationID = operationID
+        requestedVideoPreviewSourceID = targetSourceID
+        videoPreviewState = .loading
+
         videoPreviewTask = Task { [weak self] in
-            guard let self else { return }
-            await self.videoPreviewService?.stop()
-            guard !Task.isCancelled else { return }
-            await self.startVideoPreview(at: position)
+            _ = await previous?.result
+            guard let self, self.videoPreviewOperationID == operationID, !Task.isCancelled else { return }
+            do {
+                guard let videoPreviewService = self.videoPreviewService, let locator = self.locator else {
+                    throw MultimediaInspectorError.previewUnavailable
+                }
+                let source = try await self.resolveVideoPreviewSource(for: track)
+                try Task.checkCancellation()
+                guard self.videoPreviewOperationID == operationID else { throw CancellationError() }
+                let ffmpeg = try await locator.ffmpeg()
+                try Task.checkCancellation()
+                guard self.videoPreviewOperationID == operationID else { throw CancellationError() }
+                try await videoPreviewService.start(
+                    ffmpeg: ffmpeg,
+                    source: source,
+                    from: position,
+                    limits: self.sessionPreferences.videoPreviewLimits,
+                    decoder: self.sessionPreferences.videoPreviewDecoder,
+                    playbackRate: self.previewPlaybackRate,
+                    shouldPlay: shouldPlay
+                )
+                guard self.videoPreviewOperationID == operationID, !Task.isCancelled else { return }
+                self.videoPreviewSourceID = source.id
+                self.videoPreviewState = .loading
+                if self.activePreviewSource == nil {
+                    self.previewSourceID = source.id
+                    self.previewDuration = source.duration
+                    self.previewTitle = source.title
+                }
+            } catch is CancellationError {
+            } catch {
+                guard self.videoPreviewOperationID == operationID else { return }
+                self.requestedVideoPreviewSourceID = nil
+                self.videoPreviewState = .failed
+                if self.activePreviewSource == nil { self.previewState = .failed }
+                if self.errorMessage == nil { self.errorMessage = Self.clean(error) }
+            }
         }
     }
 
@@ -1578,7 +1711,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 guard let self, self.previewOperationID == operationID else { return }
                 await self.refreshPreviewSnapshot(operationID: operationID)
                 guard self.previewOperationID == operationID else { return }
-                if [.idle, .finished, .failed].contains(self.previewState) { return }
+                if [.idle, .paused, .finished, .failed].contains(self.previewState) { return }
                 try? await Task.sleep(for: .milliseconds(100))
             }
         }
@@ -1588,11 +1721,11 @@ final class MultimediaInspectorViewModel: ObservableObject {
         if let previewService, previewSourceID != nil || requestedPreviewSourceID != nil || activePreviewSource != nil {
             let snapshot = await previewService.snapshot()
             guard previewOperationID == operationID else { return }
-            previewState = snapshot.state
-            previewPosition = snapshot.position
-            previewDuration = snapshot.duration
-            previewTitle = snapshot.title
-            previewSourceID = snapshot.sourceID
+            if previewState != snapshot.state { previewState = snapshot.state }
+            if previewPosition != snapshot.position { previewPosition = snapshot.position }
+            if previewDuration != snapshot.duration { previewDuration = snapshot.duration }
+            if previewTitle != snapshot.title { previewTitle = snapshot.title }
+            if previewSourceID != snapshot.sourceID { previewSourceID = snapshot.sourceID }
             if snapshot.sourceID == requestedPreviewSourceID || [.idle, .failed].contains(snapshot.state) {
                 requestedPreviewSourceID = nil
             }
@@ -1601,14 +1734,26 @@ final class MultimediaInspectorViewModel: ObservableObject {
         if let videoPreviewService {
             let video = await videoPreviewService.snapshot(position: previewPosition)
             guard previewOperationID == operationID else { return }
-            videoPreviewState = video.state
-            videoPreviewSourceID = video.sourceID
-            if let frame = video.frame { videoPreviewFrame = frame }
-            if activePreviewSource == nil, let frame = video.frame {
-                previewPosition = frame.timestamp
-                previewDuration = video.duration
-                previewSourceID = video.sourceID
-                previewState = video.state
+            let previousVideoSourceID = videoPreviewSourceID
+            if videoPreviewState != video.state { videoPreviewState = video.state }
+            if videoPreviewSourceID != video.sourceID { videoPreviewSourceID = video.sourceID }
+            if let frame = video.frame,
+               previousVideoSourceID != video.sourceID ||
+               videoPreviewFrame?.timestamp != frame.timestamp ||
+               videoPreviewFrame?.width != frame.width ||
+               videoPreviewFrame?.height != frame.height {
+                videoPreviewFrame = frame
+            }
+            if video.sourceID == requestedVideoPreviewSourceID, video.state != .loading {
+                requestedVideoPreviewSourceID = nil
+            } else if [.idle, .failed].contains(video.state) {
+                requestedVideoPreviewSourceID = nil
+            }
+            if activePreviewSource == nil {
+                if let frame = video.frame, previewPosition != frame.timestamp { previewPosition = frame.timestamp }
+                if previewDuration != video.duration { previewDuration = video.duration }
+                if previewSourceID != video.sourceID { previewSourceID = video.sourceID }
+                if previewState != video.state { previewState = video.state }
             }
             if video.state == .failed, let message = video.errorMessage, errorMessage == nil { errorMessage = message }
         }
@@ -2183,7 +2328,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 self.loudnessResults = [:]
                 self.signalAnalysisTask?.cancel()
                 self.signalAnalysisResults = [:]
-                self.selectedVideoStreamIndex = result.inspection.videoStreams.first?.index
+                self.selectedVideoSourceID = self.inspectionVideoTracks.first.flatMap { self.previewSourceID(for: $0) }
                 self.selectedAudioStreamIndex = result.inspection.audioStreams.first?.index
                 self.warningMessage = [
                     "Resultado publicado como \(result.outputURL.lastPathComponent). El original no se ha modificado.",
@@ -2338,8 +2483,11 @@ final class MultimediaInspectorViewModel: ObservableObject {
 
     func cancelAndWait() async {
         cancelCurrentOperation()
+        videoPreviewTask?.cancel()
+        videoPreviewOperationID = UUID()
         await batch.cancelAndWait()
         await previewService?.stop()
+        await videoPreviewService?.stop()
         await waveformService?.cancel()
         await loudnessService?.cancel()
         await signalAnalysisService?.cancel()
@@ -2349,6 +2497,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
         _ = await executionTask?.result
         _ = await spectrogramTask?.result
         _ = await automaticAudioAnalysisTask?.result
+        _ = await videoPreviewTask?.result
         _ = await exportTask?.result
         _ = await attachmentExtractionTask?.result
         _ = await waveformTask?.result

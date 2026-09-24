@@ -137,6 +137,7 @@ actor PreviewSourceReplacementGate {
 /// Reproductor auxiliar de inspección. No publica archivos, no crea historial y no reserva
 /// OperationCoordinator para poder convivir con la inspección y el análisis espectral.
 public actor MultimediaAudioPreviewService {
+    private static let cancellationGracePeriod: Duration = .milliseconds(50)
     private let runner: ExternalProcessRunner
     private let commandBuilder: FFmpegAudioPreviewCommandBuilder
 
@@ -210,7 +211,7 @@ public actor MultimediaAudioPreviewService {
         let resources = detachPlaybackResources(clearContext: true)
         let runner = self.runner
         let ticket = try await replacementGate.beginReplacement {
-            try? await runner.cancel(gracePeriod: .milliseconds(250))
+            try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
             await resources.finishCleanup()
         }
         try Task.checkCancellation()
@@ -271,7 +272,8 @@ public actor MultimediaAudioPreviewService {
                 try Task.checkCancellation()
                 let result = try await runner.run(
                     .init(executable: ffmpeg, arguments: arguments),
-                    onStdout: { bufferScheduler.append($0) }
+                    onStdout: { bufferScheduler.append($0) },
+                    cancellationGracePeriod: Self.cancellationGracePeriod
                 )
                 if result.succeeded {
                     bufferScheduler.finish()
@@ -305,14 +307,14 @@ public actor MultimediaAudioPreviewService {
         guard playbackState == .playing || playbackState == .loading else { return }
         let position = currentPosition()
         let resources = detachPlaybackResources(clearContext: false)
-        let runner = self.runner
-        await replacementGate.invalidate {
-            try? await runner.cancel(gracePeriod: .milliseconds(250))
-            await resources.finishCleanup()
-        }
         basePosition = position
         playbackState = .paused
         terminalError = nil
+        let runner = self.runner
+        await replacementGate.invalidate {
+            try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
+            await resources.finishCleanup()
+        }
         #endif
     }
 
@@ -364,7 +366,7 @@ public actor MultimediaAudioPreviewService {
         let resources = detachPlaybackResources(clearContext: true)
         let runner = self.runner
         await replacementGate.invalidate {
-            try? await runner.cancel(gracePeriod: .milliseconds(250))
+            try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
             await resources.finishCleanup()
         }
         playbackState = .idle
@@ -461,6 +463,8 @@ private final class DetachedPreviewPlaybackResources: @unchecked Sendable {
 
     func cancelImmediately() {
         scheduler?.cancel()
+        player?.stop()
+        engine?.pause()
         decodeTask?.cancel()
     }
 

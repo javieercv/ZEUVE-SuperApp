@@ -1,12 +1,16 @@
-# Compilación para macOS — ZEUVE 0.20.0.0
+# Compilación para macOS — ZEUVE 0.20.2.0
 
-## Validación adicional requerida por Inspector multimedia 0.7.0
+## Validación adicional requerida por Inspector multimedia 0.7.2
+
+Además de las regresiones existentes, validar manualmente en macOS la respuesta de Play/Pausa, seek, saltos y cambio de pista con audio, vídeo y A/V, comprobando que no reaparecen saltos de identidad, frames perdidos ni procesos FFmpeg huérfanos.
+
+## Validación heredada de Inspector multimedia 0.7.1
 
 La entrega conserva FFmpeg/FFprobe `8.1.2`; no cambia su preparación, firma ni packaging. El preview puede aprovechar VideoToolbox ya habilitado en el FFmpeg empaquetado y debe degradar a software si el stream/hardware no es compatible. No se incorpora libass, por lo que ASS/SSA avanzado no forma parte de la garantía visual.
 
 Además de la suite portable, una entrega definitiva debe validarse en macOS Apple Silicon con Xcode para comprobar SwiftUI/AppKit, `AVAudioEngine`, `CVPixelBuffer`/superficie de vídeo, VideoToolbox, Vision OCR, fullscreen, reproducción A/V, motores Mach-O ARM64, Hardened Runtime, firma y publicación final. Un PASS en Linux no sustituye esas comprobaciones.
 
-El proyecto Xcode debe regenerarse con `python3 Scripts/generate_xcode_project.py`; para 0.20.0.0 el marketing version es `0.20.0`, `CURRENT_PROJECT_VERSION` es `66`, el manifest del Inspector es `0.7.0` y el del Limpiador es `0.1.0`.
+El proyecto Xcode debe regenerarse con `python3 Scripts/generate_xcode_project.py`; para 0.20.2.0 el marketing version es `0.20.2`, `CURRENT_PROJECT_VERSION` es `68`, el manifest del Inspector es `0.7.2` y el del Limpiador es `0.1.0`.
 
 ## Entorno objetivo
 

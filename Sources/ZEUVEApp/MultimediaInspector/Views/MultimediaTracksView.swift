@@ -321,14 +321,18 @@ struct MultimediaTracksView: View {
 
 
     private func videoPreviewButton(_ track: MediaEditableTrack) -> some View {
-        let selected = model.selectedVideoStreamIndex == track.source.streamIndex
-        return Button {
-            model.selectedVideoStreamIndex = track.source.streamIndex
-            model.previewSelectedVideo(at: model.previewPosition)
-        } label: {
-            Label(selected && model.videoPreviewState == .playing ? "Pausar" : "Ver", systemImage: selected && model.videoPreviewState == .playing ? "pause.fill" : "play.rectangle")
+        let playbackState = model.previewPlaybackState(for: track)
+        let isLoading = playbackState == .loading
+        let isPlaying = playbackState == .playing
+        return Button { model.activatePreview(for: track) } label: {
+            if isLoading {
+                Label("Cargando…", systemImage: "hourglass")
+            } else {
+                Label(isPlaying ? "Pausar" : "Ver", systemImage: isPlaying ? "pause.fill" : "play.rectangle")
+            }
         }
         .buttonStyle(.bordered)
+        .disabled(isLoading)
         .accessibilityHint("Previsualiza esta pista de vídeo localmente y conserva el playhead compartido.")
     }
 
@@ -439,11 +443,25 @@ struct MultimediaTracksView: View {
                         .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                     ContextualHelpButton(topic: ZEUVEHelpTopics.multimediaAdvancedAudioAnalysis)
                 }
+                if let rolloff = result.spectralRolloffHz {
+                    Text("Rolloff 99,5 %: \(Int(rolloff.rounded())) Hz")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+                if let bandwidth = result.effectiveBandwidthHz {
+                    Text("Banda efectiva: \(Int(bandwidth.rounded())) Hz")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+                if let cutoff = result.persistentCutoffCandidateHz {
+                    Text("Caída persistente candidata: \(Int(cutoff.rounded())) Hz")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
                 ForEach(result.evidence.prefix(3)) { evidence in
                     Text("• \(evidence.title): \(evidence.detail)").font(.caption2).foregroundStyle(.secondary)
                 }
-                if !result.anomalies.isEmpty {
-                    Text("\(result.anomalies.count) anomalías temporales señaladas en la timeline.")
+                if result.totalAnomalyCount > 0 {
+                    Text(result.anomaliesWereTruncated
+                         ? "\(result.anomalies.count) eventos representativos de \(result.totalAnomalyCount); límite de visualización alcanzado."
+                         : "\(result.totalAnomalyCount) anomalías temporales señaladas en la timeline.")
                         .font(.caption2).foregroundStyle(.secondary)
                 }
             }

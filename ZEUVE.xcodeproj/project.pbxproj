@@ -52,6 +52,7 @@
 		1EF9B2D5A6428FDEBE26C8D6 /* MultimediaEditPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = F436A11B338B0EECEF2E4EC7 /* MultimediaEditPreview.swift */; };
 		7627F90433CE1C4F28544E89 /* MultimediaEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6A9D397D409466FCF71E2E /* MultimediaEmptyView.swift */; };
 		B9FE8CC45881792A58A58FBB /* MultimediaMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82268DB44084576718C2DEFE /* MultimediaMetadataView.swift */; };
+		5DD5B78E13418D7C451C41D4 /* MultimediaOwningWindowReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840BD91B0EF384F9FA07A888 /* MultimediaOwningWindowReader.swift */; };
 		0855DAD39BE1B71A28F3B90A /* MultimediaPreviewPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE38878CDFD9893A7FCA94 /* MultimediaPreviewPlayerView.swift */; };
 		FC25A84E6D5EEB629085C492 /* MultimediaSubtitleOCRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACF70E6EC28989BCA4410D6 /* MultimediaSubtitleOCRView.swift */; };
 		AF127B2052BC1DAA373FF3B8 /* MultimediaSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B690FE62E6F13F154F5BFC /* MultimediaSummaryView.swift */; };
@@ -145,6 +146,7 @@
 		F436A11B338B0EECEF2E4EC7 /* MultimediaEditPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultimediaInspector/Views/MultimediaEditPreview.swift"; sourceTree = "<group>"; };
 		5C6A9D397D409466FCF71E2E /* MultimediaEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultimediaInspector/Views/MultimediaEmptyView.swift"; sourceTree = "<group>"; };
 		82268DB44084576718C2DEFE /* MultimediaMetadataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultimediaInspector/Views/MultimediaMetadataView.swift"; sourceTree = "<group>"; };
+		840BD91B0EF384F9FA07A888 /* MultimediaOwningWindowReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultimediaInspector/Views/MultimediaOwningWindowReader.swift"; sourceTree = "<group>"; };
 		ABCE38878CDFD9893A7FCA94 /* MultimediaPreviewPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultimediaInspector/Views/MultimediaPreviewPlayerView.swift"; sourceTree = "<group>"; };
 		CACF70E6EC28989BCA4410D6 /* MultimediaSubtitleOCRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultimediaInspector/Views/MultimediaSubtitleOCRView.swift"; sourceTree = "<group>"; };
 		27B690FE62E6F13F154F5BFC /* MultimediaSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultimediaInspector/Views/MultimediaSummaryView.swift"; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 				F436A11B338B0EECEF2E4EC7 /* MultimediaEditPreview.swift */,
 				5C6A9D397D409466FCF71E2E /* MultimediaEmptyView.swift */,
 				82268DB44084576718C2DEFE /* MultimediaMetadataView.swift */,
+				840BD91B0EF384F9FA07A888 /* MultimediaOwningWindowReader.swift */,
 				ABCE38878CDFD9893A7FCA94 /* MultimediaPreviewPlayerView.swift */,
 				CACF70E6EC28989BCA4410D6 /* MultimediaSubtitleOCRView.swift */,
 				27B690FE62E6F13F154F5BFC /* MultimediaSummaryView.swift */,
@@ -459,6 +462,7 @@
 				1EF9B2D5A6428FDEBE26C8D6 /* MultimediaEditPreview.swift in Sources */,
 				7627F90433CE1C4F28544E89 /* MultimediaEmptyView.swift in Sources */,
 				B9FE8CC45881792A58A58FBB /* MultimediaMetadataView.swift in Sources */,
+				5DD5B78E13418D7C451C41D4 /* MultimediaOwningWindowReader.swift in Sources */,
 				0855DAD39BE1B71A28F3B90A /* MultimediaPreviewPlayerView.swift in Sources */,
 				FC25A84E6D5EEB629085C492 /* MultimediaSubtitleOCRView.swift in Sources */,
 				AF127B2052BC1DAA373FF3B8 /* MultimediaSummaryView.swift in Sources */,
@@ -527,7 +531,7 @@
 				ARCHS = arm64;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 66;
+				CURRENT_PROJECT_VERSION = 68;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ZEUVE;
@@ -535,7 +539,7 @@
 				INFOPLIST_KEY_ZEUVEReleaseRevision = 0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.20.0;
+				MARKETING_VERSION = 0.20.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeuve.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -551,7 +555,7 @@
 				ARCHS = arm64;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 66;
+				CURRENT_PROJECT_VERSION = 68;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ZEUVE;
@@ -559,7 +563,7 @@
 				INFOPLIST_KEY_ZEUVEReleaseRevision = 0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.20.0;
+				MARKETING_VERSION = 0.20.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeuve.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";

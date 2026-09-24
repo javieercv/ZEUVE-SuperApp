@@ -30,7 +30,7 @@ for snippet in required_package:
 for key, expected in {
     "identifier": "com.zeuve.multimedia-inspector",
     "name": "Inspector multimedia",
-    "version": "0.7.0",
+    "version": "0.7.2",
     "minimumZEUVEVersion": "0.13.0",
     "executionMode": "builtIn",
 }.items():
@@ -89,6 +89,7 @@ required_files = [
     "Sources/MultimediaInspectorModule/Batch/MultimediaBatchStructuralRules.swift",
     "Sources/MultimediaInspectorModule/Batch/MultimediaBatchPreflight.swift",
     "Sources/MultimediaInspectorModule/Preview/MultimediaVideoPreviewService.swift",
+    "Sources/MultimediaInspectorModule/Preview/MultimediaPreviewControlResolver.swift",
     "Sources/MultimediaInspectorModule/Preview/FFmpegVideoPreviewCommandBuilder.swift",
     "Sources/MultimediaInspectorModule/Preview/MultimediaSubtitlePreviewService.swift",
     "Sources/MultimediaInspectorModule/Analysis/AudioSourceQualityAnalysisService.swift",
@@ -139,6 +140,7 @@ required_files = [
     "Sources/ZEUVEApp/MultimediaInspector/Spectrogram/SpectrogramAxesView.swift",
     "Sources/ZEUVEApp/MultimediaInspector/Spectrogram/MultimediaLoudnessTimelineView.swift",
     "Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaPreviewPlayerView.swift",
+    "Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaOwningWindowReader.swift",
     "Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaWaveformView.swift",
     "Sources/ZEUVEApp/MultimediaInspector/MultimediaInspectorSettingsView.swift",
     "Sources/ZEUVEApp/MultimediaInspector/Batch/MultimediaBatchView.swift",
@@ -151,6 +153,8 @@ required_files = [
     "Tests/MultimediaInspectorModuleTests/MultimediaInspectorCoreTests.swift",
     "Tests/MultimediaInspectorModuleTests/SpectrogramMathTests.swift",
     "Tests/MultimediaInspectorModuleTests/PreviewReplacementLifecycleTests.swift",
+    "Tests/MultimediaInspectorModuleTests/MultimediaPreviewControlResolverTests.swift",
+    "Tests/MultimediaInspectorModuleTests/AudioSourceQualityAnalysisTests.swift",
     "Tests/MultimediaInspectorModuleTests/AudioSignalAnalysisTests.swift",
     "Tests/MultimediaInspectorModuleTests/BatchAndPresetTests.swift",
     "Docs/Modulos/Funcionales/MULTIMEDIA_INSPECTOR.md",
@@ -359,6 +363,40 @@ for required in [
         raise SystemExit("Falta protección de cambio de pista/seek del reproductor: " + required)
 if "else if hadPreview { stopPreview() }" in view_model:
     raise SystemExit("El cambio de pista no debe programar un stop separado antes del nuevo preview.")
+
+# Correcciones 0.7.1: una única proyección de transporte por identidad, pausa real
+# de vídeo, selección por identidad completa y fullscreen sobre la ventana dueña.
+video_service = Path("Sources/MultimediaInspectorModule/Preview/MultimediaVideoPreviewService.swift").read_text()
+preview_resolver = Path("Sources/MultimediaInspectorModule/Preview/MultimediaPreviewControlResolver.swift").read_text()
+preview_player = Path("Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaPreviewPlayerView.swift").read_text()
+window_reader = Path("Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaOwningWindowReader.swift").read_text()
+for required in [
+    "MultimediaPreviewControlResolver.resolve(",
+    "requestedVideoPreviewSourceID",
+    "videoPreviewOperationID",
+    "selectedVideoSourceID",
+    "previewSessionOwnership()",
+    "pausePreviewPreservingSession()",
+]:
+    if required not in view_model:
+        raise SystemExit("Falta cierre de transporte/cancelación 0.7.1: " + required)
+for required in ["requestedSourceID", "confirmedSourceID", "transportState", "case wait", "originalOnly", "containsExternalOrUnavailable"]:
+    if required not in preview_resolver:
+        raise SystemExit("Falta el resolver puro de controles/sesión 0.7.1: " + required)
+pause_body = video_service[video_service.index("public func pause() async"):video_service.index("public func stop() async")]
+if "currentSource = nil" in pause_body or "currentFrame = nil" in pause_body:
+    raise SystemExit("Pausar vídeo debe conservar la fuente y el último fotograma.")
+for required in ["generation &+= 1", "decodeTask?.cancel()", "state = .paused"]:
+    if required not in pause_body:
+        raise SystemExit("Pausa de vídeo incompleta: " + required)
+if "NSApp.keyWindow" in preview_player:
+    raise SystemExit("Fullscreen no puede depender de NSApp.keyWindow.")
+for required in ["MultimediaOwningWindowReader", "owningWindow.window?.toggleFullScreen(nil)", ".disabled(!owningWindow.isAvailable)"]:
+    if required not in preview_player:
+        raise SystemExit("Fullscreen debe usar la ventana propietaria disponible: " + required)
+for required in ["weak var window: NSWindow?", "viewDidMoveToWindow", "publishWindow()"]:
+    if required not in window_reader:
+        raise SystemExit("Accessor de ventana incompleto: " + required)
 seek_call = "model.seekPreview(to: target)"
 drag_clear = "dragPosition = nil"
 seek_index = waveform_view.find(seek_call)
@@ -369,6 +407,32 @@ if 'Label("Cargando…"' not in ui_sources:
     raise SystemExit("La pista solicitada debe mostrar el estado Cargando durante la sustitución.")
 if "model.defaultPreferences.allowedFFTSizes" not in ui_sources:
     raise SystemExit("El selector FFT debe seguir usando defaultPreferences.allowedFFTSizes.")
+
+# Optimización 0.7.2: menor latencia sin alterar la semántica estabilizada en 0.7.1.
+runner_source = Path("Sources/ZEUVEEngines/ExternalProcessRunner.swift").read_text()
+audio_preview_source = Path("Sources/MultimediaInspectorModule/Preview/MultimediaAudioPreviewService.swift").read_text()
+runner_tests = Path("Tests/ZEUVEEnginesTests/ExternalProcessRunnerTests.swift").read_text()
+if "cancellationGracePeriod: Duration = .seconds(2)" not in runner_source:
+    raise SystemExit("ExternalProcessRunner debe conservar 2 s como gracia global por defecto.")
+for name, source in [("audio", audio_preview_source), ("vídeo", video_service)]:
+    for required in [
+        "private static let cancellationGracePeriod: Duration = .milliseconds(50)",
+        "cancellationGracePeriod: Self.cancellationGracePeriod",
+    ]:
+        if required not in source:
+            raise SystemExit(f"Falta cancelación rápida exclusiva de preview {name}: {required}")
+for required in ["player?.stop()", "engine?.pause()", "decodeTask?.cancel()"]:
+    if required not in audio_preview_source:
+        raise SystemExit("La salida de audio debe cortarse antes de esperar la limpieza: " + required)
+for required in [
+    "if [.idle, .paused, .finished, .failed].contains(self.previewState)",
+    "if previewState != snapshot.state",
+    "if previewPosition != snapshot.position",
+]:
+    if required not in view_model:
+        raise SystemExit("Falta reducción de publicaciones/monitorización del preview 0.7.2: " + required)
+if "testOwningTaskCanRequestShortCancellationGraceForEphemeralPreview" not in runner_tests:
+    raise SystemExit("Falta regresión de cancelación rápida del proceso efímero de preview.")
 
 for required in [
     "AudioTimelineViewport",
@@ -412,20 +476,19 @@ if "previewService.seek(to: target, preservePlaybackState: true)" not in view_mo
     raise SystemExit("El seek de la UI debe conservar el estado Play/Pausa.")
 
 tracks_view = Path("Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaTracksView.swift").read_text()
+for required in ["model.previewPlaybackState(for: track)", "model.activatePreview(for: track)", 'Label("Cargando…"']:
+    if required not in tracks_view:
+        raise SystemExit("La fila de vídeo debe delegar estado y acción al ViewModel: " + required)
+if "model.videoPreviewState" in tracks_view:
+    raise SystemExit("La fila de vídeo no debe reconstruir el transporte desde videoPreviewState.")
 for required in [
     "func previewPlaybackState(for sourceID: String?)",
-    "private func previewControlMatches(_ sourceID: String?)",
-    "switch previewState",
-    "case .loading:",
-    "return requestedPreviewSourceID == sourceID",
-    "case .playing, .paused, .finished:",
-    "return previewSourceID == sourceID",
+    "func previewPlaybackState(for track: MediaEditableTrack)",
+    "MultimediaPreviewControlResolver.resolve(",
     "switch previewPlaybackState(for: targetSourceID)",
 ]:
     if required not in view_model:
         raise SystemExit("Falta resolución centralizada estable de los controles de preview: " + required)
-if "if let requestedPreviewSourceID { return requestedPreviewSourceID == sourceID }" in view_model:
-    raise SystemExit("Una petición pendiente no debe tener prioridad sobre la fuente confirmada en estados estables.")
 if "private func shouldTogglePreviewControl" in view_model:
     raise SystemExit("Pistas y Espectrograma no deben mantener una segunda decisión paralela para pausar/reanudar.")
 if "model.previewPlaybackState(for: sourceID)" not in tracks_view:
@@ -535,6 +598,22 @@ loudness_timeline = Path("Sources/MultimediaInspectorModule/Analysis/AudioLoudne
 comparison_model = Path("Sources/MultimediaInspectorModule/Models/AudioTrackComparison.swift").read_text()
 loudness_timeline_view = Path("Sources/ZEUVEApp/MultimediaInspector/Spectrogram/MultimediaLoudnessTimelineView.swift").read_text()
 report_exporter = Path("Sources/MultimediaInspectorModule/Reporting/MultimediaTechnicalReportExporter.swift").read_text()
+source_quality_model = Path("Sources/MultimediaInspectorModule/Analysis/AudioSourceQualityAnalysis.swift").read_text()
+source_quality_service = Path("Sources/MultimediaInspectorModule/Analysis/AudioSourceQualityAnalysisService.swift").read_text()
+for required in [
+    "activeWindowCount", "discardedWindowCount", "spectralRolloffHz", "effectiveBandwidthHz",
+    "persistentCutoffCandidateHz", "totalAnomalyCount", "anomaliesWereTruncated",
+]:
+    if required not in source_quality_model or required not in source_quality_service:
+        raise SystemExit("Falta separación/trazabilidad del análisis espectral 0.7.1: " + required)
+for required in [
+    "occupancyCounts", "normalizedEnergySums", "temporalCoverage", "SpectralAnomalyAccumulator",
+    "maximumRetained", "expectedDuration",
+]:
+    if required not in source_quality_service:
+        raise SystemExit("Falta robustez estadística del análisis espectral 0.7.1: " + required)
+if "cutoffValues.removeFirst" in source_quality_service:
+    raise SystemExit("El análisis espectral no puede sesgarse reteniendo solo las últimas ventanas.")
 for required in [
     "AudioLoudnessTimeline",
     "AudioLoudnessTimelineAccumulator",
@@ -591,6 +670,11 @@ for required in [
     "AudioSignalReportItem",
     "let timeline: LoudnessTimeline?",
     "let signal: [Signal]",
+    "spectralRolloffHz",
+    "effectiveBandwidthHz",
+    "persistentCutoffCandidateHz",
+    "totalAnomalyCount",
+    "anomaliesWereTruncated",
 ]:
     if required not in report_exporter:
         raise SystemExit("El informe técnico actual debe incluir señal/timeline con schema 3: " + required)
@@ -698,7 +782,7 @@ for forbidden in ["generateSpectrogram", "analyzeSignal", "analyzeLoudness", "re
 for path, snippets in {
     "Sources/MultimediaInspectorModule/Models/MediaEditDraft.swift": ["videoTracks", "artworks"],
     "Sources/MultimediaInspectorModule/Execution/FFmpegMediaEditCommandBuilder.swift": ["plan.videoTracks", "attached_pic", '\"-c\", \"copy\"'],
-    "Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaPreviewPlayerView.swift": ["MultimediaVideoPreviewSurface", "selectedVideoStreamIndex", "previewPlaybackRate"],
+    "Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaPreviewPlayerView.swift": ["MultimediaVideoPreviewSurface", "selectedVideoSourceID", "previewPlaybackRate", "MultimediaOwningWindowReader"],
     "Sources/ZEUVEApp/MultimediaInspector/Batch/MultimediaBatchView.swift": ["Añadir carpeta…", "Edición estructural por lotes", "Guardar conjunto"],
     "Sources/ZEUVEApp/MultimediaInspector/Views/MultimediaSubtitleOCRView.swift": ["OCR", "exportOCRDraft"],
 }.items():
@@ -707,4 +791,4 @@ for path, snippets in {
         if snippet not in source:
             raise SystemExit(f"Falta cierre 0.19 del Inspector en {path}: {snippet}")
 
-print("Inspector multimedia 0.7.0: preview de vídeo, edición estructural, lotes, análisis avanzado, OCR, favoritos, privacidad y ayuda contextual verificados.")
+print("Inspector multimedia 0.7.2: transporte multimedia, respuesta interactiva, fullscreen, cancelación, análisis espectral, edición, lotes, OCR, privacidad y ayuda verificados.")

@@ -344,16 +344,28 @@ struct MultimediaSpectrogramView: View {
                     Text("Confianza técnica: \(Int((analysis.confidence * 100).rounded())) %")
                         .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                 }
-                if let bandwidth = analysis.effectiveBandwidthHz {
-                    Text("Ancho de banda efectivo estimado: \(formatFrequency(bandwidth))")
+                if let rolloff = analysis.spectralRolloffHz {
+                    Text("Rolloff espectral (99,5 %): \(formatFrequency(rolloff))")
                         .font(.caption).foregroundStyle(.secondary)
                 }
+                if let bandwidth = analysis.effectiveBandwidthHz {
+                    Text("Banda efectiva estimada: \(formatFrequency(bandwidth))")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                if let cutoff = analysis.persistentCutoffCandidateHz {
+                    Text("Caída persistente candidata: \(formatFrequency(cutoff))")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                Text("Ventanas útiles: \(analysis.activeWindowCount) · descartadas: \(analysis.discardedWindowCount)")
+                    .font(.caption2).foregroundStyle(.secondary)
                 ForEach(analysis.evidence.prefix(3)) { item in
                     Text("• \(item.title): \(item.detail)")
                         .font(.caption).foregroundStyle(.secondary)
                 }
-                if !analysis.anomalies.isEmpty {
-                    Text("\(analysis.anomalies.count) anomalía(s) espectral(es) localizada(s) en la timeline.")
+                if analysis.totalAnomalyCount > 0 {
+                    Text(analysis.anomaliesWereTruncated
+                         ? "\(analysis.anomalies.count) eventos representativos de \(analysis.totalAnomalyCount); se alcanzó el límite de visualización."
+                         : "\(analysis.totalAnomalyCount) anomalía(s) espectral(es) localizada(s) en la timeline.")
                         .font(.caption).foregroundStyle(.purple)
                 }
                 Text("El resultado expresa indicios y puede verse afectado por el contenido, masterización o filtrado legítimo.")

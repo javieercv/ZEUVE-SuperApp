@@ -1,4 +1,4 @@
-# Inspector multimedia — ZEUVE 0.19.0.0
+# Inspector multimedia — ZEUVE 0.20.2.0
 
 ## Identidad y alcance
 
@@ -6,13 +6,25 @@
 
 - Nombre visible: **Inspector multimedia**.
 - Identificador: `com.zeuve.multimedia-inspector`.
-- Versión del módulo: `0.7.0`.
+- Versión del módulo: `0.7.2`.
 - Versión mínima de ZEUVE: `0.13.0`.
 - Icono: `waveform.path.ecg`.
 - Atajo: `⌘6`.
 - Red: **no utiliza ni solicita acceso a red**.
 
 El módulo cubre inspección técnica, preview multimedia, análisis local, edición estructural segura, lotes y OCR revisable. No es un editor creativo, DAW ni conversor: montaje, recortes, transiciones, filtros, color grading y recodificación audiovisual permanecen fuera. El OCR bitmap local sí forma parte del módulo porque transforma una representación de subtítulos en un borrador textual revisable sin alterar la fuente.
+
+## Optimización 0.7.2
+
+El transporte no cambia de semántica. La pausa de audio captura primero el playhead y silencia inmediatamente el `AVAudioPlayerNode`; después mantiene la limpieza serializada de scheduler, FFmpeg y `AVAudioEngine`. Audio y vídeo solicitan una gracia de cancelación de 50 ms para sus procesos efímeros, mientras el runner conserva 2 s por defecto para operaciones generales.
+
+`MultimediaInspectorViewModel` sigue usando los mismos `operationID`, identidades solicitada/confirmada y resolver de controles. El estado visible de Play/Pausa se actualiza de forma optimista, el monitor deja de ejecutarse al entrar en Pausa y los snapshots solo publican propiedades o frames cuando cambian. Seek, waveform, espectrograma y cambio de pistas conservan las garantías de 0.7.1.
+
+## Corrección 0.7.1
+
+Las filas de vídeo delegan estado y acción en un resolver por identidad solicitada/confirmada y transporte global. Pausa conserva fuente/frame; los reemplazos usan una generación propia; fullscreen actúa sobre la ventana propietaria. Cancelar edición conserva pausadas solo sesiones íntegramente originales.
+
+El análisis separa rolloff 99,5 %, banda efectiva y caída persistente, descarta silencio, mide cobertura temporal y agrupa anomalías. UI e informe schema 3 muestran total y truncado sin ampliar datos privados.
 
 ## Estado consolidado 0.7.0
 

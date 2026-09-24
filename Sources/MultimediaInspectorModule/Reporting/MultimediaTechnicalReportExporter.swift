@@ -275,8 +275,14 @@ private struct ReportPayload: Codable {
         let indication: String
         let confidence: Double
         let analyzedDuration: TimeInterval
+        let activeWindowCount: Int
+        let discardedWindowCount: Int
+        let spectralRolloffHz: Double?
         let effectiveBandwidthHz: Double?
+        let persistentCutoffCandidateHz: Double?
         let highBandEnergyRatio: Double?
+        let totalAnomalyCount: Int
+        let anomaliesWereTruncated: Bool
         let evidence: [Evidence]
         let anomalies: [Anomaly]
     }
@@ -391,8 +397,14 @@ private struct ReportPayload: Codable {
                 indication: item.result.indication.displayName,
                 confidence: item.result.confidence,
                 analyzedDuration: item.result.analyzedDuration,
+                activeWindowCount: item.result.activeWindowCount,
+                discardedWindowCount: item.result.discardedWindowCount,
+                spectralRolloffHz: item.result.spectralRolloffHz,
                 effectiveBandwidthHz: item.result.effectiveBandwidthHz,
+                persistentCutoffCandidateHz: item.result.persistentCutoffCandidateHz,
                 highBandEnergyRatio: item.result.highBandEnergyRatio,
+                totalAnomalyCount: item.result.totalAnomalyCount,
+                anomaliesWereTruncated: item.result.anomaliesWereTruncated,
                 evidence: item.result.evidence.map { Evidence(title: $0.title, detail: $0.detail, weight: $0.weight) },
                 anomalies: item.result.anomalies.map { Anomaly(start: $0.start, end: $0.end, severity: $0.severity, title: $0.title, detail: $0.detail) }
             )
@@ -493,9 +505,14 @@ private struct ReportPayload: Codable {
             lines += ["", markdown ? "## Análisis avanzado de audio" : "ANÁLISIS AVANZADO DE AUDIO"]
             for value in advancedAudio {
                 lines.append("\(value.label): \(value.indication) · confianza descriptiva \(Int(value.confidence * 100)) %")
-                if let bandwidth = value.effectiveBandwidthHz { lines.append(String(format: "  Ancho de banda efectivo aproximado: %.0f Hz", bandwidth)) }
+                if let rolloff = value.spectralRolloffHz { lines.append(String(format: "  Rolloff espectral (99,5 %%): %.0f Hz", rolloff)) }
+                if let bandwidth = value.effectiveBandwidthHz { lines.append(String(format: "  Banda efectiva aproximada: %.0f Hz", bandwidth)) }
+                if let cutoff = value.persistentCutoffCandidateHz { lines.append(String(format: "  Caída persistente candidata: %.0f Hz", cutoff)) }
+                lines.append("  Ventanas útiles: \(value.activeWindowCount) · descartadas: \(value.discardedWindowCount)")
                 for evidence in value.evidence { lines.append("  • \(evidence.title): \(evidence.detail)") }
-                if !value.anomalies.isEmpty { lines.append("  Anomalías temporales detectadas: \(value.anomalies.count)") }
+                if value.totalAnomalyCount > 0 {
+                    lines.append("  Anomalías temporales detectadas: \(value.totalAnomalyCount)" + (value.anomaliesWereTruncated ? " (se conservan \(value.anomalies.count) eventos representativos)" : ""))
+                }
             }
         }
         if !ocrSummaries.isEmpty {

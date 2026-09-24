@@ -1,4 +1,12 @@
-# Arquitectura de ZEUVE 0.20.0.0
+# Arquitectura de ZEUVE 0.20.2.0
+
+## Inspector multimedia 0.7.2 — transporte responsivo
+
+`ExternalProcessRunner.run` acepta una gracia de cancelación opt-in y conserva 2 s como default global. Audio y vídeo usan 50 ms únicamente para FFmpeg de preview, que no publica archivos. Audio detiene la salida antes de completar la limpieza; el ViewModel publica el cambio de transporte de forma optimista y deja de monitorizar sesiones pausadas. Las identidades, generaciones y gates de sustitución de 0.7.1 permanecen como autoridad contra carreras.
+
+## Inspector multimedia 0.7.1
+
+`MultimediaPreviewControlResolver` proyecta el transporte compartido sobre cada identidad solicitada/confirmada. Vídeo usa una generación propia y una pausa que conserva fuente/frame. `MultimediaOwningWindowReader` entrega débilmente la ventana real para fullscreen. El análisis espectral acumula histogramas y ocupación sobre toda la señal útil, agrupa anomalías y expone cobertura/truncado.
 
 ## Navegación dinámica y Limpiador 0.20.0.0
 

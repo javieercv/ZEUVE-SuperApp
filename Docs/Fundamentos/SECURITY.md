@@ -1,4 +1,12 @@
-# Seguridad y privacidad — ZEUVE 0.20.0.0
+# Seguridad y privacidad — ZEUVE 0.20.2.0
+
+## Inspector multimedia 0.7.2
+
+La gracia corta de cancelación se limita a FFmpeg efímero de preview, que solo lee entradas y escribe a pipes en memoria; no se aplica a operaciones que publican archivos. SIGTERM sigue siendo el primer paso y SIGKILL solo se usa si el proceso no termina dentro de 50 ms. Registro global, grupos de procesos y espera de cierre permanecen activos.
+
+## Inspector multimedia 0.7.1
+
+La identidad de preview combina URL, fingerprint y stream. Cancelar edición detiene toda sesión con fuentes externas, mixtas o no resolubles; solo las fuentes verificadas del original pueden conservarse pausadas. Los nuevos campos analíticos e informes no añaden rutas, fingerprints, PCM, frames ni texto privado.
 
 ## Limpiador 0.1.0 — excepción de mantenimiento controlada
 

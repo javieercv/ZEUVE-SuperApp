@@ -85,6 +85,42 @@ final class ExternalProcessRunnerTests: XCTestCase {
         XCTAssertNil(activePID)
     }
 
+    func testOwningTaskCanRequestShortCancellationGraceForEphemeralPreview() async throws {
+        let registry = ExternalProcessRegistry()
+        let runner = ExternalProcessRunner(registry: registry)
+        let pidFile = root.appendingPathComponent("fast-task-cancel-child.pid")
+        let executable = try XCTUnwrap(helper)
+        let task = Task {
+            try await runner.run(
+                .init(executable: executable, arguments: ["children", pidFile.path]),
+                cancellationGracePeriod: .milliseconds(50)
+            )
+        }
+        let parentPID = try await waitForPID(runner)
+        let childPID = try await waitForChildPID(pidFile)
+        let clock = ContinuousClock()
+        let startedAt = clock.now
+
+        task.cancel()
+        do {
+            _ = try await task.value
+            XCTFail("Cancelar la Task propietaria debe cancelar también el proceso externo")
+        } catch is CancellationError {
+            // esperado
+        }
+
+        let elapsed = startedAt.duration(to: clock.now)
+        let parentGone = await waitUntilGone(parentPID)
+        let childGone = await waitUntilGone(childPID)
+        let groups = await registry.activeProcessGroups()
+        let activePID = await runner.activeProcessID()
+        XCTAssertLessThan(elapsed, .seconds(1))
+        XCTAssertTrue(parentGone)
+        XCTAssertTrue(childGone)
+        XCTAssertTrue(groups.isEmpty)
+        XCTAssertNil(activePID)
+    }
+
     func testApplicationShutdownRegistryTerminatesDescendants() async throws {
         let registry = ExternalProcessRegistry()
         let runner = ExternalProcessRunner(registry: registry)

@@ -7,7 +7,7 @@ import ZEUVEEngines
 @Test func manifestIsOfficialLocalModule() throws {
     let manifest = try MultimediaInspectorModuleDefinition.manifest()
     #expect(manifest.identifier == multimediaInspectorModuleIdentifier)
-    #expect(manifest.version == "0.7.0")
+    #expect(manifest.version == "0.7.2")
     #expect(!manifest.permissions.contains(.networkAccess))
     #expect(manifest.capabilities.contains(.undo))
 }

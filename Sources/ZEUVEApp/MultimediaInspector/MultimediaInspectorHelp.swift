@@ -364,7 +364,7 @@ extension ZEUVEHelpTopics {
     )
     static let multimediaAdvancedAudioAnalysis = ContextualHelpTopic(
         "Indicios de fuente con pérdida",
-        explanation: "ZEUVE analiza distribución espectral, ancho de banda efectivo y su estabilidad para buscar indicios compatibles con compresión con pérdida previa. Ningún cutoff aislado demuestra que un archivo sin pérdida sea «falso».",
+        explanation: "ZEUVE distingue el rolloff de energía del 99,5 %, la banda efectiva de contenido útil y una posible caída persistente. Descarta ventanas sin señal útil y exige continuidad y persistencia antes de señalar un cutoff candidato. Ninguna métrica aislada demuestra que un archivo sin pérdida sea «falso».",
         recommendation: "Interpreta el nivel junto con las evidencias mostradas y el contexto de la grabación."
     )
     static let multimediaBatchFolders = ContextualHelpTopic(

@@ -1,4 +1,14 @@
-# Alcance funcional de ZEUVE 0.20.0.0
+# Alcance funcional de ZEUVE 0.20.2.0
+
+## Optimización del Inspector multimedia 0.7.2
+
+Se optimiza únicamente la latencia percibida del transporte existente: corte inmediato de salida al pausar, cancelación corta de FFmpeg de preview y eliminación de publicaciones redundantes durante pausa. No cambia ninguna función visible, formato soportado, opción, política de edición ni resultado.
+
+## Corrección del Inspector multimedia 0.7.1
+
+- Controles de audio/vídeo coherentes por identidad completa, pausa real, sustituciones protegidas y fullscreen sobre la ventana propietaria.
+- Cancelación de edición conservadora para sesiones externas o mixtas.
+- Rolloff, banda efectiva y caída persistente separados; cobertura y truncado visibles en UI e informes.
 
 ## Navegación y Limpiador 0.20.0.0
 

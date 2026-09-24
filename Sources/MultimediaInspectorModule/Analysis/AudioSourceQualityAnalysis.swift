@@ -41,13 +41,45 @@ public struct AudioSourceQualityAnalysis: Codable, Sendable, Equatable {
     public let indication: AudioLossySourceIndication
     public let confidence: Double
     public let analyzedDuration: TimeInterval
+    public let activeWindowCount: Int
+    public let discardedWindowCount: Int
+    public let spectralRolloffHz: Double?
     public let effectiveBandwidthHz: Double?
+    public let persistentCutoffCandidateHz: Double?
     public let highBandEnergyRatio: Double?
     public let evidence: [AudioQualityEvidence]
+    public let totalAnomalyCount: Int
     public let anomalies: [SpectralAnomaly]
+    public let anomaliesWereTruncated: Bool
 
-    public init(indication: AudioLossySourceIndication, confidence: Double, analyzedDuration: TimeInterval, effectiveBandwidthHz: Double?, highBandEnergyRatio: Double?, evidence: [AudioQualityEvidence], anomalies: [SpectralAnomaly]) {
-        self.indication = indication; self.confidence = min(max(confidence, 0), 1); self.analyzedDuration = analyzedDuration; self.effectiveBandwidthHz = effectiveBandwidthHz; self.highBandEnergyRatio = highBandEnergyRatio; self.evidence = evidence; self.anomalies = anomalies
+    public init(
+        indication: AudioLossySourceIndication,
+        confidence: Double,
+        analyzedDuration: TimeInterval,
+        activeWindowCount: Int = 0,
+        discardedWindowCount: Int = 0,
+        spectralRolloffHz: Double? = nil,
+        effectiveBandwidthHz: Double?,
+        persistentCutoffCandidateHz: Double? = nil,
+        highBandEnergyRatio: Double?,
+        evidence: [AudioQualityEvidence],
+        totalAnomalyCount: Int? = nil,
+        anomalies: [SpectralAnomaly],
+        anomaliesWereTruncated: Bool? = nil
+    ) {
+        self.indication = indication
+        self.confidence = min(max(confidence, 0), 1)
+        self.analyzedDuration = analyzedDuration
+        self.activeWindowCount = max(activeWindowCount, 0)
+        self.discardedWindowCount = max(discardedWindowCount, 0)
+        self.spectralRolloffHz = spectralRolloffHz
+        self.effectiveBandwidthHz = effectiveBandwidthHz
+        self.persistentCutoffCandidateHz = persistentCutoffCandidateHz
+        self.highBandEnergyRatio = highBandEnergyRatio
+        self.evidence = evidence
+        self.totalAnomalyCount = max(totalAnomalyCount ?? anomalies.count, anomalies.count)
+        self.anomalies = anomalies
+        self.anomaliesWereTruncated = anomaliesWereTruncated ?? ((totalAnomalyCount ?? anomalies.count) > anomalies.count)
     }
 }
 

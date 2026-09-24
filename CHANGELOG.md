@@ -1,3 +1,18 @@
+# 0.20.2.0 — 2026-09-24
+
+- Inspector multimedia pasa a 0.7.2 y optimiza la respuesta de Play/Pausa, seek y sustituciones sin cambiar identidades, generaciones, resolver de controles ni semántica de pausa.
+- La salida de audio se detiene inmediatamente antes de la limpieza asíncrona de FFmpeg/AVAudioEngine, conservando el playhead capturado.
+- Los FFmpeg efímeros de preview usan una gracia de cancelación opt-in de 50 ms; el valor global de `ExternalProcessRunner` continúa en 2 s para el resto de operaciones.
+- El monitor del preview deja de sondear durante Pausa y evita republicar estado/frame sin cambios, reduciendo recomposiciones SwiftUI innecesarias.
+- Sin cambios de red, dependencias, motores, privacidad, edición, archivos originales ni opciones visibles. ZEUVE marketing 0.20.2, build 68.
+
+# 0.20.1.0 — 2026-09-23
+
+- Inspector multimedia 0.7.1 unifica el transporte por identidad, conserva fuente/frame al pausar vídeo y usa la ventana propietaria para fullscreen.
+- Cancelar edición conserva pausadas solo las sesiones íntegramente originales; las externas, mixtas o no resolubles se detienen.
+- El análisis separa rolloff 99,5 %, banda efectiva y caída persistente, mide cobertura y declara el truncado de anomalías.
+- Informe JSON schema 3 aditivo; ZEUVE marketing 0.20.1, build 67, sin red, motores ni dependencias nuevas.
+
 # 0.20.0.0 — 2026-09-22
 
 - Añadida personalización global de orden de módulos y atajos de teclado, compartida por Sidebar, Inicio y comandos, con recorder nativo, validación, `Sin atajo` y restauración.

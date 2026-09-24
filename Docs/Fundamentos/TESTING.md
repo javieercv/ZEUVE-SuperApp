@@ -1,4 +1,18 @@
-# Pruebas — ZEUVE 0.20.0.0
+# Pruebas — ZEUVE 0.20.2.0
+
+## Resultados actuales de 0.20.2.0
+
+- `ExternalProcessRunnerTests`: la cancelación opt-in de preview con 50 ms termina padre/hijo y limpia el registro; en el helper que ignora SIGTERM completó en ~0,11 s frente a ~2,09 s con el default global de 2 s.
+- `swiftc -parse` de los archivos SwiftUI modificados: PASS en el entorno portable.
+- Las suites completas y verificadores se registran en `Docs/Historico/Pruebas/TEST_RESULTS_0.20.2.0.md`; el build Xcode/macOS debe ejecutarse en Apple Silicon.
+
+## Resultados de 0.20.1.0
+
+- `swift test --jobs 1`: PASS; Inspector multimedia **121 pruebas**, 0 fallos.
+- Regresiones Python específicas de preview/análisis: **18/18**, PASS.
+- `Scripts/verify/multimedia_inspector.py` y parseo de **80 fuentes Swift** de ZEUVEApp: PASS.
+- `Scripts/verify_app_macos.sh`: PASS en macOS Apple Silicon; Xcode Debug, motores y firma local validados.
+- Cobertura nueva: resolver de transporte, pausa de vídeo, ownership al cancelar, señales sintéticas, cutoff conocido, bajo dominante, gap espectral, cobertura temporal y agrupación/truncado de anomalías.
 
 
 ## Resultados actuales de 0.20.0.0

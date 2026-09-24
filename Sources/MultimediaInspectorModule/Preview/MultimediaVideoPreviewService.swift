@@ -48,6 +48,7 @@ private final class VideoFrameAssembler: @unchecked Sendable {
 }
 
 public actor MultimediaVideoPreviewService {
+    private static let cancellationGracePeriod: Duration = .milliseconds(50)
     private let runner: ExternalProcessRunner
     private let builder: FFmpegVideoPreviewCommandBuilder
     private var decodeTask: Task<Void, Never>?
@@ -56,6 +57,7 @@ public actor MultimediaVideoPreviewService {
     private var currentFrame: MultimediaVideoPreviewFrame?
     private var state: MultimediaPreviewPlaybackState = .idle
     private var terminalError: String?
+    private var pauseAfterFirstFrame = false
 
     public init(runner: ExternalProcessRunner = ExternalProcessRunner(), builder: FFmpegVideoPreviewCommandBuilder = .init()) {
         self.runner = runner
@@ -68,7 +70,8 @@ public actor MultimediaVideoPreviewService {
         from position: TimeInterval,
         limits: MultimediaVideoPreviewLimits,
         decoder: MultimediaVideoPreviewDecoder = .automatic,
-        playbackRate: Double = 1
+        playbackRate: Double = 1,
+        shouldPlay: Bool = true
     ) async throws {
         guard source.fingerprint.matches(source.url) else { throw MultimediaInspectorError.inputChanged(source.title) }
         await stop()
@@ -77,6 +80,7 @@ public actor MultimediaVideoPreviewService {
         currentSource = source
         currentFrame = nil
         terminalError = nil
+        pauseAfterFirstFrame = !shouldPlay
         state = .loading
         let prepared = try builder.prepare(source: source, from: position, limits: limits, decoder: decoder, playbackRate: playbackRate)
         var normalizedLimits = limits
@@ -87,13 +91,21 @@ public actor MultimediaVideoPreviewService {
         decodeTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let result = try await runner.run(.init(executable: ffmpeg, arguments: prepared.arguments), onStdout: { assembler.append($0) })
+                let result = try await runner.run(
+                    .init(executable: ffmpeg, arguments: prepared.arguments),
+                    onStdout: { assembler.append($0) },
+                    cancellationGracePeriod: Self.cancellationGracePeriod
+                )
                 if !result.succeeded, decoder != .software, !Task.isCancelled {
                     let fallback = try builder.prepare(source: source, from: position, limits: limits, decoder: .software, playbackRate: playbackRate)
                     let fallbackAssembler = VideoFrameAssembler(width: fallback.outputWidth, height: fallback.outputHeight, fps: fallback.outputFPS, start: fallback.startPosition, maximumBufferedFrames: normalizedLimits.maximumBufferedFrames) { [weak self] frame in
                         Task { await self?.accept(frame: frame, generation: ticket) }
                     }
-                    let fallbackResult = try await runner.run(.init(executable: ffmpeg, arguments: fallback.arguments), onStdout: { fallbackAssembler.append($0) })
+                    let fallbackResult = try await runner.run(
+                        .init(executable: ffmpeg, arguments: fallback.arguments),
+                        onStdout: { fallbackAssembler.append($0) },
+                        cancellationGracePeriod: Self.cancellationGracePeriod
+                    )
                     await self.finish(generation: ticket, succeeded: fallbackResult.succeeded, message: fallbackResult.succeeded ? nil : "FFmpeg no ha podido decodificar el vídeo de previsualización.")
                 } else {
                     await self.finish(generation: ticket, succeeded: result.succeeded, message: result.succeeded ? nil : "FFmpeg no ha podido decodificar el vídeo de previsualización.")
@@ -111,26 +123,44 @@ public actor MultimediaVideoPreviewService {
         try await start(ffmpeg: ffmpeg, source: source, from: position, limits: limits, decoder: decoder, playbackRate: playbackRate)
     }
 
+    /// Detiene la decodificación conservando la fuente y el último fotograma.
+    /// Reanudar crea una nueva ejecución de FFmpeg desde el playhead compartido.
+    public func pause() async {
+        guard state == .playing || state == .loading else { return }
+        generation &+= 1
+        decodeTask?.cancel()
+        decodeTask = nil
+        pauseAfterFirstFrame = false
+        terminalError = nil
+        state = .paused
+        try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
+    }
+
     public func stop() async {
         generation &+= 1
         decodeTask?.cancel()
         decodeTask = nil
-        try? await runner.cancel(gracePeriod: .milliseconds(250))
         currentFrame = nil
         currentSource = nil
         terminalError = nil
+        pauseAfterFirstFrame = false
         state = .idle
+        try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
     }
 
     public func snapshot(position: TimeInterval) -> MultimediaVideoPreviewSnapshot {
         .init(state: state, sourceID: currentSource?.id, position: position, duration: currentSource?.duration, frame: currentFrame, errorMessage: terminalError)
     }
 
-    private func accept(frame: MultimediaVideoPreviewFrame, generation ticket: UInt64) {
+    private func accept(frame: MultimediaVideoPreviewFrame, generation ticket: UInt64) async {
         guard ticket == generation else { return }
         // Mantener solo el frame más reciente acota la memoria y aplica backpressure por descarte.
         currentFrame = frame
-        state = .playing
+        if pauseAfterFirstFrame {
+            await pause()
+        } else {
+            state = .playing
+        }
     }
 
     private func finish(generation ticket: UInt64, succeeded: Bool, message: String?) {

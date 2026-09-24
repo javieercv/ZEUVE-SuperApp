@@ -3,11 +3,12 @@ import MultimediaInspectorModule
 
 struct MultimediaPreviewPlayerView: View {
     @ObservedObject var model: MultimediaInspectorViewModel
+    @StateObject private var owningWindow = MultimediaOwningWindowReference()
 
     var body: some View {
         VStack(spacing: 9) {
             HStack(spacing: 10) {
-                Text(model.previewTitle ?? "Previsualización de audio")
+                Text(model.previewTitle ?? (model.videoTracks.isEmpty ? "Previsualización de audio" : "Previsualización de vídeo"))
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
                 Spacer()
@@ -39,10 +40,13 @@ struct MultimediaPreviewPlayerView: View {
                 }
 
                 HStack(spacing: 8) {
-                    Picker("Vídeo", selection: $model.selectedVideoStreamIndex) {
+                    Picker("Vídeo", selection: Binding(
+                        get: { model.selectedVideoSourceID },
+                        set: { model.selectVideoSource($0) }
+                    )) {
                         ForEach(model.videoTracks) { track in
                             Text(track.title.isEmpty ? "Vídeo · \(track.codec.uppercased())" : track.title)
-                                .tag(track.source.streamIndex as Int?)
+                                .tag(model.previewSourceID(for: track) as String?)
                         }
                     }
                     .frame(maxWidth: 260)
@@ -114,9 +118,10 @@ struct MultimediaPreviewPlayerView: View {
                     .accessibilityLabel("Velocidad de reproducción")
 
                     if !model.videoTracks.isEmpty {
-                        Button { NSApp.keyWindow?.toggleFullScreen(nil) } label: {
+                        Button { owningWindow.window?.toggleFullScreen(nil) } label: {
                             Image(systemName: "arrow.up.left.and.arrow.down.right")
                         }
+                        .disabled(!owningWindow.isAvailable)
                         .help("Alterna la ventana en pantalla completa para ampliar la previsualización.")
                         .accessibilityLabel("Pantalla completa")
                     }
@@ -137,6 +142,12 @@ struct MultimediaPreviewPlayerView: View {
         }
         .padding(12)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .background {
+            MultimediaOwningWindowReader { [weak owningWindow] window in
+                owningWindow?.update(window)
+            }
+            .frame(width: 0, height: 0)
+        }
     }
 
     private var timelineControls: some View {

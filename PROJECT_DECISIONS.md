@@ -1,6 +1,22 @@
 # Decisiones aprobadas de ZEUVE
 
-Fecha de consolidación: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.0.0 el 22 de septiembre de 2026.
+Fecha de consolidación: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.2.0 el 24 de septiembre de 2026.
+
+## Inspector multimedia 0.7.2 — optimización 0.20.2.0
+
+- Se conserva íntegramente el modelo estabilizado en 0.7.1: identidad solicitada/confirmada, generaciones, `MultimediaPreviewControlResolver`, pausa de vídeo con frame retenido y seek optimista.
+- La cancelación acelerada es exclusiva de procesos efímeros de preview: 50 ms de gracia antes de SIGKILL. `ExternalProcessRunner` mantiene 2 s como valor predeterminado para el resto de ZEUVE.
+- Pausar audio corta inmediatamente `AVAudioPlayerNode`/salida antes de esperar la limpieza completa; la posición se captura primero y FFmpeg continúa cerrándose de forma verificable.
+- El monitor del preview deja de sondear al quedar pausado y evita reasignar propiedades/frame sin cambios. La reproducción activa mantiene la cadencia de snapshots aprobada.
+- No cambian red, dependencias, motores, archivos originales, edición, análisis ni `OperationCoordinator`.
+
+## Inspector multimedia 0.7.1 — corrección 0.20.1.0
+
+- Estado y acción de preview se resuelven por identidad solicitada, identidad confirmada y transporte global.
+- Pausar vídeo conserva fuente/frame; fullscreen usa la ventana propietaria.
+- Al cancelar edición solo se conserva, pausada, una sesión formada enteramente por fuentes originales; cualquier fuente externa o no resoluble detiene toda la sesión.
+- Rolloff, banda efectiva y caída persistente son métricas distintas; confianza y anomalías declaran cobertura, agrupación y truncado.
+- El schema JSON sigue en 3 con campos aditivos y las mismas exclusiones de privacidad.
 
 ## Navegación personalizable y Limpiador 0.1.0 — 0.20.0.0
 
