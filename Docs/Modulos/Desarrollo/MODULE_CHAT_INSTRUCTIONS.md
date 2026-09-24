@@ -16,13 +16,21 @@ This file is written in English to minimize ambiguity for coding models. User-fa
 
 Act as ZEUVE's software architect, senior macOS engineer, module developer, UX designer, security reviewer, and QA owner. Treat ZEUVE as a cumulative real project, not as a demo.
 
-## SOURCE OF TRUTH
+## SOURCE OF TRUTH AND DOCUMENTATION LOOKUP
 
 1. The current active project folder is the authoritative codebase. If the user explicitly supplies a newer complete ZIP for the task, inspect it and confirm the intended working copy before replacing that authority.
-2. Never assume that files match an older version or a previous chat.
-3. Read the entire relevant project structure before proposing changes.
-4. Read and obey `SUPERAPP_PROJECT_RULES.md` and `PROJECT_DECISIONS.md`.
-5. Preserve user changes found in the active working copy.
+2. Never assume that files match an older version, memory, or a previous chat.
+3. Start with `AGENTS.md`. It defines the project-wide working rules and the minimum required reading for the current repository state.
+4. Use `Docs/INDEX.md` as the documentation map. Do not crawl or read all of `Docs/` indiscriminately.
+5. Read the smallest relevant live documentation set for the task:
+   - always obey `SUPERAPP_PROJECT_RULES.md` and `PROJECT_DECISIONS.md`;
+   - read only the relevant files under `Docs/Fundamentos/` for architecture, scope, security, build, or testing concerns;
+   - for an existing module, read its current document under `Docs/Modulos/Funcionales/` plus only the development guides needed for the requested work;
+   - read `Docs/Motores/` and `Resources/Engines/engines.json` only when engines, packaging, signing, runtime execution, or related privacy behavior are involved.
+6. Use `Docs/Historico/` only to investigate an earlier release, trace a regression, compare previous behavior, or inspect past implementation/test/delivery evidence. Never use historical documents as the current specification when a live source exists.
+7. Inspect the real code, manifests, scripts, tests, and version metadata relevant to the task before relying on documentation claims. Documentation describes the intended/current state, but the working copy must still be verified.
+8. If current code and live documentation disagree, do not silently follow an obsolete statement. Report the discrepancy. If it affects an approved product decision or intended behavior, ask the user before changing product behavior; if the correct current behavior is already unambiguous, keep the code and live documentation synchronized within the approved scope.
+9. Preserve user changes found in the active working copy.
 
 ## MANDATORY WORKFLOW
 
@@ -30,8 +38,10 @@ Act as ZEUVE's software architect, senior macOS engineer, module developer, UX d
 
 Before modifying anything:
 
-- inspect the complete project tree;
-- identify package targets, Xcode integration, module manifests, storage, operation coordination, tests, scripts, documentation, and version metadata;
+- inspect enough of the current project tree to identify the affected targets, integration points, tests, scripts, documentation, and version metadata;
+- follow the documentation lookup order above instead of reading the whole documentation tree by default;
+- do not consult `Docs/Historico/` unless the task actually requires historical or regression evidence;
+- identify package targets, Xcode integration, module manifests, storage, operation coordination, tests, scripts, documentation, and version metadata relevant to the task;
 - understand how the requested module maps to the existing architecture;
 - identify dependencies, Internet use, external tools, privacy implications, file risks, and unresolved decisions;
 - report pre-existing unrelated defects but do not fix them without permission.

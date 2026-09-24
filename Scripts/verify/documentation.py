@@ -243,20 +243,35 @@ for md in [Path('README.md'), Path('AGENTS.md'), Path('PROJECT_DECISIONS.md'), P
         if not destination.exists():
             fail(f'Enlace Markdown roto en {md}: {raw}')
 
-# 8) Marcadores de trabajo incompleto en documentación viva.
+# 8) Los chats de desarrollo deben seguir el mismo mapa documental que AGENTS/CODEX_CONTEXT.
+chat_instructions = read('Docs/Modulos/Desarrollo/MODULE_CHAT_INSTRUCTIONS.md')
+chat_lookup_requirements = [
+    'AGENTS.md',
+    'Docs/INDEX.md',
+    'smallest relevant live documentation set',
+    'Do not crawl or read all of `Docs/` indiscriminately',
+    'Use `Docs/Historico/` only',
+    'Never use historical documents as the current specification',
+    'If current code and live documentation disagree',
+]
+for phrase in chat_lookup_requirements:
+    if phrase not in chat_instructions:
+        fail(f'MODULE_CHAT_INSTRUCTIONS no conserva la estrategia documental canónica: {phrase}')
+
+# 9) Marcadores de trabajo incompleto en documentación viva.
 for path in [Path('README.md'), Path('AGENTS.md'), Path('PROJECT_DECISIONS.md'), *Path('Docs/Fundamentos').glob('*.md'), *Path('Docs/Modulos/Desarrollo').glob('*.md'), *Path('Docs/Modulos/Funcionales').glob('*.md'), *Path('Docs/Motores').glob('*.md')]:
     text = path.read_text(encoding='utf-8')
     if 'TODO_AUTOGENERADO' in text or 'PLACEHOLDER_AUTOGENERADO' in text:
         fail(f'Marcador de documentación incompleta en {path}')
 
-# 9) Navegación documental: todo Markdown vivo debe ser descubrible desde Docs/INDEX.md.
+# 10) Navegación documental: todo Markdown vivo debe ser descubrible desde Docs/INDEX.md.
 for live_root in [Path('Docs/Fundamentos'), Path('Docs/Modulos'), Path('Docs/Motores')]:
     for md_path in sorted(live_root.rglob('*.md')):
         relative_from_docs = md_path.relative_to('Docs').as_posix()
         if relative_from_docs not in index:
             fail(f'Docs/INDEX.md no enlaza documentación viva: {relative_from_docs}')
 
-# 10) Higiene del histórico y de la entrega.
+# 11) Higiene del histórico y de la entrega.
 if Path('BUILD_FIX_REPORT.txt').exists():
     fail('BUILD_FIX_REPORT.txt debe archivarse bajo Docs/Historico/Informes/')
 changelog_h1 = [line for line in read('CHANGELOG.md').splitlines() if line.startswith('# ')]

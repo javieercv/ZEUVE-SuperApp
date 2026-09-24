@@ -8,6 +8,7 @@
 - La confirmación enumera rutas, cantidad, tamaño y modo. El resultado detalla eliminados, omitidos y fallidos; una limpieza sin movimientos no crea un nuevo Deshacer y el plan se actualiza sin reutilizar selecciones antiguas.
 - Sin dependencias, red, motores, permisos ni migración de almacenamiento. ZEUVE marketing 0.20.3, build 69.
 - Auditoría documental: Fundamentos, documentación funcional, motores, contexto de agentes e índice se sincronizan con el estado real 0.20.3.0; se añade documentación dedicada del Organizador y se separa con más claridad documentación viva e histórica. No cambia comportamiento de producto.
+- Las instrucciones para chats de desarrollo adoptan la misma ruta documental canónica: `AGENTS.md` → `Docs/INDEX.md` → conjunto mínimo de documentación viva relevante; `Docs/Historico/` queda reservado a regresiones, comparación de versiones y evidencia pasada. El verificador documental exige esta política.
 
 ## 0.20.2.0 — 2026-09-24
 
