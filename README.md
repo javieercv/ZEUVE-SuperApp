@@ -1,10 +1,10 @@
-# ZEUVE 0.20.2.0
+# ZEUVE 0.20.3.0
 
-ZEUVE es una aplicación nativa y modular para macOS 14+ en Apple Silicon. La versión 0.20.2.0 optimiza la respuesta interactiva del **Inspector multimedia 0.7.2** sin alterar las correcciones de transporte de 0.7.1.
+ZEUVE es una aplicación nativa y modular para macOS 14+ en Apple Silicon. La versión 0.20.3.0 corrige el análisis, la selección y la revisión previa a la limpieza del **Limpiador 0.1.1**.
 
 ## Estado de esta entrega
 
-El Inspector resuelve cada control desde una identidad estable y un transporte compartido, conserva el frame al pausar vídeo, usa la ventana propietaria para fullscreen y distingue sesiones originales de externas al cancelar edición.
+El Limpiador permite cancelar el inventario durante las mediciones de tamaño y acota la búsqueda de Spotlight. Una búsqueda incompleta se señala como cobertura parcial y no convierte aplicaciones históricas en desaparecidas. El plan completo se muestra antes de limpiar y la confirmación enumera las rutas seleccionadas.
 
 El proyecto incluye:
 
@@ -14,11 +14,11 @@ El proyecto incluye:
 - Conversor universal;
 - Comparador de seguidores de Instagram;
 - **Inspector multimedia** 0.7.2;
-- **Limpiador** 0.1.0.
+- **Limpiador** 0.1.1.
 
-### Limpiador 0.1.0
+### Limpiador 0.1.1
 
-Analiza aplicaciones, residuos, cachés/logs, determinados datos regenerables de Xcode, instaladores antiguos y espacio local mediante un pipeline común y revisable. La selección automática se limita a elementos regenerables de riesgo bajo; datos persistentes, App Groups compartidos y asociaciones inciertas quedan protegidos. Papelera es el modo predeterminado y permite Undo verificable mientras macOS conserve el elemento.
+Analiza aplicaciones, residuos, cachés/logs, determinados datos regenerables de Xcode, instaladores antiguos y espacio local mediante un pipeline común y revisable. La selección automática se limita a elementos regenerables de riesgo bajo; datos persistentes, App Groups compartidos y asociaciones inciertas quedan protegidos. Papelera es el modo predeterminado y permite Undo verificable mientras macOS conserve el elemento. La selección de desinstalación mantiene la dependencia entre la `.app` y sus datos asociados; la revisión previa enumera las rutas, y los resultados distinguen eliminados, omitidos y fallidos.
 
 La navegación global puede reordenarse desde Ajustes → General → Herramientas y atajos. Los defaults son `⌘1`…`⌘7` para los siete módulos y `⌘8` para Historial, pero todos los atajos de módulos e Historial pueden cambiarse o desactivarse.
 
@@ -114,6 +114,7 @@ El mapa de consulta y las reglas para incorporar nueva documentación están en 
 - `Docs/Modulos/Funcionales/CLEANER_PRIVACY_AND_FILES.md`: privacidad, permisos y garantías de archivos del Limpiador.
 - `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.0.0.md`, `Docs/Historico/Pruebas/TEST_RESULTS_0.20.0.0.md` y `Docs/Historico/Entregas/DELIVERY_0.20.0.0.md`: cierre de la entrega 0.20.0.0.
 - `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.2.0.md`, `Docs/Historico/Pruebas/TEST_RESULTS_0.20.2.0.md` y `Docs/Historico/Entregas/DELIVERY_0.20.2.0.md`: optimización de respuesta del Inspector multimedia 0.7.2.
+- `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.3.0.md`, `Docs/Historico/Pruebas/TEST_RESULTS_0.20.3.0.md` y `Docs/Historico/Entregas/DELIVERY_0.20.3.0.md`: correcciones de confianza y cancelación del Limpiador 0.1.1.
 - `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.1.0.md`, `Docs/Historico/Pruebas/TEST_RESULTS_0.20.1.0.md` y `Docs/Historico/Entregas/DELIVERY_0.20.1.0.md`: corrección del Inspector multimedia 0.7.1.
 - Los documentos 0.18.1.0 se conservan como histórico del cierre de ayuda contextual.
 - `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.18.0.0.md`: lotes, presets y auditoría de personalización del Inspector.

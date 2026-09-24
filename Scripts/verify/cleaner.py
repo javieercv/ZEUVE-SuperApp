@@ -32,7 +32,7 @@ for snippet in [
 for key, expected in {
     "identifier": "com.zeuve.cleaner",
     "name": "Limpiador",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "minimumZEUVEVersion": "0.20.0",
     "executionMode": "builtIn",
 }.items():
@@ -92,4 +92,4 @@ for doc in ["Docs/Modulos/Funcionales/CLEANER.md", "Docs/Modulos/Funcionales/CLE
     if not Path(doc).is_file():
         raise SystemExit("Falta documentación del Limpiador: " + doc)
 
-print("Limpiador 0.1.0: integración, seguridad, privacidad, persistencia, Undo y tests verificados.")
+print("Limpiador 0.1.1: integración, seguridad, privacidad, persistencia, Undo y tests verificados.")

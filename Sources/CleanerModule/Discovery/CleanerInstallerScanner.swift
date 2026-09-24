@@ -5,8 +5,10 @@ public final class CleanerInstallerScanner:@unchecked Sendable{
         let cutoff=now.addingTimeInterval(-Double(max(1,olderThanDays))*86400);let allowed:Set<String>=["dmg","pkg","xip"]
         var result:[CleanerCandidate]=[]
         for root in roots where fileManager.fileExists(atPath:root.path){
+            if Task.isCancelled { break }
             guard let e=fileManager.enumerator(at:root,includingPropertiesForKeys:[.contentModificationDateKey,.isSymbolicLinkKey],options:[.skipsHiddenFiles]) else{continue}
             for case let url as URL in e{
+                if Task.isCancelled { break }
                 let values=try? url.resourceValues(forKeys:[.contentModificationDateKey,.isSymbolicLinkKey]);if values?.isSymbolicLink==true{e.skipDescendants();continue}
                 guard allowed.contains(url.pathExtension.lowercased()),let date=values?.contentModificationDate,date<cutoff else{continue}
                 let fp=CleanerFileInspection.fingerprint(at:url,fileManager:fileManager)

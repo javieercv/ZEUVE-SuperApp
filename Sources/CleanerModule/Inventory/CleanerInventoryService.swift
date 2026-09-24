@@ -32,6 +32,7 @@ public final class CleanerInventoryService: @unchecked Sendable {
         var urls = identityProvider.knownApplicationURLs()
         var inaccessible: [String] = []
         for root in roots {
+            if Task.isCancelled { break }
             guard fileManager.fileExists(atPath: root.path) else { continue }
             guard let enumerator = fileManager.enumerator(
                 at: root,
@@ -43,6 +44,7 @@ public final class CleanerInventoryService: @unchecked Sendable {
                 continue
             }
             for case let url as URL in enumerator {
+                if Task.isCancelled { break }
                 let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
                 if values?.isSymbolicLink == true {
                     enumerator.skipDescendants()
@@ -58,8 +60,10 @@ public final class CleanerInventoryService: @unchecked Sendable {
         var seen: Set<String> = []
         var apps: [CleanerAppInventoryItem] = []
         for url in urls.map(\.standardizedFileURL) where seen.insert(url.path).inserted {
+            if Task.isCancelled { break }
             guard let identity = identityProvider.identity(for: url) else { continue }
-            let size = CleanerFileInspection.recursiveSize(at: url, fileManager: fileManager).logical
+            let size = CleanerFileInspection.recursiveSize(at: url, fileManager: fileManager, shouldCancel: { Task.isCancelled }).logical
+            if Task.isCancelled { break }
             apps.append(.init(identity: identity, logicalSize: size))
         }
         return .init(

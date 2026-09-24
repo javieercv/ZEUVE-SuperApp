@@ -14,6 +14,7 @@ final class CleanerViewModel: ObservableObject {
     @Published var isBusy = false
     @Published var errorMessage: String?
     @Published var resultMessage: String?
+    @Published var executionSummary: CleanerExecutionSummary?
     @Published var lastHistoryID: UUID?
     @Published var spaceRoot: URL
     @Published var spaceTree: CleanerStorageNode?
@@ -52,15 +53,17 @@ final class CleanerViewModel: ObservableObject {
 
     var selectedCount: Int { plan.selectedCandidates.count }
     var selectedBytes: Int64 { plan.selectedLogicalBytes }
+    var canUndoLast: Bool { lastHistoryID != nil && undoService != nil }
 
-    func analyze() async {
+    func analyze(preservingResult: Bool = false) async {
         guard !isBusy else { return }
-        isBusy = true; errorMessage = nil; resultMessage = nil; uninstallAnalysis = nil
+        isBusy = true; errorMessage = nil; uninstallAnalysis = nil
+        if !preservingResult { resultMessage = nil; executionSummary = nil }
         defer { isBusy = false }
         do {
             let output = try await analysisService.analyze(preferences: preferences)
             analysis = output
-            plan = CleanerPlanner.plan(candidates: output.candidates, selectSafeItems: preferences.safeSelectionEnabled)
+            plan = CleanerPlanner.plan(candidates: output.candidates, selectSafeItems: !preservingResult && preferences.safeSelectionEnabled)
         } catch is CancellationError {
             resultMessage = "Análisis cancelado."
         } catch {
@@ -77,11 +80,34 @@ final class CleanerViewModel: ObservableObject {
     }
 
     func setSelected(_ selected: Bool, candidateID: UUID) {
-        plan = CleanerPlanner.settingSelection(selected, candidateID: candidateID, in: plan)
+        if uninstallAnalysis != nil {
+            guard let candidate = plan.candidates.first(where: { $0.id == candidateID }) else { return }
+            if selected && !canSelect(candidate) {
+                resultMessage = "Selecciona primero la aplicación; sus elementos asociados solo pueden retirarse con ella."
+                return
+            }
+            plan = CleanerPlanner.settingUninstallSelection(selected, candidateID: candidateID, in: plan)
+        } else {
+            plan = CleanerPlanner.settingSelection(selected, candidateID: candidateID, in: plan)
+        }
     }
 
     func selectSafeItems() {
-        plan = CleanerPlanner.plan(candidates: plan.candidates, selectSafeItems: true)
+        if uninstallAnalysis != nil {
+            let applicationSelected = plan.candidates.contains { $0.category == .application && $0.selected }
+            plan = CleanerPlanner.selectingSafeUninstallItems(in: plan)
+            if !applicationSelected { resultMessage = "Selecciona primero la aplicación para incluir sus elementos regenerables." }
+        } else {
+            plan = CleanerPlanner.plan(candidates: plan.candidates, selectSafeItems: true)
+        }
+    }
+
+    func canSelect(_ candidate: CleanerCandidate) -> Bool {
+        guard CleanerPlanner.canSelect(candidate) else { return false }
+        if uninstallAnalysis != nil && candidate.category != .application {
+            return plan.candidates.contains { $0.category == .application && $0.selected }
+        }
+        return true
     }
 
     func deselectAll() {
@@ -97,7 +123,8 @@ final class CleanerViewModel: ObservableObject {
         } catch { errorMessage = error.localizedDescription }
     }
 
-    func analyzeUninstall(_ application: CleanerAppInventoryItem) {
+    func analyzeUninstall(_ application: CleanerAppInventoryItem, preservingResult: Bool = false) {
+        if !preservingResult { resultMessage = nil; executionSummary = nil }
         let historical = (try? repository?.loadInventory()) ?? []
         let kept = (try? repository?.keptPaths()) ?? []
         let output = uninstallAnalyzer.analyze(application: application, historicalApps: historical, keptPaths: kept, safeSelection: preferences.safeSelectionEnabled)
@@ -126,18 +153,31 @@ final class CleanerViewModel: ObservableObject {
 
     func executeCurrentPlan(kind: String? = nil) async {
         guard !isBusy, !plan.selectedCandidates.isEmpty else { return }
+        let applicationURL = uninstallAnalysis.map { URL(fileURLWithPath: $0.application.identity.path) }
         let shouldRefresh = uninstallAnalysis == nil
         isBusy = true; errorMessage = nil; resultMessage = nil
         do {
             let output = try await executionService.execute(plan: plan, mode: preferences.deletionMode, kind: kind ?? (shouldRefresh ? "cleaning" : "uninstall"))
-            lastHistoryID = output.historyID
             let summary = output.summary
+            if preferences.deletionMode == .trash && summary.removedCount > 0 && undoService != nil { lastHistoryID = output.historyID }
+            executionSummary = summary
             resultMessage = "\(summary.removedCount) eliminados · \(summary.skippedCount) omitidos · \(summary.failedCount) fallidos."
+            plan = CleanerRemovalPlan(candidates: [])
+            analysis = nil
+            uninstallAnalysis = nil
         } catch {
             errorMessage = error.localizedDescription
         }
         isBusy = false
-        if shouldRefresh, errorMessage == nil { await analyze() }
+        guard errorMessage == nil else { return }
+        if let applicationURL, FileManager.default.fileExists(atPath: applicationURL.path),
+           let identity = identityProvider.identity(for: applicationURL) {
+            let item = CleanerAppInventoryItem(identity: identity, logicalSize: CleanerFileInspection.recursiveSize(at: applicationURL).logical)
+            analyzeUninstall(item, preservingResult: true)
+            deselectAll()
+        } else {
+            await analyze(preservingResult: true)
+        }
     }
 
     func undoLast() async {
@@ -146,6 +186,7 @@ final class CleanerViewModel: ObservableObject {
         do {
             let summary = try await undoService.undo(historyID: historyID)
             resultMessage = "\(summary.restoredCount) elementos restaurados; \(summary.skippedCount + summary.failedCount) no se pudieron restaurar."
+            executionSummary = nil
             if summary.restoredCount > 0 { lastHistoryID = nil }
         } catch { errorMessage = error.localizedDescription }
     }

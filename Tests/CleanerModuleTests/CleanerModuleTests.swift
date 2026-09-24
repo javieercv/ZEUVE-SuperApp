@@ -169,11 +169,91 @@ final class CleanerModuleTests: XCTestCase {
         XCTAssertEqual(try String(contentsOf: file, encoding: .utf8), "new object")
     }
 
+    func testSystemTrashAndUndoRestoreDisposableFileIntact() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("qa.sqlite"))
+        let repository = try CleanerRepository(database: db)
+        let history = try HistoryRepository(database: db)
+        let file = root.appendingPathComponent("zeuve-cleaner-qa-cache")
+        let original = Data("contenido de prueba recuperable".utf8)
+        try original.write(to: file)
+        let fingerprint = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+        let candidate = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .regenerable, risk: .low, logicalSize: fingerprint.logicalSize, consequence: "fixture", selected: true, fingerprint: fingerprint)
+        let output = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repository, history: history).execute(plan: .init(candidates: [candidate]), mode: .trash)
+        XCTAssertEqual(output.summary.removedCount, 1)
+        let trash = try XCTUnwrap(output.summary.results.first?.trashPath)
+        defer { try? FileManager.default.removeItem(atPath: trash) }
+        XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: trash))
+        let restored = try await CleanerUndoService(coordinator: OperationCoordinator(), repository: repository, history: history).undo(historyID: output.historyID)
+        XCTAssertEqual(restored.restoredCount, 1)
+        XCTAssertEqual(try Data(contentsOf: file), original)
+    }
+
     func testClearingInventoryPreservesConservedDecisions() throws {
         let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
         let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite")); let repo = try CleanerRepository(database: db)
         try repo.keep(path: "/private/user/data", value: true); try repo.clearInventoryHistory()
         XCTAssertTrue(try repo.keptPaths().contains("/private/user/data"))
+    }
+
+    func testUninstallSelectionKeepsApplicationAndNeverAutoSelectsPreferences() throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let app = CleanerCandidate(url: root.appendingPathComponent("App.app"), category: .application, associatedBundleID: "com.test.app", evidences: [], confidence: .high, status: .notResidue, risk: .medium, consequence: "app", selected: true)
+        let cache = CleanerCandidate(url: root.appendingPathComponent("cache"), category: .cache, associatedBundleID: "com.test.app", evidences: [], confidence: .high, status: .notResidue, risk: .low, consequence: "cache")
+        let preference = CleanerCandidate(url: root.appendingPathComponent("preference"), category: .preference, associatedBundleID: "com.test.app", evidences: [], confidence: .high, status: .notResidue, risk: .high, containsPotentialUserData: true, consequence: "preference", selected: true)
+        let safe = CleanerPlanner.selectingSafeUninstallItems(in: .init(candidates: [app, cache, preference]))
+        XCTAssertTrue(safe.candidates[0].selected)
+        XCTAssertTrue(safe.candidates[1].selected)
+        XCTAssertFalse(safe.candidates[2].selected)
+        let withoutApp = CleanerPlanner.settingUninstallSelection(false, candidateID: app.id, in: safe)
+        XCTAssertEqual(withoutApp.selectedCandidates.count, 0)
+        let invalid = CleanerPlanner.settingUninstallSelection(true, candidateID: cache.id, in: withoutApp)
+        XCTAssertEqual(invalid.selectedCandidates.count, 0)
+    }
+
+    func testRecursiveSizeUsesFileSizesAndStopsAtSymlink() throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let bundle = root.appendingPathComponent("Bundle.app")
+        try FileManager.default.createDirectory(at: bundle.appendingPathComponent("Contents"), withIntermediateDirectories: true)
+        try Data(repeating: 1, count: 19).write(to: bundle.appendingPathComponent("Contents/one"))
+        try Data(repeating: 2, count: 23).write(to: bundle.appendingPathComponent("Contents/two"))
+        try FileManager.default.createSymbolicLink(at: bundle.appendingPathComponent("linked"), withDestinationURL: root)
+        XCTAssertEqual(CleanerFileInspection.recursiveSize(at: bundle).logical, 42)
+        XCTAssertEqual(CleanerFileInspection.fingerprint(at: bundle)?.logicalSize, 42)
+    }
+
+    func testSpotlightDiscoveryCompletesWhenTaskWasCancelledBeforeStarting() async {
+        let gate = AsyncStream<Void>.makeStream()
+        let task = Task {
+            for await _ in gate.stream { break }
+            return await CleanerSpotlightApplicationDiscovery().discoverApplications()
+        }
+        task.cancel()
+        gate.continuation.yield(())
+        let result = await task.value
+        XCTAssertEqual(result.status, .cancelled)
+    }
+
+    func testSpotlightDiscoveryHasABoundedActiveQuery() async {
+        let clock = ContinuousClock()
+        let started = clock.now
+        let result = await CleanerSpotlightApplicationDiscovery(timeout: .milliseconds(50)).discoverApplications()
+        XCTAssertLessThan(started.duration(to: clock.now), .seconds(3))
+        XCTAssertNotEqual(result.status, .cancelled)
+    }
+
+    func testIncompleteDiscoveryProtectsHistoricallyInstalledApplications() {
+        let current = CleanerAppInventoryItem(identity: .init(bundleID: "com.test.current", name: "Current", path: "/Applications/Current.app"))
+        let historical = CleanerAppInventoryItem(identity: .init(bundleID: "com.test.external", name: "External", path: "/Volumes/External/External.app"))
+        var knownMissing = CleanerAppInventoryItem(identity: .init(bundleID: "com.test.missing", name: "Missing", path: "/Applications/Missing.app"))
+        knownMissing.availability = .missing
+        XCTAssertFalse(CleanerAnalysisService.canConfirmAbsentApplications(discoveryStatus: .timedOut, inaccessibleLocations: []))
+        XCTAssertFalse(CleanerAnalysisService.canConfirmAbsentApplications(discoveryStatus: .complete, inaccessibleLocations: ["/Applications"]))
+        let protected = CleanerAnalysisService.applicationsForAssociation(current: [current], historical: [historical, knownMissing], canConfirmAbsent: false)
+        XCTAssertEqual(Set(protected.map(\.id)), Set([current.id, historical.id]))
+        let complete = CleanerAnalysisService.applicationsForAssociation(current: [current], historical: [historical], canConfirmAbsent: true)
+        XCTAssertEqual(complete.map(\.id), [current.id])
     }
 
 }

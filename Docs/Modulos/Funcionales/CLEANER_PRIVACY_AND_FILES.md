@@ -26,6 +26,8 @@ El inventario de aplicaciones usa `/Applications`, `~/Applications`, `NSWorkspac
 
 ZEUVE no presupone Acceso total al disco. Una ruta inaccesible reduce la cobertura y debe mostrarse como análisis parcial; ausencia de acceso nunca se interpreta como ausencia de residuos. La UI puede abrir el apartado de privacidad de Ajustes del Sistema, pero ZEUVE no concede permisos por sí mismo.
 
+Una búsqueda Spotlight incompleta también reduce la cobertura. En ese caso el inventario histórico conserva su estado anterior y los elementos de aplicaciones previamente instaladas se tratan de forma conservadora en la asociación. La ausencia de una app en un análisis parcial no demuestra que se haya desinstalado.
+
 ## Enlaces simbólicos
 
 Los recorridos recursivos no siguen symlinks. Si el propio enlace es candidato, la operación se aplica al enlace y nunca a su destino.

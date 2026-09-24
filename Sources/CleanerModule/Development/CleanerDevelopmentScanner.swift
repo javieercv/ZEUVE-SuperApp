@@ -19,7 +19,8 @@ public final class CleanerDevelopmentScanner: @unchecked Sendable {
               ) else { return [] }
 
         return children.compactMap { url in
-            guard let fingerprint = CleanerFileInspection.fingerprint(at: url, fileManager: fileManager) else { return nil }
+            guard !Task.isCancelled,
+                  let fingerprint = CleanerFileInspection.fingerprint(at: url, fileManager: fileManager, shouldCancel: { Task.isCancelled }) else { return nil }
             let lower = url.lastPathComponent.lowercased()
             let isIndex = lower.contains("index") || lower.contains("modulecache")
             return CleanerCandidate(

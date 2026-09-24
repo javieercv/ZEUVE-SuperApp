@@ -1,3 +1,11 @@
+# 0.20.3.0 — 2026-09-24
+
+- Limpiador pasa a 0.1.1: inventario cancelable, medición de tamaños más rápida y búsqueda de Spotlight acotada a 30 segundos.
+- Si Spotlight no completa, el análisis muestra cobertura parcial y conserva la clasificación histórica de aplicaciones sin inferir desinstalaciones.
+- Limpieza muestra también preferencias y datos persistentes sin preseleccionarlos. En desinstalaciones, la app y sus asociados mantienen una selección coherente.
+- La confirmación enumera rutas, cantidad, tamaño y modo. El resultado detalla eliminados, omitidos y fallidos; una limpieza sin movimientos no crea un nuevo Deshacer y el plan se actualiza sin reutilizar selecciones antiguas.
+- Sin dependencias, red, motores, permisos ni migración de almacenamiento. ZEUVE marketing 0.20.3, build 69.
+
 # 0.20.2.0 — 2026-09-24
 
 - Inspector multimedia pasa a 0.7.2 y optimiza la respuesta de Play/Pausa, seek y sustituciones sin cambiar identidades, generaciones, resolver de controles ni semántica de pausa.

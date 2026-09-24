@@ -2,7 +2,7 @@
 
 ## Estado
 
-`CleanerModule` 0.1.0 forma parte de ZEUVE 0.20.0.0 como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner` y su categoría visible es **Sistema**.
+`CleanerModule` 0.1.1 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
 
 ## Objetivo
 
@@ -14,15 +14,17 @@ Pipeline: **Inventario → descubrimiento → evidencias → asociación → gua
 
 La pantalla principal tiene cinco áreas:
 
-- **Resumen**: cobertura, aplicaciones, candidatos, tamaño analizado, selección segura potencial y ubicaciones sin acceso.
+- **Resumen**: cobertura, aplicaciones, candidatos, tamaño analizado, selección segura potencial y ubicaciones sin acceso. La selección segura potencial es una estimación del espacio asignado a elementos regenerables elegibles; no ejecuta ni autoriza limpieza.
 - **Aplicaciones**: inventario, búsqueda, ubicación, análisis de desinstalación y entrada por drag & drop de `.app`.
 - **Residuos**: residuos probables, posibles, asociaciones inciertas, elementos conservados y aplicaciones no disponibles.
-- **Limpieza**: selección segura, revisión individual, Papelera o borrado permanente y Undo cuando procede.
+- **Limpieza**: muestra todos los candidatos del plan, también preferencias y datos persistentes sin marcar; permite selección segura, revisión individual, Papelera o borrado permanente y Undo cuando procede.
 - **Espacio**: explorador jerárquico por tamaño sin seguir enlaces simbólicos.
 
 ## Inventario
 
 En producción se inspeccionan `/Applications`, `~/Applications`, aplicaciones conocidas por `NSWorkspace`, resultados de Spotlight revalidados contra el filesystem y ubicaciones adicionales elegidas por el usuario. Los tests inyectan raíces propias y nunca necesitan escanear el Mac real.
+
+El inventario y las mediciones largas atienden la cancelación. Spotlight se inicia en el hilo principal, tiene un límite de 30 segundos y puede terminar por cancelación, indisponibilidad o fin de búsqueda. Si no termina normalmente, el resto del análisis continúa con cobertura parcial y un aviso visible; los registros históricos no se convierten en aplicaciones desaparecidas por ese motivo. Lo mismo se aplica cuando una raíz de inventario no es accesible.
 
 Mientras una aplicación existe se intenta conservar Bundle ID, nombre, versión/build, ruta, volumen, Signing Identifier, Team ID y App Groups. La firma se consulta mediante Security.framework en macOS; no se invoca `codesign`.
 
@@ -52,11 +54,15 @@ Si existe un desinstalador oficial relacionado se ofrece abrirlo. ZEUVE no intro
 
 Antes de ejecutar se revalidan existencia, tipo, fingerprint y guardas. Si la aplicación no puede retirarse, los elementos asociados de esa misma operación de desinstalación se omiten por seguridad.
 
+En un plan de desinstalación, «Seleccionar elementos seguros» conserva la selección explícita de la `.app` y solo añade asociados regenerables elegibles. Si se desmarca la aplicación, se desmarcan sus asociados y no pueden volver a seleccionarse hasta seleccionar la aplicación. Los datos persistentes siguen disponibles para revisión individual, siempre sin selección automática.
+
 ## Ejecución y Undo
 
 El modo predeterminado es **Mover a Papelera** con la API nativa `FileManager.trashItem`. Se registra la ubicación original, la ubicación real devuelta por macOS y un `CleanerFileFingerprint` específico.
 
 El Undo solo restaura cuando el objeto sigue verificable y la ruta original está libre. Nunca sobrescribe silenciosamente un objeto nuevo. El borrado permanente es opt-in, requiere confirmación en UI y no ofrece Undo.
+
+La confirmación previa enumera las rutas seleccionadas, cantidad, tamaño y modo de eliminación. El resultado distingue eliminados, omitidos y fallidos con detalle por elemento. Tras ejecutar se actualiza el análisis y se deja la nueva selección vacía; «Deshacer» solo aparece si hubo al menos un movimiento recuperable a Papelera.
 
 Las operaciones completas de análisis, limpieza, desinstalación, exploración pesada y restauración comparten `OperationCoordinator`.
 

@@ -35,16 +35,7 @@ struct CleanerView: View {
         .alert("Limpiador", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
             Button("Aceptar", role: .cancel) { model.errorMessage = nil }
         } message: { Text(model.errorMessage ?? "Error desconocido") }
-        .confirmationDialog(executionTitle, isPresented: $confirmExecution, titleVisibility: .visible) {
-            Button(model.preferences.deletionMode == .trash ? "Mover a Papelera" : "Eliminar permanentemente", role: .destructive) {
-                Task { await model.executeCurrentPlan() }
-            }
-            Button("Cancelar", role: .cancel) { }
-        } message: {
-            Text(model.preferences.deletionMode == .trash
-                 ? "Se revalidará cada elemento justo antes de moverlo. Los elementos que cambien se omitirán."
-                 : "Esta acción no se puede deshacer. Se revalidará cada elemento justo antes de eliminarlo.")
-        }
+        .sheet(isPresented: $confirmExecution) { executionReview }
         .dropDestination(for: URL.self) { urls, _ in
             guard let app = urls.first(where: { $0.pathExtension.lowercased() == "app" }) else { return false }
             model.analyzeDroppedApplication(app); area = .applications; return true
@@ -85,6 +76,12 @@ struct CleanerView: View {
                         metric("Analizado", bytes(result.summary.scannedLogicalBytes), "externaldrive")
                         metric("Selección segura potencial", bytes(result.summary.potentialRecoverableBytes), "sparkles")
                         metric("Sin acceso", "\(result.summary.inaccessibleLocations)", "lock.trianglebadge.exclamationmark")
+                    }
+                    Text("Selección segura potencial: espacio asignado a elementos regenerables que cumplen las guardas del análisis. No implica que se vayan a eliminar.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    if let issue = discoveryIssue(result.discoveryStatus) {
+                        Label(issue, systemImage: "exclamationmark.triangle")
+                            .font(.callout).foregroundStyle(.orange)
                     }
                     GroupBox("Principales candidatos") {
                         VStack(spacing: 0) {
@@ -151,12 +148,27 @@ struct CleanerView: View {
                 Text("\(model.selectedCount) seleccionados · \(bytes(model.selectedBytes))").foregroundStyle(.secondary)
                 Button(model.preferences.deletionMode == .trash ? "Mover a Papelera…" : "Eliminar…", role: .destructive) { confirmExecution = true }
                     .disabled(model.selectedCount == 0 || model.isBusy)
-                if model.lastHistoryID != nil && model.preferences.deletionMode == .trash {
+                if model.canUndoLast {
                     Button("Deshacer") { Task { await model.undoLast() } }.disabled(model.isBusy)
                 }
             }.padding(16)
+            if let result = model.executionSummary {
+                DisclosureGroup("Resultado: \(result.removedCount) eliminados · \(result.skippedCount) omitidos · \(result.failedCount) fallidos") {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(result.results) { item in
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("\(executionStatusName(item.status)): \(item.sourcePath)")
+                                        .font(.caption).textSelection(.enabled)
+                                    if let message = item.message { Text(message).font(.caption2).foregroundStyle(.secondary) }
+                                }
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                    }.frame(maxHeight: 150)
+                }.padding(.horizontal, 16).padding(.bottom, 8)
+            }
             Divider()
-            candidateList(candidates: model.plan.candidates.filter { [.cache,.log,.xcodeDerivedData,.xcodeIndex,.installer,.launchItem,.application].contains($0.category) })
+            candidateList(candidates: model.plan.candidates)
         }
     }
 
@@ -191,7 +203,7 @@ struct CleanerView: View {
         HStack(alignment: .top, spacing: 12) {
             Toggle("", isOn: Binding(get: { model.plan.candidates.first(where: { $0.id == candidate.id })?.selected ?? false }, set: { model.setSelected($0, candidateID: candidate.id) }))
                 .labelsHidden()
-                .disabled(!CleanerPlanner.canSelect(candidate))
+                .disabled(!model.canSelect(candidate))
             VStack(alignment: .leading, spacing: 4) {
                 Text(candidate.url.lastPathComponent).fontWeight(.medium)
                 Text(candidate.url.path).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
@@ -200,6 +212,9 @@ struct CleanerView: View {
                     if let size = candidate.logicalSize { Text(bytes(size)) }
                 }.font(.caption2).foregroundStyle(.tertiary)
                 Text(candidate.consequence).font(.caption).foregroundStyle(candidate.containsPotentialUserData ? .orange : .secondary)
+                if model.uninstallAnalysis != nil && candidate.category != .application && !model.canSelect(candidate) && CleanerPlanner.canSelect(candidate) {
+                    Text("Selecciona primero la aplicación para retirar este elemento.").font(.caption2).foregroundStyle(.orange)
+                }
                 if let evidence = candidate.evidences.first { Text("Motivo: \(evidence.explanation)").font(.caption2).foregroundStyle(.secondary) }
             }
             Spacer()
@@ -238,6 +253,59 @@ struct CleanerView: View {
     }
 
     private var executionTitle: String { model.preferences.deletionMode == .trash ? "¿Mover los elementos seleccionados a Papelera?" : "¿Eliminar permanentemente los elementos seleccionados?" }
+    private var executionReview: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(executionTitle).font(.title2.bold())
+            Text("\(model.selectedCount) elementos · \(bytes(model.selectedBytes)) de tamaño conocido")
+                .font(.headline)
+            if model.plan.selectedCandidates.contains(where: { $0.logicalSize == nil }) {
+                Text("Algunos elementos no tienen un tamaño disponible; la cifra anterior no los incluye.")
+                    .font(.caption).foregroundStyle(.orange)
+            }
+            Text(model.preferences.deletionMode == .trash
+                 ? "Se moverán a la Papelera los elementos de esta lista. Podrás deshacer los movimientos completados."
+                 : "El borrado permanente no se puede deshacer. Revisa cada ruta antes de continuar.")
+                .foregroundStyle(model.preferences.deletionMode == .trash ? Color.secondary : Color.red)
+            List(model.plan.selectedCandidates) { candidate in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(candidate.url.lastPathComponent).fontWeight(.medium)
+                    Text(candidate.url.path).font(.caption).textSelection(.enabled)
+                    Text("\(categoryName(candidate.category)) · \(candidate.logicalSize.map(bytes) ?? "Tamaño no disponible") · Riesgo \(riskName(candidate.risk))")
+                        .font(.caption2).foregroundStyle(.secondary)
+                    Text(candidate.consequence).font(.caption2).foregroundStyle(.secondary)
+                }.padding(.vertical, 3)
+            }
+            Text("ZEUVE revalidará cada elemento antes de actuar. Los que hayan cambiado se omitirán.")
+                .font(.caption).foregroundStyle(.secondary)
+            HStack {
+                Spacer()
+                Button("Cancelar") { confirmExecution = false }
+                Button(model.preferences.deletionMode == .trash ? "Mover a Papelera" : "Eliminar permanentemente", role: .destructive) {
+                    confirmExecution = false
+                    Task { await model.executeCurrentPlan() }
+                }.disabled(model.selectedCount == 0 || model.isBusy)
+            }
+        }
+        .padding(20)
+        .frame(width: 650, height: 480)
+    }
+    private func discoveryIssue(_ status: CleanerApplicationDiscoveryStatus) -> String? {
+        switch status {
+        case .complete: return nil
+        case .unavailable: return "Spotlight no pudo completar el inventario. La cobertura es parcial; no se han marcado aplicaciones históricas como desaparecidas por esta causa."
+        case .timedOut: return "Spotlight tardó demasiado. La cobertura es parcial; puedes repetir el análisis más tarde."
+        case .cancelled: return "El descubrimiento de aplicaciones se canceló."
+        }
+    }
+    private func executionStatusName(_ status: CleanerItemExecutionStatus) -> String {
+        switch status {
+        case .removed: return "Eliminado"
+        case .skippedChanged, .permissionDenied, .unavailable: return "Omitido"
+        case .failed: return "Fallido"
+        case .restored: return "Restaurado"
+        case .restoreConflict: return "Conflicto al restaurar"
+        }
+    }
     private func metric(_ title:String,_ value:String,_ icon:String)->some View { VStack(alignment:.leading,spacing:8){Image(systemName:icon).font(.title2);Text(value).font(.title2.bold());Text(title).font(.caption).foregroundStyle(.secondary)}.frame(maxWidth:.infinity,alignment:.leading).padding(14).background(.quaternary.opacity(0.45),in:RoundedRectangle(cornerRadius:12)) }
     private func bytes(_ value:Int64)->String{ByteCountFormatter.string(fromByteCount:value,countStyle:.file)}
     private func coverageName(_ c: CleanerCoverage) -> String { switch c { case .complete: return "Completa"; case .partial: return "Parcial"; case .noAccess: return "Sin acceso"; case .notAnalyzed: return "No analizada" } }

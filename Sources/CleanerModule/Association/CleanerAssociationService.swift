@@ -40,9 +40,11 @@ public final class CleanerAssociationService: @unchecked Sendable {
         for app in installedApps { for group in app.identity.appGroups { groupOwners[group,default:0]+=1 } }
         var candidates:[CleanerCandidate]=[]; var inaccessible:[String]=[]
         for (root,category,userData,requiresAdministrator) in locations {
+            if Task.isCancelled { break }
             guard fileManager.fileExists(atPath:root.path) else { continue }
             guard let children=try? fileManager.contentsOfDirectory(at:root,includingPropertiesForKeys:[.isSymbolicLinkKey],options:[.skipsHiddenFiles]) else { inaccessible.append(root.path); continue }
             for url in children {
+                if Task.isCancelled { break }
                 let path = url.standardizedFileURL.path
                 let rawName = url.lastPathComponent
                 let matchNames = category == .preference ? [rawName, url.deletingPathExtension().lastPathComponent] : [rawName]
@@ -73,7 +75,8 @@ public final class CleanerAssociationService: @unchecked Sendable {
                 else { status = .uncertainAssociation }
                 var risk:CleanerRemovalRisk = category.isRegenerable ? .low : (userData ? .high : .medium)
                 if shared || running || unavailable || confidence == .low || requiresAdministrator { risk = .high }
-                let fp=CleanerFileInspection.fingerprint(at:url,fileManager:fileManager)
+                let fp=CleanerFileInspection.fingerprint(at:url,fileManager:fileManager,shouldCancel:{Task.isCancelled})
+                if Task.isCancelled { break }
                 candidates.append(.init(url:url,category:category,associatedAppName:app.identity.name,associatedBundleID:bundle,evidences:evidences,confidence:confidence,status:status,risk:risk,logicalSize:fp?.logicalSize,allocatedSize:fp?.allocatedSize,containsPotentialUserData:userData,isShared:shared,requiresAdministrator:requiresAdministrator,applicationRunning:running,consequence: consequence(category:category, userData:userData),selected:false,fingerprint:fp))
             }
         }

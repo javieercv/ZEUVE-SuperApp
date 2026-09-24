@@ -22,11 +22,13 @@ public final class CleanerLaunchItemScanner: @unchecked Sendable {
         var candidates: [CleanerCandidate] = []
         var inaccessible: [String] = []
         for root in roots where fileManager.fileExists(atPath: root.path) {
+            if Task.isCancelled { break }
             guard let urls = try? fileManager.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) else {
                 inaccessible.append(root.path)
                 continue
             }
             for url in urls where url.pathExtension.lowercased() == "plist" {
+                if Task.isCancelled { break }
                 guard let data = try? Data(contentsOf: url),
                       let dictionary = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any] else { continue }
                 let program = (dictionary["Program"] as? String) ?? (dictionary["ProgramArguments"] as? [String])?.first
