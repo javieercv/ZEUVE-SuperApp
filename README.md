@@ -37,7 +37,7 @@ El proyecto está pensado para crecer por módulos sin perder una experiencia co
 
 | | Módulo | Función principal | Documentación |
 |:--:|---|---|:--:|
-| 📁 | **Organizador** | Organización y tratamiento de archivos | [Índice](Docs/INDEX.md) |
+| 📁 | **Organizador** | Organización y tratamiento de archivos | [Ver](Docs/Modulos/Funcionales/ORGANIZER.md) |
 | ⬇️ | **Descargador universal** | Descarga de contenido desde fuentes compatibles | [Ver](Docs/Modulos/Funcionales/UNIVERSAL_DOWNLOADER.md) |
 | 💬 | **Analizador de chats** | Análisis local de conversaciones exportadas | [Ver](Docs/Modulos/Funcionales/CHAT_ANALYZER.md) |
 | 🔄 | **Conversor universal** | Conversión de archivos entre formatos compatibles | [Ver](Docs/Modulos/Funcionales/UNIVERSAL_CONVERTER.md) |
