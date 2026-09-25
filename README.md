@@ -8,7 +8,7 @@ Herramientas distintas, una sola aplicación, con especial cuidado por la privac
 
 <br>
 
-![Versión](https://img.shields.io/badge/ZEUVE-0.20.4.0-2f81f7?style=flat-square)
+![Versión](https://img.shields.io/badge/ZEUVE-0.20.5.0-2f81f7?style=flat-square)
 ![macOS](https://img.shields.io/badge/macOS-14%2B-000000?style=flat-square&logo=apple&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-nativo-000000?style=flat-square&logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/Swift-6-F05138?style=flat-square&logo=swift&logoColor=white)
@@ -132,7 +132,7 @@ Para consultar la evolución del proyecto:
 
 <div align="center">
 
-### ZEUVE 0.20.4.0
+### ZEUVE 0.20.5.0
 
 Desarrollo activo para macOS · Apple Silicon
 

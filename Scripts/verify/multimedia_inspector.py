@@ -16,6 +16,8 @@ app_model = Path("Sources/ZEUVEApp/AppModel.swift").read_text()
 app = Path("Sources/ZEUVEApp/ZEUVEApp.swift").read_text()
 manifest_path = Path("Sources/MultimediaInspectorModule/Resources/manifest.json")
 manifest = json.loads(manifest_path.read_text())
+preflight = Path("Sources/MultimediaInspectorModule/Batch/MultimediaBatchPreflight.swift").read_text()
+preflight_tests = Path("Tests/MultimediaInspectorModuleTests/MultimediaBatchPreflightTests.swift").read_text()
 
 required_package = [
     '.library(name: "MultimediaInspectorModule"',
@@ -30,7 +32,7 @@ for snippet in required_package:
 for key, expected in {
     "identifier": "com.zeuve.multimedia-inspector",
     "name": "Inspector multimedia",
-    "version": "0.7.2",
+    "version": "0.7.3",
     "minimumZEUVEVersion": "0.13.0",
     "executionMode": "builtIn",
 }.items():
@@ -73,6 +75,28 @@ for snippet in [
         raise SystemExit("AppModel no integra completamente Inspector multimedia: " + snippet)
 if 'model.historyShortcut' not in app or 'Button("Ver historial") { model.selection = .history }' not in app:
     raise SystemExit("Historial debe usar el atajo dinámico centralizado.")
+
+for required in [
+    "async throws -> [MultimediaBatchPreflightItem]",
+    "operationID = try await coordinator.begin",
+    "await coordinator.shouldCancel(id: operationID)",
+    "await inspector.cancel()",
+    "try await coordinator.finish(id: operationID)",
+]:
+    if required not in preflight:
+        raise SystemExit("El preflight debe respetar reserva, cancelación y cierre coordinado: " + required)
+for forbidden in ["operationID = try? await coordinator.begin", "Task { try? await coordinator.finish"]:
+    if forbidden in preflight:
+        raise SystemExit("El preflight conserva un patrón que puede dejar operaciones sin registrar o huérfanas: " + forbidden)
+for required in [
+    "multimediaBatchPreflightPropagatesBusyWithoutDisturbingActiveOperation",
+    "multimediaBatchPreflightFinishesCoordinatorBeforeReturning",
+    "multimediaBatchPreflightPreservesNormalNoChangesResult",
+    "multimediaBatchPreflightRespondsToCoordinatorCancellationAndReleasesOperation",
+    "multimediaBatchPreflightRespondsToTaskCancellationAndReleasesOperation",
+]:
+    if required not in preflight_tests:
+        raise SystemExit("Falta regresión del preflight: " + required)
 
 required_files = [
     "Sources/ZEUVEEngines/MediaInspection/MediaInspectionService.swift",
@@ -791,4 +815,4 @@ for path, snippets in {
         if snippet not in source:
             raise SystemExit(f"Falta cierre 0.19 del Inspector en {path}: {snippet}")
 
-print("Inspector multimedia 0.7.2: transporte multimedia, respuesta interactiva, fullscreen, cancelación, análisis espectral, edición, lotes, OCR, privacidad y ayuda verificados.")
+print("Inspector multimedia 0.7.3: transporte multimedia, respuesta interactiva, fullscreen, cancelación, análisis espectral, edición, lotes, OCR, privacidad y ayuda verificados.")

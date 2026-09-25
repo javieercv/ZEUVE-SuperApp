@@ -63,7 +63,7 @@ class MultimediaInspectorBatchTests(unittest.TestCase):
 
     def test_manifest_declares_only_local_batch_requirements(self):
         manifest = json.loads((ROOT / "Sources/MultimediaInspectorModule/Resources/manifest.json").read_text())
-        self.assertEqual(manifest["version"], "0.7.2")
+        self.assertEqual(manifest["version"], "0.7.3")
         self.assertIn("presets", manifest["capabilities"])
         self.assertIn("openExternalApplications", manifest["permissions"])
         self.assertNotIn("networkAccess", manifest["permissions"])

@@ -1,4 +1,4 @@
-# ZEUVE 0.20.4.0 — instrucciones para agentes
+# ZEUVE 0.20.5.0 — instrucciones para agentes
 
 ## Rol
 
@@ -54,7 +54,7 @@ No uses Git salvo petición expresa del usuario.
 
 ## Forma técnica actual
 
-ZEUVE 0.20.4.0 (marketing 0.20.4, build 70) es una app nativa para macOS 14+ Apple Silicon, Swift 6, SwiftUI/AppKit cuando procede, Hardened Runtime y sin App Sandbox en esta fase.
+ZEUVE 0.20.5.0 (marketing 0.20.5, build 71) es una app nativa para macOS 14+ Apple Silicon, Swift 6, SwiftUI/AppKit cuando procede, Hardened Runtime y sin App Sandbox en esta fase.
 
 Capas principales:
 

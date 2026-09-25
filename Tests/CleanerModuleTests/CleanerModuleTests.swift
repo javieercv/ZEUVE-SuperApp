@@ -64,6 +64,43 @@ final class CleanerModuleTests: XCTestCase {
         let root=try tempDirectory();defer{try? FileManager.default.removeItem(at:root)};let db=try SQLiteDatabase(url:root.appendingPathComponent("db.sqlite"));try StorageMigrations.migrate(db);let names=try db.query("SELECT name FROM sqlite_master WHERE type='table'").compactMap{try? $0.string("name")};for name in ["cleaner_app_inventory","cleaner_associated_roots","cleaner_user_decisions","cleaner_scan_metadata","cleaner_undo_items"]{XCTAssertTrue(names.contains(name),name)}
     }
 
+    func testMalformedInventoryRowIsReportedInsteadOfSilentlyDiscarded() throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite")); let repo = try CleanerRepository(database: db)
+        try db.execute(
+            "INSERT INTO cleaner_app_inventory(bundle_id,path,volume_path,first_seen,last_seen,identity_blob) VALUES(?,?,?,?,?,?)",
+            bindings: [.text("com.test.invalid"), .text("/Applications/Invalid.app"), .text("/"), .text("2026-09-25T00:00:00Z"), .text("2026-09-25T00:00:00Z"), .blob(Data("{".utf8))]
+        )
+        XCTAssertThrowsError(try repo.loadInventory()) { error in
+            XCTAssertEqual(error as? SQLiteDatabaseError, .invalidColumn("identity_blob"))
+        }
+    }
+
+    func testMalformedUndoRowIsReportedInsteadOfSilentlyDiscarded() throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite")); let repo = try CleanerRepository(database: db)
+        let historyID = UUID()
+        try db.execute(
+            "INSERT INTO cleaner_undo_items(id,operation_id,original_path,trash_path,fingerprint_blob,created_at) VALUES(?,?,?,?,?,?)",
+            bindings: [.text("not-a-uuid"), .text(historyID.uuidString), .text("/tmp/original"), .text("/tmp/trash"), .blob(Data()), .text("2026-09-25T00:00:00Z")]
+        )
+        XCTAssertThrowsError(try repo.undoItems(historyID: historyID)) { error in
+            XCTAssertEqual(error as? SQLiteDatabaseError, .invalidColumn("id"))
+        }
+    }
+
+    func testMalformedConservedDecisionIsReportedInsteadOfWeakeningProtection() throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite")); let repo = try CleanerRepository(database: db)
+        try db.execute(
+            "INSERT INTO cleaner_user_decisions(path,decision,updated_at) VALUES(?,'keep',?)",
+            bindings: [.blob(Data([0x00, 0x01])), .text("2026-09-25T00:00:00Z")]
+        )
+        XCTAssertThrowsError(try repo.keptPaths()) { error in
+            XCTAssertEqual(error as? SQLiteDatabaseError, .invalidColumn("path"))
+        }
+    }
+
     func testChangedCandidateIsSkippedImmediatelyBeforeExecution() async throws {
         let root=try tempDirectory();defer{try? FileManager.default.removeItem(at:root)};let file=root.appendingPathComponent("cache");try Data("old".utf8).write(to:file);let fp=CleanerFileInspection.fingerprint(at:file)!;var c=CleanerCandidate(url:file,category:.cache,evidences:[.init(strength:.strong,explanation:"test")],confidence:.high,status:.probableResidue,risk:.low,logicalSize:fp.logicalSize,consequence:"cache",selected:true,fingerprint:fp);c.selected=true;try Data("changed-value".utf8).write(to:file);let db=try SQLiteDatabase(url:root.appendingPathComponent("history.sqlite"));let repo=try CleanerRepository(database:db);let history=try HistoryRepository(database:db);let service=CleanerExecutionService(coordinator:OperationCoordinator(),cleanerRepository:repo,history:history);let out=try await service.execute(plan:.init(candidates:[c]),mode:.permanent);XCTAssertEqual(out.summary.skippedCount,1);XCTAssertTrue(FileManager.default.fileExists(atPath:file.path))
     }
@@ -210,13 +247,13 @@ final class CleanerModuleTests: XCTestCase {
         let execution = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [candidate]), mode: .trash)
         XCTAssertFalse(FileManager.default.fileExists(atPath: file.path)); XCTAssertEqual(execution.summary.removedCount, 1)
         let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator)
-        let restored = try await undo.undo(historyID: execution.historyID); XCTAssertEqual(restored.restoredCount, 1); XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
+        let restored = try await undo.undo(historyID: execution.historyID); XCTAssertEqual(restored.summary.restoredCount, 1); XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
 
         let secondFP = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
         let second = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "cache", selected: true, fingerprint: secondFP)
         let execution2 = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [second]), mode: .trash)
         try Data("new object".utf8).write(to: file)
-        let conflicted = try await undo.undo(historyID: execution2.historyID); XCTAssertEqual(conflicted.results.first?.status, .restoreConflict)
+        let conflicted = try await undo.undo(historyID: execution2.historyID); XCTAssertEqual(conflicted.summary.results.first?.status, .restoreConflict)
         XCTAssertEqual(try String(contentsOf: file, encoding: .utf8), "new object")
     }
 
@@ -267,12 +304,12 @@ final class CleanerModuleTests: XCTestCase {
         try Data("conflict".utf8).write(to: files[0])
         let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator)
         let partial = try await undo.undo(historyID: output.historyID)
-        XCTAssertEqual(partial.restoredCount, 1)
+        XCTAssertEqual(partial.summary.restoredCount, 1)
         XCTAssertTrue(try undo.hasPendingItems(historyID: output.historyID))
         XCTAssertEqual(try Data(contentsOf: files[0]), Data("conflict".utf8))
         try FileManager.default.removeItem(at: files[0])
         let completed = try await undo.undo(historyID: output.historyID)
-        XCTAssertEqual(completed.restoredCount, 1)
+        XCTAssertEqual(completed.summary.restoredCount, 1)
         XCTAssertFalse(try undo.hasPendingItems(historyID: output.historyID))
         XCTAssertEqual(try Data(contentsOf: files[0]), Data("original-0".utf8))
         XCTAssertEqual(try Data(contentsOf: files[1]), Data("original-1".utf8))
@@ -295,8 +332,31 @@ final class CleanerModuleTests: XCTestCase {
         XCTAssertNotNil(output.historyWarning)
         XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
         let undone = try await CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator).undo(historyID: output.historyID)
-        XCTAssertEqual(undone.restoredCount, 1)
+        XCTAssertEqual(undone.summary.restoredCount, 1)
         XCTAssertEqual(try Data(contentsOf: file), Data("fixture".utf8))
+    }
+
+    func testUndoHistoryUpdateFailureReturnsWarningAfterRestoringFiles() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite"))
+        let repo = try CleanerRepository(database: db)
+        let history = try HistoryRepository(database: db)
+        let coordinator = OperationCoordinator()
+        let file = root.appendingPathComponent("cache")
+        try Data("fixture".utf8).write(to: file)
+        let fingerprint = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+        let candidate = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "fixture", selected: true, fingerprint: fingerprint)
+        let mutator = TestTrashMutator(trashRoot: root.appendingPathComponent("TestTrash"))
+        let execution = try await CleanerExecutionService(coordinator: coordinator, cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [candidate]), mode: .trash)
+        try db.execute("CREATE TRIGGER qa_history_update_failure BEFORE UPDATE ON operation_history BEGIN SELECT RAISE(ABORT, 'qa history update failure'); END")
+
+        let output = try await CleanerUndoService(coordinator: coordinator, repository: repo, history: history, mutator: mutator).undo(historyID: execution.historyID)
+
+        XCTAssertEqual(output.summary.restoredCount, 1)
+        XCTAssertNotNil(output.historyWarning)
+        XCTAssertEqual(try Data(contentsOf: file), Data("fixture".utf8))
+        let currentOperation = await coordinator.current()
+        XCTAssertNil(currentOperation)
     }
 
     func testUndoRegistrationFailureRollsTrashMoveBack() async throws {
@@ -334,7 +394,7 @@ final class CleanerModuleTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
         XCTAssertTrue(FileManager.default.fileExists(atPath: trash))
         let restored = try await CleanerUndoService(coordinator: OperationCoordinator(), repository: repository, history: history).undo(historyID: output.historyID)
-        XCTAssertEqual(restored.restoredCount, 1)
+        XCTAssertEqual(restored.summary.restoredCount, 1)
         XCTAssertEqual(try Data(contentsOf: file), original)
     }
 

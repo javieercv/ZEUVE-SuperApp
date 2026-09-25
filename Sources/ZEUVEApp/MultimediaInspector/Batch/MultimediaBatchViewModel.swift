@@ -208,7 +208,7 @@ final class MultimediaBatchViewModel: ObservableObject {
             guard let self else { return }; defer { self.isPreflighting = false }
             do {
                 let ffprobe = try await locator.ffprobe()
-                let prepared = await self.preflightService.prepare(files: files, ruleSet: rules, ffprobe: ffprobe, preferences: prefs)
+                let prepared = try await self.preflightService.prepare(files: files, ruleSet: rules, ffprobe: ffprobe, preferences: prefs)
                 if self.folderOptions.incompatiblePolicy == .skip {
                     let omitted = prepared.filter { $0.classification == .incompatible }.count
                     self.preflightItems = prepared.filter { $0.classification != .incompatible }

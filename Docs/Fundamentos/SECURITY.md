@@ -1,4 +1,4 @@
-# Seguridad y privacidad — ZEUVE 0.20.4.0
+# Seguridad y privacidad — ZEUVE 0.20.5.0
 
 ## Principio general
 
@@ -39,7 +39,7 @@ Para resultados nuevos:
 
 ## Excepciones aprobadas de alcance local
 
-El Limpiador declara `scanLocalStorage` y puede **analizar** ubicaciones locales documentadas aunque no hayan sido seleccionadas una a una. Esa excepción no autoriza a modificar. Eliminar/mover exige `removeLocalItems` y la secuencia descubrimiento → análisis → plan visible → selección explícita → revalidación → ejecución.
+El Limpiador declara `scanLocalStorage` y puede **analizar** ubicaciones locales documentadas aunque no hayan sido seleccionadas una a una. Esa excepción no autoriza a modificar. Eliminar/mover exige `removeLocalItems` y la secuencia descubrimiento → análisis → plan visible → selección explícita → revalidación → ejecución. Si inventario o decisiones «Conservar» no pueden leerse de forma fiable, el plan se detiene en vez de asumir que esas protecciones no existen.
 
 El Organizador mueve originales porque esa es su función explícita, siempre desde la carpeta escogida/arrastrada y después de planificar las operaciones.
 
@@ -70,4 +70,4 @@ Las importaciones deben impedir path traversal, rutas absolutas, colisiones norm
 
 ## Plataforma
 
-La app usa Hardened Runtime. No está dentro de App Sandbox en 0.20.4.0; por ello las protecciones de alcance, validación, permisos internos y UI no pueden delegarse al sandbox.
+La app usa Hardened Runtime. No está dentro de App Sandbox en 0.20.5.0; por ello las protecciones de alcance, validación, permisos internos y UI no pueden delegarse al sandbox.

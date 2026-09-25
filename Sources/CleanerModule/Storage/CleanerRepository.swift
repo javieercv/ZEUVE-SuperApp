@@ -32,7 +32,10 @@ public final class CleanerRepository: @unchecked Sendable {
     }
 
     public func loadInventory() throws -> [CleanerAppInventoryItem] {
-        let decoder=JSONDecoder(); return try database.query("SELECT identity_blob FROM cleaner_app_inventory ORDER BY last_seen DESC").compactMap { row in try? decoder.decode(CleanerAppInventoryItem.self,from:row.blob("identity_blob")) }
+        let decoder=JSONDecoder(); return try database.query("SELECT identity_blob FROM cleaner_app_inventory ORDER BY last_seen DESC").map { row in
+            do { return try decoder.decode(CleanerAppInventoryItem.self,from:row.blob("identity_blob")) }
+            catch { throw SQLiteDatabaseError.invalidColumn("identity_blob") }
+        }
     }
 
     public func upsertAssociatedRoots(_ candidates: [CleanerCandidate]) throws {
@@ -48,16 +51,21 @@ public final class CleanerRepository: @unchecked Sendable {
         if value { try database.execute("INSERT INTO cleaner_user_decisions(path,decision,updated_at) VALUES(?,'keep',?) ON CONFLICT(path) DO UPDATE SET decision='keep',updated_at=excluded.updated_at",bindings:[.text(path),.text(Self.date(Date()))]) }
         else { try database.execute("DELETE FROM cleaner_user_decisions WHERE path=?",bindings:[.text(path)]) }
     }
-    public func keptPaths() throws -> Set<String> { Set(try database.query("SELECT path FROM cleaner_user_decisions WHERE decision='keep'").compactMap{try? $0.string("path")}) }
+    public func keptPaths() throws -> Set<String> { Set(try database.query("SELECT path FROM cleaner_user_decisions WHERE decision='keep'").map{try $0.string("path")}) }
     public func isKept(path:String)throws->Bool{!((try database.query("SELECT path FROM cleaner_user_decisions WHERE path=? AND decision='keep' LIMIT 1",bindings:[.text(path)])).isEmpty)}
 
     public func saveScanMetadata(_ summary: CleanerScanSummary) throws { try database.execute("INSERT INTO cleaner_scan_metadata(id,created_at,coverage,logical_size,allocated_size,issue_count) VALUES(?,?,?,?,?,?)",bindings:[.text(UUID().uuidString),.text(Self.date(summary.finishedAt)),.text(summary.coverage.rawValue),.integer(summary.scannedLogicalBytes),.integer(summary.potentialRecoverableBytes),.integer(Int64(summary.inaccessibleLocations))]) }
 
     public func addUndoItem(_ item: CleanerUndoItem) throws { try database.execute("INSERT INTO cleaner_undo_items(id,operation_id,original_path,trash_path,fingerprint_blob,created_at) VALUES(?,?,?,?,?,?)",bindings:[.text(item.id.uuidString),.text(item.historyID.uuidString),.text(item.originalURL.path),.text(item.trashURL.path),.blob(try JSONEncoder().encode(item.fingerprint)),.text(Self.date(Date()))]) }
-    public func undoItems(historyID: UUID) throws -> [CleanerUndoItem] { let d=JSONDecoder();return try database.query("SELECT * FROM cleaner_undo_items WHERE operation_id=? ORDER BY created_at DESC",bindings:[.text(historyID.uuidString)]).compactMap{row in guard let id=UUID(uuidString:try row.string("id")),let fp=try? d.decode(CleanerFileFingerprint.self,from:row.blob("fingerprint_blob")) else{return nil};return .init(id:id,historyID:historyID,originalURL:URL(fileURLWithPath:try row.string("original_path")),trashURL:URL(fileURLWithPath:try row.string("trash_path")),fingerprint:fp)} }
+    public func undoItems(historyID: UUID) throws -> [CleanerUndoItem] { let d=JSONDecoder();return try database.query("SELECT * FROM cleaner_undo_items WHERE operation_id=? ORDER BY created_at DESC",bindings:[.text(historyID.uuidString)]).map{row in
+        guard let id=UUID(uuidString:try row.string("id")) else{throw SQLiteDatabaseError.invalidColumn("id")}
+        let fp:CleanerFileFingerprint
+        do{fp=try d.decode(CleanerFileFingerprint.self,from:row.blob("fingerprint_blob"))}catch{throw SQLiteDatabaseError.invalidColumn("fingerprint_blob")}
+        return .init(id:id,historyID:historyID,originalURL:URL(fileURLWithPath:try row.string("original_path")),trashURL:URL(fileURLWithPath:try row.string("trash_path")),fingerprint:fp)
+    } }
     public func removeUndoItem(id: UUID) throws { try database.execute("DELETE FROM cleaner_undo_items WHERE id=?",bindings:[.text(id.uuidString)]) }
     public func clearInventoryHistory() throws { try database.transaction { try database.execute("DELETE FROM cleaner_associated_roots");try database.execute("DELETE FROM cleaner_app_inventory");try database.execute("DELETE FROM cleaner_scan_metadata") } }
 
-    private func inventoryItem(bundleID:String?,path:String)throws->CleanerAppInventoryItem?{let rows=try database.query("SELECT identity_blob FROM cleaner_app_inventory WHERE bundle_id=? AND path=?",bindings:[.text(bundleID ?? "path:\(path)"),.text(path)]);guard let row=rows.first else{return nil};return try? JSONDecoder().decode(CleanerAppInventoryItem.self,from:row.blob("identity_blob"))}
+    private func inventoryItem(bundleID:String?,path:String)throws->CleanerAppInventoryItem?{let rows=try database.query("SELECT identity_blob FROM cleaner_app_inventory WHERE bundle_id=? AND path=?",bindings:[.text(bundleID ?? "path:\(path)"),.text(path)]);guard let row=rows.first else{return nil};do{return try JSONDecoder().decode(CleanerAppInventoryItem.self,from:row.blob("identity_blob"))}catch{throw SQLiteDatabaseError.invalidColumn("identity_blob")}}
     private static func date(_ date:Date)->String{let f=ISO8601DateFormatter();f.formatOptions=[.withInternetDateTime,.withFractionalSeconds];return f.string(from:date)}
 }

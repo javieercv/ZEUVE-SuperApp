@@ -18,7 +18,8 @@ public final class CleanerAnalysisService:@unchecked Sendable{
             inventory = .init(applications:apps,inaccessibleLocations:inventory.inaccessibleLocations);let keys=Set(apps.map{($0.identity.bundleID ?? "unsigned") + "|" + $0.identity.path});try repository?.upsertInventory(apps)
             let canConfirmAbsentApplications = Self.canConfirmAbsentApplications(discoveryStatus:discovery.status,inaccessibleLocations:inventory.inaccessibleLocations)
             if canConfirmAbsentApplications { try repository?.markMissingInventory(except:keys) }
-            let history=(try? repository?.loadInventory()) ?? [];let kept=(try? repository?.keptPaths()) ?? []
+            let history:[CleanerAppInventoryItem];let kept:Set<String>
+            if let repository{history=try repository.loadInventory();kept=try repository.keptPaths()}else{history=[];kept=[]}
             let associationApps = Self.applicationsForAssociation(current:apps,historical:history,canConfirmAbsent:canConfirmAbsentApplications)
             if await coordinator.shouldCancel(id:op){throw CancellationError()};try? await coordinator.update(id:op,progress:.init(completed:0,total:nil,phase:"Relacionando residuos y guardas"))
             let assoc=await runCancellable(operationID:op){[association, identityProvider] in association.scan(installedApps:associationApps,historicalApps:history,keptPaths:kept,runningBundleIDs:identityProvider.runningBundleIdentifiers())};let launchResult=await runCancellable(operationID:op){[launch] in launch.scan()};var candidates=assoc.candidates+launchResult.candidates

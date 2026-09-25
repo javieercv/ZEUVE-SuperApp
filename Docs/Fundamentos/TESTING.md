@@ -1,16 +1,16 @@
-# Pruebas y validación — ZEUVE 0.20.4.0
+# Pruebas y validación — ZEUVE 0.20.5.0
 
 ## Evidencia de la entrega actual
 
 La evidencia histórica específica está en:
 
-- `Docs/Historico/Pruebas/TEST_RESULTS_0.20.4.0.md`
-- `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.4.0.md`
-- `Docs/Historico/Entregas/DELIVERY_0.20.4.0.md`
+- `Docs/Historico/Pruebas/TEST_RESULTS_0.20.5.0.md`
+- `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.5.0.md`
+- `Docs/Historico/Entregas/DELIVERY_0.20.5.0.md`
 
 Esos archivos reflejan la ejecución realizada para esa entrega y no deben interpretarse como una prueba recién repetida después de cambios posteriores.
 
-Para 0.20.4.0 constan 30 pruebas dirigidas del Limpiador, `verify_project.sh` completo (suite Swift, 112 tests Python, verificadores y Xcode Debug) y `build_macos.sh Debug` correcto en macOS Apple Silicon. El informe de pruebas distingue lo observado en la interfaz nueva de la evidencia automatizada y la de 0.20.3.0. La caída del servicio de automatización al leer resultados impide declarar validado el recorrido visual completo.
+Para 0.20.5.0 constan 34 pruebas dirigidas del Limpiador y 5 regresiones específicas del preflight estructural. La evidencia de entrega registra por separado SwiftPM, tests, parseo, builds reales Debug/Release y verificación de la app. La rama portable de Spotlight queda cubierta por el mismo test contractual, aunque su ejecución no puede observarse en macOS.
 
 ## Comandos base
 

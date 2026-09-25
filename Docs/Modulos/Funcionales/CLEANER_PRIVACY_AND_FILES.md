@@ -14,7 +14,7 @@ Los permisos de manifiesto `scanLocalStorage` y `removeLocalItems` describen est
 
 El Limpiador no declara `networkAccess`, no contiene clientes HTTP, no descarga reglas y no envía inventarios, rutas ni resultados. No usa telemetría, analytics ni cloud.
 
-El inventario SQLite, decisiones `Conservar` y Undo permanecen en el almacenamiento local de ZEUVE. El historial global registra resultados agregados y no necesita cientos de rutas privadas en su payload visible.
+El inventario SQLite, decisiones `Conservar` y Undo permanecen en el almacenamiento local de ZEUVE. El historial global registra resultados agregados y no necesita cientos de rutas privadas en su payload visible. Un fallo de lectura o una fila inválida no se interpreta como inventario o protecciones vacíos.
 
 ## Rutas inspeccionadas
 
@@ -36,7 +36,7 @@ Los recorridos recursivos no siguen symlinks. Si el propio enlace es candidato, 
 
 Preferences, Application Support, Containers, Group Containers, bases de datos, partidas, documentos, configuraciones y plugins se consideran potencialmente persistentes. No forman parte de la selección automática segura.
 
-Una decisión «Conservar» se aplica al plan visible y se revalida desde SQLite justo antes de cualquier retirada, incluso si el plan se formó antes de tomar esa decisión.
+Una decisión «Conservar» se aplica al plan visible y se revalida desde SQLite justo antes de cualquier retirada, incluso si el plan se formó antes de tomar esa decisión. Si esas decisiones no pueden cargarse de forma fiable, no se construye un plan suponiendo que no existen.
 
 Los App Groups compartidos por otra aplicación instalada se bloquean. Si una aplicación estaba en un volumen externo actualmente ausente, se clasifica como `Aplicación actualmente no disponible` y sus datos no se convierten automáticamente en residuos.
 

@@ -1,4 +1,4 @@
-# Comparador de seguidores de Instagram 0.1.0 — ZEUVE 0.20.4.0
+# Comparador de seguidores de Instagram 0.1.0 — ZEUVE 0.20.5.0
 
 ## Identidad
 

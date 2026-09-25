@@ -1,10 +1,10 @@
-# Inspector multimedia 0.7.2 — ZEUVE 0.20.4.0
+# Inspector multimedia 0.7.3 — ZEUVE 0.20.5.0
 
 ## Identidad y alcance
 
 - ID: `com.zeuve.multimedia-inspector`.
 - Target: `MultimediaInspectorModule`.
-- Versión: `0.7.2`.
+- Versión: `0.7.3`.
 - ZEUVE mínimo: `0.13.0`.
 - Categoría: Multimedia.
 - Atajo por defecto: ⌘6.
@@ -167,6 +167,8 @@ Hay dos familias de trabajo:
 
 - análisis/exportación secuencial (inspección, señal, sonoridad, espectrograma, informe según preset);
 - edición estructural por reglas condición → acción, con análisis, plan individual, preflight, revisión y ejecución segura.
+
+El preflight estructural reserva `OperationCoordinator` antes de inspeccionar. Si otra operación está activa propaga `.busy` y no continúa sin registro. La cancelación de la tarea o la cancelación global detienen FFprobe, y el coordinador queda liberado de forma esperada antes de devolver el resultado o el error. Los fallos normales de un archivo siguen representándose en su elemento sin alterar los resultados de los demás.
 
 Con múltiples pistas de audio el módulo no elige silenciosamente una para análisis dependiente de una sola pista. Un fallo aislado no debe invalidar resultados ya publicados de otros elementos; la cancelación conserva únicamente salidas publicadas correctamente y detiene pendientes.
 

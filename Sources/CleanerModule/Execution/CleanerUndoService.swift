@@ -3,6 +3,11 @@ import ZEUVECore
 import ZEUVEStorage
 import ZEUVEOperations
 
+public struct CleanerUndoOutput: Sendable {
+    public let summary: CleanerExecutionSummary
+    public let historyWarning: String?
+}
+
 public final class CleanerUndoService: @unchecked Sendable {
     let coordinator: OperationCoordinator
     let repository: CleanerRepository
@@ -22,7 +27,7 @@ public final class CleanerUndoService: @unchecked Sendable {
         try !repository.undoItems(historyID: historyID).isEmpty
     }
 
-    public func undo(historyID: UUID) async throws -> CleanerExecutionSummary {
+    public func undo(historyID: UUID) async throws -> CleanerUndoOutput {
         let operationID = try await coordinator.begin(moduleID: cleanerModuleIdentifier, name: "Restaurando desde la Papelera")
         var results: [CleanerItemExecutionResult] = []
         do {
@@ -54,9 +59,14 @@ public final class CleanerUndoService: @unchecked Sendable {
             let remaining = try repository.undoItems(historyID: historyID)
             let restoredCount = results.filter { $0.status == .restored }.count
             let status: OperationStatus = remaining.isEmpty ? .undone : (restoredCount > 0 ? .partiallyUndone : .undoUnavailable)
-            try? history.updateUndoState(id: historyID, status: status, undoAvailable: !remaining.isEmpty)
+            var historyWarning: String?
+            do { try history.updateUndoState(id: historyID, status: status, undoAvailable: !remaining.isEmpty) }
+            catch { historyWarning = "Los archivos se restauraron, pero no se pudo actualizar el historial global." }
             try await coordinator.finish(id: operationID)
-            return .init(results: results, deletedLogicalBytes: 0, deletionMode: .trash)
+            return .init(
+                summary: .init(results: results, deletedLogicalBytes: 0, deletionMode: .trash),
+                historyWarning: historyWarning
+            )
         } catch {
             try? await coordinator.finish(id: operationID)
             throw error

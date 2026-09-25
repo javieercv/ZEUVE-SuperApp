@@ -8,7 +8,7 @@ public final class MultimediaInspectorRuleSetStore: @unchecked Sendable {
 
     public func load() -> [MultimediaBatchRuleSet] {
         guard let stored = try? repository?.value(forKey: MultimediaInspectorStorageKeys.ruleSets, as: [MultimediaBatchRuleSet].self) else { return [] }
-        return (stored ?? []).compactMap(Self.normalize)
+        return stored.compactMap(Self.normalize)
     }
 
     public func save(_ ruleSets: [MultimediaBatchRuleSet]) throws {

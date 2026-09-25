@@ -1,7 +1,7 @@
 # Guía de desarrollo de módulos de ZEUVE
 
 Versión de la guía: 1.2
-Compatible con ZEUVE: 0.20.4.0
+Compatible con ZEUVE: 0.20.5.0
 API de módulos actual: 1.0
 
 ## 1. Objetivo

@@ -1,5 +1,13 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.5.0 — 2026-09-25
+
+- Inspector multimedia 0.7.3: el preflight estructural propaga `OperationCoordinator.busy`, atiende cancelación local y global, cancela FFprobe activo y completa `finish` antes de retornar. Los resultados normales por archivo no cambian.
+- Limpiador 0.1.3: los fallos reales de persistencia y las filas malformadas de inventario, Undo o «Conservar» dejan de convertirse silenciosamente en colecciones vacías.
+- Deshacer conserva como válidos los archivos restaurados si falla la actualización secundaria del historial global y devuelve una advertencia controlada.
+- La rama portable de Spotlight devuelve `.cancelled` cuando la tarea ya estaba cancelada. Se elimina una redundancia del almacén de reglas y las pruebas actuales usan el builder FFmpeg vigente sin retirar el adaptador legacy.
+- Se añaden regresiones de ocupación, liberación, cancelación, resultados normales, persistencia corrupta y warning de historial. Sin cambios de UI, red, dependencias, motores, permisos, esquema SQLite, migraciones ni formatos válidos. ZEUVE marketing 0.20.5, build 71.
+
 ## 0.20.4.0 — 2026-09-24
 
 - Limpiador 0.1.2: asociación de residuos por Bundle ID exacto, instaladores sin duplicados entre raíces solapadas y análisis de desinstalación de apps sin identificador limitado al nombre correspondiente.

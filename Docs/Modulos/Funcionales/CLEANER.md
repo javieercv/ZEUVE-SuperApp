@@ -1,8 +1,8 @@
-# Limpiador 0.1.2 — ZEUVE 0.20.4.0
+# Limpiador 0.1.3 — ZEUVE 0.20.5.0
 
 ## Estado
 
-`CleanerModule` 0.1.2 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner`, su ZEUVE mínimo declarado es `0.20.0` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
+`CleanerModule` 0.1.3 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner`, su ZEUVE mínimo declarado es `0.20.0` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
 
 ## Objetivo
 
@@ -24,7 +24,7 @@ La pantalla principal tiene cinco áreas:
 
 En producción se inspeccionan `/Applications`, `~/Applications`, aplicaciones conocidas por `NSWorkspace`, resultados de Spotlight revalidados contra el filesystem y ubicaciones adicionales elegidas por el usuario. Los tests inyectan raíces propias y nunca necesitan escanear el Mac real.
 
-El inventario y las mediciones largas atienden la cancelación. Spotlight se inicia en el hilo principal, tiene un límite de 30 segundos y puede terminar por cancelación, indisponibilidad o fin de búsqueda. Si no termina normalmente, el resto del análisis continúa con cobertura parcial y un aviso visible; los registros históricos no se convierten en aplicaciones desaparecidas por ese motivo. Lo mismo se aplica cuando una raíz de inventario no es accesible.
+El inventario y las mediciones largas atienden la cancelación. Spotlight se inicia en el hilo principal, tiene un límite de 30 segundos y puede terminar por cancelación, indisponibilidad o fin de búsqueda. La rama portable también distingue una tarea previamente cancelada de una búsqueda no disponible. Si Spotlight no termina normalmente, el resto del análisis continúa con cobertura parcial y un aviso visible; los registros históricos no se convierten en aplicaciones desaparecidas por ese motivo. Lo mismo se aplica cuando una raíz de inventario no es accesible.
 
 Mientras una aplicación existe se intenta conservar Bundle ID, nombre, versión/build, ruta, volumen, Signing Identifier, Team ID y App Groups. La firma se consulta mediante Security.framework en macOS; no se invoca `codesign`.
 
@@ -62,7 +62,7 @@ Si la app no tiene Bundle ID, su plan solo incluye asociaciones heurísticas con
 
 El modo predeterminado es **Mover a Papelera** con la API nativa `FileManager.trashItem`. Se registra la ubicación original, la ubicación real devuelta por macOS y un `CleanerFileFingerprint` específico.
 
-El Undo solo restaura cuando el objeto sigue verificable y la ruta original está libre. Nunca sobrescribe silenciosamente un objeto nuevo. Una restauración parcial mantiene los elementos pendientes para otro intento. El borrado permanente es opt-in, requiere confirmación en UI y no ofrece Undo.
+El Undo solo restaura cuando el objeto sigue verificable y la ruta original está libre. Nunca sobrescribe silenciosamente un objeto nuevo. Una restauración parcial mantiene los elementos pendientes para otro intento. Si los archivos se restauran pero falla la actualización secundaria del historial global, la restauración sigue siendo válida y se muestra una advertencia; no se revierte el filesystem. El borrado permanente es opt-in, requiere confirmación en UI y no ofrece Undo.
 
 La confirmación previa enumera las rutas seleccionadas, cantidad, tamaño y modo de eliminación. El resultado distingue eliminados, omitidos y fallidos con detalle por elemento. Tras ejecutar se actualiza el análisis y se deja la nueva selección vacía; «Deshacer» solo aparece si hubo al menos un movimiento recuperable a Papelera.
 
@@ -80,7 +80,7 @@ La migración SQLite 3 añade:
 - `cleaner_scan_metadata`
 - `cleaner_undo_items`
 
-Las preferencias normales se guardan mediante `SettingsRepository`. Borrar el inventario histórico no borra decisiones `Conservar` ni elementos Undo todavía pendientes.
+Las preferencias normales se guardan mediante `SettingsRepository`. Borrar el inventario histórico no borra decisiones `Conservar` ni elementos Undo todavía pendientes. Las filas válidas conservan exactamente sus claves y blobs actuales; un error de SQLite o una fila malformada se comunica y detiene la preparación del plan en vez de desaparecer silenciosamente o debilitar protecciones persistidas.
 
 ## Fuera de alcance V1
 

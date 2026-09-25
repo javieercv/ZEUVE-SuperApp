@@ -38,6 +38,7 @@ public struct CleanerSpotlightApplicationDiscovery: CleanerApplicationDiscoverin
             Task { @MainActor in session.cancel() }
         }
         #else
+        if Task.isCancelled { return .init(urls: [], status: .cancelled) }
         return .init(urls: [], status: .unavailable)
         #endif
     }

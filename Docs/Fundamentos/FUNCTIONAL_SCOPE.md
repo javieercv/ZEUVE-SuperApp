@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.4.0
+# Alcance funcional vigente — ZEUVE 0.20.5.0
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 
@@ -53,7 +53,7 @@ Calibre, Ghostscript y LibreOffice no forman parte del producto actual. Ebook/EP
 - Compara seguidores y seguidos localmente, tolera variantes previstas del formato y permite exportar resultados.
 - Sin red, sesión de Instagram ni scraping.
 
-## Inspector multimedia 0.7.2
+## Inspector multimedia 0.7.3
 
 - Inspección FFprobe de contenedores/streams, vídeo, audio, subtítulos, capítulos, metadata, attachments y carátulas.
 - Preview local de audio y vídeo con transporte compartido, waveform, espectrograma y subtítulos cuando son viables.
@@ -61,16 +61,18 @@ Calibre, Ghostscript y LibreOffice no forman parte del producto actual. Ebook/EP
 - OCR local/revisable de subtítulos bitmap mediante Vision cuando el flujo lo admite.
 - Edición estructural segura de streams/metadata/capítulos/attachments/carátulas por stream copy, con Undo/Redo de borrador, planificación, FFmpeg, FFprobe y publicación segura.
 - Lotes, carpetas/reglas, presets, favoritos e informes versionados.
+- El preflight de edición por lotes respeta la exclusión global de operaciones, cancelación local/global y cierre coordinado antes de publicar el resultado.
 
 No es un editor temporal/creativo y no recodifica audio/vídeo dentro del Inspector; una transformación que exige transcode pertenece al Conversor.
 
-## Limpiador 0.1.2
+## Limpiador 0.1.3
 
 - Inventario local de aplicaciones y asociaciones/residuos.
 - Análisis de cachés/logs/tmp, restos, instaladores y contenido regenerable de desarrollo según reglas conservadoras.
 - Desinstalación asistida con selección visible y protección de datos persistentes.
 - Papelera por defecto, borrado permanente opt-in y Undo cuando los movimientos siguen verificables.
 - Spotlight acotado/cancelable; una cobertura parcial no convierte aplicaciones históricas en “ausentes”.
+- Los fallos de persistencia o filas inválidas detienen el plan en lugar de asumir que no hay inventario ni decisiones «Conservar»; un fallo secundario del historial tras Deshacer se comunica sin invalidar archivos ya restaurados.
 
 No usa red, `sudo`, shell ni helper privilegiado. `scanLocalStorage` autoriza análisis en ubicaciones documentadas; retirar elementos exige `removeLocalItems`, selección y revalidación.
 

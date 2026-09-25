@@ -123,7 +123,7 @@ func compatibilityRegistryCoversEditableContainers(_ container: EditableMediaCon
     let plan = MediaEditPlan(originalURL: source, originalFingerprint: sourceFP, targetContainer: .mp4, audioTracks: [.init(track: a, action: .keep, outputCodec: "aac")], subtitleTracks: [.init(track: s, action: .convertSubtitle, outputCodec: "mov_text")], removedOriginalStreamIndices: [1,3], warnings: [])
     let ffmpeg = URL(fileURLWithPath: "/opt/zeuve/ffmpeg")
     let output = URL(fileURLWithPath: "/tmp/output.mp4")
-    let command = try FFmpegTrackEditCommandBuilder().command(ffmpeg: ffmpeg, plan: plan, outputURL: output)
+    let command = try FFmpegMediaEditCommandBuilder().command(ffmpeg: ffmpeg, plan: plan, outputURL: output)
     #expect(command.request.executable.path == "/opt/zeuve/ffmpeg")
     #expect(command.request.arguments.prefix(5) == ["-hide_banner", "-nostdin", "-y", "-i", source.path])
     #expect(command.request.arguments.contains(["-map", "0"].first!))
@@ -139,10 +139,23 @@ func compatibilityRegistryCoversEditableContainers(_ container: EditableMediaCon
 @Test func commandBuilderCanDisableMetadataThroughInjectedPreference() throws {
     let source = try tempMediaFile(); defer { try? FileManager.default.removeItem(at: source) }
     let fp = try FileFingerprint.read(from: source)
-    let plan = MediaEditPlan(originalURL: source, originalFingerprint: fp, targetContainer: .mkv, audioTracks: [], subtitleTracks: [], removedOriginalStreamIndices: [], warnings: [])
-    let args = try FFmpegTrackEditCommandBuilder(preserveMetadata: false).command(ffmpeg: URL(fileURLWithPath:"/x/ffmpeg"), plan: plan, outputURL: URL(fileURLWithPath:"/tmp/x.mkv")).request.arguments
+    let plan = MediaEditPlan(originalURL: source, originalFingerprint: fp, targetContainer: .mkv, audioTracks: [], subtitleTracks: [], preserveMetadata: false, removedOriginalStreamIndices: [], warnings: [])
+    let args = try FFmpegMediaEditCommandBuilder().command(ffmpeg: URL(fileURLWithPath:"/x/ffmpeg"), plan: plan, outputURL: URL(fileURLWithPath:"/tmp/x.mkv")).request.arguments
     if let index = args.firstIndex(of: "-map_metadata") { #expect(args[index + 1] == "-1") } else { Issue.record("Falta -map_metadata") }
     if let index = args.firstIndex(of: "-map_chapters") { #expect(args[index + 1] == "-1") } else { Issue.record("Falta -map_chapters") }
+}
+
+@available(*, deprecated, message: "Prueba deliberada del adaptador legacy")
+@Test func legacyTrackEditCommandBuilderStillDelegatesToCurrentBuilder() throws {
+    let source = try tempMediaFile(); defer { try? FileManager.default.removeItem(at: source) }
+    let fingerprint = try FileFingerprint.read(from: source)
+    let plan = MediaEditPlan(originalURL: source, originalFingerprint: fingerprint, targetContainer: .mkv, audioTracks: [], subtitleTracks: [], removedOriginalStreamIndices: [], warnings: [])
+    let ffmpeg = URL(fileURLWithPath: "/x/ffmpeg")
+    let output = URL(fileURLWithPath: "/tmp/legacy-output.mkv")
+    let legacy = try FFmpegTrackEditCommandBuilder(preserveMetadata: false).command(ffmpeg: ffmpeg, plan: plan, outputURL: output)
+    let currentPlan = MediaEditPlan(originalURL: source, originalFingerprint: fingerprint, targetContainer: .mkv, audioTracks: [], subtitleTracks: [], preserveMetadata: false, removedOriginalStreamIndices: [], warnings: [])
+    let current = try FFmpegMediaEditCommandBuilder().command(ffmpeg: ffmpeg, plan: currentPlan, outputURL: output)
+    #expect(legacy == current)
 }
 
 @Test func plannerHonorsInjectedPreferredContainerOnlyWhenCompatible() throws {

@@ -31,12 +31,25 @@ final class CleanerViewModel: ObservableObject {
     private let uninstallAnalyzer: CleanerUninstallAnalyzer
     private let identityProvider: SystemCleanerAppIdentityProvider
     private let storageScanner = CleanerStorageScanner()
+    private let repositoryInitializationError: String?
     private var spaceScanTask: Task<CleanerStorageNode?, Never>?
 
     init(coordinator: OperationCoordinator, storage: StorageContainer?) {
         self.coordinator = coordinator
-        let repo = storage.flatMap { try? CleanerRepository(database: $0.database) }
+        let repo: CleanerRepository?
+        var repositoryInitializationError: String?
+        if let storage {
+            do { repo = try CleanerRepository(database: storage.database) }
+            catch {
+                repo = nil
+                repositoryInitializationError = "No se pudo abrir la persistencia del Limpiador: \(error.localizedDescription)"
+            }
+        } else {
+            repo = nil
+            repositoryInitializationError = "La persistencia del Limpiador no está disponible."
+        }
         self.repository = repo
+        self.repositoryInitializationError = repositoryInitializationError
         self.settingsStore = CleanerSettingsStore(settings: storage?.settings)
         self.preferences = CleanerSettingsStore(settings: storage?.settings).load()
         self.identityProvider = SystemCleanerAppIdentityProvider()
@@ -49,7 +62,16 @@ final class CleanerViewModel: ObservableObject {
         }
         self.uninstallAnalyzer = CleanerUninstallAnalyzer()
         self.spaceRoot = FileManager.default.homeDirectoryForCurrentUser
-        self.conservedPaths = ((try? repo?.keptPaths()) ?? []).sorted()
+        if let repo {
+            do { self.conservedPaths = try repo.keptPaths().sorted() }
+            catch {
+                self.conservedPaths = []
+                self.errorMessage = "No se pudieron cargar las decisiones «Conservar»: \(error.localizedDescription)"
+            }
+        } else {
+            self.conservedPaths = []
+            self.errorMessage = repositoryInitializationError
+        }
     }
 
     var selectedCount: Int { plan.selectedCandidates.count }
@@ -58,6 +80,10 @@ final class CleanerViewModel: ObservableObject {
 
     func analyze(preservingResult: Bool = false) async {
         guard !isBusy else { return }
+        guard repository != nil else {
+            errorMessage = repositoryInitializationError ?? "La persistencia del Limpiador no está disponible."
+            return
+        }
         isBusy = true; errorMessage = nil; uninstallAnalysis = nil
         if !preservingResult { resultMessage = nil; executionSummary = nil }
         defer { isBusy = false }
@@ -127,11 +153,23 @@ final class CleanerViewModel: ObservableObject {
 
     func analyzeUninstall(_ application: CleanerAppInventoryItem, preservingResult: Bool = false) {
         if !preservingResult { resultMessage = nil; executionSummary = nil }
-        let historical = (try? repository?.loadInventory()) ?? []
-        let kept = (try? repository?.keptPaths()) ?? []
-        let output = uninstallAnalyzer.analyze(application: application, historicalApps: historical, keptPaths: kept, safeSelection: preferences.safeSelectionEnabled)
-        uninstallAnalysis = output
-        plan = output.plan
+        guard let repository else {
+            errorMessage = repositoryInitializationError ?? "La persistencia del Limpiador no está disponible."
+            uninstallAnalysis = nil
+            plan = .init(candidates: [])
+            return
+        }
+        do {
+            let historical = try repository.loadInventory()
+            let kept = try repository.keptPaths()
+            let output = uninstallAnalyzer.analyze(application: application, historicalApps: historical, keptPaths: kept, safeSelection: preferences.safeSelectionEnabled)
+            uninstallAnalysis = output
+            plan = output.plan
+        } catch {
+            errorMessage = "No se pudo cargar la persistencia del Limpiador: \(error.localizedDescription)"
+            uninstallAnalysis = nil
+            plan = .init(candidates: [])
+        }
     }
 
     func analyzeDroppedApplication(_ url: URL) {
@@ -155,6 +193,10 @@ final class CleanerViewModel: ObservableObject {
 
     func executeCurrentPlan(kind: String? = nil) async {
         guard !isBusy, !plan.selectedCandidates.isEmpty else { return }
+        guard repository != nil else {
+            errorMessage = repositoryInitializationError ?? "La persistencia del Limpiador no está disponible."
+            return
+        }
         let applicationURL = uninstallAnalysis.map { URL(fileURLWithPath: $0.application.identity.path) }
         let shouldRefresh = uninstallAnalysis == nil
         isBusy = true; errorMessage = nil; resultMessage = nil
@@ -187,8 +229,10 @@ final class CleanerViewModel: ObservableObject {
         guard let historyID = lastHistoryID, let undoService else { return }
         isBusy = true; defer { isBusy = false }
         do {
-            let summary = try await undoService.undo(historyID: historyID)
+            let output = try await undoService.undo(historyID: historyID)
+            let summary = output.summary
             resultMessage = "\(summary.restoredCount) elementos restaurados; \(summary.skippedCount + summary.failedCount) no se pudieron restaurar."
+            if let warning = output.historyWarning { resultMessage = "\(resultMessage ?? "") \(warning)" }
             executionSummary = nil
             if try !undoService.hasPendingItems(historyID: historyID) { lastHistoryID = nil }
         } catch { errorMessage = error.localizedDescription }
@@ -232,7 +276,11 @@ final class CleanerViewModel: ObservableObject {
     }
 
     func revokeConservedPath(_ path: String) {
-        do { try repository?.keep(path: path, value: false); conservedPaths = ((try? repository?.keptPaths()) ?? []).sorted() }
+        guard let repository else {
+            errorMessage = repositoryInitializationError ?? "La persistencia del Limpiador no está disponible."
+            return
+        }
+        do { try repository.keep(path: path, value: false); conservedPaths = try repository.keptPaths().sorted() }
         catch { errorMessage = error.localizedDescription }
     }
 
