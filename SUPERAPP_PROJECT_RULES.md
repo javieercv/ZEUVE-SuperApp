@@ -77,6 +77,7 @@ La elección final será mía.
 
 3. PROCEDIMIENTO OBLIGATORIO ANTES DE MODIFICAR EL PROYECTO
 Cuando te entregue un ZIP, una carpeta, un repositorio o un conjunto de archivos, no debes empezar a modificarlo inmediatamente.
+Antes incluso de analizar el proyecto, debes consultar el repositorio remoto y obtener la última versión disponible conforme a la regla 44 y a `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`. Si existe una copia local, debes comprobar su estado antes de actualizarla y preservar cualquier cambio no comprometido. No debes descartar trabajo local o remoto para forzar una sincronización.
 Debes seguir este proceso:
 Fase 1. Analizar el proyecto real
 Antes de proponer cambios:
@@ -91,9 +92,9 @@ Revisa los scripts de ejecución y compilación.
 Comprueba si existen pruebas.
 Revisa la documentación disponible.
 Detecta si el proyecto ha cambiado respecto a una versión anterior.
-Trabaja siempre sobre la versión que te haya entregado más recientemente.
+Trabaja siempre sobre la versión más reciente disponible del repositorio, salvo que yo indique expresamente que una copia distinta contiene trabajo posterior todavía no publicado y debe ser la fuente de verdad.
 No debes asumir que un archivo conserva el mismo contenido que en una versión anterior. Puedo haber realizado cambios por mi cuenta y debes respetarlos.
-La versión más reciente que te entregue será siempre la fuente principal de verdad.
+La copia sincronizada más reciente o la copia posterior que yo designe expresamente será la fuente principal de verdad.
 Fase 2. Explicarme lo que has entendido
 Antes de modificar nada, debes explicarme brevemente:
 Cómo está organizado el proyecto.
@@ -927,17 +928,45 @@ Si la aplicación abrió correctamente.
 Qué partes no pudieron probarse.
 No debes afirmar que la aplicación compilada funciona si solo has probado el código fuente.
 
-44. COPIAS DE SEGURIDAD Y CONTROL DE VERSIONES
-No debes crear copias de seguridad automáticas del proyecto.
-Yo me encargaré de conservar las copias necesarias.
-No debes:
-Inicializar Git.
-Crear ramas.
-Crear commits.
-Subir archivos.
-Publicar en servicios remotos.
-Modificar repositorios remotos.
-Solo debes utilizar Git si yo te lo pido expresamente.
+44. REPOSITORIO, SINCRONIZACIÓN Y CONTROL DE VERSIONES
+El repositorio remoto de ZEUVE forma parte obligatoria del flujo de trabajo y es el punto común de continuidad entre tareas, chats, agentes y entornos de desarrollo.
+
+Antes de empezar cualquier trabajo, incluso una revisión o un cambio documental, debes:
+Consultar el repositorio remoto.
+Obtener y comprobar la última versión disponible.
+Si existe una copia local, revisar primero su estado.
+Preservar cualquier cambio local no comprometido.
+No descartar ni sobrescribir trabajo para forzar una actualización.
+Identificar el commit de partida de la tarea.
+Trabajar sobre la copia sincronizada más reciente, salvo que yo indique expresamente que otra copia contiene cambios posteriores todavía no publicados y debe prevalecer.
+
+Si no puedes acceder al repositorio remoto, no debes afirmar que trabajas sobre la última versión. Solo podrás modificar una copia no sincronizada si yo lo autorizo expresamente para esa tarea.
+
+Durante el trabajo:
+No debes borrar, resetear ni sobrescribir cambios locales o remotos ajenos al encargo.
+No debes usar `force-push`.
+No debes reescribir historial remoto compartido.
+No debes hacer rebase destructivo, mover referencias remotas de forma forzada ni eliminar commits publicados sin mi autorización expresa.
+No debes mezclar en un commit cambios no relacionados con la tarea aprobada.
+Los commits deben representar bloques lógicos y tener mensajes claros; no es obligatorio crear un commit por archivo.
+
+Antes de dar por terminada una tarea que haya producido cambios, debes:
+Comprobar de nuevo el estado remoto para detectar commits aparecidos durante el trabajo.
+Integrar de forma segura cualquier cambio remoto nuevo necesario antes de publicar.
+No sobrescribir una versión remota más reciente para imponer la copia local.
+Revisar el diff final.
+Repetir las pruebas o verificaciones afectadas si la integración ha cambiado la base.
+Crear el commit o commits correspondientes cuando el entorno use Git local.
+Subir o publicar el resultado en el repositorio remoto.
+Verificar que el commit final está realmente presente en el remoto.
+
+Una tarea con cambios no se considera entregada mientras el repositorio remoto mantenido no haya quedado actualizado, salvo que exista una imposibilidad técnica declarada o yo indique expresamente que no se publique todavía.
+
+Una revisión que no cambie archivos también debe partir del último estado remoto, pero no necesita commit vacío ni push.
+
+Cuando el entorno trabaje directamente contra GitHub mediante una integración o API, debe aplicarse la misma política: leer primero el estado actual y sus SHA, evitar escrituras sobre versiones que hayan cambiado, publicar directamente y verificar después que el cambio quedó guardado.
+
+La política operativa detallada se mantiene en `Docs/Fundamentos/REPOSITORY_WORKFLOW.md` y debe permanecer alineada con estas reglas.
 
 45. VERSIONADO
 La versión canónica de ZEUVE debe utilizar cuatro componentes:
@@ -1021,6 +1050,7 @@ La entrega debe contener siempre el proyecto completo actualizado.
 El proyecto se mantiene y actualiza directamente en la carpeta activa existente, conservando su nombre `ZEUVE_*`. No debes crear otra carpeta con un nombre de versión distinto. Puedes crear copias de respaldo recuperables, pero debe existir una única carpeta claramente actualizada como proyecto vigente.
 Regla de entrega:
 - Mantén actualizada la carpeta activa existente como resultado principal.
+- Mantén actualizado también el repositorio remoto según la regla 44; los cambios deben publicarse y verificarse antes de considerar entregada la tarea, salvo excepción expresa.
 - No generes ni empaquetes un ZIP nuevo salvo que yo lo solicite expresamente, con independencia de si el trabajo se realiza en local o en un entorno remoto.
 - Si el entorno remoto impide entregarme directamente la carpeta activa, indícalo con claridad en vez de crear por defecto una segunda copia versionada del proyecto.
 No debes entregar únicamente:
@@ -1096,8 +1126,9 @@ Prueba no realizada.
 Dependencia del entorno.
 Riesgo conocido.
 Comportamiento que requiera revisión.
-8. Entrega
-Mantener actualizada la carpeta activa original. Proporcionar un ZIP completo únicamente cuando yo lo solicite expresamente. Si el entorno no permite entregar directamente la carpeta activa, declarar esa limitación sin crear por defecto una carpeta o paquete versionado paralelo.
+8. Repositorio y entrega
+Indicar el estado de sincronización del repositorio, si aparecieron cambios remotos durante el trabajo, si fue necesario integrarlos y cuál es el commit final publicado cuando esté disponible.
+Mantener actualizada la carpeta activa original. Proporcionar un ZIP completo únicamente cuando yo lo solicite expresamente. Si el entorno no permite entregar directamente la carpeta activa o publicar en el repositorio, declarar esa limitación sin crear por defecto una carpeta o paquete versionado paralelo.
 Primero debes ofrecer el resumen corto y después la explicación detallada.
 
 49. HONESTIDAD SOBRE LAS PRUEBAS
@@ -1150,7 +1181,7 @@ Informarme.
 Preguntarme cuál debe prevalecer.
 No asumir la respuesta.
 Las instrucciones más recientes que yo dé tienen prioridad sobre las anteriores.
-Los archivos más recientes que yo entregue tienen prioridad sobre versiones anteriores.
+Los archivos más recientes que yo entregue tienen prioridad sobre versiones anteriores únicamente cuando yo indique que contienen trabajo posterior todavía no publicado o que deben sustituir expresamente al estado remoto actual; en condiciones normales, primero debe comprobarse el repositorio según la regla 44.
 
 52. COSAS QUE NO DEBES HACER
 Queda expresamente prohibido:
@@ -1176,9 +1207,9 @@ Simular progreso.
 Ocultar errores.
 Afirmar que algo ha sido probado cuando no lo ha sido.
 Afirmar que una compilación funciona si no se ha abierto.
-Inicializar o usar Git sin permiso.
+Usar Git de forma destructiva, descartar cambios para sincronizar, hacer `force-push`, reescribir historial compartido o sobrescribir una versión remota más reciente sin mi autorización.
 Crear copias del proyecto sin que se solicite.
-Distribuir o publicar el proyecto.
+Distribuir o publicar el proyecto fuera del repositorio de desarrollo aprobado.
 Añadir funciones que no te haya pedido.
 Tomar decisiones importantes por mí.
 53. ORDEN DE PRIORIDADES
@@ -1552,8 +1583,11 @@ Estar documentada.
 Incluirse en el proyecto completo.
 Reflejarse en el historial de cambios.
 Mantener la privacidad.
-Antes de tocar el proyecto, analiza, explica, pregunta y espera mi aprobación.
+Partir del último estado remoto verificado.
+Publicarse de nuevo en el repositorio remoto y comprobarse allí al finalizar cuando haya cambios.
+Antes de tocar el proyecto, sincroniza el repositorio, analiza, explica, pregunta y espera mi aprobación.
 Después de mi aprobación, realiza el trabajo completo.
+Antes de entregar, vuelve a comprobar el remoto, integra de forma segura cualquier cambio nuevo necesario, verifica y publica el resultado.
 No asumas decisiones importantes.
 No modifiques nada no autorizado.
 No afirmes que algo funciona sin haberlo probado.
