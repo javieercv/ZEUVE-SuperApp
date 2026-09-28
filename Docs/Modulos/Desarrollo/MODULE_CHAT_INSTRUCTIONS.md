@@ -2,9 +2,10 @@
 
 Use this document together with:
 
-- the current active ZEUVE project folder, or the latest complete ZIP only when the user explicitly supplies one as the working copy;
+- the current active ZEUVE project folder synchronized with the latest remote repository state, or another working copy only when the user explicitly designates it as authoritative;
 - `SUPERAPP_PROJECT_RULES.md`;
 - `PROJECT_DECISIONS.md`;
+- `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`;
 - `Docs/Modulos/Desarrollo/MODULE_DEVELOPMENT_GUIDE.md`;
 - a completed `Docs/Modulos/Desarrollo/MODULE_BRIEF_TEMPLATE.md`.
 
@@ -16,23 +17,56 @@ This file is written in English to minimize ambiguity for coding models. User-fa
 
 Act as ZEUVE's software architect, senior macOS engineer, module developer, UX designer, security reviewer, and QA owner. Treat ZEUVE as a cumulative real project, not as a demo.
 
+## MANDATORY REPOSITORY SYNCHRONIZATION
+
+Before analyzing, planning, or modifying ZEUVE, obtain and verify the latest available state of the remote repository. If an existing local working tree is used, inspect its status first and preserve all uncommitted local work; never discard or overwrite it merely to update the repository.
+
+Record or be able to identify the starting commit. If remote access is unavailable, do not claim that the working copy is current and do not modify the project unless the user explicitly authorizes work on a specific unsynchronized copy.
+
+After any task that changes files:
+
+1. check the remote repository again before publishing;
+2. detect commits created while the task was in progress;
+3. integrate relevant remote changes safely instead of overwriting them;
+4. rerun affected tests/verifiers when the base changes;
+5. commit the approved task changes when working with local Git;
+6. push/publish the result to the remote repository;
+7. verify that the final commit is actually present remotely.
+
+Never force-push, rewrite shared history, or discard local/remote changes without explicit user authorization. A change-producing task is not considered delivered until the maintained remote repository is updated, unless a technical limitation is declared or the user explicitly says not to publish yet.
+
+For review-only tasks, synchronization is still mandatory, but do not create empty commits or push when nothing changed.
+
+The canonical policy is `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`.
+
 ## SOURCE OF TRUTH AND DOCUMENTATION LOOKUP
 
-1. The current active project folder is the authoritative codebase. If the user explicitly supplies a newer complete ZIP for the task, inspect it and confirm the intended working copy before replacing that authority.
+1. The latest synchronized repository state is the authoritative codebase. If the user explicitly supplies a different complete ZIP or folder and states that it contains newer unpublished work, inspect both and confirm the intended working copy before replacing that authority.
 2. Never assume that files match an older version, memory, or a previous chat.
 3. Start with `AGENTS.md`. It defines the project-wide working rules and the minimum required reading for the current repository state.
-4. Use `Docs/INDEX.md` as the documentation map. Do not crawl or read all of `Docs/` indiscriminately.
-5. Read the smallest relevant live documentation set for the task:
+4. Read `Docs/Fundamentos/REPOSITORY_WORKFLOW.md` before modifying the project.
+5. Use `Docs/INDEX.md` as the documentation map. Do not crawl or read all of `Docs/` indiscriminately.
+6. Read the smallest relevant live documentation set for the task:
    - always obey `SUPERAPP_PROJECT_RULES.md` and `PROJECT_DECISIONS.md`;
-   - read only the relevant files under `Docs/Fundamentos/` for architecture, scope, security, build, or testing concerns;
+   - read only the relevant files under `Docs/Fundamentos/` for architecture, scope, security, build, testing, or repository concerns;
    - for an existing module, read its current document under `Docs/Modulos/Funcionales/` plus only the development guides needed for the requested work;
    - read `Docs/Motores/` and `Resources/Engines/engines.json` only when engines, packaging, signing, runtime execution, or related privacy behavior are involved.
-6. Use `Docs/Historico/` only to investigate an earlier release, trace a regression, compare previous behavior, or inspect past implementation/test/delivery evidence. Never use historical documents as the current specification when a live source exists.
-7. Inspect the real code, manifests, scripts, tests, and version metadata relevant to the task before relying on documentation claims. Documentation describes the intended/current state, but the working copy must still be verified.
-8. If current code and live documentation disagree, do not silently follow an obsolete statement. Report the discrepancy. If it affects an approved product decision or intended behavior, ask the user before changing product behavior; if the correct current behavior is already unambiguous, keep the code and live documentation synchronized within the approved scope.
-9. Preserve user changes found in the active working copy.
+7. Use `Docs/Historico/` only to investigate an earlier release, trace a regression, compare previous behavior, or inspect past implementation/test/delivery evidence. Never use historical documents as the current specification when a live source exists.
+8. Inspect the real code, manifests, scripts, tests, and version metadata relevant to the task before relying on documentation claims. Documentation describes the intended/current state, but the working copy must still be verified.
+9. If current code and live documentation disagree, do not silently follow an obsolete statement. Report the discrepancy. If it affects an approved product decision or intended behavior, ask the user before changing product behavior; if the correct current behavior is already unambiguous, keep the code and live documentation synchronized within the approved scope.
+10. Preserve user changes found in the active working copy.
 
 ## MANDATORY WORKFLOW
+
+### Phase 0 — Synchronize repository
+
+Before project analysis:
+
+- obtain the latest remote state;
+- inspect local status before updating an existing working tree;
+- preserve uncommitted changes;
+- identify the starting commit;
+- stop rather than destructively resolving a divergence.
 
 ### Phase 1 — Analyze only
 
@@ -70,14 +104,14 @@ Do not modify the project until the user clearly approves the plan. A feature re
 
 After approval:
 
-- modify the real latest project;
+- modify the real latest synchronized project;
 - do not create a parallel app, mockup, isolated demo, or unintegrated code sample;
 - do not leave `TODO`, placeholder buttons, fake progress, `pass`, or incomplete production paths;
 - keep changes limited to the approved scope;
 - stop and ask only if a new material decision appears;
 - preserve already approved behavior.
 
-### Phase 5 — Test and deliver
+### Phase 5 — Test, resynchronize, publish, and deliver
 
 - run existing tests without weakening or deleting them;
 - add module-specific unit and integration tests;
@@ -86,6 +120,11 @@ After approval:
 - manually test affected UI workflows when possible;
 - clearly distinguish implemented, automatically tested, manually tested, compiled, opened, and not tested;
 - update version metadata, changelog, docs, and test/delivery reports;
+- check the remote repository again before publishing;
+- safely integrate any new remote commits instead of overwriting them;
+- rerun affected verification after integration when necessary;
+- commit and push/publish the completed result;
+- verify that the final commit is present remotely;
 - keep the complete active project folder updated in place and create a ZIP only when the user explicitly requests one.
 
 ## ARCHITECTURE RULES
@@ -233,7 +272,7 @@ Update all relevant locations:
 - README and architecture/API docs;
 - test and delivery reports.
 
-Update the complete active project folder in place. Do not create a parallel version folder or ZIP unless the user explicitly asks for one. If a ZIP is requested, exclude `.build`, `build`, `dist`, `.swiftpm`, `DerivedData`, caches, `.DS_Store`, `._*`, `__MACOSX`, `xcuserdata`, logs, credentials, private data, and test output. Do not treat `Resources/Engines` as a build cache.
+Update the complete active project folder in place. Do not create a parallel version folder or ZIP unless the user explicitly asks for one. Publish the final verified changes to the remote repository and verify the resulting remote commit. If a ZIP is requested, exclude `.build`, `build`, `dist`, `.swiftpm`, `DerivedData`, caches, `.DS_Store`, `._*`, `__MACOSX`, `xcuserdata`, logs, credentials, private data, and test output. Do not treat `Resources/Engines` as a build cache.
 
 ## REQUIRED FINAL REPORT
 
@@ -246,7 +285,8 @@ Use this order:
 5. Modified, new, and deleted files with reasons.
 6. Previous and new version with rationale.
 7. Real limitations and untested areas.
-8. Link to the active project folder and, only when explicitly requested and created, the complete ZIP.
+8. Repository synchronization/publication status and final remote commit identifier when available.
+9. Link to the active project folder and, only when explicitly requested and created, the complete ZIP.
 
 Do not hide warnings or unresolved errors. Do not state that a compiled app opened unless it was actually opened.
 
