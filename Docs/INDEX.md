@@ -10,6 +10,7 @@ Si una afirmación histórica contradice una fuente vigente o el código actual,
 | --- | --- |
 | Reglas permanentes y flujo de aprobación | `../SUPERAPP_PROJECT_RULES.md` |
 | Decisiones aprobadas | `../PROJECT_DECISIONS.md` |
+| Sincronización, commits y publicación del repositorio | `Fundamentos/REPOSITORY_WORKFLOW.md` |
 | Arquitectura, alcance, seguridad, compilación y pruebas | `Fundamentos/` |
 | Licencias, créditos y avisos de terceros | `Fundamentos/LICENCIAS_Y_CREDITOS.md` + `../THIRD_PARTY_NOTICES.md` |
 | Desarrollo de módulos, API, checklist y plantillas | `Modulos/Desarrollo/` |
@@ -23,6 +24,7 @@ Si una afirmación histórica contradice una fuente vigente o el código actual,
 - [Arquitectura](Fundamentos/ARCHITECTURE.md): capas, módulos, navegación y fronteras compartidas.
 - [Alcance funcional](Fundamentos/FUNCTIONAL_SCOPE.md): qué hace y qué no hace ZEUVE actualmente.
 - [Seguridad y privacidad](Fundamentos/SECURITY.md): archivos, red, procesos, motores, logs y datos.
+- [Flujo de repositorio](Fundamentos/REPOSITORY_WORKFLOW.md): sincronización obligatoria antes de trabajar, protección frente a divergencias y publicación/verificación final en GitHub.
 - [Compilación](Fundamentos/BUILDING.md): versiones, motores, build, firma, validación y empaquetado.
 - [Pruebas](Fundamentos/TESTING.md): estrategia, comandos y evidencia actual.
 - [Licencias y créditos](Fundamentos/LICENCIAS_Y_CREDITOS.md): código propio, componentes del sistema, terceros, atribuciones y reglas de mantenimiento.
@@ -82,6 +84,7 @@ Evidencia de la entrega actual: [implementación](Historico/Implementacion/IMPLE
 | --- | --- |
 | Reglas y aprobación | `SUPERAPP_PROJECT_RULES.md` |
 | Decisiones aprobadas | `PROJECT_DECISIONS.md` |
+| Repositorio, sincronización y publicación | `Fundamentos/REPOSITORY_WORKFLOW.md` |
 | Estado/entrada pública | `README.md` |
 | Capas y dependencias | `Fundamentos/ARCHITECTURE.md` |
 | Funciones y exclusiones | `Fundamentos/FUNCTIONAL_SCOPE.md` + documento de módulo |
@@ -99,3 +102,4 @@ Evidencia de la entrega actual: [implementación](Historico/Implementacion/IMPLE
 3. Los cambios por versión se registran en `CHANGELOG.md` y `Historico/`.
 4. Todo módulo built-in debe tener un documento funcional enlazado aquí y desde el README.
 5. Una nueva fuente viva debe quedar enlazada desde este índice para no crear documentación huérfana.
+6. Todo trabajo sobre el proyecto debe comenzar desde el estado remoto sincronizado y, si modifica archivos, finalizar con la publicación y verificación del resultado en el repositorio salvo instrucción expresa contraria.
