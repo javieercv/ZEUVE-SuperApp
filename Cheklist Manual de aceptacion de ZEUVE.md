@@ -2,13 +2,13 @@
 
 Estado acumulado al 28/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 268 ✅ OK · 5 ❌ fallidas · 4 ⚠️ parciales · 362 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 273 ✅ OK · 5 ❌ fallidas · 4 ⚠️ parciales · 357 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 26/63 OK, 3 fallos (C-14/C-15/C-20) y 1 parcial (C-11), Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 31/63 OK, 3 fallos (C-14/C-15/C-20) y 1 parcial (C-11), Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 sigue pendiente: la opción de recordar salida estaba desactivada, por lo que no recordar tras reiniciar es esperado. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: C-26 — vídeo → fotogramas.** Última prueba cerrada y guardada: C-25, OK. UI conservada en su resultado, fuente C_video_3s.mp4 y modo Avanzado con copia rápida activada; revisar operación y opciones antes de extraer fotogramas. No hay operación activa. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: C-30 — secuencia de imágenes, pendiente por pantalla bloqueada.** Última prueba guardada: C-61 (comprobación adicional de C-29), OK. Fuente UI C29_cancelar_120s.mp4; extracción cancelada y sin FFmpeg activo. Antes de cambiar fuentes, verificar recuperación de la interfaz: tras Cancelar se mostró una tarjeta Finalizado/1 cancelado en lugar de un resumen nuevo. No reiniciar para ocultar ese posible problema. C-30 no se ha ejecutado. Las dos carpetas derivadas grandes C29 se conservan en retained-qa-results fuera de input, sin tocar originales. Publicación remota pendiente por falta de autenticación GitHub.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -66,7 +66,20 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 
 - **C-16 — avance intermedio histórico, cerrado en el registro posterior, casilla pendiente:** calidad Bajo aplicada por UI a WAV → MP3; 1 correcto, decodificación íntegra, 128000 bits/s, 48 kHz mono y 3 s. Salida C_audio_tono_3s 2.mp3, sin sobrescribir C-10. Falta comparar con otra calidad antes de cerrar el ID.
 
+- **C-26 — ✅, guardado individual:** Vídeo MP4 sintético de 3 s/5 FPS → Extraer todos los fotogramas → PNG por UI. 1 correcto y 0 fallidos/omitidos/cancelados. ImageIO decodifica los 15 PNG numerados, todos 160×90. SHA-256 del vídeo original intacto.
+
+- **C-27 — ✅, guardado individual:** Se comprueba por separado la carpeta final C_video_3s - Fotogramas en el destino QA: existe, contiene exactamente los 15 fotogramas numerados y no conserva una carpeta Procesando. Corresponde a la extracción real C-26, no a un directorio creado por el controlador.
+
+- **C-28 — ✅, guardado individual:** Crear tiempos.csv estaba activado en UI. El CSV real de C-26 contiene cabecera y 15 filas: índices 1–15, tiempos 0–2,8 s en incrementos de 0,2 y duración de 0,2 s cada uno (total 3 s). Concordancia con los 15 PNG y la fuente.
+
+- **C-29 — ✅, guardado individual:** Extracción sintética de 120 s/3600 fotogramas: segundo intento cancelado por el botón Cancelar durante la fase Convirtiendo. UI: 0 correctos, 0 fallidos/omitidos y 1 cancelado. La carpeta pasa a C29_cancelar_120s - Fotogramas - converted - Incompleto; sus 237 PNG conservados se decodifican completos a 1280×720. Fuente SHA-256 intacta y sin proceso FFmpeg residual. El primer intento acabó antes de alcanzar Cancelar y no se utilizó para aceptar este ID. No se encontró tiempos.csv en la carpeta cancelada; se registra sin extrapolar la validación de C-28 al CSV parcial.
+
+- **C-61 — ✅, guardado individual:** Comprobación específica sobre la cancelación C-29: UI no cuenta el trabajo como correcto y la salida conservada se etiqueta Incompleto. Los 237 PNG publicados se validaron completos con ImageIO; no se conservó un último fotograma truncado ni una carpeta Procesando. Esta aceptación se limita al flujo de extracción probado, no a todos los motores.
+
+- **Observación después de C-29, pendiente de revalidación UI:** los archivos y la cancelación cumplen el requisito de conservar PNG completos como Incompleto; sin embargo, la última UI accesible seguía mostrando una tarjeta de ejecución con Finalizado y 1 cancelado. El código de cancel() cancela la Task y executePlan() puede salir por Task.isCancelled antes de restablecer state; es una causa posible, no una recuperación de UI comprobada. La pantalla se bloqueó antes de verificar los controles. Reanudar comprobando si siguen habilitados, sin atribuir el bloqueo de macOS a ZEUVE ni marcar por código solo un fallo adicional.
+
 ## 1. ZEUVE general
+
 
 
 
@@ -491,10 +504,10 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 
 ## Imágenes/secuencias/fotogramas
 
-- [ ] ➖ **C-26** Vídeo → fotogramas.
-- [ ] ➖ **C-27** Se genera la carpeta de fotogramas.
-- [ ] ➖ **C-28** `tiempos.csv` se genera si se solicita.
-- [ ] ➖ **C-29** Cancelar extracción deja resultados completos como «Incompleto» según diseño.
+- [x] ✅ **C-26** Vídeo → fotogramas.
+- [x] ✅ **C-27** Se genera la carpeta de fotogramas.
+- [x] ✅ **C-28** `tiempos.csv` se genera si se solicita.
+- [x] ✅ **C-29** Cancelar extracción deja resultados completos como «Incompleto» según diseño.
 - [ ] ➖ **C-30** Secuencia de imágenes → vídeo/animación cuando corresponda.
 - [ ] ➖ **C-31** Imágenes → PDF.
 
@@ -543,7 +556,7 @@ Estos deben rechazarse claramente, no convertirse:
 
 - [x] ✅ **C-59** El original sigue intacto después de convertir.
 - [x] ✅ **C-60** Un conflicto de nombre no produce sobrescritura silenciosa.
-- [ ] ➖ **C-61** Cancelar no publica como válido un archivo roto.
+- [x] ✅ **C-61** Cancelar no publica como válido un archivo roto.
 - [ ] ➖ **C-62** La carpeta de salida recordada funciona.
 - [x] ✅ **C-63** Una conversión completada aparece en Historial.
 
