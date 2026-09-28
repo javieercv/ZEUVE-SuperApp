@@ -2,14 +2,23 @@
 
 Este documento es un mapa rápido. No sustituye a `SUPERAPP_PROJECT_RULES.md`, `PROJECT_DECISIONS.md` ni a la documentación funcional concreta.
 
+## Sincronización del repositorio
+
+Antes de analizar o modificar ZEUVE, obtén y comprueba siempre la última versión disponible del repositorio remoto. Si existe una copia local, revisa primero su estado y preserva cualquier cambio no comprometido; no descartes trabajo para forzar una actualización.
+
+Al terminar una tarea con cambios, comprueba otra vez el remoto, integra de forma segura cualquier cambio nuevo que corresponda, ejecuta de nuevo las verificaciones afectadas, publica los cambios y confirma que el commit final está realmente presente en el repositorio.
+
+No uses `force-push`, no reescribas historial compartido y no sobrescribas cambios ajenos. La política completa y obligatoria está en `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`.
+
 ## Fuentes canónicas
 
 1. `SUPERAPP_PROJECT_RULES.md`: reglas permanentes y aprobaciones.
 2. `PROJECT_DECISIONS.md`: decisiones aprobadas y su trazabilidad.
-3. `Docs/Fundamentos/`: arquitectura, alcance, seguridad, build y pruebas actuales.
-4. `Docs/Modulos/Funcionales/`: comportamiento vigente de cada módulo.
-5. `Docs/Motores/` y `Resources/Engines/engines.json`: motores y empaquetado.
-6. `Docs/Historico/`: evidencia de versiones anteriores; no es especificación vigente.
+3. `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`: sincronización obligatoria del repositorio antes y después del trabajo.
+4. `Docs/Fundamentos/`: arquitectura, alcance, seguridad, build y pruebas actuales.
+5. `Docs/Modulos/Funcionales/`: comportamiento vigente de cada módulo.
+6. `Docs/Motores/` y `Resources/Engines/engines.json`: motores y empaquetado.
+7. `Docs/Historico/`: evidencia de versiones anteriores; no es especificación vigente.
 
 No existe una dependencia de contexto en `../../.agents/skills/` ni debe suponerse que recursos externos al proyecto están disponibles.
 
