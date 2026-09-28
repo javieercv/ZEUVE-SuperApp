@@ -2,15 +2,15 @@
 
 Estado acumulado al 28/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 242 ✅ OK · 2 ❌ fallidas · 3 ⚠️ parciales · 392 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 253 ✅ OK · 2 ❌ fallidas · 3 ⚠️ parciales · 381 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 0/63, Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 11/63, Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
-El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. En el Conversor solo se han preparado archivos sintéticos: ninguna conversión se da por validada. Próximo bloque: Conversor universal. No se ha corregido producto.
+El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Conversor: 11/63 OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. Sin nuevos fallos de producto. C-62 sigue pendiente: la opción de recordar salida estaba desactivada, por lo que no recordar tras reiniciar es esperado. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. Próximo bloque del Conversor: animaciones y audio. No se ha corregido producto.
 
 ## 1. ZEUVE general
 
@@ -398,12 +398,12 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 ## Imágenes
 
-- [ ] ➖ **C-01** PNG → JPEG.
-- [ ] ➖ **C-02** JPEG → PNG.
-- [ ] ➖ **C-03** HEIC → JPEG/PNG.
-- [ ] ➖ **C-04** TIFF.
-- [ ] ➖ **C-05** BMP.
-- [ ] ➖ **C-06** Conversión que preserve correctamente dimensiones esperadas.
+- [x] ✅ **C-01** PNG → JPEG.
+- [x] ✅ **C-02** JPEG → PNG.
+- [x] ✅ **C-03** HEIC → JPEG/PNG.
+- [x] ✅ **C-04** TIFF.
+- [x] ✅ **C-05** BMP.
+- [x] ✅ **C-06** Conversión que preserve correctamente dimensiones esperadas.
 
 ## Animaciones
 
@@ -456,12 +456,12 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 - [ ] ➖ **C-38** CSV se reconoce correctamente.
 - [ ] ➖ **C-39** JSON se reconoce correctamente.
 - [ ] ➖ **C-40** XML se reconoce correctamente.
-- [ ] ➖ **C-41** Una operación mismo formato/copia segura funciona.
+- [x] ✅ **C-41** Una operación mismo formato/copia segura funciona.
 
 ## Entradas múltiples
 
 - [ ] ➖ **C-42** Varios archivos.
-- [ ] ➖ **C-43** Carpeta.
+- [x] ✅ **C-43** Carpeta.
 - [ ] ➖ **C-44** ZIP.
 - [ ] ➖ **C-45** El progreso de lote funciona.
 - [ ] ➖ **C-46** Cancelar un lote funciona.
@@ -485,11 +485,11 @@ Estos deben rechazarse claramente, no convertirse:
 
 ## Seguridad
 
-- [ ] ➖ **C-59** El original sigue intacto después de convertir.
-- [ ] ➖ **C-60** Un conflicto de nombre no produce sobrescritura silenciosa.
+- [x] ✅ **C-59** El original sigue intacto después de convertir.
+- [x] ✅ **C-60** Un conflicto de nombre no produce sobrescritura silenciosa.
 - [ ] ➖ **C-61** Cancelar no publica como válido un archivo roto.
 - [ ] ➖ **C-62** La carpeta de salida recordada funciona.
-- [ ] ➖ **C-63** Una conversión completada aparece en Historial.
+- [x] ✅ **C-63** Una conversión completada aparece en Historial.
 
 ---
 
