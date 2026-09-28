@@ -2,15 +2,24 @@
 
 Estado acumulado al 28/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 253 ✅ OK · 2 ❌ fallidas · 3 ⚠️ parciales · 381 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 254 ✅ OK · 2 ❌ fallidas · 3 ⚠️ parciales · 380 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 11/63, Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 12/63, Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
-El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Conversor: 11/63 OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. Sin nuevos fallos de producto. C-62 sigue pendiente: la opción de recordar salida estaba desactivada, por lo que no recordar tras reiniciar es esperado. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. Próximo bloque del Conversor: animaciones y audio. No se ha corregido producto.
+El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 sigue pendiente: la opción de recordar salida estaba desactivada, por lo que no recordar tras reiniciar es esperado. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
+
+## Continuidad de pruebas — guardado individual
+
+Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
+
+**Punto de continuación: C-08 — WebP animado, pendiente por bloqueo de pantalla de macOS.** Última prueba cerrada y guardada: C-07 — GIF, OK. C-08 no se ha ejecutado hasta completar una conversión y no se marca fallo de producto. Al recuperar la sesión, verificar la fuente GIF y la operación/formato antes de convertir. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+
+- **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
+- **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
 
 ## 1. ZEUVE general
 
@@ -407,7 +416,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 ## Animaciones
 
-- [ ] ➖ **C-07** GIF.
+- [x] ✅ **C-07** GIF.
 - [ ] ➖ **C-08** WebP animado.
 - [ ] ➖ **C-09** APNG.
 
