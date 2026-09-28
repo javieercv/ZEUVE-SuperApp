@@ -2,9 +2,16 @@
 
 Marca cada punto antes de considerar terminada una entrega.
 
+## Repositorio y punto de partida
+
+- [ ] Se ha consultado el repositorio remoto y se ha obtenido la última versión antes de analizar o modificar el proyecto.
+- [ ] Se ha comprobado el estado de la copia local antes de sincronizar y no se ha descartado ningún cambio no comprometido.
+- [ ] Se conoce el commit de partida de la tarea.
+- [ ] Se ha leído `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`.
+
 ## Análisis y aprobación
 
-- [ ] Se ha utilizado la carpeta activa y sus archivos reales como fuente de verdad.
+- [ ] Se ha utilizado la carpeta activa y sus archivos reales como fuente de verdad después de sincronizarla con el remoto.
 - [ ] Se han leído `SUPERAPP_PROJECT_RULES.md` y `PROJECT_DECISIONS.md`.
 - [ ] Se ha completado el brief del módulo.
 - [ ] Se ha presentado un plan basado en archivos reales.
@@ -124,9 +131,16 @@ Marca cada punto antes de considerar terminada una entrega.
 - [ ] Existe informe de pruebas.
 - [ ] Existe informe de entrega.
 - [ ] Se ha actualizado la única carpeta activa sin crear copias versionadas innecesarias.
+- [ ] Antes de publicar se ha comprobado de nuevo el remoto para detectar commits aparecidos durante el trabajo.
+- [ ] Cualquier cambio remoto nuevo necesario se ha integrado de forma segura, sin sobrescribirlo ni usar `force-push`.
+- [ ] Tras una integración de cambios remotos se han repetido las verificaciones afectadas cuando correspondía.
+- [ ] El diff final contiene únicamente los cambios del encargo aprobado.
+- [ ] Los cambios finales se han comprometido y publicado en el repositorio remoto.
+- [ ] Se ha verificado que el commit final está realmente presente en el remoto.
 - [ ] Si se solicitó un ZIP, contiene el proyecto completo.
 - [ ] Si se solicitó un ZIP, no contiene `.build`, `build`, `dist`, `.swiftpm`, `DerivedData`, cachés, `.DS_Store`, `._*`, `__MACOSX`, `xcuserdata`, logs o datos privados.
 - [ ] El informe final distingue implementado, probado, compilado, abierto y no comprobado.
+- [ ] El informe final indica el estado de sincronización/publicación del repositorio y el commit final cuando está disponible.
 
 ## Checklist adicional para mantenimiento local
 
