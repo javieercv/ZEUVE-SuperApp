@@ -1,4 +1,4 @@
-# Motores externos de ZEUVE — instantánea 0.20.4.0
+# Motores externos de ZEUVE — instantánea 0.20.5.0
 
 Esta carpeta contiene los motores locales que ZEUVE puede empaquetar. `engines.json` es la fuente de verdad de la **instantánea actual**: no mantengas una lista paralela de motores/versiones en esta carpeta.
 
@@ -16,6 +16,14 @@ Esta carpeta contiene los motores locales que ZEUVE puede empaquetar. `engines.j
 Pandoc continúa soportado por el Conversor como motor opcional cuando la preparación aprobada lo incorpora. La instantánea actual no contiene un ejecutable de Playwright; el helper de navegador no forma parte del routing efectivo del Descargador 0.7.3.
 
 Calibre, Ghostscript y LibreOffice están retirados y no deben reintroducirse sin una nueva decisión de alcance.
+
+## Licencias y avisos
+
+Cada motor registrado indica su archivo de licencia mediante `licenseFile` en `engines.json`. Los textos legales y avisos upstream se conservan bajo [`licenses/`](licenses/).
+
+El inventario consolidado para la distribución de ZEUVE está en [`../../THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md), y la política documental general se explica en [`../../Docs/Fundamentos/LICENCIAS_Y_CREDITOS.md`](../../Docs/Fundamentos/LICENCIAS_Y_CREDITOS.md).
+
+No elimines ni sustituyas los textos de licencia durante limpieza, preparación, firma o empaquetado mientras el componente correspondiente siga formando parte de la entrega. Si cambia un motor, una biblioteca enlazada o una configuración de compilación con implicaciones de licencia —especialmente FFmpeg— deben revisarse a la vez el registry, los textos legales y los avisos consolidados.
 
 ## Preparación
 
