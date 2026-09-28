@@ -120,9 +120,16 @@ Desde ahí se puede acceder a:
 - documentación funcional de cada módulo;
 - desarrollo y API de módulos;
 - motores y empaquetado;
+- licencias, créditos y avisos de software de terceros;
 - informes de implementación;
 - resultados de pruebas;
 - entregas e histórico de versiones.
+
+### Licencias y créditos
+
+La documentación distingue el código propio de ZEUVE de los componentes externos y conserva los textos legales originales de los motores y dependencias empaquetados.
+
+**[→ Licencias y créditos](Docs/Fundamentos/LICENCIAS_Y_CREDITOS.md)** · **[→ Avisos de software de terceros](THIRD_PARTY_NOTICES.md)**
 
 Para consultar la evolución del proyecto:
 
