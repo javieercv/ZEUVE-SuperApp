@@ -4,6 +4,25 @@
 
 Actúa como programador principal, arquitecto de software, diseñador de producto y UX, responsable de QA/pruebas y asesor técnico de ZEUVE. El proyecto pertenece al usuario: cualquier decisión importante de producto, arquitectura, privacidad, dependencias, empaquetado, UI o comportamiento requiere aprobación explícita.
 
+## Sincronización obligatoria del repositorio
+
+Antes de analizar, planificar o modificar ZEUVE, obtén y comprueba siempre la última versión disponible del repositorio remoto. Si trabajas sobre una copia local existente, revisa primero su estado y preserva cualquier cambio local no comprometido; nunca descartes trabajo para forzar una actualización.
+
+La política completa está en `Docs/Fundamentos/REPOSITORY_WORKFLOW.md` y es obligatoria.
+
+Al terminar cualquier trabajo que haya producido cambios:
+
+1. comprueba de nuevo el remoto para detectar commits aparecidos durante el trabajo;
+2. integra de forma segura cualquier cambio remoto necesario, sin sobrescribirlo;
+3. vuelve a ejecutar las verificaciones afectadas si la integración cambia la base;
+4. crea los commits correspondientes cuando proceda;
+5. publica el resultado en el repositorio remoto;
+6. verifica que el commit final está realmente presente en el remoto.
+
+No uses `force-push`, no reescribas historial compartido y no elimines cambios locales o remotos sin autorización expresa. Una tarea con cambios no se considera entregada hasta que el repositorio remoto haya quedado actualizado, salvo imposibilidad técnica declarada o instrucción expresa del usuario de no publicar todavía.
+
+Una revisión sin cambios también debe partir del estado remoto más reciente, pero no necesita commit vacío ni push.
+
 ## Lectura obligatoria
 
 Antes de proponer o modificar ZEUVE, lee el conjunto mínimo pertinente:
@@ -12,6 +31,7 @@ Antes de proponer o modificar ZEUVE, lee el conjunto mínimo pertinente:
 - `PROJECT_DECISIONS.md`: decisiones aprobadas. Las secciones antiguas son trazabilidad; cuando una decisión haya sido sustituida, prevalece el estado vigente indicado al inicio y las fuentes canónicas actuales.
 - `README.md`: portada y estado de la entrega actual.
 - `Docs/INDEX.md`: mapa de la documentación vigente e histórica.
+- `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`: sincronización obligatoria antes del trabajo y publicación del resultado al finalizar.
 - `Docs/Fundamentos/ARCHITECTURE.md`, `FUNCTIONAL_SCOPE.md`, `SECURITY.md`, `BUILDING.md` y `TESTING.md` según el trabajo.
 
 Para trabajo modular, lee además:
@@ -38,7 +58,7 @@ Los archivos bajo `Docs/Historico/` son evidencia de una entrega concreta. No de
 
 Antes de cambiar código o comportamiento de producto:
 
-1. Inspecciona los archivos reales de esta versión; no trabajes desde memoria ni desde una versión anterior.
+1. Confirma que estás trabajando sobre el estado remoto más reciente y después inspecciona los archivos reales de esa versión; no trabajes desde memoria ni desde una versión anterior.
 2. Explica brevemente cómo está organizado el área afectada y qué riesgos o decisiones existen.
 3. Presenta un plan concreto: archivos, comportamiento esperado, seguridad/privacidad, errores/cancelación, pruebas, dependencias, red/APIs/programas externos y efectos secundarios.
 4. Agrupa las preguntas necesarias.
@@ -50,7 +70,7 @@ El mantenimiento documental, `AGENTS.md`, contexto de agentes y verificadores do
 
 Trabaja sobre la carpeta activa `ZEUVE_*` y mantenla como única copia vigente. No crees otra carpeta versionada. No generes ni empaquetes un ZIP nuevo salvo que el usuario lo pida expresamente. Las copias recuperables internas están permitidas si no sustituyen la carpeta mantenida.
 
-No uses Git salvo petición expresa del usuario.
+Git forma parte del flujo operativo normal de ZEUVE: sincroniza antes de empezar y publica el resultado al terminar según `Docs/Fundamentos/REPOSITORY_WORKFLOW.md`.
 
 ## Forma técnica actual
 
@@ -80,6 +100,7 @@ Calibre, Ghostscript y LibreOffice están retirados. No reintroduzcas soporte de
 - Operaciones pesadas deben respetar `OperationCoordinator`.
 - Ajustes persistentes van por `SettingsView`/`SettingsRepository` salvo decisión aprobada distinta.
 - El Limpiador puede usar `scanLocalStorage` para análisis de ubicaciones documentadas; modificar/eliminar exige `removeLocalItems`, plan visible, selección explícita y revalidación.
+- Sincroniza el repositorio antes de empezar; no sobrescribas cambios ajenos; publica y verifica el resultado remoto cuando existan cambios.
 
 ## Comandos habituales
 
