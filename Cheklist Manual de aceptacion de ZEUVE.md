@@ -2,13 +2,13 @@
 
 Estado acumulado al 28/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 254 ✅ OK · 2 ❌ fallidas · 3 ⚠️ parciales · 380 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 268 ✅ OK · 5 ❌ fallidas · 4 ⚠️ parciales · 362 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 12/63, Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 26/63 OK, 3 fallos (C-14/C-15/C-20) y 1 parcial (C-11), Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 sigue pendiente: la opción de recordar salida estaba desactivada, por lo que no recordar tras reiniciar es esperado. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,12 +16,59 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: C-08 — WebP animado, pendiente por bloqueo de pantalla de macOS.** Última prueba cerrada y guardada: C-07 — GIF, OK. C-08 no se ha ejecutado hasta completar una conversión y no se marca fallo de producto. Al recuperar la sesión, verificar la fuente GIF y la operación/formato antes de convertir. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: C-26 — vídeo → fotogramas.** Última prueba cerrada y guardada: C-25, OK. UI conservada en su resultado, fuente C_video_3s.mp4 y modo Avanzado con copia rápida activada; revisar operación y opciones antes de extraer fotogramas. No hay operación activa. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
 
+- **C-08 — OK, guardado individual:** GIF → WebP animado por UI: 1 correcto, 0 fallidos/omitidos/cancelados. ImageIO decodifica los 10 fotogramas de 160×90, cada uno de 0,2 s (2 s en total). SHA-256 original sin cambios. FFprobe no interpreta este WebP animado, pero ImageIO verifica todos sus fotogramas: limitación del lector, no fallo de producto.
+
+- **C-09 — OK, guardado individual:** GIF → APNG por UI: 1 correcto, 0 fallidos/omitidos/cancelados. ImageIO decodifica los 10 fotogramas de 160×90, con UnclampedDelayTime 0,2 s por fotograma (2 s). SHA-256 del original intacto. Salida independiente con extensión .apng.
+
+- **C-10 — OK, guardado individual:** WAV sintético (tono 440 Hz, 3 s) → MP3 por UI: 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe: MP3, 48 kHz, mono, 320 kb/s, 3 s. Decodificación completa FFmpeg sin errores. No se extrapola a metadatos ni otras variantes.
+
+- **C-11 — en curso, casilla pendiente:** WAV → M4A comprobado: AAC, 48 kHz mono, 3 s, decodificación completa sin errores; UI 1 correcto y 0 fallidos/omitidos/cancelados. AAC seleccionado con una operación preparada, pero no ejecutado: macOS volvió a bloquear la pantalla (screenLocked=1), proceso QA vivo. Reanudar en AAC y guardar C-11 solo al completar la comprobación restante. Original WAV conserva SHA-256.
+
+- **C-11 — OK, guardado individual:** Sesión recuperada. WAV → M4A y WAV → AAC por UI, cada una con 1 correcto y 0 fallidos/omitidos/cancelados. Códec AAC, 48 kHz mono; M4A 3 s y AAC ADTS 2.989562 s. Ambas salidas decodificadas completas sin errores.
+
+- **C-12 — OK, guardado individual:** WAV → FLAC por UI: 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe: FLAC, 48 kHz, mono, 3 s. Decodificación completa sin errores. Archivo separado del original.
+
+- **C-11 — revisión posterior: PARCIAL, sustituye el OK inicial:** las salidas M4A y AAC son válidas, pero al reimportar la carpeta la app avisa que su propio AAC es MP3. FFprobe confirma AAC ADTS y cabecera FF F1. Causa probable respaldada por código: ConverterFormatDetector comprueba antes MP3 con una firma demasiado amplia que también acepta ADTS; la condición AAC queda detrás. No se corrigió. El alcance validado son las salidas; queda sin aceptar plenamente la detección de AAC como entrada.
+
+- **C-13 — OK, guardado individual:** MP3 generado en C-10 → WAV por UI, no mera copia. 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe: PCM s24le, 48 kHz mono, 1152 kb/s, 3 s. Decodificación completa sin errores. Salida independiente con doble prefijo.
+
+- **C-14 — ❌, guardado individual:** FALLO: MP3 mono → Opus con calidad Personalizado heredada. Vista previa permitió ejecutar; resumen 0 correctos, 1 fallido. libopus rechazó 320000 bps y pidió 500–256000. No se declara fallo de control: el motor explica incompatibilidad de bitrate con esta salida. Pendiente comprobar recuperación con un bitrate compatible; sin corregir producto.
+
+- **C-15 — ❌, guardado individual:** FALLO: WAV mono → OGG con calidad Personalizado. UI 0 correctos y 1 fallido; libopus rechaza 320000 bps y exige 500–256000. La vista previa permitía esta combinación. Mismo límite observado en C-14, ahora reproducido con otra entrada y extensión de salida. No hay salida completa publicada; sin corregir.
+
+- **C-15 — recuperación comprobada, no borra el fallo:** al seleccionar calidad Medio, WAV → OGG sí termina con 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe: Opus en Ogg, 48 kHz mono, 3,0065 s; decodificación completa sin errores. El fallo sigue asociado a Personalizado/320 kb/s con entrada mono. No se corrigió código.
+- **C-14 — recuperación comprobada, no borra el fallo:** WAV → Opus en calidad Medio termina con 1 correcto y 0 fallidos/omitidos/cancelados; Opus/Ogg, 48 kHz mono, 3,0065 s y decodificación completa sin errores. Cambiar formato volvió a Personalizado, por lo que se eligió Medio de nuevo y se verificó la vista previa antes de ejecutar.
+
+- **C-16 — ✅, guardado individual:** Calidades Bajo y Alto elegidas por UI con la misma fuente WAV: MP3 128000 y 256000 bits/s respectivamente, frente a 320000 de C-10. Cada conversión: 1 correcto y 0 fallidos/omitidos/cancelados; 48 kHz mono, 3 s, decodificación completa sin errores. Salidas sufijos 2 y 3, sin sobrescribir. La aceptación de este cambio en MP3 no borra los fallos de Opus/OGG.
+
+- **C-17 — ✅, guardado individual:** MP4 sintético H.264/AAC, 3 s, 160×90, 15 fotogramas → MP4 recodificado por UI. 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe verifica H.264, 15 fotogramas, dimensiones, duración y audio AAC mono a 48 kHz. Decodificación completa audiovisual sin errores; no mera copia.
+
+- **C-18 — ✅, guardado individual:** MP4 → MOV por UI: 1 correcto y 0 fallidos/omitidos/cancelados. H.264, 160×90, 15 fotogramas, 3 s y audio AAC 48 kHz mono, verificados por FFprobe y decodificación completa sin errores.
+
+- **C-19 — ✅, guardado individual:** MP4 → MKV por UI: 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe: Matroska, H.264, 160×90, 15 fotogramas, 3,021 s y AAC 48 kHz mono. Decodificación completa sin errores.
+
+- **C-20 — ❌, guardado individual:** FALLO DE PLAN/UI: MP4 H.264/AAC mono → WebM. Vista previa permite una operación y promete recodificación H.264, pero al ejecutar la app rechaza: «WebM solo puede conservar vídeo VP8, VP9 o AV1 con el motor incluido; elige MKV, MOV o MP4 para recodificar». UI 0 correctos, 1 fallido. Documentación vigente condiciona salidas a compatibilidad real y el código confirma esta limitación: no se pide añadir un encoder ni se considera que FFmpeg haya fallado. La discrepancia es ofrecer un plan ejecutable incompatible. No se ha comprobado aún remux de un WebM compatible; sin corregir.
+
+- **C-21 — ✅, guardado individual:** AVI sintético MPEG-4/PCM → MP4 por UI: 1 correcto y 0 fallidos/omitidos/cancelados. AVI reconocido como entrada; FFprobe y decodificación íntegra verifican salida H.264/AAC, 160×90, 15 fotogramas y 3 s. Original separado de la salida.
+
+- **C-22 — ✅, guardado individual:** Comprobación específica de recodificación en la operación C-21: entrada AVI con códec MPEG-4, salida MP4 H.264; cambio real de códec, 15 fotogramas y audio conservados. No se extrapola de una copia del mismo contenedor. En C-17 también se verificó una conversión MP4 → MP4 con recodificación anunciada por UI.
+
+- **C-23 — ✅, guardado individual:** AVI → Extraer el audio → MP3 por UI: 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe verifica un único stream MP3, 48 kHz mono, 320 kb/s, ≈3,008 s; no contiene vídeo. Decodificación completa sin errores. Original AVI y salida MP4 previa intactos.
+
+- **C-24 — ✅, guardado individual:** WAV sintético → Crear vídeo desde audio → MP4 por UI, lienzo horizontal 1920×1080 y fondo por defecto. UI 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe verifica H.264, 90 fotogramas, 1920×1080, vídeo y audio AAC ambos de 3 s; decodificación completa sin errores. No se certifica todavía la variante con imagen de fondo.
+
+- **C-25 — ✅, guardado individual:** Modo Avanzado y copia rápida activados por UI, MP4 → MKV. Vista previa anuncia remux/copia sin recodificar. UI 1 correcto y 0 fallidos/omitidos/cancelados; vídeo H.264 160×90, 15 fotogramas, audio AAC y ≈3 s. Los SHA-256 de los 15 paquetes de vídeo coinciden exactamente entre entrada y salida, confirmando copia de vídeo. Decodificación audiovisual completa sin errores.
+
+- **C-16 — avance intermedio histórico, cerrado en el registro posterior, casilla pendiente:** calidad Bajo aplicada por UI a WAV → MP3; 1 correcto, decodificación íntegra, 128000 bits/s, 48 kHz mono y 3 s. Salida C_audio_tono_3s 2.mp3, sin sobrescribir C-10. Falta comparar con otra calidad antes de cerrar el ID.
+
 ## 1. ZEUVE general
+
+
 
 ### Arranque y navegación
 
@@ -417,30 +464,30 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 ## Animaciones
 
 - [x] ✅ **C-07** GIF.
-- [ ] ➖ **C-08** WebP animado.
-- [ ] ➖ **C-09** APNG.
+- [x] ✅ **C-08** WebP animado.
+- [x] ✅ **C-09** APNG.
 
 ## Audio
 
-- [ ] ➖ **C-10** MP3.
-- [ ] ➖ **C-11** M4A/AAC.
-- [ ] ➖ **C-12** FLAC.
-- [ ] ➖ **C-13** WAV.
-- [ ] ➖ **C-14** Opus.
-- [ ] ➖ **C-15** OGG.
-- [ ] ➖ **C-16** Cambiar calidad/bitrate cuando la salida lo permita.
+- [x] ✅ **C-10** MP3.
+- [ ] ⚠️ **C-11** M4A/AAC.
+- [x] ✅ **C-12** FLAC.
+- [x] ✅ **C-13** WAV.
+- [x] ❌ **C-14** Opus.
+- [x] ❌ **C-15** OGG.
+- [x] ✅ **C-16** Cambiar calidad/bitrate cuando la salida lo permita.
 
 ## Vídeo
 
-- [ ] ➖ **C-17** MP4.
-- [ ] ➖ **C-18** MOV.
-- [ ] ➖ **C-19** MKV.
-- [ ] ➖ **C-20** WebM.
-- [ ] ➖ **C-21** AVI como entrada.
-- [ ] ➖ **C-22** Vídeo → vídeo recodificado.
-- [ ] ➖ **C-23** Vídeo → audio.
-- [ ] ➖ **C-24** Audio → vídeo.
-- [ ] ➖ **C-25** Copia rápida/stream copy en modo avanzado cuando sea compatible.
+- [x] ✅ **C-17** MP4.
+- [x] ✅ **C-18** MOV.
+- [x] ✅ **C-19** MKV.
+- [x] ❌ **C-20** WebM.
+- [x] ✅ **C-21** AVI como entrada.
+- [x] ✅ **C-22** Vídeo → vídeo recodificado.
+- [x] ✅ **C-23** Vídeo → audio.
+- [x] ✅ **C-24** Audio → vídeo.
+- [x] ✅ **C-25** Copia rápida/stream copy en modo avanzado cuando sea compatible.
 
 ## Imágenes/secuencias/fotogramas
 
