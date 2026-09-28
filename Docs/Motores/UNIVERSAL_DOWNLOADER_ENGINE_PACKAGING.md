@@ -19,6 +19,14 @@ ZEUVE.app/Contents/Resources/Engines/
 
 No mantengas una lista documental distinta del registry real.
 
+## Licencias y avisos
+
+La carpeta `licenses/` forma parte de los recursos que deben acompañar a los motores distribuidos. El inventario consolidado se mantiene en [`../../THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md) y la política documental general en [`../Fundamentos/LICENCIAS_Y_CREDITOS.md`](../Fundamentos/LICENCIAS_Y_CREDITOS.md).
+
+Cada entrada de `Resources/Engines/engines.json` debe apuntar mediante `licenseFile` al texto que corresponda al componente registrado. Si una actualización cambia la versión, la procedencia, las bibliotecas enlazadas o las opciones de compilación con implicaciones de licencia, deben revisarse conjuntamente el registry, `Resources/Engines/licenses/` y los avisos consolidados.
+
+FFmpeg requiere una atención especial porque su régimen de licencia depende de la configuración efectiva de compilación y de las bibliotecas activadas. La distribución no debe asumir una licencia genérica distinta de la que corresponda al binario realmente empaquetado.
+
 ## Orden de preparación
 
 1. Ejecutar `Scripts/prepare_engines_macos.sh` en Mac Apple Silicon.
