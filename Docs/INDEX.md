@@ -11,6 +11,7 @@ Si una afirmación histórica contradice una fuente vigente o el código actual,
 | Reglas permanentes y flujo de aprobación | `../SUPERAPP_PROJECT_RULES.md` |
 | Decisiones aprobadas | `../PROJECT_DECISIONS.md` |
 | Arquitectura, alcance, seguridad, compilación y pruebas | `Fundamentos/` |
+| Licencias, créditos y avisos de terceros | `Fundamentos/LICENCIAS_Y_CREDITOS.md` + `../THIRD_PARTY_NOTICES.md` |
 | Desarrollo de módulos, API, checklist y plantillas | `Modulos/Desarrollo/` |
 | Comportamiento y límites de cada módulo integrado | `Modulos/Funcionales/` |
 | Preparación, empaquetado y gestión de motores | `Motores/` |
@@ -24,6 +25,8 @@ Si una afirmación histórica contradice una fuente vigente o el código actual,
 - [Seguridad y privacidad](Fundamentos/SECURITY.md): archivos, red, procesos, motores, logs y datos.
 - [Compilación](Fundamentos/BUILDING.md): versiones, motores, build, firma, validación y empaquetado.
 - [Pruebas](Fundamentos/TESTING.md): estrategia, comandos y evidencia actual.
+- [Licencias y créditos](Fundamentos/LICENCIAS_Y_CREDITOS.md): código propio, componentes del sistema, terceros, atribuciones y reglas de mantenimiento.
+- [Avisos de software de terceros](../THIRD_PARTY_NOTICES.md): inventario consolidado y enlaces a los textos legales originales.
 - [Contexto para agentes](Fundamentos/CODEX_CONTEXT.md): mapa operativo breve para trabajo asistido.
 
 ## Desarrollo de módulos
@@ -85,6 +88,7 @@ Evidencia de la entrega actual: [implementación](Historico/Implementacion/IMPLE
 | Seguridad/privacidad | `Fundamentos/SECURITY.md` + documento específico cuando exista |
 | Build/firma | `Fundamentos/BUILDING.md` + scripts reales |
 | Motores actuales | `Resources/Engines/engines.json` + `Motores/` |
+| Licencias y créditos | `Fundamentos/LICENCIAS_Y_CREDITOS.md` + `THIRD_PARTY_NOTICES.md` + `Resources/Engines/licenses/` |
 | Registro built-in | manifests + `BuiltInModuleCatalog.swift` |
 | Evidencia de una versión | `Historico/` |
 
