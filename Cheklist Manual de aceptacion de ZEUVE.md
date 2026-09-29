@@ -2,13 +2,13 @@
 
 Estado acumulado al 29/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 295 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 333 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 321 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 307 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parciales (C-11/C-48), Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: F-01 — Comparador de seguidores de Instagram, todavía sin iniciar.** Conversor: 53 OK, 4 fallos (C-14/C-15/C-20/C-46), 2 parciales (C-11/C-48) y 4 pendientes (C-35–C-37 sin Pandoc; C-42 por control del selector múltiple). Última prueba guardada C-62, OK. UI QA en Conversor sin entradas ni operación activa, PID 39084; carpeta recordada output y favorita sintética conservadas en datos aislados. C-42: último intento de AXSelectedChildren no confirmó selección; panel cancelado, ninguna importación múltiple aceptada. Publicación remota pendiente por falta de autenticación HTTPS.
+**Punto de continuación: I-01 — Inspector multimedia; F-02 queda pendiente de revisión manual por control.** Última prueba cerrada y guardada: F-20, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -129,6 +129,61 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - **C-42 — intento de control incompleto, pendiente:** se abrió Seleccionar varios archivos y se intentó seleccionar los 15 PNG propios. El panel nativo cambió la columna accesible y la selección múltiple no pudo confirmarse; se canceló sin importarla. No se cuenta la carpeta C-30 como sustituto del selector múltiple. Se continúa con C-44, sin fallo de producto por este intento.
 - **C-35–C-37 — pendientes por entorno, no fallo:** la copia QA no incorpora Pandoc ni lo muestra como motor disponible. No se instala ni se cambia el empaquetado para estas pruebas; las tres conversiones condicionales de TXT/Markdown/HTML siguen sin aceptar. Se continúa por C-38.
 
+
+- **F-01 — ✅, guardado individual:** ZIP sintético completo seleccionado por panel nativo; aparece F01_exportacion.zip y catálogo de following.json, followers_1.json y followers_3.json bajo una raíz arbitraria. UI informa 4 entradas y solo 3 JSON necesarios; botón Analizar exportación disponible. Se verifica importación/catálogo, todavía sin iniciar comparación. No se usa un ZIP de datos reales.
+
+- **F-03 — ✅, guardado individual:** Comprobación específica del catálogo ya importado: following.json localizado por sufijo bajo raiz_arbitraria/connections/followers_and_following/, tamaño 324 bytes; no se exige que connections sea la raíz del ZIP. No se deduce solo del nombre externo.
+
+- **F-04 — ✅, guardado individual:** Catálogo UI muestra followers_1.json (127 bytes) y followers_3.json (181 bytes), junto a following.json. Detecta los dos archivos y anuncia 3 JSON necesarios de las 4 entradas ZIP. La comparación de sus contenidos se comprobará después de pulsar Analizar.
+
+- **F-10 — ✅, guardado individual:** Tras importar el ZIP y esperar durante las comprobaciones del catálogo, la UI permanece en importación, sin resultados. Historial del módulo conserva 7 entradas previas antes de pulsar Analizar; no se crea una comparación automáticamente. El botón requiere la acción explícita que se realizará a continuación.
+
+- **F-05 — ✅, guardado individual:** El ZIP con followers_1.json y followers_3.json, sin followers_2.json, se analiza por UI y muestra resultados (5 seguidores, 5 seguidos, 2 archivos). Se acepta el hueco de numeración tanto en catálogo como en comparación completa. ZIP original conserva su SHA-256.
+
+- **F-11 — ✅, guardado individual:** Resumen UI: 5 seguidores, coincidente con los cinco nombres únicos del fixture repartido entre followers_1 y followers_3. El duplicado gamma con espacios/mayúsculas no aumenta el total; se comprueba el resultado de la app, no solo la expectativa del generador.
+
+- **F-12 — ✅, guardado individual:** Resumen UI: 5 cuentas seguidas, coincidente con las seis relaciones de following y cinco nombres normalizados. Mutuo repetido con @/espacios/mayúsculas se cuenta una vez; ZIP permanece intacto.
+
+- **F-13 — ✅, guardado individual:** Categoría No te siguen de vuelta: lista UI exacta zeuveqa_alfa, zeuveqa_beta y zeuveqa_zeta, 3 de 3. Coincide con seguidos menos seguidores del fixture; no se infiere por contar solo tarjetas.
+
+- **F-14 — ✅, guardado individual:** Categoría Te siguen y tú no les sigues seleccionada por UI: lista exacta delta, epsilon y gamma con prefijo zeuveqa_, 3 de 3. Coincide con seguidores menos seguidos, incluyendo href /_u/ y compatibilidad media_list_data del fixture.
+
+- **F-15 — ✅, guardado individual:** Categoría Seguimiento mutuo seleccionada: UI muestra ZeuveQA_Mutuo y zeuveqa.punto, 2 de 2. Coincide con la intersección, respeta normalización sin distinguir mayúsculas y conserva representación visible; sin cuentas exclusivas en la lista mutua.
+
+- **F-16 — ✅, guardado individual:** Búsqueda EPSI introducida por UI en categoría de tres seguidores no seguidos. Tras el debounce, contador 1 de 3 y única fila zeuveqa_epsilon. Coincidencia parcial e insensible a mayúsculas, sin iniciar otra lectura/análisis.
+
+- **F-17 — ✅, guardado individual:** Con búsqueda vacía, categoría No te siguen de vuelta muestra alfa, beta, zeta (prefijo zeuveqa_) en orden ascendente A–Z. Se inspeccionan las tres filas en orden, no solo el contador.
+
+- **F-18 — ✅, guardado individual:** Botón de orden pulsado en la misma categoría: filas zeta, beta, alfa (prefijo zeuveqa_), orden inverso exacto Z–A. Cuenta y categoría sin cambios; no se inicia análisis nuevo.
+
+- **F-21 — ✅, guardado individual:** Exportación de toda la categoría No te siguen de vuelta a TXT por UI. Hoja anuncia 3 cuentas; panel nativo guarda F21_categoria.txt en carpeta QA y aviso confirma 3. Archivo real: exactamente alfa, beta, zeta (prefijo zeuveqa_), un nombre por línea y sin otras categorías. Se exporta categoría completa, no solo contador.
+
+- **F-22 — ✅, guardado individual:** CSV publicado por el panel nativo: cabecera real username,category,url y exactamente alfa/beta/zeta con prefijo zeuveqa_, categoría no_te_siguen_de_vuelta y URL pública correspondiente. Lector CSV independiente confirma 3 filas y UTF-8 válido; aviso UI confirma 3 cuentas. Una expectativa del controlador de URL en mayúsculas se ajustó a la cabecera real url; no se considera fallo de producto.
+
+- **F-23 — ✅, guardado individual:** Búsqueda beta deja solo zeuveqa_beta en la tabla. Exportar CSV con Solo cuentas visibles activado anuncia 1 cuenta y publica exactamente una fila beta, con categoría y URL correctas, sin alfa/zeta. Se registra aparte el texto menor «1 cuentas» del diálogo, no un fallo del filtrado/exportación.
+
+- **F-24 — ✅, guardado individual:** Destino limitado al CSV sintético F22_categoria.csv: macOS muestra «ya existe, ¿Quieres reemplazarlo?» y advierte sobre el contenido. Cancelar conserva SHA-256 df438f…2299; al repetir y confirmar Reemplazar explícitamente, el aviso de ZEUVE confirma 3 cuentas y el CSV mantiene el contenido/hash esperado. No hay sustitución silenciosa ni datos reales afectados.
+
+- **F-19 — ✅, guardado individual:** ZIP estructuralmente válido con listas vacías: comparación termina con 0 seguidores/0 seguidos y las tres categorías muestran 0 de 0 y «No hay cuentas en esta categoría / La exportación no contiene resultados para esta comparación», sin error de archivo. Antes, el fixture no vacío con consulta sincoincidenciaqa mostró 0 de 3 y «No hay coincidencias / Prueba con otro nombre de usuario». Ambos estados distintos comprobados por UI; ZIP vacío conserva SHA-256.
+
+- **F-06 — ✅, guardado individual:** Modo JSON separados: following.json y un followers_1.json seleccionados individualmente por panel nativo. Catálogo muestra ambos y la comparación termina con 5 seguidos/3 seguidores, 2 mutuos y única cuenta gamma en Te siguen y tú no les sigues, conforme a este conjunto reducido. Hashes de ambos originales intactos. Se verifica modo avanzado con un archivo followers válido; no se afirma selección múltiple por este ensayo.
+
+- **F-07 — ✅, guardado individual:** ZIP con la misma ruta followers_1.json duplicada: rechazo al importar, aviso explícito «El ZIP contiene archivos en conflicto: entrada duplicada» con la ruta del fixture. No se entra en comparación ni se confunde con una exportación sin seguidores; no se modifica producto.
+
+- **F-08 — ✅, guardado individual:** ZIP catalogado correctamente, pero followers_1.json contiene bytes JSON malformados. Al pulsar Analizar aparece «followers_1.json no contiene un JSON válido», sin publicar resultados de comparación. Mensaje identifica el archivo y el error de sintaxis.
+
+- **F-09 — ✅, guardado individual:** followers_1.json sintácticamente válido pero raíz objeto incompatible con la lista de seguidores. Analizar muestra «followers_1.json es un JSON válido, pero no tiene una estructura de seguidores compatible». Se distingue del JSON inválido de F-08 y de las listas vacías válidas de F-19; no publica comparación falsa.
+
+- **F-26 — ✅, guardado individual:** Historial UI filtrado al Comparador: primera fila «Comparación de seguidores» correspondiente a F-06, 5 seguidos/3 seguidores, 3 no te siguen/1 no sigues/2 mutuos y Archivos JSON/1 archivo. El análisis real aparece con métricas agregadas, sin nombres de cuenta en esta fila.
+
+- **F-27 — ✅, guardado individual:** Las comparaciones ZIP normal, vacío y JSON separados se han ejecutado y mostrado resultados usando únicamente archivos sintéticos locales, sin pantalla de login, cuenta de Instagram, contraseña ni cookies. La aceptación cubre completar el flujo sin iniciar sesión; no se afirma auditoría forense de tráfico de red.
+
+- **F-25 — ✅, guardado individual:** Segundo intento con ZIP propio de 150.000 seguidos/100.000 seguidores: Cancelar presente y habilitado, pulsado durante el análisis. Aviso «La comparación se ha cancelado. No se han guardado listas parciales»; importación/Cambiar selección/Analizar vuelven habilitados. Historial permanece en 11 registros (sin nueva comparación cancelada) y SHA-256 fuente intacto. El primer intento terminó por un error de sintaxis del controlador antes de cancelar y no se usa como aceptación; tampoco el fixture inicial con rutas ZIP no compatibles. No reproduce el bloqueo de recuperación del Conversor.
+
+- **F-20 — ✅, guardado individual:** Botón Abrir Instagram de la fila zeuveqa_alfa: abre en el navegador predeterminado una pestaña con URL exacta https://www.instagram.com/zeuveqa_alfa/. La cuenta sintética no existe y la web responde página no disponible; eso no se atribuye a ZEUVE. Se comprueba construcción/apertura del enlace, sin login, lectura de perfiles reales ni acciones en Instagram. La sesión preexistente del navegador no se usa para los análisis locales de F-27.
+
+- **F-02 — control incompleto, pendiente:** Finder muestra seleccionado únicamente F01_exportacion.zip en la carpeta propia y ZEUVE ofrece el área de soltar ZIP. El arrastre de CUA no cambia el catálogo ni permite verificar que se entregó un archivo a la app. No se marca fallo ni se sustituye esta prueba por el selector F-01. Se reserva para revisión manual y se sigue por I-01.
+- **Cierre del Comparador:** 26/27 OK y F-02 pendiente; sin fallos formales nuevos en F. Tras Cancelar F-25, un nuevo análisis pequeño vuelve a terminar con 5 seguidos/5 seguidores, confirmando recuperación real. Detalles menores de pluralización («1 cuentas», «1 archivos») anotados para informe, sin corrección. Evidencias sintéticas propias fuera del repositorio; los originales reales del usuario no se usaron.
 
 ## 1. ZEUVE general
 
@@ -616,33 +671,33 @@ Estos deben rechazarse claramente, no convertirse:
 
 # 8. Comparador de seguidores de Instagram
 
-- [ ] ➖ **F-01** Importar ZIP completo funciona.
+- [x] ✅ **F-01** Importar ZIP completo funciona.
 - [ ] ➖ **F-02** Drag & drop del ZIP funciona.
-- [ ] ➖ **F-03** Detecta `following.json`.
-- [ ] ➖ **F-04** Detecta uno o varios `followers_N.json`.
-- [ ] ➖ **F-05** Acepta huecos en la numeración de followers.
-- [ ] ➖ **F-06** Modo avanzado con JSON separados funciona.
-- [ ] ➖ **F-07** Archivos duplicados se rechazan.
-- [ ] ➖ **F-08** Un JSON malformado da error comprensible.
-- [ ] ➖ **F-09** Un JSON válido pero de estructura incorrecta da un error distinto.
-- [ ] ➖ **F-10** El análisis no comienza hasta pulsar «Analizar exportación».
-- [ ] ➖ **F-11** Total de seguidores es correcto.
-- [ ] ➖ **F-12** Total de seguidos es correcto.
-- [ ] ➖ **F-13** «Sigo pero no me siguen» es correcto.
-- [ ] ➖ **F-14** «Me siguen pero no sigo» es correcto.
-- [ ] ➖ **F-15** «Seguimiento mutuo» es correcto.
-- [ ] ➖ **F-16** Búsqueda parcial funciona.
-- [ ] ➖ **F-17** Orden A–Z funciona.
-- [ ] ➖ **F-18** Orden Z–A funciona.
-- [ ] ➖ **F-19** Un resultado vacío se presenta correctamente.
-- [ ] ➖ **F-20** «Abrir en Instagram» abre manualmente el perfil.
-- [ ] ➖ **F-21** Exportar categoría a TXT.
-- [ ] ➖ **F-22** Exportar categoría a CSV.
-- [ ] ➖ **F-23** Exportar solo resultados visibles tras búsqueda.
-- [ ] ➖ **F-24** El reemplazo de una exportación existente exige confirmación de macOS.
-- [ ] ➖ **F-25** Cancelar análisis funciona.
-- [ ] ➖ **F-26** El análisis aparece en Historial.
-- [ ] ➖ **F-27** Funciona sin iniciar sesión en Instagram.
+- [x] ✅ **F-03** Detecta `following.json`.
+- [x] ✅ **F-04** Detecta uno o varios `followers_N.json`.
+- [x] ✅ **F-05** Acepta huecos en la numeración de followers.
+- [x] ✅ **F-06** Modo avanzado con JSON separados funciona.
+- [x] ✅ **F-07** Archivos duplicados se rechazan.
+- [x] ✅ **F-08** Un JSON malformado da error comprensible.
+- [x] ✅ **F-09** Un JSON válido pero de estructura incorrecta da un error distinto.
+- [x] ✅ **F-10** El análisis no comienza hasta pulsar «Analizar exportación».
+- [x] ✅ **F-11** Total de seguidores es correcto.
+- [x] ✅ **F-12** Total de seguidos es correcto.
+- [x] ✅ **F-13** «Sigo pero no me siguen» es correcto.
+- [x] ✅ **F-14** «Me siguen pero no sigo» es correcto.
+- [x] ✅ **F-15** «Seguimiento mutuo» es correcto.
+- [x] ✅ **F-16** Búsqueda parcial funciona.
+- [x] ✅ **F-17** Orden A–Z funciona.
+- [x] ✅ **F-18** Orden Z–A funciona.
+- [x] ✅ **F-19** Un resultado vacío se presenta correctamente.
+- [x] ✅ **F-20** «Abrir en Instagram» abre manualmente el perfil.
+- [x] ✅ **F-21** Exportar categoría a TXT.
+- [x] ✅ **F-22** Exportar categoría a CSV.
+- [x] ✅ **F-23** Exportar solo resultados visibles tras búsqueda.
+- [x] ✅ **F-24** El reemplazo de una exportación existente exige confirmación de macOS.
+- [x] ✅ **F-25** Cancelar análisis funciona.
+- [x] ✅ **F-26** El análisis aparece en Historial.
+- [x] ✅ **F-27** Funciona sin iniciar sesión en Instagram.
 
 ---
 
