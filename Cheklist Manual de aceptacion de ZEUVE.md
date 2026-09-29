@@ -2,13 +2,13 @@
 
 Estado acumulado al 29/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 366 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 262 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 392 ✅ OK · 7 ❌ fallidas · 5 ⚠️ parciales · 235 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 45/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 71/180 OK y 1 fallo (I-66); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-64 — cambios visuales sin decodificar.** Última prueba cerrada y guardada: I-63, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-90 — preparar/validar fixture bitmap OCR; I-89 y otros Canvas pendientes de revisión visual.** Última prueba cerrada y guardada: I-171, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -284,6 +284,60 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - **I-63 — ✅, guardado individual:** Desde controles propios de Espectrograma, Aumentar zoom muestra 00:11.919–00:26.919 y Pan atrás 00:04.419–00:19.419; Vista completa restablece el rango. No desaparece el resultado ni cambia pista/posición. Se valida el viewport textual compartido; el gesto directo y el dibujo del playhead permanecen pendientes (I-61/I-62).
 
 - **I-64 — en curso, sin cambio de casilla:** resultado de la pista #2/880 Hz generado. Elegir Logarítmica y después Lineal conserva el resultado y Exportar PNG habilitado. Escribir el valor AX del slider no actualiza el binding; AXDecrement sí cambia Rango: -120…0 dB a -125…0 dB sin pulsar Actualizar y sin borrar el resultado. Un muestreo acotado de hijos FFmpeg no detecta ejecuciones, pero no constituye una traza exhaustiva. Faltaba completar contraste/exportación del cambio visual. macOS se bloquea (CGSession screenLocked=1); System Events deja de ver window 1 aunque PID 39084 sigue vivo. I64_log880.png no llegó a crearse, no se interpreta la ausencia de ventana como fallo de ZEUVE. Reanudar tras desbloquear en esta misma pista y comprobar el selector/menú real antes de cualquier clic. I-64 permanece pendiente; último ID cerrado I-63. Estado global 366 OK, 6 fallos, 5 parciales, 262 pendientes; Inspector 45/180 OK.
+
+- **I-64 — ✅, guardado individual:** Retomado tras desbloquear: #2/880 Hz, FFT4096/Hann y resultado existente. Sin Actualizar, Lineal→Logarítmica y AXIncrement del rango -125→-120 dB mantienen resultado y Exportar PNG habilitado. Muestreo solapado 6 s/104 lecturas no detecta FFmpeg hijo de ZEUVE. Exportación I64_log880.png 1600×900, revisada visualmente: banda desplazada por escala logarítmica; SHA distinto de I60_tono880.png. No decodificación observada y código reutiliza fullSpectrogram para rango/render. Aceptación de estos cambios visuales, no de FFT/ventana/canal que requieren nuevo análisis ni garantía de traza de procesos exhaustiva.
+
+- **I-66 — ❌, guardado individual:** FALLO GEOMÉTRICO INC-19: ventana QA en (240,33), 1055×724, límite inferior y=757. En Espectrograma generado con vídeo/audio y aviso de exportación, Play (527,791), 46×21, Fullscreen (1028,790) y Stop (1224,791) quedan íntegramente por debajo de la ventana. Pistas coloca Stop en y=685 dentro de la misma ventana; volver a Espectrograma reproduce y=791 sin redimensionar. Los controles siguen en AX, pero no caben en la superficie visible. No se infiere de falta de captura: se comparan frames nativos con ventana propietaria. Causa probable: VStack de inspected combina mínimos del espectrograma/controles con preview de vídeo y aviso sin adaptación/scroll del conjunto. No se corrige; falta captura visual complementaria, no se certifican otros tamaños.
+
+- **I-67 — ✅, guardado individual:** WAV sintético PCM 48 kHz mono/30 s abierto por UI; resultado automático muestra -21.8 LUFS. Contraste independiente FFmpeg loudnorm, solo análisis a null: input_i=-21.75 LUFS, coincide al redondear a una decimal. Original sin conversión ni publicación de audio; no se extrapola a otros materiales.
+
+- **I-68 — ✅, guardado individual:** La sonoridad de la misma pista muestra LRA 0.0 LU. Referencia loudnorm input_lra=0.00 en el tono constante de 30 s. Coherente para esta señal sin dinámica; no se afirma cobertura de rangos variables ni gates de otros materiales.
+
+- **I-69 — ✅, guardado individual:** UI muestra TP -18.1 dBTP. Análisis independiente loudnorm input_tp=-18.06 dBTP: coincide al redondear. Se acepta cálculo/presentación del true peak de este PCM, no prevención de clipping ni todas las variantes de sobremuestreo.
+
+- **I-70 — ✅, guardado individual:** UI muestra Peak -18.1 dBFS. Lectura independiente de los 1.440.000 samples PCM16 del WAV: máximo absoluto 4095/32768, sample peak -18.0639205773 dBFS, coincide al redondear. SHA-256 original 2c2eb7…abcd4 intacto.
+
+- **I-75 — ✅, guardado individual:** Abrir WAV de una sola pista ejecuta automáticamente señal, sonoridad y espectrograma sin pulsar sus botones. Pistas ya contiene ausencia de silencios/clipping y LUFS/LRA/picos; al abrir Espectrograma existe resultado con Exportar PNG habilitado. Preferencias aisladas: automatización de espectrograma/señal/sonoridad activadas y avanzado desactivado. No se exige análisis avanzado cuando está desactivado ni se extrapola a todas las configuraciones.
+
+- **I-72 — ✅, guardado individual:** Fixture nuevo PCM16 mono/48 kHz, 12 s: tono 0.1, silencio exacto 2–4 s y plateau de amplitud máxima 6–6.2 s. Apertura automática muestra 1 silencios · 2.0 s. Lectura PCM independiente confirma 96.000 muestras cero entre 2 y 4 s, con señal antes/después. Se valida detección/cantidad/duración, no marcador visual de timeline (I-74 pendiente). SHA 466c7672fb93301b2b9511bc84ec1d3a310aeadce3637386a60b82c6e2d0a68b. Detalle UX: singular presentado como 1 silencios, sin impacto en detección.
+
+- **I-73 — ✅, guardado individual:** La misma entrada con plateau 6–6.2 s muestra 1 posibles clippings y Peak -0.0 dBFS; lectura independiente confirma 9.600 muestras consecutivas en 32767, resto del tono máximo 3277. Frente al WAV de tono bajo anterior, que no produjo clipping, el positivo coincide con una saturación sintética controlada. No se extrapola a diagnosis del origen del clipping ni marcadores visuales. INC-20 menor de pluralización: 1 silencios / 1 posibles clippings procede de textos fijos de signalAnalysisLine, sin corregir.
+
+- **I-76 — ✅, guardado individual:** Reabrir MKV de dos pistas limpia los análisis anteriores. Tras estabilizar la inspección, ambas pistas carecen de señal/sonoridad; tabla A/B mantiene n/d para Integrated/LRA/picos/silencios/clipping. Espectrograma indica sin generar y Exportar PNG deshabilitado. No hay FFmpeg/FFprobe residual. Las mismas opciones automáticas estaban activadas, pero no se analizó arbitrariamente la primera pista. Selección inicial del picker no se confunde con inicio de análisis pesado.
+
+- **I-77 — ✅, guardado individual:** Fixture propio con tres audios PCM: #1 spa/440, #2 eng/880 y #5 fra/1320 Hz. Selector A cambia desde #1 a #5 · fra · Tono 1320 QA; B permanece en #2 y slot activo A. La tercera pista permite elegir una alternativa sin colisionar con B. Verificado por UI, no solo defaults.
+
+- **I-78 — ✅, guardado individual:** Selector B cambia de #2/880 a #1 · spa · Tono 440 QA. A permanece #5/fra/1320 y slot activo A; pistas distintas verificadas. No comienza Play ni análisis al elegir las pistas.
+
+- **I-79 — ✅, guardado individual:** Play de A (#5/fra/1320) y Pausa a 00:02. Seleccionar B (#1/spa/440) cambia título de pista pero conserva 00:02; lectura 1 s después sigue 00:02. Se comprueba instante común entre pistas elegidas en el comparador real, no usando botones individuales de las filas.
+
+- **I-80 — ✅, guardado individual:** Cambio A→B en Pausa conservó 00:02 durante 1 s. Después Play de B avanza a 00:04; elegir A conserva 00:04 y avanza sin otro Play a 00:06 tras 1.5 s. Se pausa A a 00:06. A/B mantiene ambos estados, no solo la selección del slot.
+
+- **I-81 — ✅, guardado individual:** Antes de Play A/B el selector Espectrograma era #1 spa; tras alternar A(#5/fra) y B(#1/spa), termina A activo con footer fra · Tono 1320 QA/00:06 pero el selector de Espectrograma sigue #1 spa PCM_S16LE. Comprobado en UI antes/después, no se cambió silenciosamente para seguir la pista de preview.
+
+- **I-82 — ✅, guardado individual:** Completar análisis A/B muestra fase Analizando #5/fra y termina con tabla real A(#5): -20.2 LUFS; B(#1): -21.8 LUFS. Ambas: LRA0, TP/Peak -18.1, 0 silencios/clippings, tiempo silencio0.000. Desaparece estado Completando y no hay alerta/motor residual. Filas individuales contienen esos resultados para #1/#5, mientras #2/880 no tiene análisis: no procesa arbitrariamente la tercera. Preview permanece en pausa 00:06. Fuente SHA e9dfa4335e93f4ba3dd3ca9d15aaf7aba8a06ae4ecc410de110ca39fa7e4ef6e.
+
+- **I-83 — ✅, guardado individual:** Acción Análisis avanzado identificada por ayuda en fila #1/440 Hz del MKV de tres audios. UI muestra Analizando indicios y anomalías espectrales y después resultado Evidencia insuficiente, rolloff y evidencia explicativa, sin alerta ni FFmpeg residual. Termina el análisis local sin confundirlo con la pista activa A/#5.
+
+- **I-84 — ✅, guardado individual:** Resultado del tono #1 se presenta como Evidencia insuficiente · confianza descriptiva 55 %. Explica que un tono o contenido muy estrecho carece de ocupación espectral suficiente y no se interpreta como cutoff. Se comprueba nivel y explicación, no una probabilidad estadística calibrada de 55 % ni una certificación de procedencia.
+
+- **I-85 — ✅, guardado individual:** La UI del análisis real muestra Rolloff 99,5 %: 457 Hz y evidencia titulada Cobertura espectral insuficiente, con explicación específica del tono estrecho. No rellena arbitrariamente banda efectiva/cutoff cuando no hay evidencia. Métrica visible coherente con señal de 440 Hz y resolución FFT; no se da por probado todo el conjunto de evidencias posibles.
+
+- **I-86 — ✅, guardado individual:** Tres materiales sin codec con pérdida: tono440 → Evidencia insuficiente; ruido con seis lowpass → Sin indicios claros (rolloff6012/banda9609); ruido con corte FFT≈6 kHz → Indicios fuertes, rolloff5953/banda6129/candidata6082 Hz, persistencia100 %. En este último explica explícitamente que puede deberse a contenido/filtrado/fuente con pérdida y por sí sola no demuestra compresión previa. No afirma fake lossless pese al corte real creado localmente. Aceptación de redacción prudente y caso de cutoff, no de exactitud universal de clasificación. SHA fuente abrupta259d653b78ecc0c4c79a937169f9c066f776d02396d67193a054ebb2ebf20a11.
+
+- **I-87 — ✅, guardado individual:** Fixture PCM16 mono12 s con tono440 de0–4,4000 de4–8 y880 de8–12, sin silencio/clipping. Análisis avanzado termina y muestra 2 anomalías temporales, coherentes con los dos cambios deliberados; la clasificación general sigue Evidencia insuficiente por señal estrecha y no convierte el transitorio en prueba de origen con pérdida. Casos anteriores constantes no mostraban eventos. No se acepta aún dibujo de overlays (I-89 pendiente). SHA8ed12fbddb458252694cfc1e2bf2e2d186a1bb8cdccc3e29f917bff42ce68772.
+
+- **I-88 — ✅, guardado individual:** Se exporta por UI el JSON técnico real I88_eventos.json para comprobar datos temporales. Dos eventos Cambio espectral brusco: 3.968–4.053333 s y7.978667–8.064 s, envolviendo cambios sintéticos conocidos a4 y8 s. totalAnomalyCount2, anomaliesWereTruncatedfalse. No son solo un contador ni coordenadas inferidas del código; se validan tiempos generados por la app. I-89 dibujo de overlays sigue pendiente de revisión visual.
+
+- **I-172 — ✅, guardado individual:** Durante I-88 se eligió explícitamente JSON en menú de informe y se publicó I88_eventos.json por panel en carpeta QA. JSON.parse lo decodifica íntegro, schemaVersion3, nombre correcto, datos técnicos y advancedAudio con dos eventos. UI confirma Informe técnico exportado y no hay alerta. Se cierra este ID por la exportación real, aunque se cruzó de orden para verificar tiempos; no se extrapola a TXT/Markdown aún.
+
+- **I-173 — ✅, guardado individual:** JSON técnico de WAV12 s comprobado: schema3, nombre sin ruta, una pista PCM16 mono48k/768000bps, duración12; LUFS -21.8/LRA4/TP-20/Peak-19.99947 coinciden con UI. Señal sin eventos y análisis avanzado con dos intervalos conocidos; timeline sonoridad120 muestras. No contiene /tmp/, fingerprint original ni sourceID. Se acepta contenido esperado de este WAV y secciones activas, no todas las combinaciones de metadata/OCR/edición.
+
+- **I-174 — ✅, guardado individual:** Exportación JSON sobre resultados ya calculados: muestreos solapados a apertura del panel (6 s/102 lecturas) y publicación (4 s/68) no observan hijos FFmpeg/FFprobe. No aparece estado Analizando ni se alteran resultados; JSON contiene exactamente el análisis previo. exportTechnicalReport usa resultados existentes. Aceptación de ausencia de nuevo análisis inesperado en esta exportación, no traza exhaustiva del sistema.
+
+- **I-170 — ✅, guardado individual:** Formato Texto elegido por menú, panel en carpeta QA, publica I170_informe.txt UTF-8 legible. Contiene nombre, contenedor, duración12, PCM16/48k/mono, timing, LUFS/LRA/picos, señal y resumen avanzado con2 anomalías. No rutas completas ni original reemplazado. TXT resume anomalías, no muestra los intervalos individuales del JSON; se acepta este formato según la salida vigente. Una lectura demasiado temprana del panel falló; esperar a ventana Exportar informe técnico permitió guardarlo, sin fallo de producto.
+
+- **I-171 — ✅, guardado individual:** Formato Markdown elegido explícitamente; I171_informe.md publicado separado en carpeta QA. Contiene encabezado # Informe técnico multimedia y secciones ## Metadatos globales/Streams/Sincronización/Sonoridad calculada/Análisis de señal/Análisis avanzado, con los mismos datos y2 anomalías que TXT/JSON. UTF-8 y acentos legibles; source SHA8ed12f…68772 intacto. No se cambia producto.
 
 ## 1. ZEUVE general
 
@@ -883,40 +937,40 @@ Estos deben rechazarse claramente, no convertirse:
 - [ ] ➖ **I-61** El playhead coincide con reproductor/waveform.
 - [ ] ➖ **I-62** Pulsar/scrub en espectrograma hace seek correctamente.
 - [x] ✅ **I-63** Zoom/pan funciona.
-- [ ] ➖ **I-64** Cambiar parámetros visuales reutilizables no vuelve a decodificar innecesariamente.
+- [x] ✅ **I-64** Cambiar parámetros visuales reutilizables no vuelve a decodificar innecesariamente.
 - [x] ✅ **I-65** Exportar espectrograma funciona.
-- [ ] ➖ **I-66** La barra inferior/reproductor sigue visible.
+- [x] ❌ **I-66** La barra inferior/reproductor sigue visible.
 
 ## Sonoridad y señal
 
-- [ ] ➖ **I-67** Integrated Loudness / LUFS.
-- [ ] ➖ **I-68** LRA.
-- [ ] ➖ **I-69** True Peak.
-- [ ] ➖ **I-70** Sample Peak.
+- [x] ✅ **I-67** Integrated Loudness / LUFS.
+- [x] ✅ **I-68** LRA.
+- [x] ✅ **I-69** True Peak.
+- [x] ✅ **I-70** Sample Peak.
 - [ ] ➖ **I-71** Timeline de sonoridad.
-- [ ] ➖ **I-72** Detección de silencios.
-- [ ] ➖ **I-73** Detección de posible clipping.
+- [x] ✅ **I-72** Detección de silencios.
+- [x] ✅ **I-73** Detección de posible clipping.
 - [ ] ➖ **I-74** Eventos aparecen en timeline.
-- [ ] ➖ **I-75** Con una sola pista se ejecuta correctamente la automatización configurada.
-- [ ] ➖ **I-76** Con varias pistas no selecciona silenciosamente una pista para análisis pesado.
+- [x] ✅ **I-75** Con una sola pista se ejecuta correctamente la automatización configurada.
+- [x] ✅ **I-76** Con varias pistas no selecciona silenciosamente una pista para análisis pesado.
 
 ## A/B
 
-- [ ] ➖ **I-77** Elegir pista A.
-- [ ] ➖ **I-78** Elegir pista B.
-- [ ] ➖ **I-79** Alternar A/B conserva timestamp.
-- [ ] ➖ **I-80** Alternar A/B conserva Play/Pausa.
-- [ ] ➖ **I-81** A/B no cambia silenciosamente la pista seleccionada para espectrograma.
-- [ ] ➖ **I-82** «Completar análisis A/B» funciona.
+- [x] ✅ **I-77** Elegir pista A.
+- [x] ✅ **I-78** Elegir pista B.
+- [x] ✅ **I-79** Alternar A/B conserva timestamp.
+- [x] ✅ **I-80** Alternar A/B conserva Play/Pausa.
+- [x] ✅ **I-81** A/B no cambia silenciosamente la pista seleccionada para espectrograma.
+- [x] ✅ **I-82** «Completar análisis A/B» funciona.
 
 ## Fuente con pérdida y anomalías
 
-- [ ] ➖ **I-83** Análisis de indicios de fuente con pérdida termina.
-- [ ] ➖ **I-84** Presenta nivel de evidencia comprensible.
-- [ ] ➖ **I-85** Muestra métricas/evidencias.
-- [ ] ➖ **I-86** No afirma automáticamente «fake lossless» basándose solo en un cutoff.
-- [ ] ➖ **I-87** Detección de anomalías espectrales funciona.
-- [ ] ➖ **I-88** Las anomalías tienen localización temporal.
+- [x] ✅ **I-83** Análisis de indicios de fuente con pérdida termina.
+- [x] ✅ **I-84** Presenta nivel de evidencia comprensible.
+- [x] ✅ **I-85** Muestra métricas/evidencias.
+- [x] ✅ **I-86** No afirma automáticamente «fake lossless» basándose solo en un cutoff.
+- [x] ✅ **I-87** Detección de anomalías espectrales funciona.
+- [x] ✅ **I-88** Las anomalías tienen localización temporal.
 - [ ] ➖ **I-89** Aparecen correctamente en timeline.
 
 ## OCR bitmap
@@ -1032,11 +1086,11 @@ Usar siempre una copia prescindible.
 - [ ] ➖ **I-167** Restaurar preset.
 - [ ] ➖ **I-168** Favorito de configuración funciona.
 - [ ] ➖ **I-169** Favorito de reglas funciona.
-- [ ] ➖ **I-170** Exportar informe TXT.
-- [ ] ➖ **I-171** Exportar informe Markdown.
-- [ ] ➖ **I-172** Exportar informe JSON.
-- [ ] ➖ **I-173** El informe incluye la información técnica esperada.
-- [ ] ➖ **I-174** Exportar informe no lanza análisis nuevos inesperadamente.
+- [x] ✅ **I-170** Exportar informe TXT.
+- [x] ✅ **I-171** Exportar informe Markdown.
+- [x] ✅ **I-172** Exportar informe JSON.
+- [x] ✅ **I-173** El informe incluye la información técnica esperada.
+- [x] ✅ **I-174** Exportar informe no lanza análisis nuevos inesperadamente.
 
 ## Compatibilidad/rendimiento
 
