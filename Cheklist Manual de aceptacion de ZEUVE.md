@@ -2,13 +2,13 @@
 
 Estado acumulado al 29/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 348 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 280 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 366 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 262 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 27/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 45/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-30 — cambiar pista conservando instante; I-02/I-22/I-29 siguen pendientes de control o verificación auditiva.** Última prueba cerrada y guardada: I-28, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-64 — cambios visuales sin decodificar.** Última prueba cerrada y guardada: I-63, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -242,6 +242,48 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - **I-02/I-22 — pendientes de control:** CUA devuelve native pipe closed al leer el Inspector y al solicitar captura. Se sigue mediante System Events; no se ejecuta un arrastre verificable en I-02 ni un seek directo sobre la timeline custom AXUnknown en I-22. No son fallos confirmados de producto. I-12 verifica dos capítulos/filas, no títulos/timing visuales ni seek de capítulo; I-15 verifica imagen y attached_pic representados en UI, no revisión visual del color de miniatura.
 - **I-29 — avance de control, pendiente de aceptación audible:** escritura AX del slider no cambia su valor (permanece 1). Foco + flechas sí permite 0,0 → 0,4 → 1,0 y se restaura 1; diferencia de control, no prueba de volumen roto. Sin escuchar la salida no se certifica mute/ganancia acústica. Play/Pausa/Reanudar y velocidades anteriores se aceptan para transporte/avance observado, no para calidad/latencia acústica; I-33 sigue pendiente. Preview detenido al cerrar el turno, sin procesos FFmpeg/FFprobe residuales.
 - **Preparación I — incidencias ajenas a ZEUVE:** el engine empaquetado no incluye encoder VP8 y rechazó deadline al crear un fixture WebM. FFmpeg Homebrew ya instalado sí incluye VP8; tampoco incluye libvorbis, por lo que se generó VP8/Opus con libopus. Estos errores ocurren en el generador propio, no al abrir WebM en la app. No se instala ni añade un motor a ZEUVE. Un selector de grupo apuntó a Sin pistas de subtítulos; no se usó para certificar audio WebM en UI. Los fixtures se conservan en /tmp/zeuve-inspector-qa.cyTrxb.
+
+- **I-30 — ✅, guardado individual:** MKV sintético de dos audios: preview spa/Tono 440 pausado en 00:02/00:30; cambiar a eng/Tono 880 actualiza la identidad de pista y conserva exactamente 00:02. No vuelve a cero ni cambia de archivo.
+
+- **I-32 — ✅, guardado individual:** Cambio 440→880 desde Pausa: 00:02 se mantiene inmediatamente tras la carga y en otra lectura 1,2 s después. Conserva Pausa; no se interpreta el botón Escuchar de otra pista como petición de reanudar.
+
+- **I-31 — ✅, guardado individual:** Reanudar eng/Tono 880 en 00:03, cambiar a spa/Tono 440 durante Play: posición sigue en 00:03 al cargar y avanza a 00:04 tras 1,2 s, sin pulsar Play de nuevo. Identidad actualizada y reproducción conservada; se pausa al terminar el ensayo.
+
+- **I-42 — ✅, guardado individual:** Botón Pantalla completa del reproductor, identificado por ayuda específica: AXFullScreen de la ventana Inspector multimedia cambia false→true tras la transición. Se comprueba la ventana propietaria de la copia QA, no una ventana global distinta.
+
+- **I-43 — ✅, guardado individual:** El mismo botón devuelve AXFullScreen a false y conserva Inspector multimedia y su sesión. Entrada/salida completas comprobadas por estado nativo; no se extrapola al escalado/aspect ratio del vídeo, todavía pendientes.
+
+- **I-46 — ✅, guardado individual:** Selector Subtítulos ofrece la pista interna spa/Texto QA/SUBRIP; seleccionarla y reproducir el vídeo muestra ZEUVE QA UNO en 00:01/00:30, dentro de su evento 1–4 s. Se pausa conservando el texto. Activación/extracción textual real comprobada, no solo nombre en selector.
+
+- **INC-17 — anomalía reproducida del transporte de vídeo sin audio activo, sin corregir:** I47_dossubtitulos.mkv (30 s, H.264) reabierto mediante Analizar otro archivo para limpiar la sesión. Pistas → botón del único vídeo: el título cambia a H264, pero seis lecturas consecutivas a intervalos de 1 s mantienen 00:00 / 00:30; tras la siguiente pulsación, otras dos lecturas mantienen cero. Una nueva pulsación y cinco lecturas más vuelven a mantener cero. También se había reproducido durante ocho lecturas en la sesión anterior. No hay alerta de error. La lectura accesible no permite certificar movimiento o conservación del fotograma, por lo que I-34–I-41 no se aceptan ni se marcan fallidos solo por esta evidencia. Causa probable, no demostración interna: startVideoOnlyPreview inicia el monitor antes de completar scheduleVideoPreview; el monitor puede leer el servicio de vídeo todavía idle/paused, sobrescribir previewState y salir. Además refreshPreviewSnapshot consulta el servicio de audio cuando previewSourceID identifica vídeo aunque activePreviewSource sea nil, pudiendo restablecer posición/título desde una sesión de audio idle. Se registra el fallo observable del reloj y queda pendiente confirmar visualmente el frame y aislar cuál de estas carreras lo causa. Fixture SHA-256 a8dff5f35b0bd06de213b37ead1669f74c01d254f6320a25deca71fb6954a164. I-48 sigue pendiente; no se confunde el fallo de CUA con esta lectura repetida de la UI real.
+
+- **I-47 — ✅, guardado individual:** Selector eng · ASS QA · ASS activado con audio en pausa a 00:02. La UI muestra un evento ASS QA UNO procedente de la pista ASS real del MKV. Activación verificada, no estilos avanzados ni SSA separado. Incidencia adicional de presentación INC-18: el texto accesible incluye literalmente <font size="18">ASS QA UNO</font>; la conversión ASS→SRT introduce etiquetas y el servicio las conserva como texto plano, que MultimediaPreviewPlayerView entrega a Text sin interpretarlas. Queda por comprobar visualmente si esas etiquetas son visibles también en pantalla; no se afirma todavía ese aspecto como fallo visual confirmado.
+
+- **I-49 — ✅, guardado individual:** Con el transporte en pausa a 00:02, cambiar ASS→SRT sustituye el evento por ZEUVE QA UNO; volver a ASS lo sustituye por <font size="18">ASS QA UNO</font>. No mueve el tiempo ni exige reanudar. Se guardan las diferencias de contenido entre pistas reales; no se certifican estilos ASS (INC-18).
+
+- **I-50 — ✅, guardado individual:** Elegir Desactivados elimina el evento ASS del texto visible/accesible a 00:02; el selector confirma Desactivados y el transporte permanece pausado en el mismo tiempo. No desaparecen las pistas del catálogo ni se altera el archivo.
+
+- **I-51 — ✅, guardado individual:** SRT activo y audio pausado: capítulo Segundo QA lleva a 00:10 y muestra ZEUVE QA DOS; capítulo Inicio QA vuelve a 00:00 y elimina el evento. El salto cambia el texto sin Play y conserva pausa. Comprobado contra tiempos SRT 10–14 y ausencia de evento en 0; sin extrapolar al transporte de vídeo sin audio afectado por INC-17.
+
+- **I-48 — ✅, guardado individual:** Con audio 440 Hz activo y SRT seleccionado, lecturas durante reproducción: UNO visible a 2–4 s, ausente a 5–7; DOS visible a 10–14 s, ausente a 15–16. Coincide con eventos SRT 1–4 y 10–14. La lectura a 00:01 (redondeada) aún no mostraba UNO; no permite medir precisión subsegundo y no se usa como fallo. Aceptación del timing textual en transporte con audio, no sincronización audiovisual ni vídeo sin audio (INC-17).
+
+- **I-52/I-53 — control visual pendiente, sin cambio de casillas:** la waveform expone AXValueDescription con posición/duración, pero su Canvas no expone los buckets generados; no se da por comprobada la generación del dibujo solo por tener controles. Dos clicks System Events calculados al 25 % y 75 % dentro del rectángulo accesible de la waveform no cambiaron el tiempo (seguía 00:16); no se ha demostrado que llegaran al DragGesture de SwiftUI, por lo que se anota como limitación de control para revisión manual, no como fallo confirmado de seek.
+
+- **I-54 — ✅, guardado individual:** Durante Play, el reproductor y AXValueDescription de la waveform coinciden en 00:17, 00:18 y 00:19 de 00:30; en pausa ambos permanecen en 00:19. Se comprueba el playhead expuesto por accesibilidad, no el dibujo píxel a píxel ni la generación del Canvas (I-52 pendiente).
+
+- **I-55 — ✅, guardado individual:** Aumentar zoom cambia vista completa 30 s por rango textual 00:11.919–00:26.919 (15 s), centrado en playhead ≈19.4 s. Reducir vuelve a vista completa y deshabilita Reducir zoom; el transporte permanece en pausa a 00:19. Se verifica rango/control real; el redibujado del Canvas requiere revisión visual.
+
+- **I-56 — ✅, guardado individual:** Con zoom 15 s, Pan atrás cambia rango 00:11.919–00:26.919 a 00:04.419–00:19.419; Pan adelante restaura el rango anterior. Vista completa elimina el rango acotado. Playhead 00:19 permanece en pausa. Se verifica desplazamiento/rango, no dibujo del Canvas.
+
+- **I-59 — ✅, guardado individual:** Pista #1 spa PCM_S16LE, Mezcla, Hann/FFT4096, Lineal, -120…0 dB. Actualizar transforma estado Espectrograma sin generar en resultado con ejes frecuencia/tiempo y leyenda de decibelios; Exportar PNG pasa de deshabilitado a habilitado, sin alerta y sin motor residual. Se verifica resultado generado por la app, no se infiere correspondencia frecuencial hasta inspeccionar exportación.
+
+- **I-65 — ✅, guardado individual:** Exportar PNG publica I65_tono440.png en la carpeta QA elegida, 1600×900 y 47.664 bytes. sips decodifica dimensiones y revisión visual del PNG real confirma raster no vacío con banda tonal horizontal. UI confirma exportación, panel se cierra y original MKV conserva SHA-256 a8dff5…a164. No se certifican todavía todos los formatos, conflictos o ejes en PNG; no hay etiquetas/ejes en este raster exportado.
+
+- **I-60 — ✅, guardado individual:** Se generaron y exportaron dos resultados separados: #1 spa/440 Hz → I65_tono440.png; #2 eng/880 Hz → I60_tono880.png. Ambos PNG 1600×900 decodificados con AppKit y revisados visualmente: la banda tonal de la segunda pista está más alta. Lectura independiente de píxeles: máximo rojo fila 882 y 866, aproximadamente 454 y 881 Hz en eje lineal 0–24 kHz (raster ≈26,7 Hz/píxel, no medición exacta del tono). Confirma que no reutiliza sin cambiar el resultado de la primera pista. Primer Actualizar enviado inmediatamente al cerrar el menú no produjo resultado; repetir después de estabilizar la selección sí lo hizo: intento rápido de control documentado, no fallo formal.
+
+- **I-63 — ✅, guardado individual:** Desde controles propios de Espectrograma, Aumentar zoom muestra 00:11.919–00:26.919 y Pan atrás 00:04.419–00:19.419; Vista completa restablece el rango. No desaparece el resultado ni cambia pista/posición. Se valida el viewport textual compartido; el gesto directo y el dibujo del playhead permanecen pendientes (I-61/I-62).
+
+- **I-64 — en curso, sin cambio de casilla:** resultado de la pista #2/880 Hz generado. Elegir Logarítmica y después Lineal conserva el resultado y Exportar PNG habilitado. Escribir el valor AX del slider no actualiza el binding; AXDecrement sí cambia Rango: -120…0 dB a -125…0 dB sin pulsar Actualizar y sin borrar el resultado. Un muestreo acotado de hijos FFmpeg no detecta ejecuciones, pero no constituye una traza exhaustiva. Faltaba completar contraste/exportación del cambio visual. macOS se bloquea (CGSession screenLocked=1); System Events deja de ver window 1 aunque PID 39084 sigue vivo. I64_log880.png no llegó a crearse, no se interpreta la ausencia de ventana como fallo de ZEUVE. Reanudar tras desbloquear en esta misma pista y comprobar el selector/menú real antes de cualquier clic. I-64 permanece pendiente; último ID cerrado I-63. Estado global 366 OK, 6 fallos, 5 parciales, 262 pendientes; Inspector 45/180 OK.
 
 ## 1. ZEUVE general
 
@@ -795,9 +837,9 @@ Estos deben rechazarse claramente, no convertirse:
 - [x] ✅ **I-27** 1× funciona.
 - [x] ✅ **I-28** 2× funciona.
 - [ ] ➖ **I-29** Volumen funciona.
-- [ ] ➖ **I-30** Cambiar pista de audio conserva el instante.
-- [ ] ➖ **I-31** Cambiar pista mientras reproduce conserva Play.
-- [ ] ➖ **I-32** Cambiar pista estando pausado conserva Pausa.
+- [x] ✅ **I-30** Cambiar pista de audio conserva el instante.
+- [x] ✅ **I-31** Cambiar pista mientras reproduce conserva Play.
+- [x] ✅ **I-32** Cambiar pista estando pausado conserva Pausa.
 - [ ] ➖ **I-33** Ninguna acción habitual se siente con el retraso de \~1 segundo que se corrigió.
 
 ## Preview de vídeo
@@ -810,39 +852,39 @@ Estos deben rechazarse claramente, no convertirse:
 - [ ] ➖ **I-39** Cambiar pista de audio durante vídeo conserva posición.
 - [ ] ➖ **I-40** Cambiar stream de vídeo conserva posición.
 - [ ] ➖ **I-41** El cambio de stream no reproduce accidentalmente otro stream con el mismo índice de otra fuente.
-- [ ] ➖ **I-42** Fullscreen entra correctamente.
-- [ ] ➖ **I-43** Fullscreen sale correctamente.
+- [x] ✅ **I-42** Fullscreen entra correctamente.
+- [x] ✅ **I-43** Fullscreen sale correctamente.
 - [ ] ➖ **I-44** Escalado de vídeo es correcto.
 - [ ] ➖ **I-45** Aspect ratio se conserva.
 
 ## Subtítulos de preview
 
-- [ ] ➖ **I-46** Activar subtítulos SRT internos.
-- [ ] ➖ **I-47** Activar ASS/SSA.
-- [ ] ➖ **I-48** Los textos aparecen sincronizados.
-- [ ] ➖ **I-49** Cambiar pista de subtítulos funciona.
-- [ ] ➖ **I-50** Desactivar subtítulos funciona.
-- [ ] ➖ **I-51** Seek actualiza correctamente el subtítulo visible.
+- [x] ✅ **I-46** Activar subtítulos SRT internos.
+- [x] ✅ **I-47** Activar ASS/SSA.
+- [x] ✅ **I-48** Los textos aparecen sincronizados.
+- [x] ✅ **I-49** Cambiar pista de subtítulos funciona.
+- [x] ✅ **I-50** Desactivar subtítulos funciona.
+- [x] ✅ **I-51** Seek actualiza correctamente el subtítulo visible.
 
 ## Waveform/timeline
 
 - [ ] ➖ **I-52** Se genera waveform.
 - [ ] ➖ **I-53** Scrub sobre waveform mueve el playhead.
-- [ ] ➖ **I-54** Playhead de waveform y reproductor coincide.
-- [ ] ➖ **I-55** Zoom funciona.
-- [ ] ➖ **I-56** Pan funciona.
+- [x] ✅ **I-54** Playhead de waveform y reproductor coincide.
+- [x] ✅ **I-55** Zoom funciona.
+- [x] ✅ **I-56** Pan funciona.
 - [ ] ➖ **I-57** Capítulos aparecen en timeline cuando corresponde.
 - [ ] ➖ **I-58** Overlays de análisis aparecen cuando están activados.
 
 ## Espectrograma
 
-- [ ] ➖ **I-59** Generar espectrograma.
-- [ ] ➖ **I-60** El resultado corresponde a la pista elegida.
+- [x] ✅ **I-59** Generar espectrograma.
+- [x] ✅ **I-60** El resultado corresponde a la pista elegida.
 - [ ] ➖ **I-61** El playhead coincide con reproductor/waveform.
 - [ ] ➖ **I-62** Pulsar/scrub en espectrograma hace seek correctamente.
-- [ ] ➖ **I-63** Zoom/pan funciona.
+- [x] ✅ **I-63** Zoom/pan funciona.
 - [ ] ➖ **I-64** Cambiar parámetros visuales reutilizables no vuelve a decodificar innecesariamente.
-- [ ] ➖ **I-65** Exportar espectrograma funciona.
+- [x] ✅ **I-65** Exportar espectrograma funciona.
 - [ ] ➖ **I-66** La barra inferior/reproductor sigue visible.
 
 ## Sonoridad y señal
