@@ -1,22 +1,22 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Estado acumulado al 28/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
+Estado acumulado al 29/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 273 ✅ OK · 5 ❌ fallidas · 4 ⚠️ parciales · 357 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 295 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 333 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 31/63 OK, 3 fallos (C-14/C-15/C-20) y 1 parcial (C-11), Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parciales (C-11/C-48), Comparador 0/27, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
-El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 sigue pendiente: la opción de recordar salida estaba desactivada, por lo que no recordar tras reiniciar es esperado. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
+El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
 ## Continuidad de pruebas — guardado individual
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: C-30 — secuencia de imágenes, pendiente por pantalla bloqueada.** Última prueba guardada: C-61 (comprobación adicional de C-29), OK. Fuente UI C29_cancelar_120s.mp4; extracción cancelada y sin FFmpeg activo. Antes de cambiar fuentes, verificar recuperación de la interfaz: tras Cancelar se mostró una tarjeta Finalizado/1 cancelado en lugar de un resumen nuevo. No reiniciar para ocultar ese posible problema. C-30 no se ha ejecutado. Las dos carpetas derivadas grandes C29 se conservan en retained-qa-results fuera de input, sin tocar originales. Publicación remota pendiente por falta de autenticación GitHub.
+**Punto de continuación: F-01 — Comparador de seguidores de Instagram, todavía sin iniciar.** Conversor: 53 OK, 4 fallos (C-14/C-15/C-20/C-46), 2 parciales (C-11/C-48) y 4 pendientes (C-35–C-37 sin Pandoc; C-42 por control del selector múltiple). Última prueba guardada C-62, OK. UI QA en Conversor sin entradas ni operación activa, PID 39084; carpeta recordada output y favorita sintética conservadas en datos aislados. C-42: último intento de AXSelectedChildren no confirmó selección; panel cancelado, ninguna importación múltiple aceptada. Publicación remota pendiente por falta de autenticación HTTPS.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -76,7 +76,59 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 
 - **C-61 — ✅, guardado individual:** Comprobación específica sobre la cancelación C-29: UI no cuenta el trabajo como correcto y la salida conservada se etiqueta Incompleto. Los 237 PNG publicados se validaron completos con ImageIO; no se conservó un último fotograma truncado ni una carpeta Procesando. Esta aceptación se limita al flujo de extracción probado, no a todos los motores.
 
-- **Observación después de C-29, pendiente de revalidación UI:** los archivos y la cancelación cumplen el requisito de conservar PNG completos como Incompleto; sin embargo, la última UI accesible seguía mostrando una tarjeta de ejecución con Finalizado y 1 cancelado. El código de cancel() cancela la Task y executePlan() puede salir por Task.isCancelled antes de restablecer state; es una causa posible, no una recuperación de UI comprobada. La pantalla se bloqueó antes de verificar los controles. Reanudar comprobando si siguen habilitados, sin atribuir el bloqueo de macOS a ZEUVE ni marcar por código solo un fallo adicional.
+- **INC-14 — fallo adicional confirmado después de C-29:** con macOS desbloqueado, la tarjeta sigue en Finalizado/1 cancelado; los botones para importar, Quitar todas y Convertir tienen enabled=false, aunque FFmpeg ya terminó. Navegar a Historial y volver al Conversor no recupera el módulo. No es el bloqueo de pantalla ni un fallo del controlador: System Events lee los controles reales y las opciones de receta siguen habilitadas. Causa probable: cancel() cancela executionTask pero no restablece state; los guard !Task.isCancelled de executePlan() retornan antes de pasar a result/preview, dejando state=.running e isBusy=true. Se conserva C-29 OK para su requisito concreto de fotogramas Incompleto y se registra aparte la recuperación de UI fallida, sin inventar un ID adicional ni aceptar C-46 (lote todavía no probado). Se reinicia normalmente solo la copia QA después de guardar esta evidencia; no se corrige producto.
+
+- **C-30 — ✅, guardado individual:** 15 PNG sintéticos seleccionados por carpeta propia, sin tiempos.csv, → Crear vídeo desde una secuencia de imágenes → MP4 por UI. Resultado: 1 correcto y 0 fallidos/omitidos/cancelados. FFprobe: H.264, 1920×1080, 15,04 s, 16 fotogramas decodificados; 15 imágenes a 1 s por defecto y último fotograma repetido según el manifiesto de secuencia. Decodificación íntegra FFmpeg sin errores y 15/15 hashes fuente intactos. La ruta ofrecida para esta secuencia es vídeo; no se afirma animación directa ni reordenación manual, que no está implementada.
+
+- **C-31 — ✅, guardado individual:** 15 PNG → Crear un PDF con imágenes por UI: 1 correcto y 0 fallidos/omitidos/cancelados. PDF real de 15 páginas, 160×90 puntos, sin cifrado. Poppler renderiza las 15 páginas a 160×90; revisión visual de la hoja de contacto confirma el patrón y los índices 0–14 en orden, sin páginas en blanco ni recorte. Se conserva el PDF separado de las fuentes.
+
+- **C-32 — ✅, guardado individual:** PDF generado en C-31 → Convertir páginas de PDF en imágenes → PNG por UI. 1 correcto y 0 fallidos/omitidos/cancelados; carpeta Páginas con 15 PNG numerados. ImageIO decodifica todos completos a 667×375 (rasterización por defecto a 300 DPI). Hoja de contacto revisada contra el render independiente Poppler: índices 0–14 en orden, contenido conservado, sin páginas vacías.
+
+- **C-33 — ✅, guardado individual:** PDF sintético de dos páginas con texto real → Extraer texto del PDF por UI: 1 correcto y 0 fallidos/omitidos/cancelados. TXT publicado contiene ambos encabezados, el número 12345 y los acentos á/é/í/ó/ú/ñ, en orden y separados por página. No se usa el PDF de imágenes de C-31 para simular OCR; no hay OCR en el alcance.
+
+- **C-34 — ✅, guardado individual:** PDF sintético AES-256 de dos páginas: Extraer texto sin contraseña devuelve el aviso correcto y no publica TXT. Tras introducir la contraseña de QA mediante el campo visible, termina 1 correcto/0 fallidos y el TXT coincide con C-33. Al cerrar el resultado, el campo vuelve a seguro y vacío. Consultas de solo lectura: 0 coincidencias de la contraseña en ajustes e Historial; tampoco en los logs aislados. Hash del PDF protegido intacto. Dos intentos de escritura que no llegaron al binding del campo se separan como control, no como contraseña rechazada por producto. Esta verificación no certifica borrado forense de RAM.
+
+- **C-38 — ✅, guardado individual:** Archivo CSV propio con cabecera fotograma/tiempo_segundos/duracion_segundos y 15 filas, copia del C-28. Importación individual por UI: 1 entrada compatible identificada CSV · 194 bytes, sin aviso de formato incorrecto. Se comprueba reconocimiento, no una conversión de tablas ni compatibilidad con Excel.
+
+- **C-39 — ✅, guardado individual:** JSON sintético válido con objeto, lista, booleano y texto UTF-8. Importación individual por UI: 1 entrada compatible identificada JSON · 75 bytes, sin aviso de extensión/contenido distinto. Se comprueba reconocimiento, no transformación arbitraria de JSON.
+
+- **C-40 — ✅, guardado individual:** XML sintético bien formado, con declaración UTF-8, elemento raíz y dos campos. Importación individual por UI: 1 entrada compatible identificada XML · 101 bytes, sin aviso de formato incorrecto. Se verifica reconocimiento, no conversión XML↔JSON ni validación de cualquier esquema.
+
+- **C-44 — ✅, guardado individual:** ZIP propio con dos PNG importado mediante el botón ZIP: UI enumera las dos entradas y prepara dos conversiones a JPEG. Ejecución: 2 correctos y 0 fallidos/omitidos/cancelados. Salidas independientes dentro de C44_dos_imagenes - Converted; ImageIO confirma ambos JPEG 160×90. SHA-256 del ZIP idéntico antes/después. Se valida ZIP simple, no ZIP cifrado, anidado, corrupto ni todas las reglas de seguridad.
+
+- **C-45 — ✅, guardado individual:** Lote real de dos vídeos sintéticos de 120 s: se observaron ambos nombres, Convirtiendo, porcentajes por archivo, transcurrido/restante aproximado y progreso global creciente de 0 a 0,96. Al terminar A, 1 correcto y progreso global 0,5; después avanzó B. Resumen final en 35 s: 2 correctos y 0 fallidos/omitidos/cancelados. Ambas salidas H.264 1280×720, 120 s/3600 fotogramas, decodificación íntegra sin errores; hashes de las dos fuentes intactos. No se deduce el progreso solo del resumen.
+
+- **C-46 — ❌, guardado individual:** FALLO DE RECUPERACIÓN, INC-14 reproducida con lote: dos vídeos, Cancelar pulsado durante Convirtiendo. El motor se detiene y la tarjeta Finalizado contabiliza 0 correctos/fallidos/omitidos y 2 cancelados; no hay FFmpeg activo ni nuevas salidas parciales publicadas. Sin embargo, Quitar todas y Convertir siguen enabled=false y no se ofrece un nuevo resumen para continuar. Las dos fuentes y las dos salidas completas anteriores conservan sus hashes. La cancelación técnica funciona, pero el flujo de lote no se recupera; se marca fallido y no se corrige.
+
+- **C-47 — ✅, guardado individual:** Dos presets incorporados aplicados por UI y ejecutados con entradas adecuadas: Imagen PNG sin pérdida selecciona PNG/Máxima calidad y produce copia con hash idéntico; Audio MP3 de alta calidad selecciona MP3/Máxima calidad y genera MP3 320 kb/s, 48 kHz mono, 3 s, decodificado íntegro. Cada operación: 1 correcto y 0 fallidos/omitidos/cancelados. Se prueban estos dos presets, no todas las combinaciones de presets con formatos.
+
+- **C-48 — ⚠️, guardado individual:** PARCIAL, INC-15: Guardar como favorita crea Conversión desde resultado y se persiste en universalConverter.favorites.v1. Después de cambiar la receta a FLAC/Bajo, aplicar la favorita restaura MP3/Máxima calidad y ejecuta 1 correcto/0 fallidos; salida MP3 320 kb/s de 3 s, decodificada íntegra. Sin embargo, la UI vuelve inmediatamente a Favorita: Ninguna y Preajuste: Configuración actual, pese a restaurar la receta guardada. Causa probable: aplicar opciones programáticamente dispara onChange de calidad; qualityChanged() borra selectedFavoriteID/selectedPresetID. No se han probado renombrado, duplicado, fijado ni exportación/importación de favoritos; sin corregir.
+
+- **C-49 — ✅, guardado individual:** EPUB sintético mínimo (mimetype EPUB y estructura de contenedor) seleccionado por Un archivo. UI: «C49.epub: formato de libro electrónico no compatible (EPUB).» No se añade ninguna entrada compatible ni receta de conversión; no se convierte ni se instala un motor retirado.
+
+- **C-50 — ✅, guardado individual:** Fixture sintético de cabecera BOOKMOBI seleccionado por UI. Aviso explícito «C50.mobi: formato de libro electrónico no compatible (MOBI).» Sin entrada compatible ni conversión. Se verifica el rechazo de la firma/extension, no la integridad de un libro MOBI completo.
+
+- **C-51 — ✅, guardado individual:** Dos fixtures de extensión .azw y .azw3, sin DRM y con cabecera sintética BOOKMOBI, seleccionados por UI. Ambos se rechazan expresamente como libro electrónico no compatible; aviso adicional AZW3 frente a contenido MOBI coherente con el fixture. Sin receta ni conversión. Se comprueba política de rechazo de ambas extensiones, no lectura de un libro Kindle completo.
+
+- **C-52 — ✅, guardado individual:** FB2 sintético XML con raíz FictionBook, metadatos y cuerpo de texto seleccionado por UI. Aviso claro «C52.fb2: formato de libro electrónico no compatible (FB2).» No aparece como entrada convertible ni se procesa mediante Pandoc u otro motor.
+
+- **C-53 — ✅, guardado individual:** EPS sintético con cabecera PS-Adobe/EPSF, BoundingBox y rectángulo local. UI indica «C53.eps: el formato EPS se reconoce, pero ya no es compatible con el Conversor.» No se ofrece conversión ni se invoca Ghostscript; no se reintroduce ese motor.
+
+- **C-54 — ✅, guardado individual:** Ambas extensiones .doc y .docx rechazadas por UI con «los formatos ofimáticos no son compatibles con el Conversor» y sin entradas convertibles. Fixtures adversariales: PNG propio renombrado, para comprobar que la política de extensión retirada no lo reinterpreta como imagen. No se afirma haber leído documentos Word reales; no se usa LibreOffice.
+
+- **C-55 — ✅, guardado individual:** Ambas extensiones .xls y .xlsx seleccionadas y rechazadas claramente por UI como formatos ofimáticos no compatibles; ninguna entrada convertible. PNG sintéticos renombrados para probar la barrera por extensión retirada, no hojas de cálculo reales ni parsing Excel. No se convierte ni se incorpora dependencia ofimática.
+
+- **C-56 — ✅, guardado individual:** Las dos extensiones .ppt/.pptx se seleccionan y reciben el aviso explícito de formatos ofimáticos no compatibles, sin entradas convertibles. Fixtures adversariales PNG renombrados: confirma rechazo por extensión incluso con contenido convertible; no prueba lectura de presentaciones reales.
+
+- **C-57 — ✅, guardado individual:** ODT, ODS y ODP seleccionados separadamente por UI. Los tres muestran «los formatos ofimáticos no son compatibles con el Conversor», sin convertirlos ni admitirlos como imágenes por su contenido PNG de QA. Se verifica barrera por las tres extensiones retiradas, no parsing de documentos OpenDocument reales.
+
+- **C-58 — ✅, guardado individual:** RTF sintético con cabecera rtf1 seleccionado individualmente. Aviso «C58.rtf: los formatos ofimáticos no son compatibles con el Conversor», sin entrada compatible, receta ni conversión. Todos los rechazos C-49–C-58 se guardaron por ID al terminar, sin interpretarlos como conversiones fallidas.
+
+- **C-62 — ✅, guardado individual:** Se activa Recordar la última carpeta por Ajustes en la copia QA y se vuelve a elegir output por panel nativo. Preferencia comprobada en UI (1), cierre normal y relanzado con los mismos datos aislados. Tras importar una imagen, Salida recupera /tmp/zeuve-converter-qa.uPwA7J/output sin volver a elegirla; vista previa prepara destino output/ZEUVE Converted. Se verifica el reinicio real, no solo SQLite. La opción queda activada únicamente en los datos QA.
+
+- **C-42 — intento de control incompleto, pendiente:** se abrió Seleccionar varios archivos y se intentó seleccionar los 15 PNG propios. El panel nativo cambió la columna accesible y la selección múltiple no pudo confirmarse; se canceló sin importarla. No se cuenta la carpeta C-30 como sustituto del selector múltiple. Se continúa con C-44, sin fallo de producto por este intento.
+- **C-35–C-37 — pendientes por entorno, no fallo:** la copia QA no incorpora Pandoc ni lo muestra como motor disponible. No se instala ni se cambia el empaquetado para estas pruebas; las tres conversiones condicionales de TXT/Markdown/HTML siguen sin aceptar. Se continúa por C-38.
+
 
 ## 1. ZEUVE general
 
@@ -508,56 +560,56 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - [x] ✅ **C-27** Se genera la carpeta de fotogramas.
 - [x] ✅ **C-28** `tiempos.csv` se genera si se solicita.
 - [x] ✅ **C-29** Cancelar extracción deja resultados completos como «Incompleto» según diseño.
-- [ ] ➖ **C-30** Secuencia de imágenes → vídeo/animación cuando corresponda.
-- [ ] ➖ **C-31** Imágenes → PDF.
+- [x] ✅ **C-30** Secuencia de imágenes → vídeo/animación cuando corresponda.
+- [x] ✅ **C-31** Imágenes → PDF.
 
 ## PDF
 
-- [ ] ➖ **C-32** PDF → imágenes.
-- [ ] ➖ **C-33** PDF → texto.
-- [ ] ➖ **C-34** Un PDF protegido compatible permite introducir contraseña sin persistirla.
+- [x] ✅ **C-32** PDF → imágenes.
+- [x] ✅ **C-33** PDF → texto.
+- [x] ✅ **C-34** Un PDF protegido compatible permite introducir contraseña sin persistirla.
 
 ## Texto y datos
 
 - [ ] ➖ **C-35** TXT → Markdown/HTML si Pandoc está preparado.
 - [ ] ➖ **C-36** Markdown → TXT/HTML si Pandoc está preparado.
 - [ ] ➖ **C-37** HTML → TXT/Markdown si Pandoc está preparado.
-- [ ] ➖ **C-38** CSV se reconoce correctamente.
-- [ ] ➖ **C-39** JSON se reconoce correctamente.
-- [ ] ➖ **C-40** XML se reconoce correctamente.
+- [x] ✅ **C-38** CSV se reconoce correctamente.
+- [x] ✅ **C-39** JSON se reconoce correctamente.
+- [x] ✅ **C-40** XML se reconoce correctamente.
 - [x] ✅ **C-41** Una operación mismo formato/copia segura funciona.
 
 ## Entradas múltiples
 
 - [ ] ➖ **C-42** Varios archivos.
 - [x] ✅ **C-43** Carpeta.
-- [ ] ➖ **C-44** ZIP.
-- [ ] ➖ **C-45** El progreso de lote funciona.
-- [ ] ➖ **C-46** Cancelar un lote funciona.
-- [ ] ➖ **C-47** Presets funcionan.
-- [ ] ➖ **C-48** Favoritos funcionan.
+- [x] ✅ **C-44** ZIP.
+- [x] ✅ **C-45** El progreso de lote funciona.
+- [x] ❌ **C-46** Cancelar un lote funciona.
+- [x] ✅ **C-47** Presets funcionan.
+- [ ] ⚠️ **C-48** Favoritos funcionan.
 
 ## Rechazos deliberados
 
 Estos deben rechazarse claramente, no convertirse:
 
-- [ ] ➖ **C-49** EPUB.
-- [ ] ➖ **C-50** MOBI.
-- [ ] ➖ **C-51** AZW/AZW3.
-- [ ] ➖ **C-52** FB2.
-- [ ] ➖ **C-53** EPS.
-- [ ] ➖ **C-54** DOC/DOCX.
-- [ ] ➖ **C-55** XLS/XLSX.
-- [ ] ➖ **C-56** PPT/PPTX.
-- [ ] ➖ **C-57** ODT/ODS/ODP.
-- [ ] ➖ **C-58** RTF.
+- [x] ✅ **C-49** EPUB.
+- [x] ✅ **C-50** MOBI.
+- [x] ✅ **C-51** AZW/AZW3.
+- [x] ✅ **C-52** FB2.
+- [x] ✅ **C-53** EPS.
+- [x] ✅ **C-54** DOC/DOCX.
+- [x] ✅ **C-55** XLS/XLSX.
+- [x] ✅ **C-56** PPT/PPTX.
+- [x] ✅ **C-57** ODT/ODS/ODP.
+- [x] ✅ **C-58** RTF.
 
 ## Seguridad
 
 - [x] ✅ **C-59** El original sigue intacto después de convertir.
 - [x] ✅ **C-60** Un conflicto de nombre no produce sobrescritura silenciosa.
 - [x] ✅ **C-61** Cancelar no publica como válido un archivo roto.
-- [ ] ➖ **C-62** La carpeta de salida recordada funciona.
+- [x] ✅ **C-62** La carpeta de salida recordada funciona.
 - [x] ✅ **C-63** Una conversión completada aparece en Historial.
 
 ---
