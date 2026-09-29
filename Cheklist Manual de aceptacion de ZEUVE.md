@@ -2,13 +2,13 @@
 
 Estado acumulado al 29/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 321 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 307 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 348 ✅ OK · 6 ❌ fallidas · 5 ⚠️ parciales · 280 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 0/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 27/180 y Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-01 — Inspector multimedia; F-02 queda pendiente de revisión manual por control.** Última prueba cerrada y guardada: F-20, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-30 — cambiar pista conservando instante; I-02/I-22/I-29 siguen pendientes de control o verificación auditiva.** Última prueba cerrada y guardada: I-28, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -184,6 +184,64 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 
 - **F-02 — control incompleto, pendiente:** Finder muestra seleccionado únicamente F01_exportacion.zip en la carpeta propia y ZEUVE ofrece el área de soltar ZIP. El arrastre de CUA no cambia el catálogo ni permite verificar que se entregó un archivo a la app. No se marca fallo ni se sustituye esta prueba por el selector F-01. Se reserva para revisión manual y se sigue por I-01.
 - **Cierre del Comparador:** 26/27 OK y F-02 pendiente; sin fallos formales nuevos en F. Tras Cancelar F-25, un nuevo análisis pequeño vuelve a terminar con 5 seguidos/5 seguidores, confirmando recuperación real. Detalles menores de pluralización («1 cuentas», «1 archivos») anotados para informe, sin corrección. Evidencias sintéticas propias fuera del repositorio; los originales reales del usuario no se usaron.
+
+- **I-01 — ✅, guardado individual:** Selector nativo abre C_video_3s.mp4 sintético. UI muestra nombre, Resumen técnico y Modo inspección solo lectura, sin pasar a lote ni editar. FFprobe independiente confirma archivo válido de 3 s con H.264/AAC.
+
+- **I-04 — ✅, guardado individual:** MP4 sintético reconocido como QuickTime/MOV: H.264 160×90 a 5 FPS, AAC mono 48 kHz y 3 s. Resumen técnico coincide con inspección independiente de los streams y no presenta error de apertura.
+
+- **I-03 — ✅, guardado individual:** MKV sintético de 30 s y 5 streams abre correctamente en modo solo lectura. Resumen coincide con FFprobe: H.264 320×180, 10 FPS, dos pistas PCM 48 kHz, un subtítulo SubRip y un adjunto. SHA-256 be88d4…98bb5 intacto.
+
+- **I-07 — ✅, guardado individual:** Resumen y encabezado muestran Matroska/WebM para el MKV y QuickTime/MOV para MP4, coincidiendo con las familias format_name devueltas por FFprobe. Se verifica el contenedor, sin confundirlo con el códec H.264.
+
+- **I-08 — ✅, guardado individual:** MKV: encabezado 00:00:30 y Resumen 0 h 00 min 30 s, coincidente con duración independiente 30.000000. MP4 anterior muestra 3 s, también exactos.
+
+- **I-16 — ✅, guardado individual:** Abrir MKV tras MP4 reemplaza nombre, dimensiones 160×90→320×180, duración 3→30 s, audio 1→2 y subtítulos 0→1. No conserva los resultados de sonoridad automáticos del MP4 mono-pista; nuevo archivo muestra sus propios capítulos/adjunto y sigue en solo lectura. Se valida este cambio de sesión, no todos los estados posibles.
+
+- **I-09 — ✅, guardado individual:** Pestaña Pistas del MKV muestra vídeo H264 · 320×180 · 10.000 FPS, coincidente con stream 0 del fixture. No se interpreta el adjunto como vídeo ni se cuenta como pista audiovisual.
+
+- **I-10 — ✅, guardado individual:** Pistas enumera dos audios distintos: spa/Tono 440 QA y eng/Tono 880 QA, ambos PCM_S16LE a 48 kHz, primero Default. A/B identifica índices #1 y #2, canales 1 y bitrates 768 kb/s; concuerda con FFprobe.
+
+- **I-11 — ✅, guardado individual:** Pistas muestra un subtítulo spa · SUBRIP · Texto · Texto QA, correspondiente al stream 3 interno del MKV. Se comprueba que aparece su pista; todavía no se certifica reproducción/sincronización de los textos.
+
+- **I-12 — ✅, guardado individual:** Resumen muestra Capítulos · 2, coincidente con los dos capítulos del MKV. Al expandir aparecen dos filas accionables con ayuda «Reproducir desde el inicio del capítulo». Se comprueba presencia y cantidad; el control AX no expone el texto interno de esas filas, por lo que no se certifica aún título/timing visible ni seek a capítulo.
+
+- **I-14 — ✅, guardado individual:** Adjuntos e imágenes · 1 expandido muestra Stream 4 · attachment con acciones de extracción/copia. Pistas también enumera el stream 4 en Otros streams solo lectura. Coincide con adjunto.txt text/plain del fixture; no se afirma extracción ni edición en este ID.
+
+- **I-13 — ✅, guardado individual:** Metadatos muestra globales title=ZEUVE QA Inspector, ARTIST, COMMENT y QA_UNKNOWN con valores sintéticos exactos. Por stream: títulos/idiomas de los dos audios y subtítulo; attachment filename=adjunto.txt, mimetype=text/plain. Coincide con FFprobe/fixture; modo lectura, sin editar tags.
+
+- **I-05 — ✅, guardado individual:** MOV propio creado por remux del vídeo sintético: selector abre I05_video.mov, UI QuickTime/MOV · H264 · 160×90 · 5 FPS · 3 s, solo lectura. Concuerda con FFprobe (H.264/AAC, 3 s). No se usa renombrado de extensión como sustituto del contenedor real.
+
+- **I-06 — ✅, guardado individual:** WebM real VP8/Opus propio: UI Matroska/WebM, VP8 160×90 5 FPS y 3 s. FFprobe confirma audio Opus y duración 3,016 s; la lectura inicial del control apuntó al grupo sin subtítulos, no se usa para afirmar el detalle de audio en UI. Se abrió con los motores empaquetados de ZEUVE; solo para crear el fixture se usó FFmpeg Homebrew ya instalado, ya que el empaquetado carece del encoder VP8. Sin instalar dependencias ni modificar la app.
+
+- **I-15 — ✅, guardado individual:** MP4 sintético con JPEG attached_pic: Adjuntos e imágenes · 1 expandido muestra imagen y «Carátula · stream 2 · mjpeg» con acciones de extracción/copia. FFprobe confirma disposición attached_pic=1 separada del vídeo principal H.264; original conserva SHA-256. Se acepta detección/presentación, no todavía extracción ni revisión visual del color de la miniatura.
+
+- **I-17 — ✅, guardado individual:** Cerrar análisis devuelve pantalla inicial con selector/lote. Desaparecen nombre, estructura, pestañas y controles de preview de I15_caratula.mp4. No hay diálogo de descarte cuando no existen cambios; original sigue intacto.
+
+- **I-98 — ✅, guardado individual:** Editar cambia explícitamente a Modo edición: borrador limpio y muestra campos permitidos de metadatos. Deshacer/Rehacer/Revisar cambios inicialmente deshabilitados, coherentes con ausencia de modificaciones. No se ejecuta edición sobre el archivo original.
+
+- **I-18 — ✅, guardado individual:** Se cambia el título del borrador a Titulo borrador QA, UI indica cambios pendientes. Cerrar análisis exige «Descartar cambios / Hay cambios sin publicar…» con Conservar y Descartar. Conservar mantiene sesión y título editado; repetir y Descartar vuelve al inicio. SHA-256 MKV intacto antes/después, sin publicar edición. Protege el borrador mediante confirmación explícita.
+
+- **I-19 — ✅, guardado individual:** Escuchar la pista WAV PCM de 30 s inicia preview: transporte pasa de 00:01 a 00:02/00:30 en lecturas sucesivas y FFmpeg empaquetado decodifica como hijo de la app. Se acepta inicio y avance de Play; no se afirma comprobación auditiva del altavoz.
+
+- **I-20 — ✅, guardado individual:** Pausa pulsada durante Play a 00:23/00:30. La lectura inmediatamente posterior y otra 1,2 s después permanecen en 00:23; no avanza otro segundo ni vuelve a cero. Se comprueba respuesta del transporte, no percepción auditiva ni benchmark de latencia submilisegundo.
+
+- **I-21 — ✅, guardado individual:** Reanudar desde Pausa 00:23 conserva ese instante y avanza a 00:25/00:30 tras 1,2 s, sin reiniciar. Se vuelve a pausar para comprobar saltos y velocidades. No se afirma escucha del altavoz.
+
+- **I-24 — ✅, guardado individual:** Retroceder en el transporte lleva el audio pausado de 00:25 a 00:10/00:30, salto de 15 s configurado en esta copia QA. El seek conserva la sesión y no cambia de archivo.
+
+- **I-23 — ✅, guardado individual:** Avanzar lleva el audio pausado de 00:10 a 00:25/00:30, salto de 15 s. Una lectura 0,8 s después permanece en 00:25: seek no reanuda Play accidentalmente.
+
+- **I-25 — ✅, guardado individual:** Selector Velocidad ofrece 0,5×/0,75×/1×/1,25×/1,5×/2×. Elegir 0,5× conserva Pausa/00:25 y la observación posterior confirma 0,5×, sin reiniciar; la lectura AX inmediatamente tras el clic todavía decía 1× por actualización asíncrona. La velocidad real se contrasta por separado en los siguientes IDs.
+
+- **I-26 — ✅, guardado individual:** Con 0,5× aplicado, Play desde 00:10 y Pausa tras 4 s de espera deja 00:12/00:30. Control muestra 0,5×. Avance aproximado 2 s, coherente con media velocidad, no solo selección visual; no se certifica calidad/tono auditivo.
+
+- **I-27 — ✅, guardado individual:** Seleccionar 1× y reanudar conserva posición inicial ≈00:12; tras 4 s de espera y Pausa la UI muestra 00:15/00:30 y 1×. Contraste aproximado a resolución de segundos (3 s mostrados, con arranque/actualización incluidos), no una medición de reloj de alta precisión ni una tasa exacta garantizada.
+
+- **I-28 — ✅, guardado individual:** Con 2× aplicado, Play conserva ≈00:16; tras 4 s de espera y Pausa UI muestra 00:23/00:30 y 2×. Avance aproximado 7 s con resolución a segundos y arranque incluidos, frente a ≈2 s a 0,5× y ≈3 s a 1×; coherente con doble velocidad. No certifica pitch/calidad auditiva.
+
+- **I-02/I-22 — pendientes de control:** CUA devuelve native pipe closed al leer el Inspector y al solicitar captura. Se sigue mediante System Events; no se ejecuta un arrastre verificable en I-02 ni un seek directo sobre la timeline custom AXUnknown en I-22. No son fallos confirmados de producto. I-12 verifica dos capítulos/filas, no títulos/timing visuales ni seek de capítulo; I-15 verifica imagen y attached_pic representados en UI, no revisión visual del color de miniatura.
+- **I-29 — avance de control, pendiente de aceptación audible:** escritura AX del slider no cambia su valor (permanece 1). Foco + flechas sí permite 0,0 → 0,4 → 1,0 y se restaura 1; diferencia de control, no prueba de volumen roto. Sin escuchar la salida no se certifica mute/ganancia acústica. Play/Pausa/Reanudar y velocidades anteriores se aceptan para transporte/avance observado, no para calidad/latencia acústica; I-33 sigue pendiente. Preview detenido al cerrar el turno, sin procesos FFmpeg/FFprobe residuales.
+- **Preparación I — incidencias ajenas a ZEUVE:** el engine empaquetado no incluye encoder VP8 y rechazó deadline al crear un fixture WebM. FFmpeg Homebrew ya instalado sí incluye VP8; tampoco incluye libvorbis, por lo que se generó VP8/Opus con libopus. Estos errores ocurren en el generador propio, no al abrir WebM en la app. No se instala ni añade un motor a ZEUVE. Un selector de grupo apuntó a Sin pistas de subtítulos; no se usó para certificar audio WebM en UI. Los fixtures se conservan en /tmp/zeuve-inspector-qa.cyTrxb.
 
 ## 1. ZEUVE general
 
@@ -705,37 +763,37 @@ Estos deben rechazarse claramente, no convertirse:
 
 ## Apertura e inspección
 
-- [ ] ➖ **I-01** Abrir archivo con selector.
+- [x] ✅ **I-01** Abrir archivo con selector.
 - [ ] ➖ **I-02** Arrastrar archivo.
-- [ ] ➖ **I-03** MKV.
-- [ ] ➖ **I-04** MP4.
-- [ ] ➖ **I-05** MOV.
-- [ ] ➖ **I-06** WebM.
-- [ ] ➖ **I-07** Muestra contenedor/formato.
-- [ ] ➖ **I-08** Muestra duración.
-- [ ] ➖ **I-09** Muestra streams de vídeo.
-- [ ] ➖ **I-10** Muestra streams de audio.
-- [ ] ➖ **I-11** Muestra subtítulos.
-- [ ] ➖ **I-12** Muestra capítulos.
-- [ ] ➖ **I-13** Muestra metadata.
-- [ ] ➖ **I-14** Muestra attachments.
-- [ ] ➖ **I-15** Muestra carátulas/`attached_pic` cuando existen.
-- [ ] ➖ **I-16** Abrir otro archivo limpia correctamente el estado anterior.
-- [ ] ➖ **I-17** Cerrar archivo limpia correctamente la sesión.
-- [ ] ➖ **I-18** Si existe un borrador con cambios pide confirmación antes de descartarlo.
+- [x] ✅ **I-03** MKV.
+- [x] ✅ **I-04** MP4.
+- [x] ✅ **I-05** MOV.
+- [x] ✅ **I-06** WebM.
+- [x] ✅ **I-07** Muestra contenedor/formato.
+- [x] ✅ **I-08** Muestra duración.
+- [x] ✅ **I-09** Muestra streams de vídeo.
+- [x] ✅ **I-10** Muestra streams de audio.
+- [x] ✅ **I-11** Muestra subtítulos.
+- [x] ✅ **I-12** Muestra capítulos.
+- [x] ✅ **I-13** Muestra metadata.
+- [x] ✅ **I-14** Muestra attachments.
+- [x] ✅ **I-15** Muestra carátulas/`attached_pic` cuando existen.
+- [x] ✅ **I-16** Abrir otro archivo limpia correctamente el estado anterior.
+- [x] ✅ **I-17** Cerrar archivo limpia correctamente la sesión.
+- [x] ✅ **I-18** Si existe un borrador con cambios pide confirmación antes de descartarlo.
 
 ## Preview de audio
 
-- [ ] ➖ **I-19** Play.
-- [ ] ➖ **I-20** Pausa responde inmediatamente.
-- [ ] ➖ **I-21** Reanudar responde inmediatamente.
+- [x] ✅ **I-19** Play.
+- [x] ✅ **I-20** Pausa responde inmediatamente.
+- [x] ✅ **I-21** Reanudar responde inmediatamente.
 - [ ] ➖ **I-22** Seek con la timeline.
-- [ ] ➖ **I-23** Seek hacia delante.
-- [ ] ➖ **I-24** Seek hacia atrás.
-- [ ] ➖ **I-25** Cambiar velocidad.
-- [ ] ➖ **I-26** 0,5× funciona.
-- [ ] ➖ **I-27** 1× funciona.
-- [ ] ➖ **I-28** 2× funciona.
+- [x] ✅ **I-23** Seek hacia delante.
+- [x] ✅ **I-24** Seek hacia atrás.
+- [x] ✅ **I-25** Cambiar velocidad.
+- [x] ✅ **I-26** 0,5× funciona.
+- [x] ✅ **I-27** 1× funciona.
+- [x] ✅ **I-28** 2× funciona.
 - [ ] ➖ **I-29** Volumen funciona.
 - [ ] ➖ **I-30** Cambiar pista de audio conserva el instante.
 - [ ] ➖ **I-31** Cambiar pista mientras reproduce conserva Play.
@@ -836,7 +894,7 @@ Con un archivo que tenga PGS compatible:
 
 Usar siempre una copia prescindible.
 
-- [ ] ➖ **I-98** Entrar en modo edición.
+- [x] ✅ **I-98** Entrar en modo edición.
 - [ ] ➖ **I-99** Eliminar vídeo cuando la estructura resultante sea válida.
 - [ ] ➖ **I-100** Eliminar pista de audio.
 - [ ] ➖ **I-101** Eliminar subtítulo.
