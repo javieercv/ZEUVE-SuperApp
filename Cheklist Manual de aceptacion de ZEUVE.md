@@ -2,13 +2,13 @@
 
 Estado acumulado al 03/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 432 ✅ OK · 14 ❌ fallidas · 10 ⚠️ parciales · 183 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 446 ✅ OK · 14 ❌ fallidas · 10 ⚠️ parciales · 169 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 111/180 OK, 8 fallos (I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136) y 5 parciales (I-93/I-96/I-128/I-134/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 125/180 OK, 8 fallos (I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136) y 5 parciales (I-93/I-96/I-128/I-134/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-144 — lotes del Inspector; app en I130_contraste_sin_titulo 2.mp4, solo lectura.** Última prueba cerrada y guardada: I-141, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-158 — cancelación de lote y conservación de resultados; luego reglas I-159.** Última prueba cerrada y guardada: I-157, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -448,6 +448,42 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - **I-141 — ✅, guardado individual, 03/10/2026, evidencia final corregida:** Elegir como salida I130_contraste_sin_titulo.mp4 ya existente muestra confirmación nativa explícita con Cancelar/Reemplazar. Al intentar cancelar posteriormente, la hoja ya no existe: el control devuelve índice inválido y la app ya anuncia I130_contraste_sin_titulo 2.mp4. Se verifica esa publicación nueva con title=QA conflicto nombre, un H264/un AAC y sin carátula; payloads de ambos streams idénticos a I130_base.mp4. El archivo preexistente conserva SHA-256 589d30a676d622611e894fe5b13159828cb93540e0f220eea67ec0b20a88ed67 y su JPEG, y el original I130_base también conserva su hash. No hubo sobrescritura: el publicador resolvió el conflicto mediante sufijo 2. No se puede afirmar qué decisión cerró la confirmación ni que funcionó Cancelar; esa rama queda para revisión manual de control. Se corrige la anotación inicial de cancelación/no publicación, que no correspondía al estado final observado.
 
 - **Contraste de carátulas y continuidad, 03/10/2026:** I-128–I-134, I-140 e I-141 se guardaron por separado: 3 OK, 4 fallos y 2 parciales. Contrastes posteriores al fallo: borrar el título automático permite publicar JPEG/PNG en MP4, con attached_pic=1 y paquetes de imagen iguales a sus archivos; vídeo H264 (50 paquetes) y audio AAC (236) conservan secuencias SHA-256. INC-25: título automático no representado por la ruta MP4 de carátulas; INC-26: carátula MKV remapeada como vídeo regular; INC-27: la ruta MOV probada omite la carátula; INC-28: compatibilidad revisa PNG original aunque se retire del borrador; INC-29: und desaparece como tag visible en MKV y el validador exige igualdad literal. Cuatro remux independientes reproducen las discrepancias observadas en app; no son los temporales rechazados por la app, que no se recuperaron. Archivo original MKV, base MP4/MOV e imágenes protegidos. Plan revisado no enumera explícitamente carátulas (amplía I-135 parcial sin cambiar su casilla). I-141 corregido al comprobar el estado final: archivo nuevo con sufijo 2 y preexistente intacto, no cancelación certificada. CUA sigue cerrando el pipe; visualización I-128 parcial, no fallo de producto. App PID 41759 en I130_contraste_sin_titulo 2.mp4, solo lectura, sin preview ni motores activos. Siguiente I-144/lotes. Sin correcciones de producto ni cambios de preferencias personales.
+
+- **I-144 — ✅, guardado individual, 03/10/2026:** Selección múltiple real en NSOpenPanel: 01_audio.wav y 02_video.mp4, de la carpeta sintética Seleccion. Se abre Inspector multimedia · Lote con 2 archivos, ambos En espera, sin inspección/edición iniciada. El primer intento de Cmd+A no tenía foco en la lista; al enfocar mediante flecha abajo y seleccionar todo, ambos archivos aparecen correctamente. Diferencia de control, no fallo de selección de ZEUVE.
+
+- **I-145 — ✅, guardado individual, 03/10/2026:** Añadir carpeta al lote selecciona Arbol sin iniciar trabajo pesado. La cola pasa de 2 a 5 archivos con raiz.wav, nivel1.mp4 y nivel2.wav añadidos, conservando los dos iniciales. UI informa Carpeta añadida: 3 archivos; 3 elementos omitidos por filtros o seguridad.
+
+- **I-146 — ✅, guardado individual, 03/10/2026:** Con configuración QA vigente (subcarpetas incluidas), el selector añade nivel1.mp4 de Arbol/Sub y nivel2.wav de Arbol/Sub/Profundo además de raiz.wav. Los tres nombres están presentes y En espera en la cola; la estructura real de fixture confirma profundidades 0/1/2. Recorrido efectivo comprobado, no solo el toggle o lectura del enumerador.
+
+- **I-150 — ✅, guardado individual, 03/10/2026:** El árbol incluye enlaces simbólicos a un archivo y una carpeta con destino único no seleccionado (no_debe_entrar.wav), además de un enlace a vídeo. Al enumerar solo entran los tres archivos regulares: no aparecen enlaces ni destinos exclusivos. UI pasa de 3 a 5 omitidos al añadir dos enlaces nuevos y conserva cola de 5 entradas. No se sigue el enlace de carpeta ni el de archivo.
+
+- **I-151 — ✅, guardado individual, 03/10/2026:** Se vuelve a añadir el mismo árbol con sus tres archivos regulares ya en cola. Recuento permanece 5 y cada nombre 01_audio.wav, 02_video.mp4, nivel1.mp4, nivel2.wav y raiz.wav aparece una sola vez. La deduplicación se comprueba por ruta repetida, no se afirma deduplicación por contenido: archivos idénticos en rutas distintas permanecen como entradas distintas.
+
+- **I-152 — ✅, guardado individual, 03/10/2026:** Lote nativo de inspección rápida sobre 5 fixtures (3 WAV mono y 2 MP4 H.264/AAC): las cinco filas pasan de En espera a Completado. Resumen: 5 correctos, 0 avisos/omitidos/fallidos/cancelados; WAV V0/A1/S0 y MP4 V1/A1/S0. Sin informes ni espectrogramas y sin salida configurada. No se modifican originales.
+
+- **I-147 — ✅, guardado individual, 03/10/2026:** Prueba nativa con la misma carpeta y cola vaciada entre escenarios: Ajustes > Inspector > profundidad 0 añade solo raiz.wav (1); profundidad 1 añade raiz.wav+nivel1.mp4 (2); profundidad 2 añade también nivel2.wav (3). Se cambia con el control de profundidad real, subcarpetas activadas. La enumeración respeta cada límite sin arrastrar archivos de la cola anterior. Baseline 8 se restaurará al terminar ocultos/filtros.
+
+- **I-148 — ✅, guardado individual, 03/10/2026:** Ajustes aislados: con ocultos desactivados entran 3 archivos visibles; al activarlos, vaciar cola y añadir la misma carpeta entran 4 incluyendo .oculto.wav. Se desactiva, vacía y añade de nuevo: vuelven solo nivel1.mp4, nivel2.wav y raiz.wav. Los tres symlinks siguen excluidos incluso con ocultos activados. Preferencia restaurada a false.
+
+- **I-149 — ✅, guardado individual, 03/10/2026:** Se cambian filtros desde Ajustes nativos y se vacía cola entre casos: solo wav admite nivel2.wav+raiz.wav (2) y excluye nivel1.mp4; solo mp4 admite exclusivamente nivel1.mp4 (1). Oculto, txt y symlinks no entran. Se restauran las 20 extensiones iniciales, profundidad 8, subcarpetas true y ocultos false; lectura nativa confirma baseline.
+
+- **I-153 — ✅, guardado individual, 03/10/2026:** Lote de señal nativo con 1 MP4 mono y 2 WAV mono, checkbox señal activado y otras dos operaciones desactivadas. Primera ejecución sin exportación y repetición con JSON: 3 correctos/0 fallos; los 3 informes contienen exactamente un resultado signal (duraciones 5.0133/10/10 s, cero silencios y cero clipping, coherente con tonos continuos). loudness vacío confirma que no se lanzó la otra operación.
+
+- **I-156 — ✅, guardado individual, 03/10/2026:** El lote nativo anterior publica 3 informes JSON en la carpeta sintética Resultados, uno por archivo, con nombre/duración/streams y signal coincidentes; todos parsean como JSON válido. UI resumen 3 informes y 0 espectrogramas; no fallos ni sobreescritura de originales. TXT/Markdown individuales ya estaban verificados; esta prueba de lote ejercita JSON.
+
+- **I-154 — ✅, guardado individual, 03/10/2026:** Lote nativo con sonoridad activada y señal/espectrograma desactivados: 3 correctos y 3 nuevos JSON, sin fallos ni avisos. Cada informe nuevo tiene un resultado loudness y signal vacío, con EBU R128 y mapa temporal; WAV idénticos: -20.2 LUFS, -18.1 dBTP, ~10 s. Los informes de señal anteriores se conservan y la app usa sufijo 2 ante conflicto.
+
+- **I-155 — ✅, guardado individual, 03/10/2026:** Lote nativo: señal/sonoridad off, espectrograma on y JSON. Los 3 archivos terminan correctos; resumen 3 PNG+3 informes. Se abren los 3 PNG exportados y se verifica 1600×900: banda continua a ~660 Hz para MP4 y ~1320 Hz para ambos WAV, coherente con fixtures. No imágenes vacías, no fallos ni sobreescrituras de los JSON previos (sufijo 3).
+
+- **I-157 — ✅, guardado individual, 03/10/2026:** Se añade no_multimedia.txt expresamente desde el selector y, detrás, 3 archivos válidos. Ejecutado lote nativo JSON: el primero falla con «FFprobe no ha podido analizar el archivo»; los tres siguientes se procesan y publican informes JSON válidos. Resumen 4 archivos, 3 correctos, 1 fallido, 0 cancelados; el error esperado queda aislado y no detiene el resto.
+
+### Continuidad técnica — lotes, 03/10/2026
+
+14 IDs nuevos OK: I-144–I-157. Carpetas, selección múltiple, profundidad 0/1/2, ocultos, filtros, symlinks y deduplicación comprobados por UI nativa; inspección, señal, sonoridad, PNG e informes comprobados con resultados publicados. El TXT incompatible esperado falla sin detener los tres archivos válidos, no es un nuevo defecto de producto. Estado 446 OK, 14 fallos, 10 parciales, 169 pendientes; Inspector 125/180 OK, 8 fallos, 5 parciales, 42 pendientes.
+
+Fixtures y salidas: QA-20261003.oGJ5vx/Batch-I144, fuera del repositorio. Ajustes aislados restaurados: profundidad 8, subcarpetas activadas, ocultos desactivados y las 20 extensiones iniciales; orden A–Z y política de incompatibles sin cambiar. App QA PID 41759, pantalla de lote completado (4 archivos, 3 correctos, TXT fallido esperado), JSON seleccionado, tres operaciones desactivadas, carpeta Resultados; sin proceso pesado activo. Siguiente I-158: preparar un caso cancelable y verificar resultados ya publicados, después reglas I-159. Ningún arreglo ni cambio de código/configuración del proyecto.
+
+Control separado: seleccionar Ajustes mediante AXPress en fila/texto no cambió de sección; navegación por teclado sí. La lectura completa de Ajustes fue lenta y se sustituyó por lectura del grupo pertinente. El selector de salida tiene un botón adicional «Nueva carpeta»: el ordinal antiguo pulsó Cancelar; se corrigió solo el auxiliar de QA para usar «Usar carpeta». Otro selector necesitó un segundo clic explícito para cerrar; no se atribuyen estos intentos de automatización a ZEUVE ni se marcaron pruebas por ellos. CUA visual sigue pendiente; se inspeccionaron los PNG exportados como archivos, no la ventana mediante captura.
 
 ## 1. ZEUVE general
 
@@ -1164,20 +1200,20 @@ Usar siempre una copia prescindible.
 
 ## Lotes
 
-- [ ] ➖ **I-144** Seleccionar varios archivos.
-- [ ] ➖ **I-145** Añadir carpeta.
-- [ ] ➖ **I-146** Recorrer subcarpetas.
-- [ ] ➖ **I-147** Controlar profundidad.
-- [ ] ➖ **I-148** Incluir/excluir ocultos.
-- [ ] ➖ **I-149** Aplicar filtros.
-- [ ] ➖ **I-150** No seguir symlinks.
-- [ ] ➖ **I-151** Deduplicar entradas.
-- [ ] ➖ **I-152** Lote de inspección.
-- [ ] ➖ **I-153** Lote de señal.
-- [ ] ➖ **I-154** Lote de sonoridad.
-- [ ] ➖ **I-155** Lote de espectrogramas.
-- [ ] ➖ **I-156** Lote de informes.
-- [ ] ➖ **I-157** Un archivo incompatible no detiene los demás.
+- [x] ✅ **I-144** Seleccionar varios archivos.
+- [x] ✅ **I-145** Añadir carpeta.
+- [x] ✅ **I-146** Recorrer subcarpetas.
+- [x] ✅ **I-147** Controlar profundidad.
+- [x] ✅ **I-148** Incluir/excluir ocultos.
+- [x] ✅ **I-149** Aplicar filtros.
+- [x] ✅ **I-150** No seguir symlinks.
+- [x] ✅ **I-151** Deduplicar entradas.
+- [x] ✅ **I-152** Lote de inspección.
+- [x] ✅ **I-153** Lote de señal.
+- [x] ✅ **I-154** Lote de sonoridad.
+- [x] ✅ **I-155** Lote de espectrogramas.
+- [x] ✅ **I-156** Lote de informes.
+- [x] ✅ **I-157** Un archivo incompatible no detiene los demás.
 - [ ] ➖ **I-158** Cancelar lote conserva únicamente resultados ya publicados correctamente.
 
 ## Reglas de edición por lotes
