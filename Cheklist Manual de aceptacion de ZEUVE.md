@@ -2,13 +2,13 @@
 
 Estado acumulado al 03/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 429 ✅ OK · 10 ❌ fallidas · 8 ⚠️ parciales · 192 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 432 ✅ OK · 14 ❌ fallidas · 10 ⚠️ parciales · 183 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 108/180 OK, 4 fallos (I-66/I-120/I-127/I-136) y 3 parciales (I-93/I-96/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 111/180 OK, 8 fallos (I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136) y 5 parciales (I-93/I-96/I-128/I-134/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-128 — carátulas; app en I126_adjunto_anadido.mkv, solo lectura; I-118/Canvas pendientes.** Última prueba cerrada y guardada: I-127, ❌. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-144 — lotes del Inspector; app en I130_contraste_sin_titulo 2.mp4, solo lectura.** Última prueba cerrada y guardada: I-141, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -428,6 +428,26 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - **I-127 — ❌, guardado individual, 03/10/2026:** Nombre y MIME del attachment existente admiten adjunto_renombrado_QA.bin y application/octet-stream en el borrador. Al ejecutar aparece La validación final ha fallado: un adjunto original ha cambiado de códec; I127_adjunto_metadata.mkv no se publica. La entrada conserva filename=adjunto_qa.txt, MIME text/plain y SHA-256 66ebe77dd5ad08d8497b2662daffaf4cca150bcb4170d7ca87b14c8c08015f80. Coincide con INC-23: este attachment no tiene codec_name en FFprobe y el borrador utiliza un fallback distinto. Se considera fallida la edición completa de nombre/MIME en este caso, aunque los controles del borrador responden.
 
 - **Contraste y continuidad, 03/10/2026:** 8 IDs cerrados en esta continuación: I-114–I-117, I-119 e I-126 OK; I-120 e I-127 fallidos. Los siete streams de la entrada I111 y la salida I126 conservan todas sus secuencias de hashes SHA-256 de paquetes: vídeo 100/100/120, audio 118/469 y subtítulos 2/2. El remux independiente INC24_remux_independiente.mkv aplica título antiguo y luego nuevo como el constructor de comandos; FFprobe devuelve el nuevo título con todos los paquetes intactos. La UI real no publica I120, y no se recuperó su temporal: la causa se infiere del código, donde updateVideoMetadata solo cambia metadata.videoValuesByStream, el constructor sobrescribe el título después de los títulos de tracks y validateTrackMetadata todavía exige track.title antiguo. INC-24, sin corregir. I127 amplía INC-23 a edición de nombre/MIME de un attachment existente; añadirlo como externo en I126 sí funciona. Se aceptaron las alertas y descartó el borrador I127: app abierta en I126, Resumen/solo lectura, sin motores ni reproducción. I-118 queda pendiente de comprobación visual; no se marca fallo de producto por falta de acceso al Canvas. Fuente remota inicial 3cc4e1b sin novedades; cambios exclusivamente documentales.
+
+- **I-128 — ⚠️, guardado individual, 03/10/2026:** El MKV sintético contiene cover.jpg MJPEG 240×160 y FFprobe attached_pic=1. Resumen → Adjuntos e imágenes · 1 muestra Carátula · stream 2 · mjpeg, un AXImage y Extraer/Copiar. Reconocimiento técnico y presencia de la vista comprobados; no se certifican imagen visible, color, proporción o calidad del render porque CUA continúa devolviendo native pipe closed. Esa limitación es de control, no un fallo de ZEUVE.
+
+- **I-129 — ✅, guardado individual, 03/10/2026:** Extraer carátula genera I129_caratula_extraida.jpg y la UI confirma la extracción sin modificar original. cmp verifica identidad byte a byte con I128_cover_A.jpg (SHA-256 c82623b375a3f32363d6c494e9fd96adfb102418d594dd76d9da82791b5fb9e0); imagen extraída se abre y conserva el patrón sintético 240×160. No se confunde esta inspección del archivo con la comprobación visual pendiente de la miniatura dentro de ZEUVE.
+
+- **I-130 — ❌, guardado individual, 03/10/2026:** Añadir carátula acepta JPEG externo en I130_base.mp4; el borrador muestra MJPEG, imagen y título automático I128_cover_A. Plan MP4 permitido. Al ejecutar, alerta La validación final ha fallado: el título de una carátula no coincide. I130_caratula_anadida.mp4 no se publica. Fallo de la incorporación completa con el título que la propia app propone; fuente y JPEG originales protegidos. Se contrastará sin ese título para separar el problema de metadata del contenido de la imagen.
+
+- **I-131 — ❌, guardado individual, 03/10/2026:** Sustituir reemplaza en el borrador la carátula JPEG por I131_cover_B.png, PNG 180×240, sin acumular una segunda imagen. Título automático I131_cover_B. Al publicar I131_caratula_sustituida.mp4 se repite La validación final ha fallado: el título de una carátula no coincide y la salida no se publica. La sustitución completa con defaults falla, aunque el borrador sustituye correctamente; probable misma incidencia de metadata que I-130.
+
+- **I-132 — ❌, guardado individual, 03/10/2026:** Eliminar la carátula PNG del borrador muestra Sin carátula attached_pic. Al revisar, la app cambia de MP4 a MKV aunque el borrador ya no contiene esa imagen; anuncia stream copy. Ejecutar rechaza la salida con La validación final ha fallado: el idioma de una pista no coincide. No se publica I132_sin_caratula.mp4 ni otra variante I132. La eliminación completa falla para esta entrada; el original conserva la carátula PNG. Probables dos factores: compatibilidad consulta la imagen original eliminada y el cambio a MKV no conserva und como tag visible.
+
+- **I-133 — ❌, guardado individual, 03/10/2026:** En I128_caratula_original.mkv se conserva la carátula existente y solo se cambia el título global a QA MKV conservar caratula. Plan MKV con un vídeo H264 y un audio AAC. Ejecutar falla: La validación final ha fallado: el número de pistas de vídeo no coincide con el plan; I133_MKV_conservar_caratula.mkv no se publica. Original conserva SHA-256 5f6f0f0a2a00c6807f29754e04b88e011d75f8d6a3343135d5f9cb9e3169fef8. Se contrastará el remapeo de la carátula MJPEG a MKV, sin arreglar producto.
+
+- **I-134 — ⚠️, guardado individual, 03/10/2026:** MP4 publica JPEG y PNG cuando se vacía manualmente el título de carátula: I130_contraste_sin_titulo.mp4 tiene MJPEG attached_pic=1 con paquete SHA-256 idéntico al JPEG, e I131_contraste_sin_titulo.mp4 tiene PNG attached_pic=1 con SHA-256 idéntico al PNG. Defaults con título fallan (I-130/I-131). MOV se prueba aparte con H264/AAC compatibles y JPEG; falla con título automático y vacío: el número de carátulas no coincide con el plan; ninguna salida I134 se publica. Aceptación parcial: imágenes correctas en MP4 sin título, MOV no funciona en el caso probado. No se certifica miniatura UI visual.
+
+- **I-140 — ✅, guardado individual, 03/10/2026:** Añadir fuente sintética rawvideo RGB24/NUT al MP4 crea un segundo vídeo RAWVIDEO. Revisar cambios rechaza la operación con La operación requeriría recodificar vídeo o audio (la pista de vídeo rawvideo no cabe por copia directa en MP4). Utiliza el Conversor universal. No se ofrece plan ejecutable ni panel de salida. Se prueba rechazo previo, no una ejecución recodificada oculta; originales intactos.
+
+- **I-141 — ✅, guardado individual, 03/10/2026, evidencia final corregida:** Elegir como salida I130_contraste_sin_titulo.mp4 ya existente muestra confirmación nativa explícita con Cancelar/Reemplazar. Al intentar cancelar posteriormente, la hoja ya no existe: el control devuelve índice inválido y la app ya anuncia I130_contraste_sin_titulo 2.mp4. Se verifica esa publicación nueva con title=QA conflicto nombre, un H264/un AAC y sin carátula; payloads de ambos streams idénticos a I130_base.mp4. El archivo preexistente conserva SHA-256 589d30a676d622611e894fe5b13159828cb93540e0f220eea67ec0b20a88ed67 y su JPEG, y el original I130_base también conserva su hash. No hubo sobrescritura: el publicador resolvió el conflicto mediante sufijo 2. No se puede afirmar qué decisión cerró la confirmación ni que funcionó Cancelar; esa rama queda para revisión manual de control. Se corrige la anotación inicial de cancelación/no publicación, que no correspondía al estado final observado.
+
+- **Contraste de carátulas y continuidad, 03/10/2026:** I-128–I-134, I-140 e I-141 se guardaron por separado: 3 OK, 4 fallos y 2 parciales. Contrastes posteriores al fallo: borrar el título automático permite publicar JPEG/PNG en MP4, con attached_pic=1 y paquetes de imagen iguales a sus archivos; vídeo H264 (50 paquetes) y audio AAC (236) conservan secuencias SHA-256. INC-25: título automático no representado por la ruta MP4 de carátulas; INC-26: carátula MKV remapeada como vídeo regular; INC-27: la ruta MOV probada omite la carátula; INC-28: compatibilidad revisa PNG original aunque se retire del borrador; INC-29: und desaparece como tag visible en MKV y el validador exige igualdad literal. Cuatro remux independientes reproducen las discrepancias observadas en app; no son los temporales rechazados por la app, que no se recuperaron. Archivo original MKV, base MP4/MOV e imágenes protegidos. Plan revisado no enumera explícitamente carátulas (amplía I-135 parcial sin cambiar su casilla). I-141 corregido al comprobar el estado final: archivo nuevo con sufijo 2 y preexistente intacto, no cancelación certificada. CUA sigue cerrando el pipe; visualización I-128 parcial, no fallo de producto. App PID 41759 en I130_contraste_sin_titulo 2.mp4, solo lectura, sin preview ni motores activos. Siguiente I-144/lotes. Sin correcciones de producto ni cambios de preferencias personales.
 
 ## 1. ZEUVE general
 
@@ -1122,13 +1142,13 @@ Usar siempre una copia prescindible.
 
 ## Carátulas
 
-- [ ] ➖ **I-128** Visualizar carátula.
-- [ ] ➖ **I-129** Extraer carátula.
-- [ ] ➖ **I-130** Añadir carátula.
-- [ ] ➖ **I-131** Sustituir carátula.
-- [ ] ➖ **I-132** Eliminar carátula.
-- [ ] ➖ **I-133** Resultado correcto en MKV.
-- [ ] ➖ **I-134** Resultado correcto en MP4/MOV compatible.
+- [ ] ⚠️ **I-128** Visualizar carátula.
+- [x] ✅ **I-129** Extraer carátula.
+- [x] ❌ **I-130** Añadir carátula.
+- [x] ❌ **I-131** Sustituir carátula.
+- [x] ❌ **I-132** Eliminar carátula.
+- [x] ❌ **I-133** Resultado correcto en MKV.
+- [ ] ⚠️ **I-134** Resultado correcto en MP4/MOV compatible.
 
 ## Ejecutar edición
 
@@ -1137,8 +1157,8 @@ Usar siempre una copia prescindible.
 - [x] ✅ **I-137** El original permanece intacto.
 - [x] ✅ **I-138** El resultado contiene exactamente los streams previstos.
 - [x] ✅ **I-139** Audio/vídeo se mantienen por stream copy.
-- [ ] ➖ **I-140** Una operación que necesitaría transcode audiovisual es rechazada, no recodificada a escondidas.
-- [ ] ➖ **I-141** Conflicto de nombre no sobrescribe silenciosamente.
+- [x] ✅ **I-140** Una operación que necesitaría transcode audiovisual es rechazada, no recodificada a escondidas.
+- [x] ✅ **I-141** Conflicto de nombre no sobrescribe silenciosamente.
 - [x] ✅ **I-142** Cancelar edición funciona.
 - [x] ✅ **I-143** El archivo final abre correctamente después de la validación.
 
