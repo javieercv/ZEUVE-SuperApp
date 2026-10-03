@@ -1,14 +1,14 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Estado acumulado al 03/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
+Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 446 ✅ OK · 14 ❌ fallidas · 10 ⚠️ parciales · 169 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 455 ✅ OK · 15 ❌ fallidas · 12 ⚠️ parciales · 157 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 125/180 OK, 8 fallos (I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136) y 5 parciales (I-93/I-96/I-128/I-134/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 134/180 OK, 9 fallos (I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 7 parciales (I-93/I-96/I-128/I-134/I-135/I-161/I-162); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-158 — cancelación de lote y conservación de resultados; luego reglas I-159.** Última prueba cerrada y guardada: I-157, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-175 — memoria con archivo largo; después compatibilidad I-176–I-180.** Última prueba cerrada y guardada: I-167, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -484,6 +484,40 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 Fixtures y salidas: QA-20261003.oGJ5vx/Batch-I144, fuera del repositorio. Ajustes aislados restaurados: profundidad 8, subcarpetas activadas, ocultos desactivados y las 20 extensiones iniciales; orden A–Z y política de incompatibles sin cambiar. App QA PID 41759, pantalla de lote completado (4 archivos, 3 correctos, TXT fallido esperado), JSON seleccionado, tres operaciones desactivadas, carpeta Resultados; sin proceso pesado activo. Siguiente I-158: preparar un caso cancelable y verificar resultados ya publicados, después reglas I-159. Ningún arreglo ni cambio de código/configuración del proyecto.
 
 Control separado: seleccionar Ajustes mediante AXPress en fila/texto no cambió de sección; navegación por teclado sí. La lectura completa de Ajustes fue lenta y se sustituyó por lectura del grupo pertinente. El selector de salida tiene un botón adicional «Nueva carpeta»: el ordinal antiguo pulsó Cancelar; se corrigió solo el auxiliar de QA para usar «Usar carpeta». Otro selector necesitó un segundo clic explícito para cerrar; no se atribuyen estos intentos de automatización a ZEUVE ni se marcaron pruebas por ellos. CUA visual sigue pendiente; se inspeccionaron los PNG exportados como archivos, no la ventana mediante captura.
+
+- **I-158 — ✅, guardado individual, 04/10/2026:** Lote nativo de sonoridad+JSON: 01_corto.wav (10 s), 02_largo.flac (tono sintético 2 h), 03_pendiente.wav. Se observa primero Completado/informe publicado, segundo Analizando sonoridad EBU R128 y tercero En espera; se pulsa Cancelar lote. Resultado 1 correcto/2 cancelados/0 fallos/1 informe. Carpeta de salida contiene solo el JSON del primero, válido y con SHA-256 igual antes/después (add477…ce1c), sin resultados de los cancelados. No motores activos tras cancelar y hashes de los tres originales intactos.
+
+- **I-159 — ✅, guardado individual, 04/10/2026:** Desde UI nativa se crea regla Audio / Idioma / Es igual a / spa → Cambiar idioma / fra y se guarda «QA I159 spa a fra». Aparece como conjunto seleccionable y SQLite aislado confirma un ruleSet schema1 con condición/action correctas, sin rutas multimedia. No se editan preferencias reales ni código.
+
+- **I-161 — ⚠️, guardado individual, 04/10/2026:** Preflight real distingue 01_coincide.mp4 Aplicable y 02_no_coincide.mp4 Sin cambios; resumen 1 aplicable/1 sin cambios, sin escribir salidas. Aceptación parcial: solo enseña clasificación por archivo. No muestra el plan individual, pista afectada, idioma anterior/nuevo ni explicación de cambios/avisos; código de la vista confirma que solo renderiza nombre/clasificación/contador de avisos. No se considera limitación de control ni se corrige.
+
+- **I-162 — ⚠️, guardado individual, 04/10/2026:** Antes de ejecutar se puede revisar la clasificación del preflight y no se publica automáticamente; el botón ejecutable depende de carpeta. Aceptación parcial: no hay vista/botón de detalle de cada plan para revisar las transformaciones exactas; el usuario ve Aplicable/Sin cambios y los controles generales de regla, no un antes/después individual. Se documenta esta cobertura limitada junto a I-161, sin cambiar producto.
+
+- **I-160 — ✅, guardado individual, 04/10/2026:** Regla real spa→fra sobre dos MP4 H.264/AAC: preflight 1 aplicable/1 sin cambios, confirmación explícita Ejecutar y publicación solo de 01_coincide_editado.mp4. FFprobe confirma audio fra, vídeo und, mismos codecs/duración5 s. Hash de cada paquete coincide con original (50 vídeo/236 audio): stream copy sin recodificar. No se genera salida del archivo eng; ambos originales mantienen SHA-256.
+
+- **I-165 — ✅, guardado individual, 04/10/2026:** Se añade un tercer MP4 spa, manteniendo el eng que no coincide. Preflight real: 2 aplicables/1 sin cambios; confirmación explícita Ejecutar. Se publican 01_coincide_editado 2.mp4 y 03_coincide_editado.mp4 en la ejecución secuencial, ambos audio fra/H264+AAC/5 s. Los paquetes de ambos streams coinciden con originales y se conserva la salida preexistente; ningún archivo eng publicado. No errores. La UI al finalizar no ofrece resumen persistente de esta ejecución estructural; resultado verificado en las salidas, no extrapolado al estado En espera de la cola de análisis.
+
+- **I-163 — ✅, guardado individual, 04/10/2026:** Con lote de sonoridad activo en 02_largo.flac (UI 4/4, 86 %) se pulsa Generar preflight. ZEUVE muestra «Ya hay una operación en curso: Analizando sonoridad.» y no prepara planes. Se cancela después el lote para liberar coordinación. Se verifica rechazo real desde UI mientras una operación pesada del mismo módulo estaba activa, no solo código ni un busy simulado.
+
+- **I-164 — ❌, guardado individual, 04/10/2026:** Aceptación fallida en la interfaz: al preparar preflight nativo de 200 MP4 sintéticos no hay acción «Cancelar preflight». Se completa con 200 aplicables. Se inspecciona UI y vista real: mientras isPreflighting solo cambia Generar preflight a Preparando…/spinner; el encabezado decide Cancelar lote únicamente por isRunning. Cerrar lote no llama cancelStructural ni cancela structuralTask; la tarjeta global tampoco ofrece cancelar. No se pudo solicitar cancelación de preflight desde el flujo previsto. No se atribuye fallo al algoritmo interno (las pruebas históricas de servicio sí contemplan cancelación); es una ruta de cancelación no expuesta por la UI. Sin arreglar.
+
+- **I-166 — ✅, guardado individual, 04/10/2026:** Se crea «QA I166 informe» desde Ajustes > Inspector, se edita a JSON sin señal/sonoridad/espectrograma y guarda. Se cambia a Inspección rápida y se vuelve a seleccionar el personalizado en Lote: restaura los tres toggles off y JSON. Ejecución real sobre MP4 termina 1 correcto/1 informe; JSON válido y signal/loudness vacíos. SettingsRepository aislado conserva el preset schema1/configuración correcta, sin rutas.
+
+- **I-168 — ✅, guardado individual, 04/10/2026:** Se marca el preset personalizado como favorito desde su estrella: ayuda cambia a Quitar preset de favoritos y SettingsRepository registra batchPreset con ID/nombre, sin rutas. Se desmarca: ayuda vuelve a Añadir preset a favoritos y el registro desaparece mientras el favorito de reglas permanece. El preset conserva configuración y ejecución comprobada en I-166. Alta/baja real sin afectar archivos ni otros favoritos.
+
+- **I-169 — ✅, guardado individual, 04/10/2026:** Se marca conjunto QA I159 spa a fra como favorito: selector muestra ★ y store aislado registra kind structuralRuleSet, referencia al conjunto y nombre, sin archivos/rutas. Se desmarca: desaparece ★ y store queda con items vacío. No se borra ni modifica la regla persistida spa→fra; ejecución semántica comprobada en I-160/I-165. Ambos favoritos de prueba vuelven al estado inicial vacío.
+
+- **I-167 — ✅, guardado individual, 04/10/2026:** En Ajustes aislados se pulsa Restaurar presets de lote predeterminados y se revisa confirmación explícita «Se sustituirán los presets actuales por los incluidos con ZEUVE». Al aceptar vuelven exactamente los 4 defaults/configuraciones (rápida, MD, audio completo JSON y PNG), desaparece solo el personalizado QA; batch vuelve a Inspección rápida. Favoritos de prueba ya vacíos, regla guardada se conserva y archivos/resultados mantienen hashes. Restauración específica con advertencia correcta, no reset global S-16.
+
+### Continuidad técnica — reglas, cancelación y presets, 04/10/2026
+
+12 IDs nuevos cerrados individualmente: I-158–I-169, 9 OK, 1 fallo y 2 parciales. Estado 455 OK, 15 fallos, 12 parciales, 157 pendientes; Inspector 134/180 OK, 9 fallos, 7 parciales, 30 pendientes. I-164 falla por ausencia de ruta de cancelación de preflight en la UI; I-161/I-162 solo clasifican archivos, sin detalle de plan individual. No se confunde lo anterior con fallo del servicio interno de cancelación. INC-30/INC-31 ampliadas en el informe de incidencias fuera del proyecto; ningún arreglo.
+
+I-162: evidencia adicional posterior, sin convertirla en OK completo. Ejecutar planes aplicables abre confirmación nativa explícita con Cancelar/Ejecutar y explica archivos nuevos/originales intactos/validación FFprobe. Se confirma la barrera previa a escritura, pero la confirmación tampoco muestra el antes/después individual. I-165 publica ambos planes; al acabar desaparecen los contadores de edición y la cola de análisis permanece En espera. Se registra esta limitación comunicativa sin falsear el resultado verificado en salidas.
+
+Datos persistentes de pruebas: Batch-I158 (FLAC sintético 2 h/193 MB, WAV cortos e informe conservado tras cancelar), Batch-I159 (MP4 spa/eng/spa y 3 salidas estructurales verificadas por paquetes), Batch-I164 (200 MP4 sintéticos, solo preflight; ninguna ejecución masiva). Todo fuera del repositorio, sin datos reales. El reset específico de presets tiene advertencia correcta y no reproduce el reset global S-16. Se restauran 4 defaults, se desmarcan los dos favoritos QA y se retira únicamente el conjunto QA I159 creado en esta sesión; reglas/favoritos vuelven vacíos. La regla retirada es recuperable a partir de su condición/acción documentadas y de las salidas, y no se borran fixtures ni resultados.
+
+App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motores activos; Ajustes cerrados y opciones de carpetas sin cambios respecto al baseline restaurado. Siguiente I-175: medir memoria con archivo largo, después I-176–I-180. Se conservan pendientes anteriores y no se certifica Release completa. Control separado: se esperó actualización real tras cambiar menús dinámicos; algunos intentos de acceso demasiado pronto o de navegación del selector no concluyeron y no sirvieron como evidencia de producto.
 
 ## 1. ZEUVE general
 
@@ -1214,24 +1248,24 @@ Usar siempre una copia prescindible.
 - [x] ✅ **I-155** Lote de espectrogramas.
 - [x] ✅ **I-156** Lote de informes.
 - [x] ✅ **I-157** Un archivo incompatible no detiene los demás.
-- [ ] ➖ **I-158** Cancelar lote conserva únicamente resultados ya publicados correctamente.
+- [x] ✅ **I-158** Cancelar lote conserva únicamente resultados ya publicados correctamente.
 
 ## Reglas de edición por lotes
 
-- [ ] ➖ **I-159** Crear conjunto de reglas.
-- [ ] ➖ **I-160** Condición → acción funciona.
-- [ ] ➖ **I-161** Preflight muestra qué ocurrirá.
-- [ ] ➖ **I-162** Se puede revisar antes de ejecutar.
-- [ ] ➖ **I-163** Una operación pesada ya activa impide empezar indebidamente el preflight.
-- [ ] ➖ **I-164** Cancelar el preflight funciona.
-- [ ] ➖ **I-165** Ejecutar edición secuencial funciona.
+- [x] ✅ **I-159** Crear conjunto de reglas.
+- [x] ✅ **I-160** Condición → acción funciona.
+- [ ] ⚠️ **I-161** Preflight muestra qué ocurrirá.
+- [ ] ⚠️ **I-162** Se puede revisar antes de ejecutar.
+- [x] ✅ **I-163** Una operación pesada ya activa impide empezar indebidamente el preflight.
+- [x] ❌ **I-164** Cancelar el preflight funciona.
+- [x] ✅ **I-165** Ejecutar edición secuencial funciona.
 
 ## Presets, favoritos e informes
 
-- [ ] ➖ **I-166** Crear/usar preset de lote.
-- [ ] ➖ **I-167** Restaurar preset.
-- [ ] ➖ **I-168** Favorito de configuración funciona.
-- [ ] ➖ **I-169** Favorito de reglas funciona.
+- [x] ✅ **I-166** Crear/usar preset de lote.
+- [x] ✅ **I-167** Restaurar preset.
+- [x] ✅ **I-168** Favorito de configuración funciona.
+- [x] ✅ **I-169** Favorito de reglas funciona.
 - [x] ✅ **I-170** Exportar informe TXT.
 - [x] ✅ **I-171** Exportar informe Markdown.
 - [x] ✅ **I-172** Exportar informe JSON.
