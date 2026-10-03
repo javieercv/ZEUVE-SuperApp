@@ -1,14 +1,14 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Estado acumulado al 29/09/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
+Estado acumulado al 03/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 392 ✅ OK · 7 ❌ fallidas · 5 ⚠️ parciales · 235 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 423 ✅ OK · 8 ❌ fallidas · 8 ⚠️ parciales · 200 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 71/180 OK y 1 fallo (I-66); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 102/180 OK, 2 fallos (I-66/I-136) y 3 parciales (I-93/I-96/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-90 — preparar/validar fixture bitmap OCR; I-89 y otros Canvas pendientes de revisión visual.** Última prueba cerrada y guardada: I-171, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-114 — capítulos sobre I111_video_principal.mkv; I-89/Canvas pendientes.** Última prueba cerrada y guardada: I-142, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -338,6 +338,78 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - **I-170 — ✅, guardado individual:** Formato Texto elegido por menú, panel en carpeta QA, publica I170_informe.txt UTF-8 legible. Contiene nombre, contenedor, duración12, PCM16/48k/mono, timing, LUFS/LRA/picos, señal y resumen avanzado con2 anomalías. No rutas completas ni original reemplazado. TXT resume anomalías, no muestra los intervalos individuales del JSON; se acepta este formato según la salida vigente. Una lectura demasiado temprana del panel falló; esperar a ventana Exportar informe técnico permitió guardarlo, sin fallo de producto.
 
 - **I-171 — ✅, guardado individual:** Formato Markdown elegido explícitamente; I171_informe.md publicado separado en carpeta QA. Contiene encabezado # Informe técnico multimedia y secciones ## Metadatos globales/Streams/Sincronización/Sonoridad calculada/Análisis de señal/Análisis avanzado, con los mismos datos y2 anomalías que TXT/JSON. UTF-8 y acentos legibles; source SHA8ed12f…68772 intacto. No se cambia producto.
+
+- **I-90 — ✅, guardado individual, 03/10/2026:** Entrada sintética PGS validada con FFprobe y decodificación independiente de todos los bitmaps. La UI detecta 1 subtítulo spa · HDMV_PGS_SUBTITLE · Bitmap en I90_bitmap.mkv, vídeo H.264 640×360 y 12 s. SHA-256 c577cb6cce977effdf4c1e3da6d35244b0a2b4c6cda8aaec44d078cc742e26ec. Sesión nueva con datos propios QA-20261003.oGJ5vx/Data; la antigua /tmp ya no existe. App Debug existente 0.20.5/build 71; ninguna recompilación ni cambio de producto.
+
+- **I-91 — ✅, guardado individual, 03/10/2026:** Al pulsar OCR de la pista bitmap #1 aparece la hoja OCR de subtítulos bitmap y se completa el reconocimiento local: textos ZEUVE QA UNO/DOS/TRES reconocidos al 100 %. El borrador contiene 12 filas; la calidad temporal se revisa por separado en I-93.
+
+- **I-93 — ⚠️, guardado individual, 03/10/2026:** Produce una hoja revisable con texto, inclusión, inicio/fin y 12 filas, pero la estructura temporal es incorrecta (INC-21). La entrada validada tiene tres eventos 0–2, 4–6 y 8–10 s. UI: UNO 0–1999.999 s, DOS 4000–5999.999 s, TRES 8000–9999.999 s, duplicados de texto y 6 filas vacías incluidas; fin de una fila 4294977295.000 s. FFmpeg extrae nombres con PTS en microsegundos y el servicio los multiplica por la base original 1/1000; además trata frames de borrado/EOF como eventos. Borrador visible, aceptación temporal incompleta; sin modificar producto.
+
+- **I-94 — ✅, guardado individual, 03/10/2026:** La hoja real muestra spa y HDMV_PGS_SUBTITLE, Stream 1, Confianza 100 % en las filas con UNO/DOS/TRES y Confianza 0 % + Revisar en las vacías. Resumen 12 incluidos · 6 por revisar. Se verifica la presentación de idioma/confianza; persiste la incidencia temporal INC-21 de I-93.
+
+- **I-95 — ✅, guardado individual, 03/10/2026:** Se edita por teclado el TextEditor de la primera fila: ZEUVE QA UNO → ZEUVE QA UNO REVISADO; el valor real queda actualizado al cambiar el foco. La corrección pertenece únicamente al borrador de QA y se verificará también en el SRT publicado. No se corrige código ni el archivo de entrada.
+
+- **I-96 — ⚠️, guardado individual, 03/10/2026:** Exportar SRT publica I96_sin_retemporizar.srt como archivo nuevo y conserva la corrección ZEUVE QA UNO REVISADO. Sin embargo, exporta también el timing inválido y las filas vacías de INC-21: primera entrada hasta 00:33:19,999 y última hasta 1193049:14:55,050 para un vídeo de 12 s. El formato se escribe, pero el resultado no es utilizable tal como se genera; aceptación parcial. SHA-256 original intacto.
+
+- **I-97 — ✅, guardado individual, 03/10/2026:** Tras OCR, revisión, exportación y cierre de la hoja, Pistas sigue mostrando únicamente el subtítulo spa · HDMV_PGS_SUBTITLE · Bitmap, sin añadir ni sustituir por SRT. La sesión permanece en modo inspección/solo lectura; SHA-256 c577cb6cce977effdf4c1e3da6d35244b0a2b4c6cda8aaec44d078cc742e26ec idéntico antes/después. El SRT se publica aparte.
+
+- **I-92 — ✅, guardado individual, 03/10/2026:** Entrada sintética larga: 300 eventos PGS, 1198 s y 975 KB. Se inicia OCR, se observa la hoja en estado activo (5 botones; Cancelar disponible), se pulsa Cancelar antes de completar y la hoja desaparece. No quedan hijos FFmpeg/FFprobe de PID 41759; OCR y Analizar otro archivo vuelven habilitados. UI permanece utilizable en solo lectura sin mensaje de error ni SRT publicado por esta operación. No se utiliza el resultado rápido anterior como prueba de cancelación.
+
+- **I-135 — ⚠️, guardado individual, 03/10/2026:** Revisar cambios abre el plan antes de ejecutar y enumera dos audios, dos SRT, dos capítulos, un attachment y Video A/Video B como eliminados. Pero muestra simultáneamente dos filas Vídeo · H264 · Copia exacta, aunque el borrador ya no contiene vídeo (INC-22). Causa respaldada por MultimediaEditPreview: enumera inspection.videoStreams en vez de plan.videoTracks. La revisión está disponible pero contradice la estructura prevista; aceptación parcial. Pendiente contrastar la ejecución real I-99.
+
+- **I-136 — ❌, guardado individual, 03/10/2026:** Generar archivo nuevo tras quitar ambos vídeos falla en validación final: «un adjunto original ha cambiado de códec». I99_sin_video.mkv no se publica; el original sigue intacto. FFprobe no proporciona codec_name para el attachment text/plain. MediaEditableAttachment.from representa el ausente como «attachment» y sameCodec compara con nil normalizado a cadena vacía: probable falso rechazo (INC-23). Se conserva el fallo y se probará sin ese attachment para aislar la edición audiovisual; no se corrige producto.
+
+- **I-121 — ✅, guardado individual, 03/10/2026:** En Metadatos, después de entrar en edición, Otros tags · solo lectura conserva QA_UNKNOWN = Etiqueta conservada. También se muestran tags técnicos ENCODER/DURATION y filename/mimetype del attachment. No se extrapola todavía a su preservación en una salida publicada.
+
+- **I-122 — ✅, guardado individual, 03/10/2026:** Metadatos limita los campos editables a nueve tags globales permitidos y título/idioma de streams. QA_UNKNOWN, ENCODER, DURATION y MIME/nombre originales aparecen como textos en Otros tags · solo lectura, con acciones de copia y sin TextField asociado. Mensaje de UI explica la preservación de tags no reconocidos y evita editarlos indiscriminadamente.
+
+- **I-123 — ✅, guardado individual, 03/10/2026:** Resumen → Adjuntos · 1 despliega el attachment adjunto_qa.txt con MIME text/plain, ayuda contextual, Extraer y eliminación del borrador. Metadatos también muestra filename/mimetype y Pistas identifica Stream 6 · attachment · sin códec. Se valida su representación técnica; no se afirma un visor de contenido de texto que la app no ofrece.
+
+- **I-124 — ✅, guardado individual, 03/10/2026:** Extraer publica I124_adjunto_extraido.txt en la carpeta QA. cmp confirma identidad byte a byte con el archivo sintético originalmente adjuntado; SHA-256 94883f0a3aee01adb2caa01b5ceed53eba4a7700249ece7d6cd526ed9d46decb. UI informa de extracción y protección del multimedia original. No se sobrescribe adjunto_qa.txt.
+
+- **I-125 — ✅, guardado individual, 03/10/2026:** Se elimina el attachment del borrador; la UI muestra Sin adjuntos editables y el plan 0 conservados · 0 añadidos · 1 eliminados. Al ejecutar esta variante, FFprobe confirma cero streams attachment en I99_sin_video_sin_adjunto.mkv. El attachment permanece en el original, cuyo SHA-256 no cambia. Se retira solo de la salida nueva.
+
+- **I-99 — ✅, guardado individual, 03/10/2026:** Eliminados Video A y Video B del borrador. La variante sin el attachment que provocaba INC-23 publica correctamente un MKV nuevo de 10 s con 0 vídeo, 2 PCM_s16le, 2 SUBRIP y 2 capítulos. Ambas pistas de audio decodifican completas sin errores. La app abre el resultado en solo lectura. Esta aceptación aislada no borra el fallo de publicación I-136 con attachment ni la contradicción del plan I-135.
+
+- **I-137 — ✅, guardado individual, 03/10/2026:** Después del intento fallido con attachment y de la publicación correcta sin él, I99_estructura.mkv mantiene exactamente su SHA-256 inicial 44b372cc5f6342c40ec314141964ee1f02ff03ee85f1d630638eb5a48744187f. Las acciones del borrador y la ejecución crean/validan otra salida sin modificar el original.
+
+- **I-138 — ✅, guardado individual, 03/10/2026:** La variante publicada I99_sin_video_sin_adjunto.mkv coincide con el borrador efectivo: exactamente 2 audios PCM_s16le (spa/Audio 440 y eng/Audio 880), 2 subtítulos SUBRIP (spa/eng), 2 capítulos a 0/5 s; cero vídeos y cero attachments. FFprobe confirma estructura y 10 s. Persiste la incidencia de presentación del plan INC-22, que no alteró esta salida.
+
+- **I-143 — ✅, guardado individual, 03/10/2026:** Tras validación/publicación, la misma app cambia automáticamente a I99_sin_video_sin_adjunto.mkv y lo abre en modo inspección · solo lectura, duración 10 s, sin alerta. FFprobe inspecciona su estructura y FFmpeg decodifica completas ambas pistas de audio. No se confunde la mera existencia de un archivo temporal con una publicación correcta.
+
+- **I-100 — ✅, guardado individual, 03/10/2026:** Se elimina Audio 440 del borrador original y se retira el attachment para aislar INC-23. I100_sin_audio440.mkv se publica/abre correctamente: 2 H.264, 1 PCM_s16le eng/Audio 880 y 2 SUBRIP; Audio 440 ya no existe en la salida. Decodificación audiovisual completa sin errores. El original mantiene ambas pistas.
+
+- **I-139 — ✅, guardado individual, 03/10/2026:** Comparación independiente SHA-256 de los paquetes codificados: los 100 paquetes de Video A, 100 de Video B y 469 de Audio 880 son idénticos, en el mismo orden, entre original y salida I100_sin_audio440.mkv (mapeo 0→0, 1→1, 3→2). No se deduce stream copy solo por igualdad de códec; se contrasta el payload real. Decodificación completa de los dos vídeos y del audio sin errores.
+
+- **I-101 — ✅, guardado individual, 03/10/2026:** Se elimina SUBRIP spa del borrador de I100_sin_audio440.mkv. I101_solo_eng.mkv se publica y se abre en solo lectura; FFprobe confirma un único subtítulo SUBRIP eng, dos vídeos y Audio 880 conservados. La pista retirada ya no aparece en la salida nueva.
+
+- **I-102 — ✅, guardado individual, 03/10/2026:** Añadir audio inspecciona WAV PCM_s16le mono 48 kHz, 10 s, tono sintético 1320 Hz, e incorpora una segunda pista al borrador. I102_con_audio_externo.mkv se publica y abre con los dos vídeos, Audio 880, el audio externo y el SRT eng. Los 118 paquetes del WAV son idénticos a los de la nueva pista #3 (SHA agregado 69f50adf8d2b8447c4dd9fc2ac06893cdc020c6b229ba30a51e230ab3517c3ba), confirmando copia del audio añadido.
+
+- **I-103 — ✅, guardado individual, 03/10/2026:** Añadir subtítulo inspecciona subs_spa.srt e incorpora una segunda pista SUBRIP al borrador. I103_con_sub_externo.mkv se publica/abre y FFprobe confirma dos SUBRIP (#4 original eng, #5 externo). Los dos paquetes/textos externos conservan sus hashes de datos exactos frente al SRT de entrada. No sustituye la pista previa.
+
+- **I-104 — ✅, guardado individual, 03/10/2026:** Añadir pista de vídeo desde I90_bitmap.mkv añade únicamente su H.264 640×360, sin importar su PGS. La salida I104_con_video_externo.mkv contiene tres vídeos (dos 320×180 previos + uno externo 640×360), dos audios y dos SUBRIP; se publica y abre con 12 s. Los 120 paquetes del vídeo externo coinciden exactamente con su fuente. No hay transcode audiovisual.
+
+- **I-105 — ✅, guardado individual, 03/10/2026:** Mover pista abajo cambia Video A/Video B a Video B/Video A, manteniendo el tercer vídeo externo. I105_video_reordenado.mkv publica ese orden: títulos B, A, externo 640×360. Hashes de todos los paquetes de las tres pistas coinciden con el mapeo previo 0→1, 1→0, 2→2. Orden real comprobado, no solo cambio visual del borrador.
+
+- **I-106 — ✅, guardado individual, 03/10/2026:** Mover Audio 880 abajo coloca primero el audio externo 1320 Hz. I106_audio_reordenado.mkv publica las pistas en ese orden (#3 externo, #4 eng/Audio 880). Los 469 paquetes de 880 Hz y 118 del externo coinciden exactamente tras el intercambio 3→4 y 4→3. Sin recodificación.
+
+- **I-107 — ✅, guardado individual, 03/10/2026:** Mover el SRT eng abajo coloca primero el SRT externo en español. I107_sub_reordenado.mkv publica el orden #5 externo y #6 eng. Los dos paquetes de cada subtítulo mantienen su identidad de datos con el intercambio 5→6 y 6→5; se comprueban las pistas reales de salida.
+
+- **I-108 — ✅, guardado individual, 03/10/2026:** Se cambia el título de la primera pista de audio a Audio externo QA en el borrador. La publicación I108_titulo_audio.mkv conserva ese título exactamente en el stream #3 según FFprobe; Audio 880 mantiene su título independiente. UI permite revisar y ejecutar el cambio.
+
+- **I-109 — ✅, guardado individual, 03/10/2026:** Se cambia el idioma de Audio externo QA a fra. I109_idioma_audio.mkv se publica; FFprobe confirma language=fra en #3 y conserva language=eng/título Audio 880 en #4. El valor del borrador y el de la salida coinciden.
+
+- **I-110 — ✅, guardado individual, 03/10/2026:** Se activa Default en Audio externo QA y Forced en el primer SRT. La UI cambia audio 00→10 y subtítulos 0000→0100. I110_dispositions.mkv publica exactamente default=1 en audio #3 y forced=1 en subtítulo #5, con las demás pistas de esas clases en 0. FFprobe confirma las dispositions reales.
+
+- **I-111 — ✅, guardado individual, 03/10/2026:** Se elige Video B como único vídeo Default/principal en MKV. El borrador cambia flags 010→100 y desmarca Video A automáticamente. I111_video_principal.mkv publica default=1 en Video B #0 y default=0 en Video A #1 y externo #2, confirmado por FFprobe. No se afirma la elección de un reproductor externo distinto.
+
+- **I-112 — ✅, guardado individual, 03/10/2026:** En un borrador limpio de I111_video_principal.mkv se desmarca Default del primer audio (10→00). Deshacer restituye 10, vuelve a Modo edición: borrador limpio y habilita Rehacer. La acción revierte el estado del borrador sin ejecutar ni alterar el archivo publicado.
+
+- **I-113 — ✅, guardado individual, 03/10/2026:** Rehacer tras I-112 vuelve a aplicar la retirada de Default (10→00), muestra Editando un borrador con cambios pendientes y habilita Deshacer. El ciclo ida/vuelta se comprueba en las casillas reales; no se publica otro archivo por Undo/Redo.
+
+- **I-142 — ✅, guardado individual, 03/10/2026:** Cancelar edición con un borrador modificado solicita Descartar cambios. Conservar mantiene la sesión y sus cambios; al repetir y elegir Descartar vuelve a modo inspección · solo lectura. I111_video_principal.mkv conserva SHA-256 40b881cb5d468cf5c24369be1a8f8ad7ad4a12bb51a12ed5c18e6df0e9bb5fb6, sin nueva salida ni motores residuales. Se valida salida/descarte del modo edición; no se extrapola a cancelar una ejecución FFmpeg larga.
+
+- **Continuidad técnica, 03/10/2026:** las antiguas carpetas /tmp de QA habían desaparecido. Se utiliza la app Debug existente 0.20.5/build 71 de DerivedData, con almacenamiento aislado y fixtures persistentes en /Users/javiercv/.codex/visualizations/2026/09/27/01a0e339-8047-7950-991a-cd8b4c6e6344/QA-20261003.oGJ5vx. PID 41759; queda abierta en I111_video_principal.mkv, Pistas/solo lectura, sin preview ni motores activos. 35 IDs cerrados en esta continuación: 31 OK, 1 fallo, 3 parciales; 639 IDs/títulos originales conservados. CUA funcionó inicialmente y después volvió a cerrar su pipe; se prosiguió con AppleScript autorizado. Un botón por ordinal alcanzó el transporte al cambiar el layout; el guard del panel evitó escribir/publicar nada y se reidentificó Generar en el plan real. Son incidencias del control y no se cuentan como fallos de la app. INC-23 contrastada además con remux independiente: attachment original y copiado mantienen codec_name ausente, 49 bytes de extradata idénticos, nombre y MIME iguales. Ningún cambio de producto, build, motores o configuración personal. Al cierre, CGSession confirma screenLocked=1: las 35 pruebas ya estaban terminadas y guardadas; no se intenta I-114 ni se realizan más acciones UI. Retomar capítulos tras recuperar acceso a la pantalla, conservando este checkpoint. Remoto inicial/final sin novedades en 3cc4e1b9d7e5929fdd44c36cbfae2a6d1f3fdad2; verificación de IDs/títulos/estados y documentación correcta.
 
 ## 1. ZEUVE general
 
@@ -977,35 +1049,35 @@ Estos deben rechazarse claramente, no convertirse:
 
 Con un archivo que tenga PGS compatible:
 
-- [ ] ➖ **I-90** Detecta la pista bitmap.
-- [ ] ➖ **I-91** Inicia OCR.
-- [ ] ➖ **I-92** Puede cancelarse.
-- [ ] ➖ **I-93** Produce borrador revisable.
-- [ ] ➖ **I-94** Muestra confianza/idioma cuando corresponda.
-- [ ] ➖ **I-95** Permite revisar/corregir el texto.
-- [ ] ➖ **I-96** Exportar SRT funciona.
-- [ ] ➖ **I-97** No sustituye automáticamente el subtítulo original.
+- [x] ✅ **I-90** Detecta la pista bitmap.
+- [x] ✅ **I-91** Inicia OCR.
+- [x] ✅ **I-92** Puede cancelarse.
+- [ ] ⚠️ **I-93** Produce borrador revisable.
+- [x] ✅ **I-94** Muestra confianza/idioma cuando corresponda.
+- [x] ✅ **I-95** Permite revisar/corregir el texto.
+- [ ] ⚠️ **I-96** Exportar SRT funciona.
+- [x] ✅ **I-97** No sustituye automáticamente el subtítulo original.
 
 ## Edición de streams
 
 Usar siempre una copia prescindible.
 
 - [x] ✅ **I-98** Entrar en modo edición.
-- [ ] ➖ **I-99** Eliminar vídeo cuando la estructura resultante sea válida.
-- [ ] ➖ **I-100** Eliminar pista de audio.
-- [ ] ➖ **I-101** Eliminar subtítulo.
-- [ ] ➖ **I-102** Añadir audio externo compatible.
-- [ ] ➖ **I-103** Añadir subtítulo externo compatible.
-- [ ] ➖ **I-104** Añadir vídeo externo compatible cuando proceda.
-- [ ] ➖ **I-105** Reordenar vídeo.
-- [ ] ➖ **I-106** Reordenar audio.
-- [ ] ➖ **I-107** Reordenar subtítulos.
-- [ ] ➖ **I-108** Cambiar título.
-- [ ] ➖ **I-109** Cambiar idioma.
-- [ ] ➖ **I-110** Cambiar default/disposition.
-- [ ] ➖ **I-111** Elegir stream principal cuando el contenedor lo permita.
-- [ ] ➖ **I-112** Undo del borrador funciona.
-- [ ] ➖ **I-113** Redo del borrador funciona.
+- [x] ✅ **I-99** Eliminar vídeo cuando la estructura resultante sea válida.
+- [x] ✅ **I-100** Eliminar pista de audio.
+- [x] ✅ **I-101** Eliminar subtítulo.
+- [x] ✅ **I-102** Añadir audio externo compatible.
+- [x] ✅ **I-103** Añadir subtítulo externo compatible.
+- [x] ✅ **I-104** Añadir vídeo externo compatible cuando proceda.
+- [x] ✅ **I-105** Reordenar vídeo.
+- [x] ✅ **I-106** Reordenar audio.
+- [x] ✅ **I-107** Reordenar subtítulos.
+- [x] ✅ **I-108** Cambiar título.
+- [x] ✅ **I-109** Cambiar idioma.
+- [x] ✅ **I-110** Cambiar default/disposition.
+- [x] ✅ **I-111** Elegir stream principal cuando el contenedor lo permita.
+- [x] ✅ **I-112** Undo del borrador funciona.
+- [x] ✅ **I-113** Redo del borrador funciona.
 
 ## Capítulos
 
@@ -1019,14 +1091,14 @@ Usar siempre una copia prescindible.
 
 - [ ] ➖ **I-119** Editar tag permitido.
 - [ ] ➖ **I-120** Editar metadata de stream permitida.
-- [ ] ➖ **I-121** Tags desconocidos siguen visibles.
-- [ ] ➖ **I-122** No convierte indiscriminadamente cualquier tag en editable.
+- [x] ✅ **I-121** Tags desconocidos siguen visibles.
+- [x] ✅ **I-122** No convierte indiscriminadamente cualquier tag en editable.
 
 ## Attachments
 
-- [ ] ➖ **I-123** Visualizar attachment.
-- [ ] ➖ **I-124** Extraer attachment.
-- [ ] ➖ **I-125** Eliminar attachment.
+- [x] ✅ **I-123** Visualizar attachment.
+- [x] ✅ **I-124** Extraer attachment.
+- [x] ✅ **I-125** Eliminar attachment.
 - [ ] ➖ **I-126** Añadir attachment externo compatible.
 - [ ] ➖ **I-127** Editar nombre/MIME cuando corresponda.
 
@@ -1042,15 +1114,15 @@ Usar siempre una copia prescindible.
 
 ## Ejecutar edición
 
-- [ ] ➖ **I-135** Antes de ejecutar se puede revisar el plan.
-- [ ] ➖ **I-136** Ejecutar genera un archivo nuevo.
-- [ ] ➖ **I-137** El original permanece intacto.
-- [ ] ➖ **I-138** El resultado contiene exactamente los streams previstos.
-- [ ] ➖ **I-139** Audio/vídeo se mantienen por stream copy.
+- [ ] ⚠️ **I-135** Antes de ejecutar se puede revisar el plan.
+- [x] ❌ **I-136** Ejecutar genera un archivo nuevo.
+- [x] ✅ **I-137** El original permanece intacto.
+- [x] ✅ **I-138** El resultado contiene exactamente los streams previstos.
+- [x] ✅ **I-139** Audio/vídeo se mantienen por stream copy.
 - [ ] ➖ **I-140** Una operación que necesitaría transcode audiovisual es rechazada, no recodificada a escondidas.
 - [ ] ➖ **I-141** Conflicto de nombre no sobrescribe silenciosamente.
-- [ ] ➖ **I-142** Cancelar edición funciona.
-- [ ] ➖ **I-143** El archivo final abre correctamente después de la validación.
+- [x] ✅ **I-142** Cancelar edición funciona.
+- [x] ✅ **I-143** El archivo final abre correctamente después de la validación.
 
 ## Lotes
 
