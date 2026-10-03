@@ -2,13 +2,13 @@
 
 Estado acumulado al 03/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 423 ✅ OK · 8 ❌ fallidas · 8 ⚠️ parciales · 200 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 429 ✅ OK · 10 ❌ fallidas · 8 ⚠️ parciales · 192 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 102/180 OK, 2 fallos (I-66/I-136) y 3 parciales (I-93/I-96/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 108/180 OK, 4 fallos (I-66/I-120/I-127/I-136) y 3 parciales (I-93/I-96/I-135); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-114 — capítulos sobre I111_video_principal.mkv; I-89/Canvas pendientes.** Última prueba cerrada y guardada: I-142, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: I-128 — carátulas; app en I126_adjunto_anadido.mkv, solo lectura; I-118/Canvas pendientes.** Última prueba cerrada y guardada: I-127, ❌. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -410,6 +410,24 @@ Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID
 - **I-142 — ✅, guardado individual, 03/10/2026:** Cancelar edición con un borrador modificado solicita Descartar cambios. Conservar mantiene la sesión y sus cambios; al repetir y elegir Descartar vuelve a modo inspección · solo lectura. I111_video_principal.mkv conserva SHA-256 40b881cb5d468cf5c24369be1a8f8ad7ad4a12bb51a12ed5c18e6df0e9bb5fb6, sin nueva salida ni motores residuales. Se valida salida/descarte del modo edición; no se extrapola a cancelar una ejecución FFmpeg larga.
 
 - **Continuidad técnica, 03/10/2026:** las antiguas carpetas /tmp de QA habían desaparecido. Se utiliza la app Debug existente 0.20.5/build 71 de DerivedData, con almacenamiento aislado y fixtures persistentes en /Users/javiercv/.codex/visualizations/2026/09/27/01a0e339-8047-7950-991a-cd8b4c6e6344/QA-20261003.oGJ5vx. PID 41759; queda abierta en I111_video_principal.mkv, Pistas/solo lectura, sin preview ni motores activos. 35 IDs cerrados en esta continuación: 31 OK, 1 fallo, 3 parciales; 639 IDs/títulos originales conservados. CUA funcionó inicialmente y después volvió a cerrar su pipe; se prosiguió con AppleScript autorizado. Un botón por ordinal alcanzó el transporte al cambiar el layout; el guard del panel evitó escribir/publicar nada y se reidentificó Generar en el plan real. Son incidencias del control y no se cuentan como fallos de la app. INC-23 contrastada además con remux independiente: attachment original y copiado mantienen codec_name ausente, 49 bytes de extradata idénticos, nombre y MIME iguales. Ningún cambio de producto, build, motores o configuración personal. Al cierre, CGSession confirma screenLocked=1: las 35 pruebas ya estaban terminadas y guardadas; no se intenta I-114 ni se realizan más acciones UI. Retomar capítulos tras recuperar acceso a la pantalla, conservando este checkpoint. Remoto inicial/final sin novedades en 3cc4e1b9d7e5929fdd44c36cbfae2a6d1f3fdad2; verificación de IDs/títulos/estados y documentación correcta.
+
+- **I-114 — ✅, guardado individual, 03/10/2026:** Añadir capítulo en posición actual crea Capítulo 3 en 9,900 s (el transporte redondea a 00:10). El plan muestra 3 capítulos; la salida nueva I114_capitulo_anadido.mkv contiene 0–5 Inicio QA, 5–9,9 Segundo QA y 9,9–12 Capítulo 3, confirmado con FFprobe. I111_video_principal.mkv conserva SHA-256 40b881cb5d468cf5c24369be1a8f8ad7ad4a12bb51a12ed5c18e6df0e9bb5fb6.
+
+- **I-115 — ✅, guardado individual, 03/10/2026:** Eliminar Segundo QA retira exclusivamente el marcador de 5 s. Borrador y salida I115_capitulo_eliminado.mkv contienen Inicio QA 0–9,9 y Capítulo 3 9,9–12; los finales se recalculan automáticamente. FFprobe confirma dos capítulos, y la entrada I114 sigue conteniendo tres.
+
+- **I-116 — ✅, guardado individual, 03/10/2026:** Entrada real por teclado renombra Capítulo 3 a Final QA - capitulo renombrado. La salida I116_capitulo_renombrado.mkv conserva ese título exacto y los intervalos 0–9,9/9,9–12, confirmados con FFprobe. Un intento previo de escribir AXValue no activó el binding y dejó el borrador limpio; el guard de Generar impidió publicar ese intento y se repitió con teclado. Esta diferencia se registra como control, no como fallo de producto ni como prueba de Unicode.
+
+- **I-117 — ✅, guardado individual, 03/10/2026:** El campo Tiempo acepta 7,250 s mediante teclado y confirmación. I117_capitulo_7250.mkv contiene el segundo capítulo en 7,250–12 s y recalcula el final del primero a 7,250 s, manteniendo ambos títulos. FFprobe confirma precisión de milisegundos. El original I116 conserva el marcador en 9,900 s.
+
+- **I-119 — ✅, guardado individual, 03/10/2026:** Metadatos → Título global cambia QA Estructura a ZEUVE QA Metadata global. I119_metadata_global.mkv contiene exactamente ese title; ARTIST=QA Sintetico y QA_UNKNOWN=Etiqueta conservada permanecen, así como los dos capítulos 0–7,25/7,25–12. Confirmación independiente con FFprobe; no se editan tags desconocidos.
+
+- **I-120 — ❌, guardado individual, 03/10/2026:** El título de vídeo stream 0 se introduce por teclado como Video principal metadata QA; el borrador pasa a cambios pendientes y el plan indica 1 campo modificado. Ejecutar muestra alerta: La validación final ha fallado: el título de una pista no coincide. I120_metadata_stream.mkv no se publica. Entrada I119 y sus tags originales siguen intactos. Fallo observado en metadata permitida de vídeo; no se extrapola a todos los campos o tipos de stream. Se investiga la probable divergencia entre metadata de vídeo y título de la pista del borrador, sin cambios de producto.
+
+- **I-126 — ✅, guardado individual, 03/10/2026:** Añadir adjunto acepta adjunto_qa.txt como archivo regular, propone text/plain y el plan 1 añadido. I126_adjunto_anadido.mkv se publica correctamente: FFprobe confirma attachment stream 7, filename=adjunto_qa.txt, mimetype=text/plain y 49 bytes de extradata con el texto sintético exacto. La entrada I119 no tenía attachments y sigue intacta (SHA-256 f6b1081687c3db11c5cde96d72b01a46c727485735183862d3aa5f9e38b45ba2).
+
+- **I-127 — ❌, guardado individual, 03/10/2026:** Nombre y MIME del attachment existente admiten adjunto_renombrado_QA.bin y application/octet-stream en el borrador. Al ejecutar aparece La validación final ha fallado: un adjunto original ha cambiado de códec; I127_adjunto_metadata.mkv no se publica. La entrada conserva filename=adjunto_qa.txt, MIME text/plain y SHA-256 66ebe77dd5ad08d8497b2662daffaf4cca150bcb4170d7ca87b14c8c08015f80. Coincide con INC-23: este attachment no tiene codec_name en FFprobe y el borrador utiliza un fallback distinto. Se considera fallida la edición completa de nombre/MIME en este caso, aunque los controles del borrador responden.
+
+- **Contraste y continuidad, 03/10/2026:** 8 IDs cerrados en esta continuación: I-114–I-117, I-119 e I-126 OK; I-120 e I-127 fallidos. Los siete streams de la entrada I111 y la salida I126 conservan todas sus secuencias de hashes SHA-256 de paquetes: vídeo 100/100/120, audio 118/469 y subtítulos 2/2. El remux independiente INC24_remux_independiente.mkv aplica título antiguo y luego nuevo como el constructor de comandos; FFprobe devuelve el nuevo título con todos los paquetes intactos. La UI real no publica I120, y no se recuperó su temporal: la causa se infiere del código, donde updateVideoMetadata solo cambia metadata.videoValuesByStream, el constructor sobrescribe el título después de los títulos de tracks y validateTrackMetadata todavía exige track.title antiguo. INC-24, sin corregir. I127 amplía INC-23 a edición de nombre/MIME de un attachment existente; añadirlo como externo en I126 sí funciona. Se aceptaron las alertas y descartó el borrador I127: app abierta en I126, Resumen/solo lectura, sin motores ni reproducción. I-118 queda pendiente de comprobación visual; no se marca fallo de producto por falta de acceso al Canvas. Fuente remota inicial 3cc4e1b sin novedades; cambios exclusivamente documentales.
 
 ## 1. ZEUVE general
 
@@ -1081,16 +1099,16 @@ Usar siempre una copia prescindible.
 
 ## Capítulos
 
-- [ ] ➖ **I-114** Añadir capítulo.
-- [ ] ➖ **I-115** Eliminar capítulo.
-- [ ] ➖ **I-116** Renombrar capítulo.
-- [ ] ➖ **I-117** Cambiar su posición temporal.
+- [x] ✅ **I-114** Añadir capítulo.
+- [x] ✅ **I-115** Eliminar capítulo.
+- [x] ✅ **I-116** Renombrar capítulo.
+- [x] ✅ **I-117** Cambiar su posición temporal.
 - [ ] ➖ **I-118** Timeline refleja cambios antes de ejecutar.
 
 ## Metadata
 
-- [ ] ➖ **I-119** Editar tag permitido.
-- [ ] ➖ **I-120** Editar metadata de stream permitida.
+- [x] ✅ **I-119** Editar tag permitido.
+- [x] ❌ **I-120** Editar metadata de stream permitida.
 - [x] ✅ **I-121** Tags desconocidos siguen visibles.
 - [x] ✅ **I-122** No convierte indiscriminadamente cualquier tag en editable.
 
@@ -1099,8 +1117,8 @@ Usar siempre una copia prescindible.
 - [x] ✅ **I-123** Visualizar attachment.
 - [x] ✅ **I-124** Extraer attachment.
 - [x] ✅ **I-125** Eliminar attachment.
-- [ ] ➖ **I-126** Añadir attachment externo compatible.
-- [ ] ➖ **I-127** Editar nombre/MIME cuando corresponda.
+- [x] ✅ **I-126** Añadir attachment externo compatible.
+- [x] ❌ **I-127** Editar nombre/MIME cuando corresponda.
 
 ## Carátulas
 
