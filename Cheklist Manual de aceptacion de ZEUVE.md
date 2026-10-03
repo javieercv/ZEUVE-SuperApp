@@ -2,13 +2,13 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 455 ✅ OK · 15 ❌ fallidas · 12 ⚠️ parciales · 157 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 481 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 127 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 134/180 OK, 9 fallos (I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 7 parciales (I-93/I-96/I-128/I-134/I-135/I-161/I-162); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: I-175 — memoria con archivo largo; después compatibilidad I-176–I-180.** Última prueba cerrada y guardada: I-167, ✅. La publicación remota sigue pendiente por falta de autenticación en GitHub; el guardado local no depende del push.
+**Punto de continuación: Inspector completo en cobertura — 160 OK, 12 fallidas, 8 parciales, 0 sin abordar.** Última revisión guardada: I-128, ✅. Las dos comprobaciones acústicas (I-29/I-35) requieren escucha humana; los otros seis parciales tienen limitaciones de producto documentadas. No se continúa otro módulo en este encargo. Publicación remota pendiente de autenticación GitHub.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -518,6 +518,70 @@ I-162: evidencia adicional posterior, sin convertirla en OK completo. Ejecutar p
 Datos persistentes de pruebas: Batch-I158 (FLAC sintético 2 h/193 MB, WAV cortos e informe conservado tras cancelar), Batch-I159 (MP4 spa/eng/spa y 3 salidas estructurales verificadas por paquetes), Batch-I164 (200 MP4 sintéticos, solo preflight; ninguna ejecución masiva). Todo fuera del repositorio, sin datos reales. El reset específico de presets tiene advertencia correcta y no reproduce el reset global S-16. Se restauran 4 defaults, se desmarcan los dos favoritos QA y se retira únicamente el conjunto QA I159 creado en esta sesión; reglas/favoritos vuelven vacíos. La regla retirada es recuperable a partir de su condición/acción documentadas y de las salidas, y no se borran fixtures ni resultados.
 
 App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motores activos; Ajustes cerrados y opciones de carpetas sin cambios respecto al baseline restaurado. Siguiente I-175: medir memoria con archivo largo, después I-176–I-180. Se conservan pendientes anteriores y no se certifica Release completa. Control separado: se esperó actualización real tras cambiar menús dinámicos; algunos intentos de acceso demasiado pronto o de navegación del selector no concluyeron y no sirvieron como evidencia de producto.
+
+- **I-52 — ✅, guardado individual, 04/10/2026:** Revisión visual nativa del FLAC de 2 h: waveform completa visible, buckets de amplitud constante coherentes con tono de 880 Hz y playhead superpuesto. Captura QA I175-preview.png. Ya no se depende exclusivamente del AXUnknown.
+
+- **I-175 — ✅, guardado individual, 04/10/2026:** FLAC sintético de 7200 s, 202,8 MB, mono48k: inspección, análisis completo de señal/sonoridad y reproducción nativa con waveform completados. RSS basal247792–248032KB; monitor de apertura max307568KB/15312KB hijos; segundo monitor108s max315440KB app y29344KB hijos, final315280/14176KB. Lectura posterior295936/14256KB. Sin crecimiento proporcional a PCM completo de2h, congelación ni error. Medición RSS, no heap/VRAM ni garantía universal.
+
+- **I-176 — ✅, guardado individual, 04/10/2026:** Muestra local HEVC3840×2160,12fps,8s: inspección correcta, Ver prepara preview y Play reproduce hasta00:08/00:08 con frame testsrc2 visible. RSS puntual760512KB app+552096KB FFmpeg durante preparación y1116720KB app sin hijos al finalizar. Sin cierre/error; alcance es esta muestra4K corta, no benchmark de4K60/largometraje. Capturas I176-play/final.
+
+- **I-177 — ✅, guardado individual, 04/10/2026:** HEVC hvc1/yuv420p en MP4 validado por ffprobe instalado y por UI3840×2160/12FPS. Inspección, análisisAAC, Play y frame final correctos en ZEUVE. No se confunde Ver (selección/preparación) con Play.
+
+- **I-178 — ✅, guardado individual, 04/10/2026:** DecoderAV1 presente en FFmpeg empaquetado; noencoderAV1, por lo que fixture sintético640×360/12fps/8s creado con SVTAV1 del FFmpeg Homebrew ya instalado (sin instalación/modificación de motores ZEUVE). UI identificaAV1; Play reproduce frame y reloj00:05/00:08 con waveform/playhead coherentes. CapturaI178-resultado.
+
+- **I-179 — ✅, guardado individual, 04/10/2026:** Fixture H26420s realmenteVFR: timestamps ffprobe0–10s cada0.1s y10–20s cada0.066667s. UI indicaFPSmedio12.521,duración20s; reproducción muestra reloj09s,framecontemporáneo~09s/playhead~45%,yfinal20s conframe19.933s. Timeline temporal coherente conPTS/noestiramiento. ClickSystemEvents sobrecanvas noefectivo no se usa como prueba de seek.
+
+- **I-180 — ✅, guardado individual, 04/10/2026:** MuestraHEVC Main10/PQ/BT.2020 comprobada por ffprobe; Resumen nativo identificaHDR(PQ·BT.2020) y preview muestra frames a00:05/00:08. Noerror/crash. Solo compatibilidad/preview, sin certificar luminancia/tone mapping ni monitorHDRdereferencia. PrimerafixtureVideoToolbox perdiótransfer/primarias y se descartó como evidenciaHDR; fixtureválida hechaconx265ya instalado fueraapp.
+
+- **I-34 — ✅, guardado individual, 04/10/2026:** Reproducción nativaMKV40s H264testsrc2+AAC: frames dinámicos visibles desde preparación hasta~15s,Play/Pausa responden; evidenciaI34-frameA eI36-pausaA. También contrasteAV1/HEVC. No es solo cambio de reloj sin imagen.
+
+- **I-36 — ✅, guardado individual, 04/10/2026:** Pausa alrededor15s conserva el último frame tras breve asentamiento de cola: capturasI36-pausaB/C mantienen exactamente patrón ytimecode14.750,pese alecturasposteriores. El reloj permanece00:15/00:40,no se borra la imagen ni vuelve0. Captura inmediatamente traspausarA tenía14.583 antesdeasentarse2frames.
+
+- **I-22 — ✅, guardado individual, 04/10/2026:** Arrastre real de puntero sobrecanvas waveform mediantehelperQA invocadodesdeAppleScript,75%→25% delancho: playhead/reloj cambian15→10s,posición~25%. ClickAXSystemEvents anterior noactivabaDragGesture y noera evidenciadefallo. CapturaI38-seek10; efecto de seek sobreframe evaluado porseparadoI38.
+
+- **I-53 — ✅, guardado individual, 04/10/2026:** Scrub realwaveformMKV40s mueveplayheada10s/25%,relojcoincidente. No se certifica porAXsetValue: fuegesture down/drag/up yverificaciónvisual.
+
+- **I-38 — ❌, guardado individual, 04/10/2026:** Fallo reproducido enpausa: scrubrealde~15s→10s cambia reloj/playhead,pero framepermanece contimecode14.750durantecapturasI38-seek10 eI38-espera separadas. Al Play imagen vuelveaavanzar desdeel destino. Seektemporal funciona, pero actualizaciónvisualpausada no. NoatribuidoclickAX: gesto realverificado.
+
+- **I-37 — ✅, guardado individual, 04/10/2026:** Play despuésdelseekpausadoa10s reanuda desdeeldestino,sinvolver0: después~6s reloj16s/frame15.333yplayhead~40%. CapturaI37-reanudar. DiferentedeI38: reanudarcorrecto,framepausadoseekestancado.
+
+- **I-39 — ❌, guardado individual, 04/10/2026:** Durante vídeoMKV2AAC, B→A conB reproduciendoa25s: tras4s conserva reloj29s yselecciónTono440,pero aparecealerta«Este ejecutor ya tiene un proceso activo» yelframequeda~24.917s mientrasrelojavanza30s. CapturasI39-estable/vueltaA/modalActual. Posición se conserva, flujo de cambio no es sano. Primerintento durantecarga separado delcontrasteestable; noseatribuyefallo porintentoAXincorrectodescartaralerta.
+
+- **I-40 — ✅, guardado individual, 04/10/2026:** VídeoPatron16x9→Morado9x16 en pausa30s conserva reloj/playhead30s; Playreanuda desde30 hasta36conimagenrealdeotrostream(moradovertical),sinreinicio0. CapturasI40-morado/moradoPlay. La imagen seactualizaalreproducir; limitaciónpausedframeyacapturadaI38.
+
+- **I-45 — ✅, guardado individual, 04/10/2026:** ComparaciónvisualdosstreamsconSAR1: original640×360seve~289×162(16:9); segundo360×640semuestra~90×162(9:16),centradoconbandaslaterales,sindeformación. CapturasI34-frameA/I40-moradoPlay.
+
+- **I-44 — ✅, guardado individual, 04/10/2026:** Previewvertical conservaaspectfit centrado enventana yfullscreen: regiónnormal~90×162; fullscreen~117×208mismo9:16,bandasnegras ysinrecorte/estiramiento. CapturaI44-fullscreen. Escalado mayor al ampliarapp,ycontenido permaneceentero. Pruebadentrodeapp,noexportadovideo.
+
+- **I-41 — ✅, guardado individual, 04/10/2026:** BorradornativoañadeexternoI41_externo_verde.mkv(H264stream0verde) aloriginalI34_multistream40.mkv(H264stream0testsrc2). SelectorVídeo·H264reproduceverde; volverPatron16x9reproducepatrónoriginal. Ambosstreamíndice0dearchivosdistintos,nocruzafuentes. CapturasI41-externoVerde/original0. Borradornopublicado.
+
+- **I-57 — ✅, guardado individual, 04/10/2026:** WaveformnativaMKV40sconcapítulosInicioQA0s/SegundoQA5s: marcadorespunteadosvisiblesal0% y12.5%,coherentesconffmetadata yduración40s. CapturasI34-frameA/I36-pausaC.No sesustituye porfilasAX; secomprobócanvasreal.
+
+- **I-118 — ✅, guardado individual, 04/10/2026:** Borradordecapítulosnativo: SegundoQA cambia5→20s conentrada real de teclado; field muestra20.000 ymarcadortimelinepasa12.5%→50% antesdeRevisar/Generar. CapturaI118-capitulo20. No archivoresultantepublicado; ffprobeoriginalseguirácapítulo5s trasdescartarborrador.
+
+- **I-58 — ✅, guardado individual, 04/10/2026:** QA nativa 04/10: I58_silencio_clipping.wav (12 s, PCM16, silencio 2–4 s y saturación 6–7 s). Overlays activados visibles en la forma de onda: franja gris con tooltip 00:02.000–00:04.000 y marcador naranja cerca de 6,5 s. Captura I58-overlays.png; también comprobados visualmente en Espectrograma. Sin cambios de preferencias.
+
+- **I-74 — ✅, guardado individual, 04/10/2026:** QA nativa 04/10: la línea temporal coloca el silencio 2–4 s y el clipping 6–7 s donde fueron generados en I58_silencio_clipping.wav. Forma de onda, bandas del espectrograma y marcador naranja coinciden sobre el mismo eje de 12 s; tooltip de silencio precisa 2.000–4.000 s.
+
+- **I-71 — ✅, guardado individual, 04/10/2026:** QA nativa 04/10: Espectrograma muestra el gráfico «Sonoridad temporal · Short-term LUFS» con curva y eje temporal 0–12 s. Tras la ventana inicial de 3 s, presenta descenso/recuperación alrededor del silencio y aumento alrededor de la señal saturada 6–7 s; no es solo la cifra LUFS integrada. Interpretado como short-term con ventana, no como amplitud instantánea.
+
+- **I-62 — ✅, guardado individual, 04/10/2026:** QA nativa 04/10 mediante CUA: clic en el centro del espectrograma de 12 s lleva el transporte a 00:06 y arrastre desde la coordenada 9 s hasta 3 s lo lleva a 00:03. La app inicia/reanuda escucha al hacer seek; se pausa posteriormente con su control propio. El gesto real funciona, a diferencia del AXPress sin arrastre de intentos antiguos.
+
+- **I-61 — ✅, guardado individual, 04/10/2026:** QA visual nativa 04/10: durante reproducción y en pausa a ~9/12 s, líneas blancas de espectrograma, gráfico LUFS y waveform señalan la misma fracción temporal (~75 %) aunque sus márgenes/ancho difieren; reloj 00:09/00:12 coherente. No se confunde cursor punteado de hover (9.000 s) con playhead continuo.
+
+- **I-29 — ⚠️, guardado individual, 04/10/2026:** QA nativa 04/10: clic real en slider cambia 1→0 (icono Silencio)→0.438889→0.994444 y acción Increment restituye exactamente 1. El control responde y el estado mute es coherente. No existe escucha ni captura loopback de la salida en esta sesión: no certifico ganancia/mute acústicos. Revisión humana breve: reproducir un tono y comparar 0/medio/1.
+
+- **I-89 — ✅, guardado individual, 04/10/2026:** QA nativa 04/10: nuevo PCM16/48 kHz de 12 s, tonos 440 Hz 0–4, 4000 Hz 4–8 y 880 Hz 8–12. Análisis avanzado devuelve 2 anomalías; screenshot I89-timeline.png muestra bandas violetas en ~4 y ~8 s, coincidentes con los cambios de la señal. Se acepta posición temporal del overlay, no clasificación como origen con pérdida (correctamente Evidencia insuficiente) ni exactitud del eje Y ya registrada aparte.
+
+- **I-02 — ✅, guardado individual, 04/10/2026:** QA nativa 04/10: arrastre real desde una fila de Finder (carpeta aislada con un único I02-arrastrar.wav) a la zona visible del Inspector. La app abre exactamente ese WAV, identifica duración 12 s y permanece en modo inspección/solo lectura. SHA de copia y fixture idéntico db7aeed036929e92d938c29731d1f825aaa3d3dc5e88235e65ef57f8b14726c9. Primer arrastre tomó una captura PNG por desplazamiento de filas; es error de coordenadas del controlador, no de ZEUVE; también fue aceptada como archivo.
+
+- **I-33 — ❌, guardado individual, 04/10/2026:** QA 04/10: no se acepta el criterio global de respuesta habitual. Play/Pausa de audio y seek de espectrograma responden, pero el seek de vídeo pausado deja indefinidamente la imagen anterior (I-38: playhead 10 s, frame 14.750 s aún en captura posterior), y cambiar audio durante vídeo produce alerta y frame congelado (I-39: reloj 29–30 s, frame ~24.917 s). No es una medición exacta de latencia de entrada de 1 s; son bloqueos visuales confirmados en acciones habituales, no los retardos de lectura AX del controlador.
+
+- **I-35 — ⚠️, guardado individual, 04/10/2026:** QA 04/10: fixtures H.264/HEVC/AV1/VFR con audio permiten contrastar reloj, frames con timecode y waveform en reproducción normal; I-34/I-179 confirman coherencia temporal visual dentro de resolución de FPS y redondeo del reloj. En cambio I-39 demuestra pérdida de actualización del vídeo tras cambio de audio. No escucho la salida real ni dispongo de loopback: sincronía acústica/lip-sync no certificada. Revisión humana breve: vídeo de pulsos/beeps o habla, inicial y tras seek/cambio de pista. Conservado parcial, no aprobación por inferencia del código.
+
+- **I-128 — ✅, guardado individual, 04/10/2026:** Revisión visual adicional 04/10, sustituye el parcial de control del 03/10: se reabre I128_caratula_original.mkv, despliega Adjuntos e imágenes y desplaza hasta mostrar la miniatura completa. Captura I128-miniatura-completa.png: patrón de barras/color/círculo y proporción 3:2 coinciden con I128_cover_A.jpg (240×160), sin recorte propio de la miniatura; la primera vista cortada era el borde del scroll. Identificación Carátula · stream 2 · mjpeg coherente. Ahora OK por render realmente observado, no por AXImage.
+
+- **Cierre del Inspector, 04/10/2026:** 30 IDs pendientes abordados y I-128 revalidado visualmente: 26 OK adicionales, 3 casillas fallidas (I-33/I-38/I-39; dos incidencias de vídeo distintas) y 2 parciales acústicos. Total Inspector 160/180 OK, 12 fallidas y 8 parciales; 0 pendientes. El resto de módulos no cambia. Original multistream conserva SHA 320e47cd…501ca y capítulos 0/5 s tras descartar borradores de vídeo externo y capítulo 20 s; no se publican ediciones de esos borradores. Preview detenido, volumen restituido exactamente a 1, ventana devuelta a tamaño/posición iniciales y sin motores hijos activos. No se cambia código, configuración de producto, versión, motores ni empaquetado. Casos 4K/HEVC/AV1/VFR/HDR están acotados a fixtures sintéticos; HDR es compatibilidad, no calibración de color. Todos los resultados se guardaron individualmente.
 
 ## 1. ZEUVE general
 
@@ -1040,7 +1104,7 @@ Estos deben rechazarse claramente, no convertirse:
 ## Apertura e inspección
 
 - [x] ✅ **I-01** Abrir archivo con selector.
-- [ ] ➖ **I-02** Arrastrar archivo.
+- [x] ✅ **I-02** Arrastrar archivo.
 - [x] ✅ **I-03** MKV.
 - [x] ✅ **I-04** MP4.
 - [x] ✅ **I-05** MOV.
@@ -1063,33 +1127,33 @@ Estos deben rechazarse claramente, no convertirse:
 - [x] ✅ **I-19** Play.
 - [x] ✅ **I-20** Pausa responde inmediatamente.
 - [x] ✅ **I-21** Reanudar responde inmediatamente.
-- [ ] ➖ **I-22** Seek con la timeline.
+- [x] ✅ **I-22** Seek con la timeline.
 - [x] ✅ **I-23** Seek hacia delante.
 - [x] ✅ **I-24** Seek hacia atrás.
 - [x] ✅ **I-25** Cambiar velocidad.
 - [x] ✅ **I-26** 0,5× funciona.
 - [x] ✅ **I-27** 1× funciona.
 - [x] ✅ **I-28** 2× funciona.
-- [ ] ➖ **I-29** Volumen funciona.
+- [ ] ⚠️ **I-29** Volumen funciona.
 - [x] ✅ **I-30** Cambiar pista de audio conserva el instante.
 - [x] ✅ **I-31** Cambiar pista mientras reproduce conserva Play.
 - [x] ✅ **I-32** Cambiar pista estando pausado conserva Pausa.
-- [ ] ➖ **I-33** Ninguna acción habitual se siente con el retraso de \~1 segundo que se corrigió.
+- [x] ❌ **I-33** Ninguna acción habitual se siente con el retraso de \~1 segundo que se corrigió.
 
 ## Preview de vídeo
 
-- [ ] ➖ **I-34** El vídeo se reproduce.
-- [ ] ➖ **I-35** Vídeo y audio están sincronizados.
-- [ ] ➖ **I-36** Pausar conserva el frame.
-- [ ] ➖ **I-37** Reanudar no reinicia desde cero.
-- [ ] ➖ **I-38** Seek de vídeo funciona.
-- [ ] ➖ **I-39** Cambiar pista de audio durante vídeo conserva posición.
-- [ ] ➖ **I-40** Cambiar stream de vídeo conserva posición.
-- [ ] ➖ **I-41** El cambio de stream no reproduce accidentalmente otro stream con el mismo índice de otra fuente.
+- [x] ✅ **I-34** El vídeo se reproduce.
+- [ ] ⚠️ **I-35** Vídeo y audio están sincronizados.
+- [x] ✅ **I-36** Pausar conserva el frame.
+- [x] ✅ **I-37** Reanudar no reinicia desde cero.
+- [x] ❌ **I-38** Seek de vídeo funciona.
+- [x] ❌ **I-39** Cambiar pista de audio durante vídeo conserva posición.
+- [x] ✅ **I-40** Cambiar stream de vídeo conserva posición.
+- [x] ✅ **I-41** El cambio de stream no reproduce accidentalmente otro stream con el mismo índice de otra fuente.
 - [x] ✅ **I-42** Fullscreen entra correctamente.
 - [x] ✅ **I-43** Fullscreen sale correctamente.
-- [ ] ➖ **I-44** Escalado de vídeo es correcto.
-- [ ] ➖ **I-45** Aspect ratio se conserva.
+- [x] ✅ **I-44** Escalado de vídeo es correcto.
+- [x] ✅ **I-45** Aspect ratio se conserva.
 
 ## Subtítulos de preview
 
@@ -1102,20 +1166,20 @@ Estos deben rechazarse claramente, no convertirse:
 
 ## Waveform/timeline
 
-- [ ] ➖ **I-52** Se genera waveform.
-- [ ] ➖ **I-53** Scrub sobre waveform mueve el playhead.
+- [x] ✅ **I-52** Se genera waveform.
+- [x] ✅ **I-53** Scrub sobre waveform mueve el playhead.
 - [x] ✅ **I-54** Playhead de waveform y reproductor coincide.
 - [x] ✅ **I-55** Zoom funciona.
 - [x] ✅ **I-56** Pan funciona.
-- [ ] ➖ **I-57** Capítulos aparecen en timeline cuando corresponde.
-- [ ] ➖ **I-58** Overlays de análisis aparecen cuando están activados.
+- [x] ✅ **I-57** Capítulos aparecen en timeline cuando corresponde.
+- [x] ✅ **I-58** Overlays de análisis aparecen cuando están activados.
 
 ## Espectrograma
 
 - [x] ✅ **I-59** Generar espectrograma.
 - [x] ✅ **I-60** El resultado corresponde a la pista elegida.
-- [ ] ➖ **I-61** El playhead coincide con reproductor/waveform.
-- [ ] ➖ **I-62** Pulsar/scrub en espectrograma hace seek correctamente.
+- [x] ✅ **I-61** El playhead coincide con reproductor/waveform.
+- [x] ✅ **I-62** Pulsar/scrub en espectrograma hace seek correctamente.
 - [x] ✅ **I-63** Zoom/pan funciona.
 - [x] ✅ **I-64** Cambiar parámetros visuales reutilizables no vuelve a decodificar innecesariamente.
 - [x] ✅ **I-65** Exportar espectrograma funciona.
@@ -1127,10 +1191,10 @@ Estos deben rechazarse claramente, no convertirse:
 - [x] ✅ **I-68** LRA.
 - [x] ✅ **I-69** True Peak.
 - [x] ✅ **I-70** Sample Peak.
-- [ ] ➖ **I-71** Timeline de sonoridad.
+- [x] ✅ **I-71** Timeline de sonoridad.
 - [x] ✅ **I-72** Detección de silencios.
 - [x] ✅ **I-73** Detección de posible clipping.
-- [ ] ➖ **I-74** Eventos aparecen en timeline.
+- [x] ✅ **I-74** Eventos aparecen en timeline.
 - [x] ✅ **I-75** Con una sola pista se ejecuta correctamente la automatización configurada.
 - [x] ✅ **I-76** Con varias pistas no selecciona silenciosamente una pista para análisis pesado.
 
@@ -1151,7 +1215,7 @@ Estos deben rechazarse claramente, no convertirse:
 - [x] ✅ **I-86** No afirma automáticamente «fake lossless» basándose solo en un cutoff.
 - [x] ✅ **I-87** Detección de anomalías espectrales funciona.
 - [x] ✅ **I-88** Las anomalías tienen localización temporal.
-- [ ] ➖ **I-89** Aparecen correctamente en timeline.
+- [x] ✅ **I-89** Aparecen correctamente en timeline.
 
 ## OCR bitmap
 
@@ -1193,7 +1257,7 @@ Usar siempre una copia prescindible.
 - [x] ✅ **I-115** Eliminar capítulo.
 - [x] ✅ **I-116** Renombrar capítulo.
 - [x] ✅ **I-117** Cambiar su posición temporal.
-- [ ] ➖ **I-118** Timeline refleja cambios antes de ejecutar.
+- [x] ✅ **I-118** Timeline refleja cambios antes de ejecutar.
 
 ## Metadata
 
@@ -1212,7 +1276,7 @@ Usar siempre una copia prescindible.
 
 ## Carátulas
 
-- [ ] ⚠️ **I-128** Visualizar carátula.
+- [x] ✅ **I-128** Visualizar carátula.
 - [x] ✅ **I-129** Extraer carátula.
 - [x] ❌ **I-130** Añadir carátula.
 - [x] ❌ **I-131** Sustituir carátula.
@@ -1274,12 +1338,12 @@ Usar siempre una copia prescindible.
 
 ## Compatibilidad/rendimiento
 
-- [ ] ➖ **I-175** Archivo largo no provoca un crecimiento absurdo de RAM.
-- [ ] ➖ **I-176** Vídeo 4K puede inspeccionarse/reproducirse dentro de límites razonables.
-- [ ] ➖ **I-177** HEVC.
-- [ ] ➖ **I-178** AV1 si el FFmpeg instalado lo soporta.
-- [ ] ➖ **I-179** VFR mantiene una timeline coherente.
-- [ ] ➖ **I-180** HDR se puede inspeccionar/previsualizar sin tratarlo como monitor HDR de referencia.
+- [x] ✅ **I-175** Archivo largo no provoca un crecimiento absurdo de RAM.
+- [x] ✅ **I-176** Vídeo 4K puede inspeccionarse/reproducirse dentro de límites razonables.
+- [x] ✅ **I-177** HEVC.
+- [x] ✅ **I-178** AV1 si el FFmpeg instalado lo soporta.
+- [x] ✅ **I-179** VFR mantiene una timeline coherente.
+- [x] ✅ **I-180** HDR se puede inspeccionar/previsualizar sin tratarlo como monitor HDR de referencia.
 
 ---
 
