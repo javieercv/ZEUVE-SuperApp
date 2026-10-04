@@ -143,6 +143,6 @@ Para consultar la evolución del proyecto:
 
 Desarrollo activo para macOS · Apple Silicon
 
-Correcciones de QA implementadas con regresiones automáticas; aceptación manual de los 22 IDs del alcance pendiente de comprobación. [Evidencia de validación](Docs/Historico/Pruebas/TEST_RESULTS_0.20.6.0.md).
+Correcciones de QA implementadas con regresiones automáticas y los 22 IDs del alcance comprobados desde UI en Release con datos aislados. [Evidencia técnica](Docs/Historico/Pruebas/TEST_RESULTS_0.20.6.0.md) y [QA manual](Docs/Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md). La checklist conserva 1 fallo del Descargador excluido, 14 parciales y 34 pendientes.
 
 </div>

@@ -1,12 +1,66 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
+Estado acumulado al 04/10/2026 · revalidación de ZEUVE 0.20.6.0 (marketing 0.20.6, build 72). Se conserva la evidencia anterior de 0.20.5.0/build 71.
 
-**639 pruebas: 568 ✅ OK · 23 ❌ fallidas · 14 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 590 ✅ OK · 1 ❌ fallida · 14 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
 
-Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
+Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. Ambas usan datos aislados y archivos sintéticos; la cobertura no certifica toda la distribución ni cualquier entrada posible.
 
-## Correcciones aprobadas — 04/10/2026 · 0.20.6.0/build 72
+## Revalidación manual — 04/10/2026 · 0.20.6.0/build 72
+
+22/22 IDs del alcance comprobados desde la interfaz y registrados individualmente. Control AppleScript/System Events y clics nativos CoreGraphics con permiso de eventos ya concedido, autorizado por el usuario. Copia interna de Release, datos aislados y originales sintéticos; Pandoc solo en QA. Las conversiones y ediciones se iniciaron desde UI; hashes, FFprobe y decodificación complementan la comprobación. Las pruebas de servicio previas no sustituyen esta aceptación.
+
+- **C-14 — ✅, guardado individual:** WAV mono → OPUS en Personalizado/Automático: plan anuncia 256 kb/s y UI termina 1 correcto/0 fallidos. En Avanzado, 320 kb/s explícitos mono muestran el aviso de máximo 256 antes de convertir, sin reducir la selección; al sustituir por WAV estéreo, el plan anuncia 320 elegidos y termina 1 correcto/0 fallidos. FFprobe y decodificación íntegra confirman Opus mono/estéreo respectivamente; originales intactos.
+
+- **C-15 — ✅, guardado individual:** WAV mono → OGG en Personalizado/Automático: plan anuncia 256 kb/s, UI 1 correcto/0 fallidos/omitidos/cancelados; FFprobe confirma Opus en Ogg, mono 48 kHz y decodificación íntegra sin errores. Elegir 320 kb/s explícitos muestra antes de ejecutar el aviso de máximo 256 y mantiene la selección. Original intacto.
+
+- **C-35 — ✅, guardado individual:** TXT → Markdown y HTML por UI: cada ruta termina 1 correcto/0 fallidos/omitidos/cancelados. Markdown de párrafos simples aceptado y publicado; HTML independiente válido. Lectura de ambas salidas confirma 12345, acentos y ñ; fuente intacta.
+
+- **C-36 — ✅, guardado individual:** Markdown → TXT y HTML por UI: cada ruta termina 1 correcto/0 fallidos/omitidos/cancelados. TXT elimina marcadores de énfasis/código y conserva contenido/listas; HTML válido conserva estructura. Salidas UTF-8 comprobadas y original intacto.
+
+- **C-37 — ✅, guardado individual:** HTML → TXT y Markdown por UI: cada ruta termina 1 correcto/0 fallidos/omitidos/cancelados. TXT plano sin etiquetas/énfasis y Markdown con contenido textual publicado; 12345 y ñ conservados. Original intacto.
+
+- **C-20 — ✅, guardado individual:** UI simple no ofrece WebM. Avanzado/copia rápida con H.264 muestra rechazo durante la preparación, sin ejecutar un plan incompatible. Contraste AV1/AAC: plan anuncia copia de vídeo y Opus mono a 256 kb/s; UI 1 correcto/0 fallidos. FFprobe verifica WebM AV1/Opus y todos los hashes de paquetes de vídeo coinciden con la fuente; audio decodificado íntegro. El decoder AV1 local no permite comprobar reproducción de vídeo, límite separado del remux. El 320 explícito heredado se rechazó correctamente y se eligió Automático por UI.
+
+- **C-46 — ✅, guardado individual:** Lote de dos vídeos sintéticos de 120 s: botón Cancelar pulsado durante Convirtiendo; resumen 0 correctos/fallidos/omitidos y 2 cancelados, sin FFmpeg residual. Cerrar resultado recupera importar/Quitar todas y permite preparar y ejecutar WAV→MP3 sin reiniciar: 1 correcto/0 fallidos y decodificación íntegra. Fuentes intactas. Primer intento de control no llegó al botón vivo y acabó 2 correctos; solo el segundo acredita cancelación.
+
+- **P-16 — ✅, guardado individual:** Se revalida el fallo transversal mediante C-46: tras cancelar el lote real, la misma sesión recupera controles y ejecuta otra conversión completa sin reiniciar ZEUVE. Motores terminados, secretos efímeros vacíos en UI y originales intactos. Aceptación del recorrido de cancelación del Conversor que originó INC-14; no extrapolación a cualquier motor.
+
+- **I-38 — ✅, guardado individual:** Seek real desde transporte: tras Pausa, +15 s lleva reloj a 00:35 y frame a timecode 00:00:34.9; se conserva Reanudar. Contraste -15 s en estado detenido/finalizado pasa por 25 y 10 s con frame 10.083. Capturas guardadas; no queda la imagen anterior.
+
+- **I-39 — ✅, guardado individual:** Durante vídeo MKV con dos AAC se cambia Tono440 → Tono1320 → Tono440 desde Escuchar en Pistas. Reloj continúa de 10 a 15 y 19 s; frame 18.500 en vuelta A, sin alerta de ejecutor ocupado ni congelación. Pausa y seek posteriores responden. Evidencia visual y AX; no certifica sincronía acústica.
+
+- **I-66 — ✅, guardado individual:** Capturas visuales a 1470×844, 1055×724 y mínimo efectivo 1035×724. Espectrograma generado con vídeo/audio y aviso de PNG exportado: Play, saltos, velocidad, volumen, pantalla completa y Stop quedan dentro de la ventana; al estrecharse pasan a dos filas. Contenido superior desplazable. Se restaura tamaño amplio.
+
+- **I-33 — ✅, guardado individual:** En el multistream H264/2 AAC, Play/Pausa/Reanudar, saltos pausados, navegación Resumen/Pistas/Espectrograma y cambios A→B→A responden sin los bloqueos visuales previos; los frames siguen al destino o al reloj. Acciones de transporte enviadas en ~0,15–0,2 s, capturas confirman resultado. Muestreo funcional, sin afirmar una garantía de latencia máxima para todos los archivos.
+
+- **I-120 — ✅, guardado individual:** Desde Metadatos se escribe título de vídeo A; Pistas muestra el mismo valor. Se reordena A después de B y se publica I120-I127-I136_UI.mkv. FFprobe confirma Video B en ordinal 0 y Vídeo A metadata QA 206 en ordinal 1; paquetes de ambas pistas idénticos al original y decodificación completa correcta.
+
+- **I-127 — ✅, guardado individual:** En Resumen/Adjuntos se cambia nombre a adjunto_metadata_206.bin y MIME a application/octet-stream. Publicación desde Generar archivo nuevo completada y resultado abierto automáticamente en solo lectura. FFprobe confirma ambos tags; extradata idéntica, aunque codec_name sigue ausente como en la entrada.
+
+- **I-136 — ✅, guardado individual:** Generar archivo nuevo publica MKV con los 7 streams, dos capítulos, título reordenado y attachment sin codec_name conservado. No aparece el falso cambio de códec anterior. Los seis streams audiovisuales/subtítulos conservan sus paquetes SHA-256 y el adjunto conserva extradata; vídeo/audio decodifican completos. Original intacto.
+
+- **I-130 — ✅, guardado individual:** UI añade JPEG a MP4 sin carátula. Campo Título vacío/deshabilitado y limitación MP4 visible. Generar archivo nuevo publica I130_UI_add.mp4; FFprobe confirma una attached_pic MJPEG. JPEG extraído idéntico a imagen elegida, vídeo/audio conservan paquetes y decodifican completos. Original intacto.
+
+- **I-131 — ✅, guardado individual:** UI Sustituir cambia JPEG por PNG en MP4. Título vacío/deshabilitado y limitación visible. Se publica I131_UI_replace.mp4 con una única attached_pic PNG, sin la JPEG anterior. PNG extraído idéntico a imagen B, paquetes audiovisuales intactos y decodificación completa correcta.
+
+- **I-132 — ✅, guardado individual:** UI elimina la carátula original de I130_contraste_sin_titulo.mp4 y publica I132_UI_remove.mp4. Resultado con 0 attached_pic, un vídeo y un audio; no falso rechazo de idioma ausente/und ni bloqueo por carátula eliminada. Paquetes de vídeo/audio idénticos y decodificación completa correcta.
+
+- **I-133 — ✅, guardado individual:** UI edita metadata global en MKV con carátula original y publica I133_UI_keep.mkv. Se conserva la imagen como adjunto Matroska; extradata idéntica a la original. Vídeo/audio mantienen todos los paquetes y decodifican completos. Original intacto; resultado abierto en solo lectura.
+
+- **I-164 — ✅, guardado individual:** 201 archivos propios: captura muestra Preparando…, Cancelar preflight y coordinador activo. Clic nativo con permiso de eventos ya concedido cancela durante ejecución; captura posterior muestra Generar preflight, controles activos, sin planes ni coordinador. Sin resultados tardíos. Cerrar/reabrir lote y preparar un archivo termina con 1 aplicable, sin FFprobe residual ni salidas masivas. Intentos AX tardíos se excluyen de aceptación; los lotes de 1201 solo fueron de preparación.
+
+- **S-16 — ✅, guardado individual:** Se crea preset QA206_preset_reset en Ajustes, conjunto QA206_regla_reset en Lote y se marcan ambos favoritos desde UI. General → Restaurar todos los ajustes, confirmación aceptada. Tras cierre normal y reapertura, ambos se seleccionan y conservan configuración/★. SQLite reabierto: presets, reglas y favoritos byte a byte idénticos antes/después del reset y reinicio. Datos aislados; no reset del usuario.
+
+- **L-74 — ✅, guardado individual:** Solo Antiguo-QA-206.pkg propio, 83 bytes, seleccionado y revisado por ruta exacta. UI mueve 1 a Papelera/0 fallidos, persiste Undo. Cierre normal y reapertura (13650→14806): Limpieza ofrece Deshacer antes de analizar. Al pulsarlo, archivo restaurado a su ruta original con SHA-256 idéntico y 0 filas Undo pendientes. La lectura externa de Papelera fue denegada por macOS y no se eludió; restauración comprobada desde ZEUVE.
+
+Informe: [QA manual de 0.20.6.0](Docs/Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md). El único ❌ vigente es D-13, fuera del alcance. Los 14 parciales y los 34 pendientes no se reclasifican.
+
+## Historial de correcciones e intentos previos — 04/10/2026
+
+Las notas de este bloque reflejan el estado anterior a la revalidación completada arriba; se conservan como evidencia histórica.
+
+### Correcciones aprobadas — 0.20.6.0/build 72
 
 **Segundo reintento y diagnóstico — 04/10/2026:** remoto actualizado en `e8577ac`, sin cambios ajenos. Se separaron clic y lectura: el botón Conversor de Inicio aceptó el clic, pero `getAXState` con diferencias desactivadas cerró el controlador; tampoco se recuperó mediante captura. En otra sesión aislada, Inicio → Inspector y el selector funcionaron; se eligió `I34_multistream40.mkv` mediante su ruta completa y Abrir. La lectura posterior volvió a perder la conexión. El informe de cierre de macOS identifica `SkyComputerUseService`, `EXC_BREAKPOINT/SIGTRAP` y `Array.remove(at:)` en el hilo que falló. Esto confirma un cierre del controlador, sin demostrar la causa interna ni un fallo de producto. **0 casos de aceptación completados en este segundo reintento.** No se ejecutaron ediciones, conversiones, resets ni retiradas; los doce originales conservaron sus hashes. Pendiente recuperar el controlador o autorizar expresamente otro método de control de la misma UI; las casillas anteriores permanecen intactas.
 
@@ -37,17 +91,19 @@ Las correcciones se han implementado después de la aprobación explícita del p
 - **I-164 — ❌, corregido, pendiente de comprobación:** Cancelar preflight cancela la tarea real, libera el coordinador y descarta revisiones obsoletas; cerrar espera terminación. Falta el recorrido nativo del botón. Aceptación desde UI sin repetir por fallo del controlador; no se marca OK.
 - **L-74 — ❌, corregido, pendiente de comprobación:** Deshacer se recupera de SQLite reabierto con ubicación de Papelera, fingerprint, escritura y conflictos; regresión completada. Aceptación desde UI sin repetir por fallo del controlador; no se marca OK.
 
-Evidencia técnica: `Docs/Historico/Pruebas/TEST_RESULTS_0.20.6.0.md`. El estado acumulado de aceptación permanece **568 OK / 23 fallidas / 14 parciales / 34 pendientes**. Las evidencias anteriores corresponden a Debug 0.20.5.0/build 71 y se conservan debajo.
+Evidencia técnica: `Docs/Historico/Pruebas/TEST_RESULTS_0.20.6.0.md`. El estado acumulado al terminar aquel intento era **568 OK / 23 fallidas / 14 parciales / 34 pendientes**. Las evidencias anteriores corresponden a Debug 0.20.5.0/build 71 y se conservan debajo.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
 Confirmación manual del usuario, 04/10/2026: **F-02 funciona**. El arrastre del ZIP del Comparador se acepta por esta confirmación; no se afirma una repetición por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 54/63 OK, 7 fallidas (C-14/C-15/C-20/C-35/C-36/C-37/C-46), 2 parciales (C-11/C-48) y 0 pendientes, Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 13/16 OK, 1 fallida (P-16), 1 parcial (P-12) y 1 pendiente (P-11).
+Resumen actual: General 40/40 OK; Historial 15/15 OK; Ajustes 18/18 OK; Organizador 49/50 OK y 1 parcial; Descargador 44/80 OK, 1 fallo, 2 parciales y 33 pendientes; Analizador 75/75 OK; Conversor 61/63 OK y 2 parciales; Comparador 27/27 OK; Inspector 172/180 OK y 8 parciales; Limpiador 75/75 OK; Privacidad transversal 14/16 OK, 1 parcial y 1 pendiente.
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. El lote de carpeta no validó por sí solo C-42 ni C-45; ambos se comprobaron después en sus recorridos específicos, según su guardado individual. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
-## Continuidad de pruebas — guardado individual
+## Historial de pruebas de 0.20.5.0 — guardado individual
+
+Este bloque conserva los resultados y las incidencias de aquella ronda. El estado vigente de los 22 IDs corregidos figura en la revalidación de 0.20.6.0 y en las casillas al final.
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
@@ -923,7 +979,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **S-13** «Restaurar todos los ajustes predeterminados» pide confirmación.
 - [x] ✅ **S-14** La restauración funciona.
 - [x] ✅ **S-15** No borra Historial.
-- [x] ❌ **S-16** No borra presets/preajustes.
+- [x] ✅ **S-16** No borra presets/preajustes.
 - [x] ✅ **S-17** No borra favoritos.
 - [x] ✅ **S-18** No borra los archivos del usuario.
 
@@ -1235,8 +1291,8 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [ ] ⚠️ **C-11** M4A/AAC.
 - [x] ✅ **C-12** FLAC.
 - [x] ✅ **C-13** WAV.
-- [x] ❌ **C-14** Opus.
-- [x] ❌ **C-15** OGG.
+- [x] ✅ **C-14** Opus.
+- [x] ✅ **C-15** OGG.
 - [x] ✅ **C-16** Cambiar calidad/bitrate cuando la salida lo permita.
 
 ## Vídeo
@@ -1244,7 +1300,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **C-17** MP4.
 - [x] ✅ **C-18** MOV.
 - [x] ✅ **C-19** MKV.
-- [x] ❌ **C-20** WebM.
+- [x] ✅ **C-20** WebM.
 - [x] ✅ **C-21** AVI como entrada.
 - [x] ✅ **C-22** Vídeo → vídeo recodificado.
 - [x] ✅ **C-23** Vídeo → audio.
@@ -1268,9 +1324,9 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 ## Texto y datos
 
-- [x] ❌ **C-35** TXT → Markdown/HTML si Pandoc está preparado.
-- [x] ❌ **C-36** Markdown → TXT/HTML si Pandoc está preparado.
-- [x] ❌ **C-37** HTML → TXT/Markdown si Pandoc está preparado.
+- [x] ✅ **C-35** TXT → Markdown/HTML si Pandoc está preparado.
+- [x] ✅ **C-36** Markdown → TXT/HTML si Pandoc está preparado.
+- [x] ✅ **C-37** HTML → TXT/Markdown si Pandoc está preparado.
 - [x] ✅ **C-38** CSV se reconoce correctamente.
 - [x] ✅ **C-39** JSON se reconoce correctamente.
 - [x] ✅ **C-40** XML se reconoce correctamente.
@@ -1282,7 +1338,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **C-43** Carpeta.
 - [x] ✅ **C-44** ZIP.
 - [x] ✅ **C-45** El progreso de lote funciona.
-- [x] ❌ **C-46** Cancelar un lote funciona.
+- [x] ✅ **C-46** Cancelar un lote funciona.
 - [x] ✅ **C-47** Presets funcionan.
 - [ ] ⚠️ **C-48** Favoritos funcionan.
 
@@ -1382,7 +1438,7 @@ Estos deben rechazarse claramente, no convertirse:
 - [x] ✅ **I-30** Cambiar pista de audio conserva el instante.
 - [x] ✅ **I-31** Cambiar pista mientras reproduce conserva Play.
 - [x] ✅ **I-32** Cambiar pista estando pausado conserva Pausa.
-- [x] ❌ **I-33** Ninguna acción habitual se siente con el retraso de \~1 segundo que se corrigió.
+- [x] ✅ **I-33** Ninguna acción habitual se siente con el retraso de \~1 segundo que se corrigió.
 
 ## Preview de vídeo
 
@@ -1390,8 +1446,8 @@ Estos deben rechazarse claramente, no convertirse:
 - [ ] ⚠️ **I-35** Vídeo y audio están sincronizados.
 - [x] ✅ **I-36** Pausar conserva el frame.
 - [x] ✅ **I-37** Reanudar no reinicia desde cero.
-- [x] ❌ **I-38** Seek de vídeo funciona.
-- [x] ❌ **I-39** Cambiar pista de audio durante vídeo conserva posición.
+- [x] ✅ **I-38** Seek de vídeo funciona.
+- [x] ✅ **I-39** Cambiar pista de audio durante vídeo conserva posición.
 - [x] ✅ **I-40** Cambiar stream de vídeo conserva posición.
 - [x] ✅ **I-41** El cambio de stream no reproduce accidentalmente otro stream con el mismo índice de otra fuente.
 - [x] ✅ **I-42** Fullscreen entra correctamente.
@@ -1427,7 +1483,7 @@ Estos deben rechazarse claramente, no convertirse:
 - [x] ✅ **I-63** Zoom/pan funciona.
 - [x] ✅ **I-64** Cambiar parámetros visuales reutilizables no vuelve a decodificar innecesariamente.
 - [x] ✅ **I-65** Exportar espectrograma funciona.
-- [x] ❌ **I-66** La barra inferior/reproductor sigue visible.
+- [x] ✅ **I-66** La barra inferior/reproductor sigue visible.
 
 ## Sonoridad y señal
 
@@ -1506,7 +1562,7 @@ Usar siempre una copia prescindible.
 ## Metadata
 
 - [x] ✅ **I-119** Editar tag permitido.
-- [x] ❌ **I-120** Editar metadata de stream permitida.
+- [x] ✅ **I-120** Editar metadata de stream permitida.
 - [x] ✅ **I-121** Tags desconocidos siguen visibles.
 - [x] ✅ **I-122** No convierte indiscriminadamente cualquier tag en editable.
 
@@ -1516,22 +1572,22 @@ Usar siempre una copia prescindible.
 - [x] ✅ **I-124** Extraer attachment.
 - [x] ✅ **I-125** Eliminar attachment.
 - [x] ✅ **I-126** Añadir attachment externo compatible.
-- [x] ❌ **I-127** Editar nombre/MIME cuando corresponda.
+- [x] ✅ **I-127** Editar nombre/MIME cuando corresponda.
 
 ## Carátulas
 
 - [x] ✅ **I-128** Visualizar carátula.
 - [x] ✅ **I-129** Extraer carátula.
-- [x] ❌ **I-130** Añadir carátula.
-- [x] ❌ **I-131** Sustituir carátula.
-- [x] ❌ **I-132** Eliminar carátula.
-- [x] ❌ **I-133** Resultado correcto en MKV.
+- [x] ✅ **I-130** Añadir carátula.
+- [x] ✅ **I-131** Sustituir carátula.
+- [x] ✅ **I-132** Eliminar carátula.
+- [x] ✅ **I-133** Resultado correcto en MKV.
 - [ ] ⚠️ **I-134** Resultado correcto en MP4/MOV compatible.
 
 ## Ejecutar edición
 
 - [ ] ⚠️ **I-135** Antes de ejecutar se puede revisar el plan.
-- [x] ❌ **I-136** Ejecutar genera un archivo nuevo.
+- [x] ✅ **I-136** Ejecutar genera un archivo nuevo.
 - [x] ✅ **I-137** El original permanece intacto.
 - [x] ✅ **I-138** El resultado contiene exactamente los streams previstos.
 - [x] ✅ **I-139** Audio/vídeo se mantienen por stream copy.
@@ -1565,7 +1621,7 @@ Usar siempre una copia prescindible.
 - [ ] ⚠️ **I-161** Preflight muestra qué ocurrirá.
 - [ ] ⚠️ **I-162** Se puede revisar antes de ejecutar.
 - [x] ✅ **I-163** Una operación pesada ya activa impide empezar indebidamente el preflight.
-- [x] ❌ **I-164** Cancelar el preflight funciona.
+- [x] ✅ **I-164** Cancelar el preflight funciona.
 - [x] ✅ **I-165** Ejecutar edición secuencial funciona.
 
 ## Presets, favoritos e informes
@@ -1704,7 +1760,7 @@ Si Xcode está instalado:
 
 - [x] ✅ **L-72** Reiniciar ZEUVE conserva inventario/histórico necesario.
 - [x] ✅ **L-73** Reiniciar conserva decisiones «Conservar».
-- [x] ❌ **L-74** Undo pendiente sigue apareciendo cuando todavía es verificable.
+- [x] ✅ **L-74** Undo pendiente sigue apareciendo cuando todavía es verificable.
 - [x] ✅ **L-75** Restaurar ajustes del Limpiador no borra indebidamente inventario/Undo/decisiones que deban conservarse.
 
 ---
@@ -1726,4 +1782,4 @@ Si Xcode está instalado:
 - [x] ✅ **P-13** Analizar chats no deja mensajes completos en Historial.
 - [x] ✅ **P-14** Comparar seguidores no deja usernames/listas en Historial.
 - [x] ✅ **P-15** OCR del Inspector no deja el texto OCR completo en Historial.
-- [x] ❌ **P-16** Cancelar operaciones no deja ZEUVE permanentemente bloqueado.
+- [x] ✅ **P-16** Cancelar operaciones no deja ZEUVE permanentemente bloqueado.

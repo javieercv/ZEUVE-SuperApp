@@ -1,6 +1,6 @@
 # Pruebas y validación — ZEUVE 0.20.6.0
 
-La evidencia de la corrección vigente está en [TEST_RESULTS_0.20.6.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.6.0.md). Las pruebas automáticas e integraciones locales no sustituyen la aceptación desde la UI; los 22 IDs corregidos conservan ❌ hasta su comprobación manual, impedida en esta ronda por pérdida de conexión del controlador nativo.
+La evidencia de las correcciones está en [TEST_RESULTS_0.20.6.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.6.0.md). La [revalidación manual de 04/10/2026](../Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) completa desde UI los 22 IDs corregidos sobre una copia interna de Release con datos aislados. Checklist acumulada: 590 OK, 1 fallo del Descargador excluido, 14 parciales y 34 pendientes. Los límites de reproducción AV1, sincronía acústica y cobertura restante figuran en ese informe.
 
 ## Evidencia de la entrega actual
 

@@ -69,7 +69,7 @@ La instantánea empaquetable concreta se define en `../Resources/Engines/engines
 
 `Historico/` conserva lo que se entregó, implementó o probó en cada versión. No se actualiza para hacerlo coincidir con el presente y no debe usarse como especificación vigente cuando exista una fuente equivalente en `Fundamentos/`, `Modulos/` o `Motores/`.
 
-Evidencia de la entrega actual: [implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.6.0.md), [pruebas](Historico/Pruebas/TEST_RESULTS_0.20.6.0.md) y [entrega](Historico/Entregas/DELIVERY_0.20.6.0.md).
+Evidencia de la entrega actual: [implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.6.0.md), [pruebas](Historico/Pruebas/TEST_RESULTS_0.20.6.0.md), [entrega](Historico/Entregas/DELIVERY_0.20.6.0.md) y [revalidación manual de los 22 IDs corregidos](Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md).
 
 - [`Historico/Entregas/`](Historico/Entregas/): notas de entrega.
 - [`Historico/Implementacion/`](Historico/Implementacion/): informes de implementación.
