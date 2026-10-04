@@ -2,13 +2,13 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 523 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 85 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 535 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 73 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 42/75 OK, 0 fallidas, 0 parciales y 33 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 54/75 OK, 0 fallidas, 0 parciales y 21 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: Limpiador L-32, Conservar sobre caché propia, tras desbloquear macOS.** Última prueba guardada: L-39, ✅. Limpiador 42 OK y 33 pendientes; Inspector ya abordado completo. Se mantienen preparados seis asociados propios del Bundle ID com.zeuve.qa.cleaner.sil382 en ~/Library y la .app sintética en ~/Applications/ZEUVE QA Limpiador Sil382.app. No hay retirada ejecutada ni decisión Conservar guardada. GitHub conectado.
+**Punto de continuación: Limpiador L-22/L-23, desinstalador oficial y app abierta usando fixtures propios; después residuos, instaladores y persistencia pendientes.** Última prueba guardada: L-53, ✅. Limpiador 54 OK y 21 pendientes; Inspector ya abordado completo. App/log propios restaurados y sin Undo pendiente de estos lotes, selección final0; caché propia Conservada. Volver a analizar antes de otro plan. Fixtures en ubicaciones nativas documentadas; GitHub conectado.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -672,6 +672,32 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - **L-39 — ✅, guardado individual, 04/10/2026:** Con app desmarcada, intento de clic sobre caché deshabilitada deja casilla a 0; todos los asociados siguen enabled=false. Al volver a marcar la app se habilitan, conservando casillas a 0. No se obliga el valor AX ni se salta la barrera.
 
 - **L-32 — intento incompleto, sigue pendiente, 04/10/2026:** Se abrió Más de la caché propia, con Conservar visible, pero antes de ejecutar esa opción macOS bloqueó la sesión (CGSSessionScreenIsLocked=Yes, proceso QA vivo). El clic devolvió ventana inaccesible; no se observa desmarcado ni bloqueo por conservar. Consulta de solo lectura en SQLite QA: 0 decisiones para esa ruta. No se marca OK/parcial/fallo. Esta vez se conservan preparados los seis fixtures propios en sus ubicaciones de ~/Library y la .app en ~/Applications, para reanudar sin perder asociación. Solo contienen los datos sintéticos documentados; la raíz Containers incluye su metadata automática de macOS. No se ejecutó retirada ni borrado. Tras desbloquear, revisar/cerrar el menú si sigue abierto y repetir Conservar sobre la caché propia.
+
+- **L-32 — ✅, guardado individual, 04/10/2026:** Conservar ejecutado desde Más de la caché propia: aparece «Elemento marcado como Conservado.», su casilla pasa de 1 a 0 y queda deshabilitada; total baja de 3 / 790 bytes a 2 / 665 bytes. SQLite QA en solo lectura confirma decision=keep para esa ruta. No hay retirada.
+
+- **L-33 — ✅, guardado individual, 04/10/2026:** Clic físico sobre la casilla de la caché conservada no la selecciona; enabled=false y valor0 permanecen. Pulsar Seleccionar elementos seguros tampoco la añade: app+log siguen marcados y la caché conservada queda en0.
+
+- **L-34 — ✅, guardado individual, 04/10/2026:** Se vuelve a ejecutar Analizar desinstalación de la misma app. El nuevo plan mantiene 7 candidatos: caché propia conservada a0/deshabilitada, app+log seleccionados. La decisión keep sigue en SQLite QA. Reanálisis real, no solo cambio de pestaña.
+
+- **L-45 — ✅, guardado individual, 04/10/2026:** Plan general: se deseleccionó todo (incluidos candidatos reales), se seleccionó únicamente el log sintético de 125 bytes y se revisó la hoja con esa única ruta. Confirmar Mover a Papelera termina en «1 eliminados · 0 omitidos · 0 fallidos», original ausente y registro Undo para ese objetivo. No se retira la app ni ningún dato real.
+
+- **L-46 — ✅, guardado individual, 04/10/2026:** SQLite QA registra la ruta real de FileManager.trashItem: /Users/javiercv/.Trash/com.zeuve.qa.cleaner.sil382. El log ya no existe en su ubicación de Library/Logs; su archivo dentro de Papelera conserva SHA-256 0cc506e5c06c1f26e8b2f2ebfc748743aa4abb570195d9b04c9e70caedc15889. Movimiento real y recuperable, no borrado permanente.
+
+- **L-47 — ✅, guardado individual, 04/10/2026:** Resultado de la retirada propia distingue explícitamente «1 eliminados · 0 omitidos · 0 fallidos». Esta prueba valida presentación de los tres contadores en una ejecución correcta; no afirma haber forzado aquí un fallo de filesystem ni un omitido.
+
+- **L-48 — ✅, guardado individual, 04/10/2026:** Tras mover el único log propio a Papelera se observa reanálisis automático: indicador de actividad y lista temporalmente Sin elementos, después desaparece el indicador y se repuebla el plan general. No se pulsa Analizar manualmente para producir esta renovación. Resultado de retirada se conserva visible.
+
+- **L-49 — ✅, guardado individual, 04/10/2026:** Después de terminar el reanálisis automático, la UI muestra 0 seleccionados / 0 KB, casillas visibles vacías y Mover a Papelera deshabilitado. No vuelve a seleccionar automáticamente los candidatos reales tras limpiar.
+
+- **L-50 — ✅, guardado individual, 04/10/2026:** Antes de la retirada no había botón Deshacer en Limpieza; después del movimiento real recuperable aparece Deshacer. SQLite QA contiene el original/ruta de Papelera/fingerprint del único log propio. No se infiere aquí el comportamiento de borrado permanente, todavía pendiente.
+
+- **L-51 — ✅, guardado individual, 04/10/2026:** Deshacer devuelve el log propio a Library/Logs; UI «1 elementos restaurados; 0 no se pudieron restaurar.». Hash del archivo restaurado igual al original 0cc506e5…5889. Se retira su objeto de Papelera y el registro Undo de esa operación queda a0; Deshacer desaparece y la selección sigue vacía.
+
+- **L-52 — ✅, guardado individual, 04/10/2026:** Segundo lote recuperable, solo app+log sintéticos (2 /665 bytes). Tras moverlos a Papelera se crea un log NUEVO propio en la ruta original, hash d789b651…1f02. Deshacer restaura la app, no sobrescribe ni mezcla el nuevo log y deja el original intacto en Papelera (hash0cc506e5…5889). UI1 restaurado/1 no restaurado; protección contra conflicto comprobada.
+
+- **L-53 — ✅, guardado individual, 04/10/2026:** En el Undo parcial del lote propio, la app queda restaurada con hashc3cc867a…347c7 y se elimina su registro Undo. SQLite QA conserva exactamente1 pendiente (log original/ruta de Papelera), la UI mantiene Deshacer y el objeto de Papelera sigue verificable. No se confunde un conflicto previsto con fallo de producto.
+
+- **L-50/L-52/L-53 — recuperación completa, 04/10/2026, sin cambiar recuentos:** Se libera la ruta del log moviendo el objeto NUEVO propio a QA-L.Sil382/Conflicto-Undo/log-nuevo-preservado (hash d789b651…1f02), sin borrarlo. Segundo Deshacer restaura el log original con hash0cc506e5…5889; la app mantiene hashc3cc867a…347c7. UI1 restaurado/0 no restaurados, registros Undo de ese lote a0 y Deshacer desaparece. Los movimientos de esta sesión afectan solo a log y app sintéticos; todos se han restaurado y no queda ninguno de esos originales en Papelera. Caché propia sigue Conservada; otros cuatro persistentes no se retiran. Selección final0. La lista analizada puede preceder a la restauración: volver a analizar antes de preparar otro plan.
 
 ## 1. ZEUVE general
 
@@ -1481,9 +1507,9 @@ Usar siempre una copia prescindible.
 - [x] ✅ **L-29** Application Support no se autoselecciona.
 - [x] ✅ **L-30** Containers no se autoseleccionan.
 - [x] ✅ **L-31** Group Containers no se autoseleccionan.
-- [ ] ➖ **L-32** «Conservar» desmarca inmediatamente el elemento.
-- [ ] ➖ **L-33** «Conservar» impide volver a seleccionarlo indebidamente.
-- [ ] ➖ **L-34** La decisión sigue presente tras volver a analizar.
+- [x] ✅ **L-32** «Conservar» desmarca inmediatamente el elemento.
+- [x] ✅ **L-33** «Conservar» impide volver a seleccionarlo indebidamente.
+- [x] ✅ **L-34** La decisión sigue presente tras volver a analizar.
 
 ## Desinstalación
 
@@ -1502,15 +1528,15 @@ Usar siempre una copia prescindible.
 
 Usar únicamente elementos que se puedan perder.
 
-- [ ] ➖ **L-45** «Mover a Papelera» funciona.
-- [ ] ➖ **L-46** El elemento termina realmente en la Papelera.
-- [ ] ➖ **L-47** Resultado distingue retirados/omitidos/fallidos.
-- [ ] ➖ **L-48** Después de limpiar renueva el análisis.
-- [ ] ➖ **L-49** Después de limpiar la selección queda vacía.
-- [ ] ➖ **L-50** «Deshacer» aparece solo si hubo movimientos recuperables.
-- [ ] ➖ **L-51** Deshacer restaura correctamente.
-- [ ] ➖ **L-52** No sobrescribe una ruta original que ahora esté ocupada.
-- [ ] ➖ **L-53** Un Undo parcial mantiene pendientes los elementos que todavía podrían restaurarse.
+- [x] ✅ **L-45** «Mover a Papelera» funciona.
+- [x] ✅ **L-46** El elemento termina realmente en la Papelera.
+- [x] ✅ **L-47** Resultado distingue retirados/omitidos/fallidos.
+- [x] ✅ **L-48** Después de limpiar renueva el análisis.
+- [x] ✅ **L-49** Después de limpiar la selección queda vacía.
+- [x] ✅ **L-50** «Deshacer» aparece solo si hubo movimientos recuperables.
+- [x] ✅ **L-51** Deshacer restaura correctamente.
+- [x] ✅ **L-52** No sobrescribe una ruta original que ahora esté ocupada.
+- [x] ✅ **L-53** Un Undo parcial mantiene pendientes los elementos que todavía podrían restaurarse.
 
 ## Borrado permanente
 
