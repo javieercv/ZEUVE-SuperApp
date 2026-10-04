@@ -2,13 +2,13 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 512 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 96 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 523 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 85 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 31/75 OK, 0 fallidas, 0 parciales y 44 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 42/75 OK, 0 fallidas, 0 parciales y 33 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: Limpiador L-20/L-21, asociados propios y datos persistentes, tras desbloquear macOS.** Última prueba guardada: L-19, ✅. Limpiador 31 OK y 44 pendientes; Inspector ya abordado completo. Fixtures preparados guardados en QA-L.Sil382/Asociados-preparados; .app en QA-L.Sil382/Apps. Queda la raíz sintética de Containers con metadata propia de macOS, sin el archivo de prueba. Autenticación GitHub restablecida; consultar remoto antes de reanudar.
+**Punto de continuación: Limpiador L-32, Conservar sobre caché propia, tras desbloquear macOS.** Última prueba guardada: L-39, ✅. Limpiador 42 OK y 33 pendientes; Inspector ya abordado completo. Se mantienen preparados seis asociados propios del Bundle ID com.zeuve.qa.cleaner.sil382 en ~/Library y la .app sintética en ~/Applications/ZEUVE QA Limpiador Sil382.app. No hay retirada ejecutada ni decisión Conservar guardada. GitHub conectado.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -648,6 +648,30 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - **L-19 — ✅, guardado individual, 04/10/2026:** Repetido el botón nativo Analizar desinstalación con el bundle propio presente en la ruta inventariada de ~/Applications. Se abre plan de 1 candidato (la app), casilla seleccionada y 540 bytes; app e Info.plist siguen existiendo con SHA-256 c3cc867a…347c7 intacto. No se ejecuta retirada. Las lecturas AX inmediatas fueron transitoriamente inaccesibles; lectura posterior y hash confirman el desenlace, sin atribuir ese control al producto.
 
 - **L-20/L-21 — preparados, todavía pendientes, 04/10/2026:** Se crearon seis fixtures propios del Bundle ID com.zeuve.qa.cleaner.sil382 en Caches, Logs, Preferences, Application Support, Containers y Group Containers; no se analizaron ni retiraron desde ZEUVE. macOS volvió a bloquearse (CGSSessionScreenIsLocked=Yes, PID QA 41759 vivo) antes de abrir el nuevo análisis. No se cambian casillas. Cinco raíces se trasladaron recuperablemente a QA-L.Sil382/Asociados-preparados, con subcarpetas por categoría, y la .app se devolvió a QA-L.Sil382/Apps/ZEUVE QA Limpiador.app; Info.plist mantiene SHA c3cc867a…347c7. La raíz sintética de Containers no pudo renombrarse: macOS devuelve Operation not permitted. Su archivo propio ZEUVE-QA-Sil382.txt sí se movió a la carpeta QA; en la raíz solo queda la metadata .com.apple.containermanagerd.metadata.plist creada automáticamente por macOS. Se preserva y no se elude esa protección; comprobar el contenido antes de continuar. No queda la app temporal en ~/Applications. Las otras cinco raíces no quedan en ~/Library. Reanudar tras desbloquear, reponer únicamente los fixtures propios en las ubicaciones documentadas y verificar su plan; no usar el candidato de la ruta antigua si falta la app. No se ejecutó retirada.
+
+- **L-20 — ✅, guardado individual, 04/10/2026:** Analizar desinstalación de la app sintética genera 7 elementos: la .app y seis asociados propios (Caches, Logs, Preferences, Application Support, Containers, Group Containers). Cada fila muestra ruta exacta, categoría y motivo «Coincide con el Bundle ID observado de la aplicación». No se asocia por un simple prefijo; alcance acotado a coincidencia exacta de este fixture.
+
+- **L-21 — ✅, guardado individual, 04/10/2026:** En el plan nativo, los cuatro asociados persistentes propios aparecen con casilla 0, Riesgo alto y aviso «Puede contener preferencias o datos persistentes. No se selecciona automáticamente.»; solo .app, caché y log están seleccionados (3 / 790 bytes). No se ejecuta retirada.
+
+- **L-26 — ✅, guardado individual, 04/10/2026:** La caché propia ~/Library/Caches/com.zeuve.qa.cleaner.sil382 está preseleccionada, 125 bytes, Riesgo bajo, asociación exacta por Bundle ID y consecuencia regenerable. Es un fixture elegible, no una autorización para retirar cachés reales.
+
+- **L-27 — ✅, guardado individual, 04/10/2026:** El log propio ~/Library/Logs/com.zeuve.qa.cleaner.sil382 está preseleccionado, 125 bytes, Riesgo bajo y motivo de Bundle ID exacto. No se acepta por extrapolación a todos los logs; no se retira.
+
+- **L-28 — ✅, guardado individual, 04/10/2026:** Preferences/com.zeuve.qa.cleaner.sil382.plist aparece como Preferencias, 260 bytes, Riesgo alto y casilla 0 aunque la asociación sea exacta. Aviso de datos persistentes presente.
+
+- **L-29 — ✅, guardado individual, 04/10/2026:** Application Support/com.zeuve.qa.cleaner.sil382 aparece con casilla 0, Riesgo alto y aviso de datos persistentes, aunque coincide exactamente con Bundle ID. Fixture de 125 bytes.
+
+- **L-30 — ✅, guardado individual, 04/10/2026:** Containers/com.zeuve.qa.cleaner.sil382 aparece como Container, 595 bytes (fixture de 125 + metadata propia de macOS de 470), Riesgo alto y casilla 0. No se prueba aquí la retirada del contenedor ni se elude su protección.
+
+- **L-31 — ✅, guardado individual, 04/10/2026:** Group Containers/com.zeuve.qa.cleaner.sil382 aparece con casilla 0, Riesgo alto y aviso persistente. La asociación observada es por Bundle ID exacto de fixture sintético; no se afirma validación de entitlement App Group real ni de compartición entre apps.
+
+- **L-37 — ✅, guardado individual, 04/10/2026:** Desde Deseleccionar todo (7 casillas a 0), se selecciona explícitamente solo la .app y se pulsa Seleccionar elementos seguros: añade caché y log propios (125 bytes cada uno), deja los cuatro persistentes en 0 y conserva app seleccionada. No se basa solo en preselección inicial.
+
+- **L-38 — ✅, guardado individual, 04/10/2026:** Plan con app+caché+log seleccionados; se marca manualmente también la preferencia propia (4 seleccionados), luego se desmarca la .app. Todos los seis asociados pasan a casilla 0 y enabled=false, incluidos persistentes seleccionados de forma manual.
+
+- **L-39 — ✅, guardado individual, 04/10/2026:** Con app desmarcada, intento de clic sobre caché deshabilitada deja casilla a 0; todos los asociados siguen enabled=false. Al volver a marcar la app se habilitan, conservando casillas a 0. No se obliga el valor AX ni se salta la barrera.
+
+- **L-32 — intento incompleto, sigue pendiente, 04/10/2026:** Se abrió Más de la caché propia, con Conservar visible, pero antes de ejecutar esa opción macOS bloqueó la sesión (CGSSessionScreenIsLocked=Yes, proceso QA vivo). El clic devolvió ventana inaccesible; no se observa desmarcado ni bloqueo por conservar. Consulta de solo lectura en SQLite QA: 0 decisiones para esa ruta. No se marca OK/parcial/fallo. Esta vez se conservan preparados los seis fixtures propios en sus ubicaciones de ~/Library y la .app en ~/Applications, para reanudar sin perder asociación. Solo contienen los datos sintéticos documentados; la raíz Containers incluye su metadata automática de macOS. No se ejecutó retirada ni borrado. Tras desbloquear, revisar/cerrar el menú si sigue abierto y repetir Conservar sobre la caché propia.
 
 ## 1. ZEUVE general
 
@@ -1442,8 +1466,8 @@ Usar siempre una copia prescindible.
 - [x] ✅ **L-17** Muestra nombre/ubicación correctamente.
 - [x] ✅ **L-18** Arrastrar una `.app` abre su análisis de desinstalación.
 - [x] ✅ **L-19** «Analizar desinstalación» no elimina nada.
-- [ ] ➖ **L-20** Detecta asociados razonables de la app.
-- [ ] ➖ **L-21** Datos persistentes aparecen pero no preseleccionados.
+- [x] ✅ **L-20** Detecta asociados razonables de la app.
+- [x] ✅ **L-21** Datos persistentes aparecen pero no preseleccionados.
 - [ ] ➖ **L-22** Si existe un desinstalador oficial, se ofrece.
 - [ ] ➖ **L-23** Una app abierta recibe el tratamiento previsto antes de intentar retirarla.
 
@@ -1451,12 +1475,12 @@ Usar siempre una copia prescindible.
 
 - [ ] ➖ **L-24** Muestra residuos probables.
 - [ ] ➖ **L-25** Muestra asociaciones inciertas sin tratarlas como seguras.
-- [ ] ➖ **L-26** Cachés regenerables elegibles pueden preseleccionarse.
-- [ ] ➖ **L-27** Logs regenerables elegibles pueden preseleccionarse.
-- [ ] ➖ **L-28** Preferences no se autoseleccionan.
-- [ ] ➖ **L-29** Application Support no se autoselecciona.
-- [ ] ➖ **L-30** Containers no se autoseleccionan.
-- [ ] ➖ **L-31** Group Containers no se autoseleccionan.
+- [x] ✅ **L-26** Cachés regenerables elegibles pueden preseleccionarse.
+- [x] ✅ **L-27** Logs regenerables elegibles pueden preseleccionarse.
+- [x] ✅ **L-28** Preferences no se autoseleccionan.
+- [x] ✅ **L-29** Application Support no se autoselecciona.
+- [x] ✅ **L-30** Containers no se autoseleccionan.
+- [x] ✅ **L-31** Group Containers no se autoseleccionan.
 - [ ] ➖ **L-32** «Conservar» desmarca inmediatamente el elemento.
 - [ ] ➖ **L-33** «Conservar» impide volver a seleccionarlo indebidamente.
 - [ ] ➖ **L-34** La decisión sigue presente tras volver a analizar.
@@ -1465,9 +1489,9 @@ Usar siempre una copia prescindible.
 
 - [x] ✅ **L-35** Seleccionar la `.app` funciona.
 - [x] ✅ **L-36** «Seleccionar elementos seguros» mantiene seleccionada la `.app`.
-- [ ] ➖ **L-37** Solo añade asociados regenerables seguros.
-- [ ] ➖ **L-38** Desmarcar la `.app` desmarca sus asociados.
-- [ ] ➖ **L-39** No se pueden volver a seleccionar asociados de esa desinstalación mientras la app esté desmarcada.
+- [x] ✅ **L-37** Solo añade asociados regenerables seguros.
+- [x] ✅ **L-38** Desmarcar la `.app` desmarca sus asociados.
+- [x] ✅ **L-39** No se pueden volver a seleccionar asociados de esa desinstalación mientras la app esté desmarcada.
 - [x] ✅ **L-40** Antes de ejecutar aparece confirmación.
 - [x] ✅ **L-41** La confirmación muestra cantidad.
 - [x] ✅ **L-42** Muestra tamaño.
