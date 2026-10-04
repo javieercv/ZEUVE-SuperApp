@@ -2,7 +2,7 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 568 ✅ OK · 20 ❌ fallidas · 14 ⚠️ parciales · 37 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 568 ✅ OK · 23 ❌ fallidas · 14 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
@@ -10,7 +10,7 @@ Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 f
 
 Confirmación manual del usuario, 04/10/2026: **F-02 funciona**. El arrastre del ZIP del Comparador se acepta por esta confirmación; no se afirma una repetición por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 54/63 OK, 4 fallidas, 2 parciales y 3 pendientes, Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 13/16 OK, 1 fallida (P-16), 1 parcial (P-12) y 1 pendiente (P-11).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 54/63 OK, 7 fallidas (C-14/C-15/C-20/C-35/C-36/C-37/C-46), 2 parciales (C-11/C-48) y 0 pendientes, Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 13/16 OK, 1 fallida (P-16), 1 parcial (P-12) y 1 pendiente (P-11).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. El lote de carpeta no validó por sí solo C-42 ni C-45; ambos se comprobaron después en sus recorridos específicos, según su guardado individual. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -18,7 +18,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: Pruebas locales cerradas con sus resultados; C-35–C-37 pendientes de preparar Pandoc, P-11 y la parte remota de P-12 vinculadas al Descargador excluido** Última prueba guardada: P-12, ⚠️. Descargador excluido por el usuario; no se corrige producto.
+**Punto de continuación: ronda local cerrada; no quedan pruebas pendientes de ejecución fuera del Descargador.** C-35/C-36/C-37 ejecutadas y fallidas (INC-35/INC-36), con sus rutas de contraste correctas. Quedan 33 IDs del Descargador y P-11 de su sesión, excluidos por el usuario. Los 14 parciales y 23 fallos siguen abiertos como resultados de aceptación, sin arreglar. Última prueba guardada: C-37.
 
 Reclasificación documental de privacidad, 04/10/2026, autorizada por el usuario: se reutilizan exclusivamente evidencias de pruebas anteriores, sin nuevas pruebas ni cambios de producto.
 
@@ -138,7 +138,7 @@ Estado histórico de la reclasificación anterior (sustituido por la ronda de ci
 - **C-62 — ✅, guardado individual:** Se activa Recordar la última carpeta por Ajustes en la copia QA y se vuelve a elegir output por panel nativo. Preferencia comprobada en UI (1), cierre normal y relanzado con los mismos datos aislados. Tras importar una imagen, Salida recupera /tmp/zeuve-converter-qa.uPwA7J/output sin volver a elegirla; vista previa prepara destino output/ZEUVE Converted. Se verifica el reinicio real, no solo SQLite. La opción queda activada únicamente en los datos QA.
 
 - **C-42 — intento de control incompleto, pendiente:** se abrió Seleccionar varios archivos y se intentó seleccionar los 15 PNG propios. El panel nativo cambió la columna accesible y la selección múltiple no pudo confirmarse; se canceló sin importarla. No se cuenta la carpeta C-30 como sustituto del selector múltiple. Se continúa con C-44, sin fallo de producto por este intento.
-- **C-35–C-37 — pendientes por entorno, no fallo:** la copia QA no incorpora Pandoc ni lo muestra como motor disponible. No se instala ni se cambia el empaquetado para estas pruebas; las tres conversiones condicionales de TXT/Markdown/HTML siguen sin aceptar. Se continúa por C-38.
+- **C-35–C-37 — estado histórico previo a la preparación autorizada del 04/10/2026, sustituido por los resultados individuales finales:** la copia QA no incorpora Pandoc ni lo muestra como motor disponible. No se instala ni se cambia el empaquetado para estas pruebas; las tres conversiones condicionales de TXT/Markdown/HTML siguen sin aceptar. Se continúa por C-38.
 
 
 - **F-01 — ✅, guardado individual:** ZIP sintético completo seleccionado por panel nativo; aparece F01_exportacion.zip y catálogo de following.json, followers_1.json y followers_3.json bajo una raíz arbitraria. UI informa 4 entradas y solo 3 JSON necesarios; botón Analizar exportación disponible. Se verifica importación/catálogo, todavía sin iniciar comparación. No se usa un ZIP de datos reales.
@@ -780,6 +780,20 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 - **Cierre operativo de la ronda local, 04/10/2026:** 10 IDs anteriormente pendientes abordados y guardados uno a uno: C-42, P-01–P-07 y P-15 OK; P-12 parcial. No hay incidencias nuevas: se mantiene INC-21 del OCR y el resto de defectos sin arreglar. P-11 necesita sesión de Instagram (Descargador excluido); C-35–C-37 necesitan Pandoc, ausente en el entorno. Preparar el motor solo en QA se ha consultado y queda a la espera de respuesta explícita. El Limpiador preseleccionó 20 candidatos regenerables tras analizar; no se confirmó ningún plan ni retirada. Antes de cerrar se pulsó Deseleccionar todo: 0 seleccionados/0 KB y Mover a Papelera deshabilitado. App offline PID21666 cerrada normalmente; el perfil no modifica la red global. Solo se organizaron/copiaron fixtures propios; no se borró ni movió ningún dato real. Problemas de control separados: foco de teclado que llegó al chat, navegación del selector a carpeta padre, ambigüedad AX con dos procesos de igual nombre y lectura AX masiva lenta cancelada únicamente en el controlador. No se confunden con fallos de ZEUVE. Se preservan las evidencias QA externas.
 
+- **C-35 — ❌, guardado individual, 04/10/2026:** ❌ INC-35: con Pandoc3.10 ARM64 preparado exclusivamente en copia interna QA (mismo ejecutable SHA d52ec703…1f829, ZIP oficial SHA fijado d9cad01d…aee34), la UI ofrece TXT→Markdown y prepara una operación por Pandoc. Al ejecutar el TXT sintético de120 bytes, termina0 correctos/1 fallido: «Se esperaba Markdown (.md), pero el contenido generado se ha detectado como Texto (.txt)». No publica MD. Causa respaldada por código: el detector clasifica texto sin marcadores como TXT aunque tenga extensión.md y el validador exige igualdad exacta, rechazando Markdown de párrafos simples. Original intacto; no es falta de motor ni red/control. Se comprobará HTML como contraste sin borrar este fallo.
+
+- **C-35 — contraste guardado individual, 04/10/2026:** TXT→HTML por UI termina1 correcto/0 fallidos/omitidos/cancelados y publica HTML UTF-8 independiente de4046 bytes con título textual, acentos, ñ,12345 y & escapado como &amp;. Original SHA2d9a8846…c93b9 intacto. La reproducción diagnóstica separada del mismo Pandoc TXT→MD termina exit0 y genera párrafos sin marcadores, coherente con el rechazo del validador de ZEUVE; no se presenta esa ejecución CLI como conversión UI aceptada. HTML funciona pero C-35 permanece fallida por TXT→MD, sin arreglar producto.
+
+- **C-36 — ❌, guardado individual, 04/10/2026:** ❌ INC-36: Markdown sintético con encabezado, negrita/cursiva, lista y código,154 bytes, detectado correctamente como MD al importar. Markdown→TXT se prepara por Pandoc y al ejecutar termina0 correctos/1 fallido: «Se esperaba Texto (.txt), pero el contenido generado se ha detectado como Markdown (.md)». No publica TXT. Reproducción diagnóstica separada del mismo comando Pandoc termina exit0, pero su salida.txt mantiene #, **negrita**, *cursiva*, guiones y backticks. Causa muy respaldada: PandocCommandBuilder no pasa --to plain (ni --from); delega en la extensión.txt, que en esta ejecución produce Markdown. El validador detecta correctamente esos marcadores y rechaza el resultado. No es falta de motor ni control. Se continúa con HTML como contraste, sin arreglo.
+
+- **C-36 — contraste guardado individual, 04/10/2026:** Markdown→HTML por UI termina1 correcto/0 fallidos/omitidos/cancelados y publica HTML UTF-8 de4162 bytes; cuerpo verificado con h1, strong, em, lista de2 elementos, code, acentos y ñ. Original SHA0fe845f5…ad6d4 intacto. Diagnóstico separado con --to plain sí elimina marcadores de énfasis/código, confirmando la diferencia frente al comando real que usa la app; conserva dos guiones de lista, también ambiguos para la heurística del detector. No se modifica el comando del producto. C-36 sigue fallida por Markdown→TXT.
+
+- **C-37 — ❌, guardado individual, 04/10/2026:** ❌ INC-36 reproducida en HTML→TXT: se importa HTML sintético válido con título, h1, strong/em, lista y código; la vista previa permite una operación por Pandoc hacia.txt. Resultado0 correctos/1 fallido, mismo aviso «Se esperaba Texto (.txt), pero el contenido generado se ha detectado como Markdown (.md)». No publica TXT. El comando de la app tampoco fija --to plain para HTML→TXT; el contraste diagnóstico de C-36 ya muestra la inferencia incorrecta de salida.txt. No se atribuye a red, motor ausente ni control. Se continúa HTML→Markdown como contraste, sin modificar producto.
+
+- **C-37 — contraste guardado individual, 04/10/2026:** HTML→Markdown por UI termina1 correcto/0 fallidos/omitidos/cancelados y publica un MD independiente. Lectura real verifica frontmatter lang=es/title, marcadores de encabezado, negrita y cursiva, lista alfa/beta12345, código QA_LOCAL, acentos y ñ. Original SHAbb12edf0…3b342 intacto. Esta ruta funciona; C-37 permanece fallida por HTML→TXT. Con las tres conversiones condicionales ya ejercitadas no quedan IDs pendientes de ejecución local fuera del Descargador; P-11 sigue vinculada a su sesión y P-12 mantiene cobertura parcial.
+
+- **Cierre de Pandoc autorizado por el usuario, 04/10/2026:** la respuesta «haz lo que tengas que hacer» aprueba prepararlo exclusivamente en QA. Se descarga el ZIP oficial3.10 ARM64 y coincide exactamente con el SHA fijado en prepare_engines_macos.sh: d9cad01d96ae774a0dc8c8c45bb1ad3e4c5ff2cc2e24f45958f5f9b7974aee34. Binario Pandoc SHA d0a20cc85a03ec30f602c6acb568158982240431e5589e0e7c01ce80e0253493. Como el Conversor solo busca el recurso incluido, se usa una copia interna PandocQA.app en QA-final-20261004.y2CNs7, no una nueva carpeta del proyecto ni una app instalada. Comparación completa de bundles: única diferencia pandoc añadido; ambos ejecutables ZEUVE conservan SHA d52ec703f973ba60068a327c3b096d788664e86ee9b2764a89cc772aa661f829. Manifest, código, firma y app original no se editan. Se mantienen datos aislados y red denegada por proceso. Se ejecutan seis conversiones UI: TXT→HTML, MD→HTML y HTML→MD correctas; TXT→MD, MD→TXT y HTML→TXT fallidas. Los tres IDs se guardaron al constatar cada fallo y los contrastes se anotaron después, sin ocultarlo. Historial añade3 convert/completed y3 convert/failed. Tres originales conservan exactamente sus hashes. Al cerrar Otra conversión deja entradas vacías; proceso50215 termina normalmente exit0 y no quedan app QA ni Pandoc activos. Evidencias conservadas fuera del repositorio. Global568 OK/23 fallidas/14 parciales/34 pendientes; esos34 pertenecen al Descargador o su sesión excluidos. No se ha arreglado ningún defecto ni se certifica la distribución Release.
+
 ## 1. ZEUVE general
 
 
@@ -1221,9 +1235,9 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 ## Texto y datos
 
-- [ ] ➖ **C-35** TXT → Markdown/HTML si Pandoc está preparado.
-- [ ] ➖ **C-36** Markdown → TXT/HTML si Pandoc está preparado.
-- [ ] ➖ **C-37** HTML → TXT/Markdown si Pandoc está preparado.
+- [x] ❌ **C-35** TXT → Markdown/HTML si Pandoc está preparado.
+- [x] ❌ **C-36** Markdown → TXT/HTML si Pandoc está preparado.
+- [x] ❌ **C-37** HTML → TXT/Markdown si Pandoc está preparado.
 - [x] ✅ **C-38** CSV se reconoce correctamente.
 - [x] ✅ **C-39** JSON se reconoce correctamente.
 - [x] ✅ **C-40** XML se reconoce correctamente.
