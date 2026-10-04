@@ -2,13 +2,13 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 481 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 127 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 511 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 97 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 0/75 todavía sin su batería completa; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 30/75 OK, 0 fallidas, 0 parciales y 45 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: Inspector completo en cobertura — 160 OK, 12 fallidas, 8 parciales, 0 sin abordar.** Última revisión guardada: I-128, ✅. Las dos comprobaciones acústicas (I-29/I-35) requieren escucha humana; los otros seis parciales tienen limitaciones de producto documentadas. No se continúa otro módulo en este encargo. Publicación remota pendiente de autenticación GitHub.
+**Punto de continuación: Limpiador L-19, repetir el botón Analizar desinstalación con la app sintética presente en la ruta de inventario, tras desbloquear macOS.** Última prueba guardada: L-44, ✅. Limpiador 30 OK y 45 pendientes; Inspector ya abordado completo. Publicación remota pendiente de autenticación GitHub.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -582,6 +582,68 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - **I-128 — ✅, guardado individual, 04/10/2026:** Revisión visual adicional 04/10, sustituye el parcial de control del 03/10: se reabre I128_caratula_original.mkv, despliega Adjuntos e imágenes y desplaza hasta mostrar la miniatura completa. Captura I128-miniatura-completa.png: patrón de barras/color/círculo y proporción 3:2 coinciden con I128_cover_A.jpg (240×160), sin recorte propio de la miniatura; la primera vista cortada era el borde del scroll. Identificación Carátula · stream 2 · mjpeg coherente. Ahora OK por render realmente observado, no por AXImage.
 
 - **Cierre del Inspector, 04/10/2026:** 30 IDs pendientes abordados y I-128 revalidado visualmente: 26 OK adicionales, 3 casillas fallidas (I-33/I-38/I-39; dos incidencias de vídeo distintas) y 2 parciales acústicos. Total Inspector 160/180 OK, 12 fallidas y 8 parciales; 0 pendientes. El resto de módulos no cambia. Original multistream conserva SHA 320e47cd…501ca y capítulos 0/5 s tras descartar borradores de vídeo externo y capítulo 20 s; no se publican ediciones de esos borradores. Preview detenido, volumen restituido exactamente a 1, ventana devuelta a tamaño/posición iniciales y sin motores hijos activos. No se cambia código, configuración de producto, versión, motores ni empaquetado. Casos 4K/HEVC/AV1/VFR/HDR están acotados a fixtures sintéticos; HDR es compatibilidad, no calibración de color. Todos los resultados se guardaron individualmente.
+
+- **L-01 — ✅, guardado individual, 04/10/2026:** En la app QA nativa, pulsar Analizar cambia inmediatamente la acción a Cancelar y aparece indicador de actividad. No se ha ejecutado limpieza ni retirada; se analiza el inventario local permitido por el módulo.
+
+- **L-02 — ✅, guardado individual, 04/10/2026:** Mientras se analiza aparece indicador de uso y botón Cancelar, diferenciando el estado de trabajo del inicial Analizar. Se comprobará por separado que termine y la información final; no se infiere un porcentaje a partir del spinner.
+
+- **L-08 — ✅, guardado individual, 04/10/2026:** Primer análisis nativo completado: Resumen muestra Cobertura «Completa». Se acepta presencia/estado mostrado, no se extrapola a cobertura de archivos protegidos que no se hayan enumerado.
+
+- **L-09 — ✅, guardado individual, 04/10/2026:** Resumen nativo muestra 568 aplicaciones detectadas tras el análisis. El inventario de aplicaciones se contrastará en su pestaña; no se borró ninguna app.
+
+- **L-10 — ✅, guardado individual, 04/10/2026:** Resumen nativo muestra 442 candidatos y un bloque de elementos grandes; se distinguen las cifras de apps y de candidatos.
+
+- **L-11 — ✅, guardado individual, 04/10/2026:** Resumen muestra «Analizado 51,04 GB», además de tamaños por candidato. Se valida que la métrica exista y no esté vacía; no equivale al espacio recuperable.
+
+- **L-12 — ✅, guardado individual, 04/10/2026:** Resumen muestra «Selección segura potencial 1,18 GB» y explica que son elementos regenerables que cumplen guardas y no implica eliminación. Es distinto de 51,04 GB analizados; no se ejecutó esa selección sobre datos reales.
+
+- **L-05 — ✅, guardado individual, 04/10/2026:** Segundo análisis nativo iniciado con indicador de actividad. Se pulsa Cancelar aproximadamente 10 s después; desaparece el spinner y aparece «Análisis cancelado.» en la siguiente lectura (<1 s de comando/lectura). No se solicitó ni ejecutó retirada.
+
+- **L-06 — ✅, guardado individual, 04/10/2026:** Tras Cancelar la UI vuelve a sin indicador de actividad, conserva las cinco pestañas y el resumen anterior, muestra «Análisis cancelado.» y recupera la acción inicial. Se comprobará reanálisis por separado.
+
+- **L-07 — ✅, guardado individual, 04/10/2026:** Después del estado «Análisis cancelado.» se pulsa de nuevo Analizar: reaparece indicador de actividad, se retira el mensaje de cancelación y comienza otro análisis. No es solo botón habilitado: nuevo trabajo nativo observado.
+
+- **L-03 — ✅, guardado individual, 04/10/2026:** Reanálisis iniciado a 09:21:49 UTC y comprobado terminado a 09:22:14 UTC: límite superior observado 25 s (no cronometraje del instante exacto de fin). Sin spinner, resumen disponible tras cancelación previa. Tiempo razonable para esta sesión/volumen; no garantía para cualquier disco.
+
+- **L-04 — ✅, guardado individual, 04/10/2026:** Dos análisis reales han terminado y uno intermedio se canceló. El último vuelve a resumen en ≤25 s, sin quedar atrapado indefinidamente en inventario. No se da por probada una fase solo por leer el código de Spotlight.
+
+- **L-14 — ✅, guardado individual, 04/10/2026:** Inventario nativo, filtrado por «Visual Studio Code»: muestra Code, ruta /Applications/Visual Studio Code.app, versión 1.140.0 y estado Instalada. La ruta existe en filesystem. Detección real de /Applications, no solo fuente configurada.
+
+- **L-17 — ✅, guardado individual, 04/10/2026:** Fila de inventario muestra nombre Code y ruta /Applications/Visual Studio Code.app con versión y estado, coherentes con el bundle instalado. El buscador puede encontrar por ruta aunque el nombre visible difiera del nombre de carpeta.
+
+- **L-16 — ✅, guardado individual, 04/10/2026:** Búsqueda real: «Visual Studio Code» devuelve solo la fila Code por coincidencia de ruta; consulta sintética inexistente deja lista sin filas; volver a la consulta inicial recupera la fila. No se abre ni desinstala Code.
+
+- **L-15 — ✅, guardado individual, 04/10/2026:** Tras colocar una .app sintética propia en ~/Applications y volver a analizar, Aplicaciones muestra «ZEUVE QA Limpiador», versión 1.0, 540 bytes y ruta exacta /Users/javiercv/Applications/ZEUVE QA Limpiador Sil382.app. No se ejecutó ni eliminó la app; se retira después de esta comprobación.
+
+- **L-66 — ✅, guardado individual, 04/10/2026:** Se abre el área Espacio del Limpiador. Antes de analizar muestra «Explorador de espacio», permite elegir carpeta, umbral mínimo en MB y Analizar espacio; explica que no se siguen enlaces simbólicos.
+
+- **L-67 — ✅, guardado individual, 04/10/2026:** Elegida la carpeta sintética Espacio, el árbol nativo calcula 201,3 MB totales; grande.bin muestra 134,2 MB y Subcarpeta 67,1 MB. Contraste directo con tamaños lógicos 134217728 y 67108864 bytes de fixtures propios; los archivos son dispersos y no se confunde esta medición con espacio físico recuperable.
+
+- **L-68 — ✅, guardado individual, 04/10/2026:** El despliegue nativo de Espacio y Subcarpeta permite navegar la jerarquía: grande.bin, carpeta hija y enlace; al abrir Subcarpeta aparecen mediano.bin (67,1 MB) y pequeno.txt (70 bytes). No hay mezcla de los hijos con el nivel superior.
+
+- **L-69 — ✅, guardado individual, 04/10/2026:** no-seguir-enlace aparece como archivo de 134 bytes, sin hijos. Apunta a un fixture propio externo de 256 MiB, pero Espacio suma 201,3 MB, no los ~469,8 MB que resultaría de seguirlo. El destino permanece intacto y fuera del árbol.
+
+- **L-70 — ✅, guardado individual, 04/10/2026:** Tras subir Mín. de 0 a 100 MB y pulsar Analizar espacio, el árbol conserva Espacio (201,3 MB) y grande.bin (134,2 MB) y oculta Subcarpeta (67,1 MB), sus hijos pequeños y el enlace (134 bytes). El filtro se aplica al volver a analizar, no inmediatamente al cambiar el umbral.
+
+- **L-71 — ✅, guardado individual, 04/10/2026:** Con Mín. 200 MB y nuevo análisis, aparece «Sin resultados de espacio» y «Ningún elemento de esta carpeta supera el tamaño mínimo elegido. Reduce el mínimo y vuelve a analizar.», distinto del mensaje inicial «Explorador de espacio» antes de analizar. El directorio conserva los fixtures, no está realmente vacío.
+
+- **L-18 — ✅, guardado individual, 04/10/2026:** Arrastre real desde Finder de la .app sintética propia a ZEUVE: aparece el banner «Desinstalación: ZEUVE QA Limpiador», 1 elemento revisable y botón Revisar plan en Limpieza. No se abre la aplicación ni se ejecuta retirada. El inventario anterior aún enseña su antigua ruta de ~/Applications; se contrasta la ruta efectiva en el plan, no se asume actualización automática.
+
+- **L-35 — ✅, guardado individual, 04/10/2026:** En Limpieza, la casilla de la .app sintética propia se desmarca (0 seleccionados, 0 KB) y se vuelve a marcar (1 seleccionado, 540 bytes). La ruta del plan es la ubicación QA actual, no la entrada histórica de ~/Applications. No se ejecuta retirada.
+
+- **L-36 — ✅, guardado individual, 04/10/2026:** Con la .app sintética marcada, pulsar Seleccionar elementos seguros mantiene su casilla en 1 y el total en 1 seleccionado / 540 bytes. El único candidato de este plan es la app, riesgo medio; no se interpreta como limpieza regenerable ni se borra.
+
+- **L-40 — ✅, guardado individual, 04/10/2026:** Pulsar Mover a Papelera… abre una hoja de revisión previa «¿Mover los elementos seleccionados a Papelera?», con cancelar y confirmar separados. El fixture sigue existiendo con SHA-256 c3cc867a…347c7; no se confirma la retirada en esta prueba.
+
+- **L-41 — ✅, guardado individual, 04/10/2026:** La hoja de revisión previa muestra «1 elementos», consistente con la única .app sintética seleccionada. No se pulsa confirmar.
+
+- **L-42 — ✅, guardado individual, 04/10/2026:** La hoja de revisión muestra «540 bytes de tamaño conocido» y la fila «Aplicación · 540 bytes · Riesgo medio», consistente con el fixture propio y el total del plan.
+
+- **L-43 — ✅, guardado individual, 04/10/2026:** La confirmación lista la ruta completa del único objetivo, QA-L.Sil382/Apps/ZEUVE QA Limpiador.app, sin sustituirla por la ruta antigua del inventario. Ninguna ruta de usuario real está seleccionada.
+
+- **L-44 — ✅, guardado individual, 04/10/2026:** La confirmación identifica explícitamente «Mover … a Papelera», explica la posibilidad de deshacer movimientos completados y que se revalidará cada elemento y se omitirán cambios. No se confunde con borrado permanente.
+
+- **L-19 — intento incompleto, sin cambiar casilla, 04/10/2026:** Después de cancelar la revisión de Papelera se colocó temporalmente el bundle propio de nuevo en su ruta de inventario de ~/Applications y se envió Analizar desinstalación. No se obtuvo una lectura final: macOS bloqueó la sesión (CGSSessionScreenIsLocked=true), System Events dejó de exponer ventanas y screencapture no pudo capturar. El proceso QA 41759 seguía vivo; no se afirma un fallo de ZEUVE ni se da el ID por terminado. La app sintética se devolvió a QA-L.Sil382/Apps/ZEUVE QA Limpiador.app, hash c3cc867aad12cd57d0b8ef7c59265c7e67ec368611cbe00f6df80c948ba347c7 intacto, sin copia restante en ~/Applications. Antes de reanudar, asegurar que la ruta del candidato coincida con su ubicación actual. No se ejecutó limpieza ni borrado.
 
 ## 1. ZEUVE general
 
@@ -1351,30 +1413,30 @@ Usar siempre una copia prescindible.
 
 ## Análisis general
 
-- [ ] ➖ **L-01** Pulsar «Analizar» inicia el análisis.
-- [ ] ➖ **L-02** Se ve claramente que está trabajando.
-- [ ] ➖ **L-03** Termina en un tiempo razonable.
-- [ ] ➖ **L-04** Ya no se queda eternamente en «Inventariando aplicaciones».
-- [ ] ➖ **L-05** Cancelar funciona.
-- [ ] ➖ **L-06** Después de cancelar vuelve a estado normal.
-- [ ] ➖ **L-07** Se puede volver a analizar después.
+- [x] ✅ **L-01** Pulsar «Analizar» inicia el análisis.
+- [x] ✅ **L-02** Se ve claramente que está trabajando.
+- [x] ✅ **L-03** Termina en un tiempo razonable.
+- [x] ✅ **L-04** Ya no se queda eternamente en «Inventariando aplicaciones».
+- [x] ✅ **L-05** Cancelar funciona.
+- [x] ✅ **L-06** Después de cancelar vuelve a estado normal.
+- [x] ✅ **L-07** Se puede volver a analizar después.
 
 ## Resumen
 
-- [ ] ➖ **L-08** Muestra cobertura.
-- [ ] ➖ **L-09** Muestra aplicaciones.
-- [ ] ➖ **L-10** Muestra candidatos.
-- [ ] ➖ **L-11** Muestra tamaño analizado.
-- [ ] ➖ **L-12** Muestra selección segura potencial.
+- [x] ✅ **L-08** Muestra cobertura.
+- [x] ✅ **L-09** Muestra aplicaciones.
+- [x] ✅ **L-10** Muestra candidatos.
+- [x] ✅ **L-11** Muestra tamaño analizado.
+- [x] ✅ **L-12** Muestra selección segura potencial.
 - [ ] ➖ **L-13** Muestra ubicaciones sin acceso cuando existen.
 
 ## Aplicaciones
 
-- [ ] ➖ **L-14** Detecta apps de `/Applications`.
-- [ ] ➖ **L-15** Detecta apps de `~/Applications` si existen.
-- [ ] ➖ **L-16** Buscar una aplicación funciona.
-- [ ] ➖ **L-17** Muestra nombre/ubicación correctamente.
-- [ ] ➖ **L-18** Arrastrar una `.app` abre su análisis de desinstalación.
+- [x] ✅ **L-14** Detecta apps de `/Applications`.
+- [x] ✅ **L-15** Detecta apps de `~/Applications` si existen.
+- [x] ✅ **L-16** Buscar una aplicación funciona.
+- [x] ✅ **L-17** Muestra nombre/ubicación correctamente.
+- [x] ✅ **L-18** Arrastrar una `.app` abre su análisis de desinstalación.
 - [ ] ➖ **L-19** «Analizar desinstalación» no elimina nada.
 - [ ] ➖ **L-20** Detecta asociados razonables de la app.
 - [ ] ➖ **L-21** Datos persistentes aparecen pero no preseleccionados.
@@ -1397,16 +1459,16 @@ Usar siempre una copia prescindible.
 
 ## Desinstalación
 
-- [ ] ➖ **L-35** Seleccionar la `.app` funciona.
-- [ ] ➖ **L-36** «Seleccionar elementos seguros» mantiene seleccionada la `.app`.
+- [x] ✅ **L-35** Seleccionar la `.app` funciona.
+- [x] ✅ **L-36** «Seleccionar elementos seguros» mantiene seleccionada la `.app`.
 - [ ] ➖ **L-37** Solo añade asociados regenerables seguros.
 - [ ] ➖ **L-38** Desmarcar la `.app` desmarca sus asociados.
 - [ ] ➖ **L-39** No se pueden volver a seleccionar asociados de esa desinstalación mientras la app esté desmarcada.
-- [ ] ➖ **L-40** Antes de ejecutar aparece confirmación.
-- [ ] ➖ **L-41** La confirmación muestra cantidad.
-- [ ] ➖ **L-42** Muestra tamaño.
-- [ ] ➖ **L-43** Muestra rutas.
-- [ ] ➖ **L-44** Muestra modo de retirada.
+- [x] ✅ **L-40** Antes de ejecutar aparece confirmación.
+- [x] ✅ **L-41** La confirmación muestra cantidad.
+- [x] ✅ **L-42** Muestra tamaño.
+- [x] ✅ **L-43** Muestra rutas.
+- [x] ✅ **L-44** Muestra modo de retirada.
 
 ## Papelera
 
@@ -1449,12 +1511,12 @@ Si Xcode está instalado:
 
 ## Espacio
 
-- [ ] ➖ **L-66** Explorador de Espacio abre.
-- [ ] ➖ **L-67** Calcula tamaños.
-- [ ] ➖ **L-68** La navegación jerárquica funciona.
-- [ ] ➖ **L-69** No sigue symlinks.
-- [ ] ➖ **L-70** El filtro de tamaño funciona.
-- [ ] ➖ **L-71** Distingue «sin resultados por filtro» de «carpeta no analizada».
+- [x] ✅ **L-66** Explorador de Espacio abre.
+- [x] ✅ **L-67** Calcula tamaños.
+- [x] ✅ **L-68** La navegación jerárquica funciona.
+- [x] ✅ **L-69** No sigue symlinks.
+- [x] ✅ **L-70** El filtro de tamaño funciona.
+- [x] ✅ **L-71** Distingue «sin resultados por filtro» de «carpeta no analizada».
 
 ## Persistencia
 
