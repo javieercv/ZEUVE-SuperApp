@@ -2,13 +2,15 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 555 ✅ OK · 19 ❌ fallidas · 13 ⚠️ parciales · 52 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 556 ✅ OK · 19 ❌ fallidas · 13 ⚠️ parciales · 51 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
+Confirmación manual del usuario, 04/10/2026: **F-02 funciona**. El arrastre del ZIP del Comparador se acepta por esta confirmación; no se afirma una repetición por el agente.
+
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -745,6 +747,8 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 - **Cierre operativo del Limpiador, 04/10/2026:** las 10 pruebas restantes se guardaron individualmente: 9 OK y L-74 fallida (INC-34). No se arregla producto. Antiguo-QA.dmg, fixture de texto propio95 bytes, fue borrado permanentemente tras plan de ruta única y confirmación; no recuperable por Papelera, contenido reproducible. Antiguo-QA.pkg97 bytes se movió a Papelera para comprobar persistencia y se recuperó manualmente a su ruta libre al faltar Deshacer tras reinicio; SHA13651dc5…931c8 intacto y ya no está en Papelera. Su fila Undo permanece en SQLite QA como evidencia, ahora no verificable porque el objeto se restauró externamente; no se altera la base para ocultarla. Permiso de carpeta ficticia Sin-acceso-final restaurado700, preferencias QA restauradas a defaults y ubicaciones adicionales vacías. Peticiones de macOS de Apple Music/datos de otras apps rechazadas con No permitir, sin eludir TCC; no se atribuyen a fallo de ZEUVE. Una lectura de panel y un clic físico fuera de viewport no cambiaron selección; se verificaron filas/selección y se usó AX para la casilla correcta. Al intentar Cancelar, el análisis ya había terminado y se inició otro por cambio de botón; se dejó terminar, no se retiró nada. Nuevo PID15538, almacenamiento aislado confirmado, último análisis Completa/0 sin acceso, Conservado propio visible0/deshabilitado y selección final0. No hay operaciones activas ni datos reales eliminados.
 
+- **F-02 — ✅, confirmación manual del usuario, 04/10/2026:** El usuario confirma que arrastrar y soltar el ZIP en el Comparador funciona. Se sustituye el estado pendiente por OK por esta confirmación, no por una prueba nueva del agente. El intento automatizado incompleto anterior se conserva como trazabilidad de control. Comparador cerrado: 27/27 OK y 0 pendientes.
+
 ## 1. ZEUVE general
 
 
@@ -1232,7 +1236,7 @@ Estos deben rechazarse claramente, no convertirse:
 # 8. Comparador de seguidores de Instagram
 
 - [x] ✅ **F-01** Importar ZIP completo funciona.
-- [ ] ➖ **F-02** Drag & drop del ZIP funciona.
+- [x] ✅ **F-02** Drag & drop del ZIP funciona.
 - [x] ✅ **F-03** Detecta `following.json`.
 - [x] ✅ **F-04** Detecta uno o varios `followers_N.json`.
 - [x] ✅ **F-05** Acepta huecos en la numeración de followers.
