@@ -2,13 +2,13 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 535 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 73 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 546 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 62 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 54/75 OK, 0 fallidas, 0 parciales y 21 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 65/75 OK, 0 fallidas, 0 parciales y 10 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: Limpiador L-22/L-23, desinstalador oficial y app abierta usando fixtures propios; después residuos, instaladores y persistencia pendientes.** Última prueba guardada: L-53, ✅. Limpiador 54 OK y 21 pendientes; Inspector ya abordado completo. App/log propios restaurados y sin Undo pendiente de estos lotes, selección final0; caché propia Conservada. Volver a analizar antes de otro plan. Fixtures en ubicaciones nativas documentadas; GitHub conectado.
+**Punto de continuación: L-13/L-65; después L-72–L-75 y L-54–L-57 (permanente).** Última prueba guardada: L-60, ✅. Inspector ya abordado completo. Publicación GitHub disponible; sincronizar al cierre.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -698,6 +698,30 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - **L-53 — ✅, guardado individual, 04/10/2026:** En el Undo parcial del lote propio, la app queda restaurada con hashc3cc867a…347c7 y se elimina su registro Undo. SQLite QA conserva exactamente1 pendiente (log original/ruta de Papelera), la UI mantiene Deshacer y el objeto de Papelera sigue verificable. No se confunde un conflicto previsto con fallo de producto.
 
 - **L-50/L-52/L-53 — recuperación completa, 04/10/2026, sin cambiar recuentos:** Se libera la ruta del log moviendo el objeto NUEVO propio a QA-L.Sil382/Conflicto-Undo/log-nuevo-preservado (hash d789b651…1f02), sin borrarlo. Segundo Deshacer restaura el log original con hash0cc506e5…5889; la app mantiene hashc3cc867a…347c7. UI1 restaurado/0 no restaurados, registros Undo de ese lote a0 y Deshacer desaparece. Los movimientos de esta sesión afectan solo a log y app sintéticos; todos se han restaurado y no queda ninguno de esos originales en Papelera. Caché propia sigue Conservada; otros cuatro persistentes no se retiran. Selección final0. La lista analizada puede preceder a la restauración: volver a analizar antes de preparar otro plan.
+
+- **L-22 — ✅, guardado individual, 04/10/2026:** Al reanalizar la app propia con «ZEUVE QA Uninstall Simulado.app» en Contents/Resources, se observa el aviso de desinstalador relacionado y las acciones Abrir desinstalador oficial/Reanalizar residuos. No se ejecuta el desinstalador. Fixture de bundle válido sin ejecutable ni Team ID: se acepta la oferta por ubicación/nombre, no autenticidad de proveedor ni validación de firma de terceros.
+
+- **L-23 — ✅, guardado individual, 04/10/2026:** La app sintética ZEUVE QA Abierta Sil382 (PID 10230; Bundle ID com.zeuve.qa.cleaner.sil382.running) se detecta abierta. Su app y caché quedan desmarcadas y deshabilitadas; Mover a Papelera también está deshabilitado. «Cerrar aplicación y continuar» termina únicamente el proceso propio y reanaliza: ambas filas pasan a seleccionables/seleccionadas. No se ejecuta eliminación; hashes de Info.plist y caché sin cambios.
+
+- **L-24 — ✅, guardado individual, 04/10/2026:** Tras cerrar y apartar recuperablemente el bundle de QA, un análisis completo con 0 ubicaciones inaccesibles presenta su caché de 106 bytes en Residuos como «Residuo probable», riesgo bajo y evidencia de Bundle ID observado. La fila queda visible con su ruta exacta; no se retira.
+
+- **L-25 — ✅, guardado individual, 04/10/2026:** El log propio ~/Library/Logs/ZEUVE QA Abierta Sil382 coincide solo por nombre, no por Bundle ID: Residuos lo etiqueta «Asociación incierta», riesgo alto y evidencia heurística. Tras «Seleccionar elementos seguros» permanece desmarcado, mientras la caché propia con evidencia fuerte sí se selecciona. No se elimina nada.
+
+- **L-61 — ✅, guardado individual, 04/10/2026:** UI Residuos detecta antiguo-QA.dmg (95 bytes, modificación 01/01/2025) dentro de Downloads/ZEUVE-QA-Sil382-instaladores: Instalador, Asociación incierta, riesgo medio, más de 90 días. Fixture de texto con extensión .dmg, no imagen montable; se valida clasificación por extensión/antigüedad, sin abrirlo.
+
+- **L-62 — ✅, guardado individual, 04/10/2026:** UI Residuos detecta antiguo-QA.pkg (97 bytes, modificación 01/01/2025) como Instalador/Asociación incierta/riesgo medio, más de 90 días. Archivo sintético de texto con extensión .pkg, no paquete instalable; no se instala ni ejecuta.
+
+- **L-63 — ✅, guardado individual, 04/10/2026:** UI Residuos detecta antiguo-QA.xip (98 bytes, modificación 01/01/2025) como Instalador/Asociación incierta/riesgo medio, más de 90 días. Archivo sintético de texto con extensión .xip, no XIP válido; no se extrae ni ejecuta.
+
+- **L-64 — ✅, guardado individual, 04/10/2026:** Los tres instaladores sintéticos antiguos permanecen a 0 después de «Seleccionar elementos seguros». UI muestra riesgo medio, asociación incierta y «La antigüedad no demuestra que ya no sea necesario. Nunca se selecciona automáticamente». Se verifica en contraste con la caché propia probable seleccionada. No se retira ningún instalador.
+
+- **L-58 — ✅, guardado individual, 04/10/2026:** El plan nativo de Limpieza presenta datos de desarrollo detectados realmente: DerivedData de ZEUVE (704,5 MB), ModuleCache.noindex (276,1 MB) y SymbolCache.noindex (21,2 MB), con estado Regenerable y riesgo bajo. Se consultan solo etiquetas/metadatos; todos quedan desmarcados y no se toca ningún dato de Xcode.
+
+- **L-59 — ✅, guardado individual, 04/10/2026:** UI clasifica la carpeta de compilación como «Xcode DerivedData» y ModuleCache.noindex/SymbolCache.noindex como «Índice Xcode», Regenerable/riesgo bajo, con consecuencias diferenciadas recompilar/regenerar índice y evidencia DerivedData. Corroborado en raíces persistidas del análisis. Sin eliminación ni cambio de archivos reales.
+
+- **L-60 — ✅, guardado individual, 04/10/2026:** Se crea exclusivamente el fixture propio Xcode/Archives/ZEUVE-QA-Sil382.xcarchive (texto, no archivo de distribución real). Nuevo análisis nativo termina con cobertura Completa y 0 sin acceso: no genera ninguna raíz de Archives en el resultado persistido, mientras DerivedData/índices siguen presentes. El escáner vigente limita esa categoría a DerivedData. Fixture conservado sin cambios; no se trata como caché ni se autoselecciona. Selección final vacía.
+
+- **Continuidad técnica, 04/10/2026 — L-22–L-25/L-58–L-64:** 11 IDs nuevos OK, ninguno fallido. App propia abierta cerrada por la acción nativa de ZEUVE; su bundle se aparta recuperablemente como QA-L.Sil382/Apps/ZEUVE QA Abierta Sil382.bundle-qa para probar residuos. Su caché y el log heurístico propios permanecen en ~/Library; tres instaladores ficticios de texto, fechados 01/01/2025, en ~/Downloads/ZEUVE-QA-Sil382-instaladores. Fixture de Archives propio conservado bajo ~/Library/Developer/Xcode/Archives/ZEUVE-QA-Sil382.xcarchive. La app propia de ~/Applications conserva el desinstalador simulado anidado, no ejecutado. No se borra ni se mueve ningún dato real; selección final0, app de QA principal PID41759 abierta. Oferta de desinstalador validada por nombre/ubicación en fixture sin firma, no autenticidad de proveedor. Control: clic auxiliar reidentificado por AX y foreground; corregidas coma decimal y referencia AppleScript fuera del proyecto. Lectura masiva de cientos de filas fue demasiado lenta y se canceló solo el controlador propio; se usó la pestaña Residuos y filas concretas de Xcode. No son fallos de ZEUVE. Quedan L-13/L-65, L-72–L-75 y L-54–L-57; no se intenta borrado permanente en esta continuación.
 
 ## 1. ZEUVE general
 
@@ -1494,13 +1518,13 @@ Usar siempre una copia prescindible.
 - [x] ✅ **L-19** «Analizar desinstalación» no elimina nada.
 - [x] ✅ **L-20** Detecta asociados razonables de la app.
 - [x] ✅ **L-21** Datos persistentes aparecen pero no preseleccionados.
-- [ ] ➖ **L-22** Si existe un desinstalador oficial, se ofrece.
-- [ ] ➖ **L-23** Una app abierta recibe el tratamiento previsto antes de intentar retirarla.
+- [x] ✅ **L-22** Si existe un desinstalador oficial, se ofrece.
+- [x] ✅ **L-23** Una app abierta recibe el tratamiento previsto antes de intentar retirarla.
 
 ## Residuos y selección segura
 
-- [ ] ➖ **L-24** Muestra residuos probables.
-- [ ] ➖ **L-25** Muestra asociaciones inciertas sin tratarlas como seguras.
+- [x] ✅ **L-24** Muestra residuos probables.
+- [x] ✅ **L-25** Muestra asociaciones inciertas sin tratarlas como seguras.
 - [x] ✅ **L-26** Cachés regenerables elegibles pueden preseleccionarse.
 - [x] ✅ **L-27** Logs regenerables elegibles pueden preseleccionarse.
 - [x] ✅ **L-28** Preferences no se autoseleccionan.
@@ -1551,16 +1575,16 @@ Con un elemento completamente prescindible:
 
 Si Xcode está instalado:
 
-- [ ] ➖ **L-58** Detecta datos regenerables correspondientes.
-- [ ] ➖ **L-59** DerivedData/índices elegibles se clasifican correctamente.
-- [ ] ➖ **L-60** Xcode Archives no se trata como caché normal autoseleccionable.
+- [x] ✅ **L-58** Detecta datos regenerables correspondientes.
+- [x] ✅ **L-59** DerivedData/índices elegibles se clasifican correctamente.
+- [x] ✅ **L-60** Xcode Archives no se trata como caché normal autoseleccionable.
 
 ## Instaladores
 
-- [ ] ➖ **L-61** Detecta `.dmg` antiguos.
-- [ ] ➖ **L-62** Detecta `.pkg` antiguos.
-- [ ] ➖ **L-63** Detecta `.xip` antiguos.
-- [ ] ➖ **L-64** No considera automáticamente «seguro borrar» algo solo porque sea antiguo.
+- [x] ✅ **L-61** Detecta `.dmg` antiguos.
+- [x] ✅ **L-62** Detecta `.pkg` antiguos.
+- [x] ✅ **L-63** Detecta `.xip` antiguos.
+- [x] ✅ **L-64** No considera automáticamente «seguro borrar» algo solo porque sea antiguo.
 - [ ] ➖ **L-65** Una misma ubicación añadida por rutas solapadas no genera candidatos duplicados.
 
 ## Espacio
