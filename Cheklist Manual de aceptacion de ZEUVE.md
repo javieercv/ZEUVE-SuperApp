@@ -2,13 +2,13 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 546 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 62 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 555 ✅ OK · 19 ❌ fallidas · 13 ⚠️ parciales · 52 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 65/75 OK, 0 fallidas, 0 parciales y 10 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: L-13/L-65; después L-72–L-75 y L-54–L-57 (permanente).** Última prueba guardada: L-60, ✅. Inspector ya abordado completo. Publicación GitHub disponible; sincronizar al cierre.
+**Punto de continuación: Limpiador terminado: 75/75 pruebas abordadas, 74 OK y L-74 fallida (INC-34), sin pendientes.** No se ha corregido producto. Otros módulos y privacidad conservan sus pendientes; Descargador sigue pausado por decisión del usuario.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -722,6 +722,28 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - **L-60 — ✅, guardado individual, 04/10/2026:** Se crea exclusivamente el fixture propio Xcode/Archives/ZEUVE-QA-Sil382.xcarchive (texto, no archivo de distribución real). Nuevo análisis nativo termina con cobertura Completa y 0 sin acceso: no genera ninguna raíz de Archives en el resultado persistido, mientras DerivedData/índices siguen presentes. El escáner vigente limita esa categoría a DerivedData. Fixture conservado sin cambios; no se trata como caché ni se autoselecciona. Selección final vacía.
 
 - **Continuidad técnica, 04/10/2026 — L-22–L-25/L-58–L-64:** 11 IDs nuevos OK, ninguno fallido. App propia abierta cerrada por la acción nativa de ZEUVE; su bundle se aparta recuperablemente como QA-L.Sil382/Apps/ZEUVE QA Abierta Sil382.bundle-qa para probar residuos. Su caché y el log heurístico propios permanecen en ~/Library; tres instaladores ficticios de texto, fechados 01/01/2025, en ~/Downloads/ZEUVE-QA-Sil382-instaladores. Fixture de Archives propio conservado bajo ~/Library/Developer/Xcode/Archives/ZEUVE-QA-Sil382.xcarchive. La app propia de ~/Applications conserva el desinstalador simulado anidado, no ejecutado. No se borra ni se mueve ningún dato real; selección final0, app de QA principal PID41759 abierta. Oferta de desinstalador validada por nombre/ubicación en fixture sin firma, no autenticidad de proveedor. Control: clic auxiliar reidentificado por AX y foreground; corregidas coma decimal y referencia AppleScript fuera del proyecto. Lectura masiva de cientos de filas fue demasiado lenta y se canceló solo el controlador propio; se usó la pestaña Residuos y filas concretas de Xcode. No son fallos de ZEUVE. Quedan L-13/L-65, L-72–L-75 y L-54–L-57; no se intenta borrado permanente en esta continuación.
+
+- **L-54 — ✅, guardado individual, 04/10/2026:** Antes de cambiar preferencias de QA, Ajustes → Limpiador muestra «Al eliminar: Mover a Papelera», sin permanente seleccionado. La sesión aislada no tenía valor persistido cleaner.preferences; UI y modo de ejecución vigente confirman el default no destructivo.
+
+- **L-13 — ✅, guardado individual, 04/10/2026:** Ubicación adicional propia Sin-acceso-final, añadida desde NSOpenPanel, con permiso temporal000: nuevo análisis muestra en Resumen Cobertura Parcial y «Sin acceso: 1». SQLite del análisis corrobora partial/issue_count1 frente a complete/0 previo. La UI ofrece el contador, no un listado nominal de rutas. Se restaura permiso700 del fixture; ningún permiso real ni TCC modificado.
+
+- **L-65 — ✅, guardado individual, 04/10/2026:** Se añaden por UI ~/Downloads y su subcarpeta ZEUVE-QA-Sil382-instaladores, ambas solapadas entre sí y con Downloads predeterminado. Nuevo análisis y lectura nativa de Residuos: matched3, exactamente una fila por cada fixture dmg/pkg/xip, con rutas idénticas y sin duplicados pese a tres recorridos potenciales. Ningún instalador real seleccionado.
+
+- **L-55 — ✅, guardado individual, 04/10/2026:** En modo opt-in Eliminar permanentemente y plan con único fixture propio antiguo-QA.dmg (95 bytes), pulsar Eliminar abre una confirmación explícita antes de retirar nada. Enumera la ruta exacta, cantidad/tamaño/riesgo y avisa «El borrado permanente no se puede deshacer». Archivo todavía presente mientras se revisa el diálogo; ningún dato real seleccionado.
+
+- **L-56 — ✅, guardado individual, 04/10/2026:** Confirmado el diálogo con ruta única del fixture de texto antiguo-QA.dmg (95 bytes): UI devuelve 1 eliminado/0 omitidos/0 fallidos y la ruta deja de existir. Retirada permanente nativa real, no simulada; solo este archivo propio prescindible, creado por el agente y verificado antes. No recuperable mediante Papelera/Undo; contenido sintético reproducible. Ningún dato real retirado.
+
+- **L-57 — ✅, guardado individual, 04/10/2026:** Tras retirada permanente y reanálisis terminado (Completa/0 sin acceso), Limpieza mantiene resultado1/0/0 y selección0; no aparece Deshacer. SQLite cleaner_undo_items continúa con0 filas, sin registro para el fixture retirado. Se verifica sin Undo anterior pendiente para no confundir operaciones.
+
+- **L-75 — ✅, guardado individual, 04/10/2026:** Con Undo real pendiente del fixture antiguo-QA.pkg (movido a Papelera, hash original13651dc5…931c8) y decisión Conservar, se confirma «Restaurar preferencias del módulo», no reset global. Las 3 ubicaciones QA adicionales desaparecen y vuelve el default Papelera/90 días. SHA-256 de los volcados de inventario, raíces asociadas, decisiones y Undo idénticos antes/después; Conservar visible y Deshacer sigue disponible en esta sesión. No se borra inventario ni Undo.
+
+- **L-72 — ✅, guardado individual, 04/10/2026:** Reinicio real de la app QA (PID41759→15538), mismo binario Debug y ZEUVE_DATA_DIR aislado confirmado antes/después. SHA-256 de los volcados de cleaner_app_inventory y cleaner_associated_roots son idénticos; se conservan claves, identidades y fechas del inventario histórico, no solo el número de apps. La nueva pantalla requiere analizar para poblar resultados actuales; no se confunde ese estado inicial vacío con pérdida de persistencia.
+
+- **L-73 — ✅, guardado individual, 04/10/2026:** Tras reinicio real, las decisiones persistidas conservan exactamente su volcado SHA-256 (749f6f4b…adad45) y Ajustes → Limpiador carga/muestra la ruta de caché QA conservada con su acción Revocar. La decisión no se perdió ni pasó a una lista vacía. El reanálisis nuevo está separado de esta comprobación de persistencia y atendiendo peticiones de macOS, no se da por completo aún.
+
+- **L-74 — ❌, guardado individual, 04/10/2026:** ❌ INC-34: tras reiniciar, Limpieza no ofrece Deshacer ya antes de iniciar otro análisis. Sigue intacto el Undo A6639230-DD58-4BF7-9E79-5EDB3E9AC808: objeto en Papelera, SHA13651dc5…931c8, inode35064674/tamaño97/fecha/tipo iguales al fingerprint, ruta original libre y directorio escribible. Registro SQLite no perdido. Causa respaldada por código: lastHistoryID nace nil y solo se asigna al ejecutar una retirada en la sesión; init no recarga operaciones pendientes. Historial global solo ofrece Undo para Organizador, no recuperación alternativa del Limpiador. Sin arreglo; se recuperará manualmente únicamente el fixture propio.
+
+- **Cierre operativo del Limpiador, 04/10/2026:** las 10 pruebas restantes se guardaron individualmente: 9 OK y L-74 fallida (INC-34). No se arregla producto. Antiguo-QA.dmg, fixture de texto propio95 bytes, fue borrado permanentemente tras plan de ruta única y confirmación; no recuperable por Papelera, contenido reproducible. Antiguo-QA.pkg97 bytes se movió a Papelera para comprobar persistencia y se recuperó manualmente a su ruta libre al faltar Deshacer tras reinicio; SHA13651dc5…931c8 intacto y ya no está en Papelera. Su fila Undo permanece en SQLite QA como evidencia, ahora no verificable porque el objeto se restauró externamente; no se altera la base para ocultarla. Permiso de carpeta ficticia Sin-acceso-final restaurado700, preferencias QA restauradas a defaults y ubicaciones adicionales vacías. Peticiones de macOS de Apple Music/datos de otras apps rechazadas con No permitir, sin eludir TCC; no se atribuyen a fallo de ZEUVE. Una lectura de panel y un clic físico fuera de viewport no cambiaron selección; se verificaron filas/selección y se usó AX para la casilla correcta. Al intentar Cancelar, el análisis ya había terminado y se inició otro por cambio de botón; se dejó terminar, no se retiró nada. Nuevo PID15538, almacenamiento aislado confirmado, último análisis Completa/0 sin acceso, Conservado propio visible0/deshabilitado y selección final0. No hay operaciones activas ni datos reales eliminados.
 
 ## 1. ZEUVE general
 
@@ -1506,7 +1528,7 @@ Usar siempre una copia prescindible.
 - [x] ✅ **L-10** Muestra candidatos.
 - [x] ✅ **L-11** Muestra tamaño analizado.
 - [x] ✅ **L-12** Muestra selección segura potencial.
-- [ ] ➖ **L-13** Muestra ubicaciones sin acceso cuando existen.
+- [x] ✅ **L-13** Muestra ubicaciones sin acceso cuando existen.
 
 ## Aplicaciones
 
@@ -1566,10 +1588,10 @@ Usar únicamente elementos que se puedan perder.
 
 Con un elemento completamente prescindible:
 
-- [ ] ➖ **L-54** Borrado permanente no está seleccionado por defecto.
-- [ ] ➖ **L-55** Requiere confirmación.
-- [ ] ➖ **L-56** Elimina el elemento.
-- [ ] ➖ **L-57** No ofrece Undo.
+- [x] ✅ **L-54** Borrado permanente no está seleccionado por defecto.
+- [x] ✅ **L-55** Requiere confirmación.
+- [x] ✅ **L-56** Elimina el elemento.
+- [x] ✅ **L-57** No ofrece Undo.
 
 ## Xcode
 
@@ -1585,7 +1607,7 @@ Si Xcode está instalado:
 - [x] ✅ **L-62** Detecta `.pkg` antiguos.
 - [x] ✅ **L-63** Detecta `.xip` antiguos.
 - [x] ✅ **L-64** No considera automáticamente «seguro borrar» algo solo porque sea antiguo.
-- [ ] ➖ **L-65** Una misma ubicación añadida por rutas solapadas no genera candidatos duplicados.
+- [x] ✅ **L-65** Una misma ubicación añadida por rutas solapadas no genera candidatos duplicados.
 
 ## Espacio
 
@@ -1598,10 +1620,10 @@ Si Xcode está instalado:
 
 ## Persistencia
 
-- [ ] ➖ **L-72** Reiniciar ZEUVE conserva inventario/histórico necesario.
-- [ ] ➖ **L-73** Reiniciar conserva decisiones «Conservar».
-- [ ] ➖ **L-74** Undo pendiente sigue apareciendo cuando todavía es verificable.
-- [ ] ➖ **L-75** Restaurar ajustes del Limpiador no borra indebidamente inventario/Undo/decisiones que deban conservarse.
+- [x] ✅ **L-72** Reiniciar ZEUVE conserva inventario/histórico necesario.
+- [x] ✅ **L-73** Reiniciar conserva decisiones «Conservar».
+- [x] ❌ **L-74** Undo pendiente sigue apareciendo cuando todavía es verificable.
+- [x] ✅ **L-75** Restaurar ajustes del Limpiador no borra indebidamente inventario/Undo/decisiones que deban conservarse.
 
 ---
 
