@@ -2,7 +2,7 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 559 ✅ OK · 20 ❌ fallidas · 13 ⚠️ parciales · 47 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 568 ✅ OK · 20 ❌ fallidas · 14 ⚠️ parciales · 37 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
@@ -10,15 +10,15 @@ Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 f
 
 Confirmación manual del usuario, 04/10/2026: **F-02 funciona**. El arrastre del ZIP del Comparador se acepta por esta confirmación; no se afirma una repetición por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 5/16 OK (P-08/P-09/P-10/P-13/P-14), 1 fallida (P-16) y 10 pendientes.
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 54/63 OK, 4 fallidas, 2 parciales y 3 pendientes, Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 13/16 OK, 1 fallida (P-16), 1 parcial (P-12) y 1 pendiente (P-11).
 
-El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
+El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. El lote de carpeta no validó por sí solo C-42 ni C-45; ambos se comprobaron después en sus recorridos específicos, según su guardado individual. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
 ## Continuidad de pruebas — guardado individual
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: Limpiador terminado: 75/75 pruebas abordadas, 74 OK y L-74 fallida (INC-34), sin pendientes.** No se ha corregido producto. Otros módulos y privacidad conservan sus pendientes; Descargador sigue pausado por decisión del usuario.
+**Punto de continuación: Pruebas locales cerradas con sus resultados; C-35–C-37 pendientes de preparar Pandoc, P-11 y la parte remota de P-12 vinculadas al Descargador excluido** Última prueba guardada: P-12, ⚠️. Descargador excluido por el usuario; no se corrige producto.
 
 Reclasificación documental de privacidad, 04/10/2026, autorizada por el usuario: se reutilizan exclusivamente evidencias de pruebas anteriores, sin nuevas pruebas ni cambios de producto.
 
@@ -27,7 +27,7 @@ Reclasificación documental de privacidad, 04/10/2026, autorizada por el usuario
 - **P-10 — ✅, evidencia previa:** conflictos de Organizador O-42/O-49, Conversor C-60, Comparador F-24, Inspector I-141/I-142 y Limpiador L-52/L-53 no sobrescribieron silenciosamente archivos existentes. F-24 requirió confirmación expresa para reemplazar. Aceptación de los conflictos normales efectivamente probados, no garantía de toda entrada posible.
 - **P-16 — ❌, evidencia previa C-46/INC-14:** cancelar detuvo los motores, pero dejó controles del Conversor deshabilitados hasta reiniciar la app. La recuperación correcta de otros módulos no elimina este fallo transversal. No se ha corregido.
 
-P-01–P-07 continúan pendientes porque no se documentó una ejecución con Internet desconectado. P-11 sigue pendiente de una sesión de Instagram. P-12 continúa pendiente: INC-06 acredita una URL de autenticación con parámetros persistida, no credenciales/tokens utilizables ni fuga de sesión demostrados. P-15 sigue pendiente de comprobar específicamente el Historial tras OCR. P-13/P-14 permanecen OK.
+Estado histórico de la reclasificación anterior (sustituido por la ronda de cierre registrada más abajo): entonces P-01–P-07, P-11/P-12 y P-15 seguían pendientes. Ahora P-01–P-07 y P-15 están OK; P-12 es parcial por cobertura local sin sesión remota, y P-11 permanece pendiente dentro del Descargador excluido. INC-06 no demuestra fuga de credenciales/tokens utilizables. P-13/P-14 permanecen OK.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -758,6 +758,28 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 - **F-02 — ✅, confirmación manual del usuario, 04/10/2026:** El usuario confirma que arrastrar y soltar el ZIP en el Comparador funciona. Se sustituye el estado pendiente por OK por esta confirmación, no por una prueba nueva del agente. El intento automatizado incompleto anterior se conserva como trazabilidad de control. Comparador cerrado: 27/27 OK y 0 pendientes.
 
+- **C-42 — ✅, guardado individual, 04/10/2026:** Se abre la ventana nativa Seleccionar varios archivos, se seleccionan varios archivos sintéticos y se confirma Abrir. El Conversor importa 7 entradas compatibles distintas (CSV/JSON/texto/marcado) en una sola selección y muestra aparte el rechazo del ejecutable de sondeo no compatible. No se usa una carpeta como sustituto del selector múltiple. El intento de navegar a Entradas quedó en su carpeta padre, propiedad íntegra del QA; se verificaron los nombres realmente importados, sin archivos personales ni ejecución sobre el lote mixto.
+
+- **P-03 — ✅, guardado individual, 04/10/2026:** Nueva sesión Debug PID21666 con datos aislados en QA-final-20261004.y2CNs7/Data, iniciada bajo sandbox-exec offline.sb que deniega network*. Sondeo con el mismo perfil: connect a loopback devuelve EPERM (errno1), no simple conexión rechazada. Por UI se importa entrada.csv, se prepara y ejecuta CSV→CSV (copia segura admitida): 1 correcto/0 fallidos/omitidos/cancelados, salida independiente con SHA-256 aa27cd…b265 igual al original e Historial completed. Funcionamiento local comprobado en ese recorrido sin red; no certifica todos los formatos ni los motores opcionales ausentes.
+
+- **P-02 — ✅, guardado individual, 04/10/2026:** Bajo la misma sesión con network* denegado (PID21666, perfil offline verificado con EPERM), se importa por selector nativo un TXT WhatsApp propio y se ejecuta Analizar. Resumen real: 3 de3 mensajes,2 participantes,1 día activo y periodo10:00–10:04. Historial local completed: processedFiles1/messages3/participants2, sin mensajes completos. No se abren enlaces ni se usa Instagram remoto. Aceptación de un análisis local real sin Internet.
+
+- **P-04 — ✅, guardado individual, 04/10/2026:** Bajo el perfil offline con network* denegado se importa un ZIP sintético válido con connections/followers_and_following y se ejecuta Analizar exportación. Resultado:2 seguidos/2 seguidores,1 no sigue de vuelta (qa_beta),1 no seguido y1 mutuo; Historial completed con esos contadores, sin usernames. No se pulsa Abrir en Instagram ni se usa sesión. El primer ZIP de QA con JSON en la raíz fue rechazado correctamente por estructura; se preserva como intento de fixture, no fallo de red/producto.
+
+- **P-01 — ✅, guardado individual, 04/10/2026:** Con network* denegado para la app (PID21666/perfil offline verificado), se selecciona exclusivamente la carpeta Organizador propia con2 archivos sintéticos. Analizar prepara2 movimientos/4 carpetas/0 conflictos; se revisan Datos/CSV/datos_offline.csv y Documentos/TXT/notas_offline.txt y se confirma Organizar2 archivos. Ambos aparecen en esos destinos con SHA-256 idénticos (1ce80d…9824/afa991…0b82); Historial organize/completed con Undo disponible. No se mueve ningún archivo real ni se requiere red.
+
+- **P-05 — ✅, guardado individual, 04/10/2026:** Con la app Debug PID21666 y sus motores bajo network* denegado, se importa I90_bitmap.mkv propio y FFprobe completa la inspección: Matroska/H264,640×360,10FPS,12s,sin audio y1 subtítulo PGS spa. Resumen y Pistas disponibles en modo inspección/solo lectura, sin requerir red. SHA-256 de entrada c577cb…26ec antes de abrir. Se continúa OCR como comprobación independiente P-15; no se certifican todas las posibles variantes por este único caso.
+
+- **P-15 — ✅, guardado individual, 04/10/2026:** Se ejecuta OCR real de I90_bitmap.mkv bajo la sesión offline. La hoja termina con12 filas y reconoce los tres textos sintéticos ZEUVE QA UNO/DOS/TRES (100% en las filas con texto); se cierra la hoja. Comprobación de la tabla operation_history antes/durante/después: mantiene4 entradas previas (Conversor,Analizador,Comparador,Organizador), ninguna operación OCR y0 payloads con cualquiera de los tres textos. El original conserva SHA-256 c577cb…26ec. El texto OCR no queda en Historial en este recorrido. Se reproduce el timing incorrecto conocido INC-21, sin corregirlo ni convertir este OK de privacidad en aceptación funcional del SRT.
+
+- **P-06 — ✅, guardado individual, 04/10/2026:** Limpiador probado desde la interfaz nativa en la misma instancia QA con red denegada por perfil de proceso (sonda connect: EPERM). El análisis terminó con cobertura Completa: 569 aplicaciones, 449 candidatos, 51,31 GB analizados, 1,18 GB de selección segura potencial y 0 ubicaciones sin acceso; cleaner_scan_metadata confirmó complete y 51.309.784.900 bytes. Solo análisis: no se seleccionaron manualmente elementos ni se retiró o eliminó ningún archivo. La preselección automática posterior se vació antes de cerrar (0 seleccionados/0 KB).
+
+- **P-07 — ✅, guardado individual, 04/10/2026:** Cierre transversal basado en las seis pruebas nativas P-01–P-06 realizadas en una misma sesión QA con network* denegado y sonda EPERM: organización real, análisis de chat, conversión/copia segura CSV, comparación de exportación, inspección multimedia/OCR y análisis del Limpiador terminaron sin Internet. Se acepta la independencia de red de los recorridos locales ejercitados. El Descargador queda fuera de esta ronda; no se prueba sesión remota ni se generaliza a motores opcionales ausentes, instalación de motores o enlaces externos.
+
+- **P-12 — ⚠️, guardado individual, 04/10/2026:** Revisión acotada de credenciales locales: C-34 ya ejercitó un PDF AES-256 con contraseña sintética introducida por UI y comprobó 0 coincidencias en los logs aislados, ajustes e Historial, además de campo seguro vacío al terminar. En esta ronda se auditan los 5 registros JSONL realmente producidos por Conversor, Analizador y Organizador: 0 patrones de Authorization/Bearer/access_token/refresh_token/sessionid/csrftoken/password/credential/cookie y metadatos limitados a contadores. Resultado PARCIAL: los módulos locales ejercitados no mostraron la contraseña ni credenciales; no se usó una sesión ni un token de autenticación real. INC-06 sigue siendo un defecto de saneamiento de URL, no prueba de fuga de tokens utilizables. La cobertura de autenticación remota queda fuera por exclusión del Descargador.
+
+- **Cierre operativo de la ronda local, 04/10/2026:** 10 IDs anteriormente pendientes abordados y guardados uno a uno: C-42, P-01–P-07 y P-15 OK; P-12 parcial. No hay incidencias nuevas: se mantiene INC-21 del OCR y el resto de defectos sin arreglar. P-11 necesita sesión de Instagram (Descargador excluido); C-35–C-37 necesitan Pandoc, ausente en el entorno. Preparar el motor solo en QA se ha consultado y queda a la espera de respuesta explícita. El Limpiador preseleccionó 20 candidatos regenerables tras analizar; no se confirmó ningún plan ni retirada. Antes de cerrar se pulsó Deseleccionar todo: 0 seleccionados/0 KB y Mover a Papelera deshabilitado. App offline PID21666 cerrada normalmente; el perfil no modifica la red global. Solo se organizaron/copiaron fixtures propios; no se borró ni movió ningún dato real. Problemas de control separados: foco de teclado que llegó al chat, navegación del selector a carpeta padre, ambigüedad AX con dos procesos de igual nombre y lectura AX masiva lenta cancelada únicamente en el controlador. No se confunden con fallos de ZEUVE. Se preservan las evidencias QA externas.
+
 ## 1. ZEUVE general
 
 
@@ -1209,7 +1231,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 ## Entradas múltiples
 
-- [ ] ➖ **C-42** Varios archivos.
+- [x] ✅ **C-42** Varios archivos.
 - [x] ✅ **C-43** Carpeta.
 - [x] ✅ **C-44** ZIP.
 - [x] ✅ **C-45** El progreso de lote funciona.
@@ -1642,19 +1664,19 @@ Si Xcode está instalado:
 
 # 11. Privacidad y seguridad transversal
 
-- [ ] ➖ **P-01** Organizador funciona sin Internet.
-- [ ] ➖ **P-02** Analizador de chats funciona sin Internet.
-- [ ] ➖ **P-03** Conversor funciona sin Internet.
-- [ ] ➖ **P-04** Comparador funciona sin Internet.
-- [ ] ➖ **P-05** Inspector funciona sin Internet.
-- [ ] ➖ **P-06** Limpiador funciona sin Internet.
-- [ ] ➖ **P-07** Solo el Descargador necesita Internet para su trabajo normal.
+- [x] ✅ **P-01** Organizador funciona sin Internet.
+- [x] ✅ **P-02** Analizador de chats funciona sin Internet.
+- [x] ✅ **P-03** Conversor funciona sin Internet.
+- [x] ✅ **P-04** Comparador funciona sin Internet.
+- [x] ✅ **P-05** Inspector funciona sin Internet.
+- [x] ✅ **P-06** Limpiador funciona sin Internet.
+- [x] ✅ **P-07** Solo el Descargador necesita Internet para su trabajo normal.
 - [x] ✅ **P-08** Un archivo original convertido permanece intacto.
 - [x] ✅ **P-09** Un archivo original inspeccionado/editado permanece intacto.
 - [x] ✅ **P-10** Ningún conflicto normal sobrescribe silenciosamente un archivo existente.
 - [ ] ➖ **P-11** Después de utilizar una sesión de Instagram, los registros no muestran cookies.
-- [ ] ➖ **P-12** Los registros no muestran tokens/credenciales.
+- [ ] ⚠️ **P-12** Los registros no muestran tokens/credenciales.
 - [x] ✅ **P-13** Analizar chats no deja mensajes completos en Historial.
 - [x] ✅ **P-14** Comparar seguidores no deja usernames/listas en Historial.
-- [ ] ➖ **P-15** OCR del Inspector no deja el texto OCR completo en Historial.
+- [x] ✅ **P-15** OCR del Inspector no deja el texto OCR completo en Historial.
 - [x] ❌ **P-16** Cancelar operaciones no deja ZEUVE permanentemente bloqueado.
