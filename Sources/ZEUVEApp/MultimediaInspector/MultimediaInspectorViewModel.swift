@@ -342,12 +342,16 @@ final class MultimediaInspectorViewModel: ObservableObject {
 
     func closeBatch() {
         guard !batch.isRunning else { return }
-        batch.clear()
-        isBatchMode = false
+        Task { [weak self] in
+            guard let self else { return }
+            await self.batch.cancelAndWait()
+            self.batch.clear()
+            self.isBatchMode = false
+        }
     }
 
     func openBatchItem(_ url: URL) {
-        guard !batch.isRunning else { return }
+        guard !batch.isBusy else { return }
         isBatchMode = false
         requestOpen(url)
     }
@@ -594,7 +598,6 @@ final class MultimediaInspectorViewModel: ObservableObject {
             defaultPreferences = .defaults
             failures.append("Inspector multimedia: \(error.localizedDescription)")
         }
-        batch.restoreDefaultPresets()
         batch.updatePreferences(defaultPreferences)
         return failures
     }
@@ -735,7 +738,14 @@ final class MultimediaInspectorViewModel: ObservableObject {
         mutate { draft in
             switch track.kind {
             case .video:
-                if let i = draft.videoTracks.firstIndex(where: { $0.id == track.id }) { draft.videoTracks[i] = track }
+                if let i = draft.videoTracks.firstIndex(where: { $0.id == track.id }) {
+                    let previous = draft.videoTracks[i]
+                    draft.videoTracks[i] = track
+                    if let index = track.source.originalStreamIndex {
+                        if previous.title != track.title { draft.setVideoMetadata(track.title, for: "title", streamIndex: index) }
+                        if previous.language != track.language { draft.setVideoMetadata(track.language, for: "language", streamIndex: index) }
+                    }
+                }
             case .audio:
                 if let i = draft.audioTracks.firstIndex(where: { $0.id == track.id }) { draft.audioTracks[i] = track }
             case .subtitle:
@@ -887,7 +897,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 guard let locator = self.locator else { throw MultimediaInspectorError.ffprobeUnavailable }
                 let probe = try await self.inspector.inspect(url: url, ffprobe: try await locator.ffprobe(), fingerprint: fp, useCache: false)
                 guard let stream = probe.streams.first(where: { $0.codec_type == "video" }), let index = stream.index else { throw MultimediaInspectorError.invalidInput }
-                let artwork = MediaEditableArtwork(source: .external(url: url, fingerprint: fp, streamIndex: index), codec: stream.codec_name ?? url.pathExtension, title: url.deletingPathExtension().lastPathComponent)
+                let artwork = MediaEditableArtwork(source: .external(url: url, fingerprint: fp, streamIndex: index), codec: stream.codec_name ?? url.pathExtension, title: self.currentDraft?.targetContainer == .mp4 ? "" : url.deletingPathExtension().lastPathComponent)
                 self.mutate { $0.artworks = [artwork] }
                 self.artworkPreviewData = (values.fileSize ?? Int.max) <= 32 * 1024 * 1024 ? (try? Data(contentsOf: url, options: [.mappedIfSafe])) : nil
             } catch { self.errorMessage = Self.clean(error) }
@@ -933,7 +943,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
     }
 
     func updateVideoMetadata(streamIndex: Int, key: String, value: String) {
-        mutate { $0.metadata.setVideoValue(value, for: key, streamIndex: streamIndex) }
+        mutate { $0.setVideoMetadata(value, for: key, streamIndex: streamIndex) }
     }
 
     func chooseExternalTrack(kind: MediaTrackKind) {
@@ -1681,6 +1691,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 guard self.videoPreviewOperationID == operationID, !Task.isCancelled else { return }
                 self.videoPreviewSourceID = source.id
                 self.videoPreviewState = .loading
+                self.beginPreviewMonitoring(operationID: self.previewOperationID)
                 if self.activePreviewSource == nil {
                     self.previewSourceID = source.id
                     self.previewDuration = source.duration
@@ -1711,7 +1722,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 guard let self, self.previewOperationID == operationID else { return }
                 await self.refreshPreviewSnapshot(operationID: operationID)
                 guard self.previewOperationID == operationID else { return }
-                if [.idle, .paused, .finished, .failed].contains(self.previewState) { return }
+                if [.idle, .paused, .finished, .failed].contains(self.previewState), self.requestedVideoPreviewSourceID == nil, self.videoPreviewState != .loading { return }
                 try? await Task.sleep(for: .milliseconds(100))
             }
         }
@@ -1734,6 +1745,10 @@ final class MultimediaInspectorViewModel: ObservableObject {
         if let videoPreviewService {
             let video = await videoPreviewService.snapshot(position: previewPosition)
             guard previewOperationID == operationID else { return }
+            // Un reemplazo pendiente conserva el frame visible hasta que su fuente nueva
+            // haya entregado un frame o un estado terminal, sin consumir snapshots viejos.
+            if requestedVideoPreviewSourceID != nil,
+               video.sourceID != requestedVideoPreviewSourceID { return }
             let previousVideoSourceID = videoPreviewSourceID
             if videoPreviewState != video.state { videoPreviewState = video.state }
             if videoPreviewSourceID != video.sourceID { videoPreviewSourceID = video.sourceID }
@@ -2455,6 +2470,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
 
     func cancelCurrentOperation() {
         if batch.isRunning { batch.cancel() }
+        if batch.isPreflighting || batch.isExecutingStructural { batch.cancelStructural() }
         inspectionTask?.cancel()
         executionTask?.cancel()
         automaticAudioAnalysisTask?.cancel()

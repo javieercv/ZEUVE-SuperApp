@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.5.0
+# Alcance funcional vigente — ZEUVE 0.20.6.0
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 
@@ -39,7 +39,7 @@ No elude DRM, CAPTCHA, paywalls ni controles de acceso. El navegador Playwright 
 
 No usa red ni conserva contenido privado completo en el historial global.
 
-## Conversor universal 0.3.0
+## Conversor universal 0.3.1
 
 - Conversión local de imágenes, audio, vídeo, PDF, texto y datos en las rutas documentadas.
 - FFmpeg/FFprobe para multimedia; APIs nativas cuando corresponda; Pandoc opcional para rutas compatibles cuando está preparado.
@@ -53,7 +53,7 @@ Calibre, Ghostscript y LibreOffice no forman parte del producto actual. Ebook/EP
 - Compara seguidores y seguidos localmente, tolera variantes previstas del formato y permite exportar resultados.
 - Sin red, sesión de Instagram ni scraping.
 
-## Inspector multimedia 0.7.3
+## Inspector multimedia 0.7.4
 
 - Inspección FFprobe de contenedores/streams, vídeo, audio, subtítulos, capítulos, metadata, attachments y carátulas.
 - Preview local de audio y vídeo con transporte compartido, waveform, espectrograma y subtítulos cuando son viables.
@@ -65,7 +65,7 @@ Calibre, Ghostscript y LibreOffice no forman parte del producto actual. Ebook/EP
 
 No es un editor temporal/creativo y no recodifica audio/vídeo dentro del Inspector; una transformación que exige transcode pertenece al Conversor.
 
-## Limpiador 0.1.3
+## Limpiador 0.1.4
 
 - Inventario local de aplicaciones y asociaciones/residuos.
 - Análisis de cachés/logs/tmp, restos, instaladores y contenido regenerable de desarrollo según reglas conservadoras.

@@ -3,7 +3,7 @@
   "identifier": "com.zeuve.universal-converter",
   "name": "Conversor universal",
   "summary": "Convierte imágenes, audio, vídeo, PDF, texto y datos de forma local, segura y con prioridad de calidad.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "minimumZEUVEVersion": "0.7.0",
   "moduleAPI": "1.0",
   "technology": "mixed",

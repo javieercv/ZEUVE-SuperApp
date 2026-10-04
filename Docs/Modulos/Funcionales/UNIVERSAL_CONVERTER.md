@@ -1,9 +1,9 @@
-# Conversor universal 0.3.0 — ZEUVE 0.20.5.0
+# Conversor universal 0.3.1 — ZEUVE 0.20.6.0
 
 ## Identidad
 
 - Identificador: `com.zeuve.universal-converter`.
-- Versión del módulo: `0.3.0`.
+- Versión del módulo: `0.3.1`.
 - ZEUVE mínimo declarado: `0.7.0`.
 - Funcionamiento local; no declara acceso de red.
 
@@ -75,6 +75,18 @@ CSV se mantiene como formato genérico de datos:
 En modo simple, seleccionar una salida de vídeo implica recodificar la pista de vídeo. Para MP4 con códec automático se utiliza H.264 mediante libx264, manteniendo resolución y FPS originales salvo que el usuario los cambie. La opción de copia rápida sin recodificar solo aparece en modo avanzado y está desactivada por defecto.
 
 La extracción crea inmediatamente en el destino una carpeta visible con sufijo `Procesando`. Al completar, la carpeta se renombra al nombre definitivo en el mismo volumen. Si se cancela o falla, ZEUVE valida el último fotograma, conserva los archivos completos y cambia el nombre a `Incompleto`. `tiempos.csv` se construye durante la misma ejecución de FFmpeg.
+
+## Planificación de audio, WebM y texto
+
+La planificación inspecciona con FFprobe los archivos locales cuando necesita conocer canales o códec para Opus/OGG o WebM. Los datos técnicos permanecen en memoria; no se incorporan a presets, ajustes ni historial. La inspección adquiere `OperationCoordinator`, atiende cancelación local/global y revalida el fingerprint. En entradas ZIP aún no extraídas, el plan declara la comprobación pendiente y la ejecución verifica la capacidad antes de iniciar el encoder.
+
+Para libopus, el límite es 256 kb/s por canal efectivo. Con bitrate automático, Máximo/Personalizado resuelven 256 kb/s en mono y 320 kb/s en estéreo, anunciados en el plan; una elección explícita de 320 kb/s en mono se rechaza conservando la selección. Una transformación explícita a mono usa el límite mono. Las rutas de copia compatible no aplican restricciones del encoder que no se ejecuta.
+
+WebM requiere modo avanzado y copia rápida de vídeo VP8/VP9/AV1, sin transformaciones del vídeo ni AAC de salida. H.264/HEVC se rechazan durante la preparación. El audio compatible se copia; cuando debe convertirse a Opus se comprueban todos los streams seleccionados y se anuncia el bitrate. No se añade un encoder de vídeo WebM.
+
+Pandoc recibe un writer explícito: `plain`, `markdown` o `html`. TXT y Markdown pueden contener los mismos párrafos y símbolos: la extensión solo desambigua contenido textual, después de firmas más específicas. La salida TXT/Markdown exige un archivo regular no vacío, UTF-8 completo y ausencia de datos binarios/controles incompatibles, con lectura por bloques de todo el archivo. HTML conserva su validación específica.
+
+Cancelar espera la terminación del servicio y su limpieza antes de devolver los controles a un estado utilizable. El resumen cancelado y las reglas de fotogramas recuperables se conservan; las contraseñas efímeras se vacían también en la ruta de cancelación.
 
 ## Persistencia secundaria y carpetas recordadas
 

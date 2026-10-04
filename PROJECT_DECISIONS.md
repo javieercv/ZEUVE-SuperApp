@@ -1,20 +1,34 @@
 # Decisiones aprobadas de ZEUVE
 
-Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.5.0 el 25 de septiembre de 2026.
+Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.6.0 el 4 de octubre de 2026.
 
 > **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
 
-## Estado vigente de referencia — ZEUVE 0.20.5.0
+## Estado vigente de referencia — ZEUVE 0.20.6.0
 
 Este bloque resume las decisiones actualmente efectivas que más fácilmente pueden confundirse con registros antiguos. No sustituye los detalles de cada sección ni las fuentes vivas.
 
-- Built-ins: Organizador 0.1.4, Descargador 0.7.3, Analizador de chats 0.1.6, Conversor 0.3.0, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.3 y Limpiador 0.1.3.
-- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.5.0.
+- Built-ins: Organizador 0.1.4, Descargador 0.7.3, Analizador de chats 0.1.6, Conversor 0.3.1, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.4 y Limpiador 0.1.4.
+- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.6.0.
 - Ajustes: centralizados. Orden de secciones: Organizador 10, Descargador 20, Analizador 30, Conversor 40, Inspector 50 y Limpiador 60; el Comparador no tiene sección propia.
 - Inspector: inspección + preview + análisis + edición estructural segura sin transcode audiovisual; la transformación que requiere recodificación pertenece al Conversor.
 - Limpiador: `scanLocalStorage` autoriza análisis local documentado; cualquier retirada exige `removeLocalItems`, plan visible, selección y revalidación. Papelera es el modo seguro predeterminado y Undo solo aparece cuando es verificable.
 - Motores requeridos por la instantánea actual: yt-dlp, Deno, FFmpeg, FFprobe, gallery-dl e instaloader-zeuve. Pandoc sigue soportado como opcional del Conversor cuando se prepara. Playwright no participa en la ruta efectiva actual. Calibre, Ghostscript y LibreOffice están retirados.
-- Versión: ZEUVE 0.20.5.0, marketing 0.20.5, build 71.
+- Versión: ZEUVE 0.20.6.0, marketing 0.20.6, build 72.
+
+## Correcciones de QA aprobadas — 0.20.6.0
+
+Plan aprobado por el usuario con «ok» el 04/10/2026: corregir únicamente los 22 IDs fallidos fuera del Descargador, agrupados por causa raíz. No se amplían formatos, motores, permisos, dependencias, servicios, esquema SQLite ni contratos persistidos; los parciales, incluido MOV/carátulas, quedan fuera del encargo.
+
+- El reset global conserva presets, reglas y favoritos del Inspector.
+- Opus automático se resuelve por canales efectivos y se anuncia; una selección explícita incompatible se rechaza sin reducirla. Estéreo no hereda el límite mono.
+- WebM conserva vídeo compatible por copia avanzada; las rutas que necesitan encoder no incluido se bloquean antes de ejecutar.
+- TXT/Markdown se validan como texto completo, y Pandoc fija el writer; cancelar el Conversor recupera su estado al concluir la limpieza.
+- Preview serializa recursos y generaciones, actualiza el frame en seek pausado y reserva espacio para el transporte.
+- Edición usa metadata efectiva, normaliza ausencias de códec/idioma sin ignorar cambios reales, limita título de portada MP4 y conserva portada MKV como imagen adjunta propia.
+- El lote expone cancelación real de preflight; Deshacer del Limpiador se recupera de persistencia con revalidación.
+- Versionado aprobado: marketing 0.20.6, build 72; Conversor 0.3.1, Inspector 0.7.4 y Limpiador 0.1.4. Los otros módulos mantienen su versión.
+- Las correcciones automáticas no convierten aceptaciones manuales en OK; las pruebas sin recorrido nativo completo conservan ❌ con nota «corregido, pendiente de comprobación».
 
 ## Saneamiento técnico acotado — Inspector 0.7.3 y Limpiador 0.1.3 — 0.20.5.0
 

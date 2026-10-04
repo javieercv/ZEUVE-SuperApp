@@ -66,5 +66,5 @@ for required in ['case txt, markdown, html, csv, json, xml', 'case .csv, .json, 
 for extension in ['doc','docx','xls','xlsx','ppt','pptx','odt','ods','odp','rtf']:
     if f'case "{extension}":' in models: raise SystemExit('Extensión ofimática todavía registrada: ' + extension)
 view_model = Path('Sources/ZEUVEApp/UniversalConverter/UniversalConverterViewModel.swift').read_text()
-for value in ['planRevision', 'planTask?.cancel()', 'Task.sleep', 'guard revision == self.planRevision']:
+for value in ['planRevision', 'planTask?.cancel()', 'Task.sleep', 'guard !Task.isCancelled, revision == self.planRevision']:
     if value not in view_model: raise SystemExit('Falta control de resultados obsoletos: ' + value)

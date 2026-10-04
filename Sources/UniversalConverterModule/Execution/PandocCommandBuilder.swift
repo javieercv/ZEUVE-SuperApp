@@ -8,7 +8,8 @@ public struct PandocCommandBuilder: Sendable {
         guard [.txt, .markdown, .html].contains(target) else {
             throw UniversalConverterError.incompatibleRecipe("Pandoc no admite la salida \(target.displayName) con los motores aprobados.")
         }
-        var arguments = [source.path, "--standalone", "--output", destination.path]
+        let writer = target == .txt ? "plain" : (target == .markdown ? "markdown" : "html")
+        var arguments = [source.path, "--to", writer, "--standalone", "--output", destination.path]
         switch metadataPolicy {
         case .allCompatible:
             break

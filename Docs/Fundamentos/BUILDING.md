@@ -1,15 +1,15 @@
-# Compilación y entrega — ZEUVE 0.20.5.0
+# Compilación y entrega — ZEUVE 0.20.6.0
 
 ## Estado de versión
 
-- ZEUVE: `0.20.5.0` (`VERSION`).
-- `MARKETING_VERSION`: `0.20.5`.
+- ZEUVE: `0.20.6.0` (`VERSION`).
+- `MARKETING_VERSION`: `0.20.6`.
 - Revisión bundle: `0`.
-- Build: `71`.
+- Build: `72`.
 - Plataforma objetivo: macOS 14+ Apple Silicon.
 - Swift 6, SwiftUI/AppKit, Hardened Runtime, sin App Sandbox en esta fase.
 
-Versiones de módulos: Organizador 0.1.4, Descargador 0.7.3, Analizador de chats 0.1.6, Conversor 0.3.0, Comparador 0.1.0, Inspector 0.7.3 y Limpiador 0.1.3.
+Versiones de módulos: Organizador 0.1.4, Descargador 0.7.4, Analizador de chats 0.1.6, Conversor 0.3.1, Comparador 0.1.0, Inspector 0.7.4 y Limpiador 0.1.4.
 
 ## Requisitos
 

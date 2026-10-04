@@ -1,4 +1,4 @@
-# Contexto operativo para agentes — ZEUVE 0.20.5.0
+# Contexto operativo para agentes — ZEUVE 0.20.6.0
 
 Este documento es un mapa rápido. No sustituye a `SUPERAPP_PROJECT_RULES.md`, `PROJECT_DECISIONS.md` ni a la documentación funcional concreta.
 
@@ -24,9 +24,9 @@ No existe una dependencia de contexto en `../../.agents/skills/` ni debe suponer
 
 ## Estado de producto
 
-- ZEUVE: `0.20.5.0`.
-- Marketing: `0.20.5`.
-- Build: `71`.
+- ZEUVE: `0.20.6.0`.
+- Marketing: `0.20.6`.
+- Build: `72`.
 - Plataforma: macOS 14+ Apple Silicon.
 - Swift 6; SwiftUI + AppKit; Hardened Runtime; sin App Sandbox en esta fase.
 
@@ -37,10 +37,10 @@ No existe una dependencia de contexto en `../../.agents/skills/` ni debe suponer
 | `com.zeuve.organizer` | 0.1.4 | ⌘1 |
 | `com.zeuve.universal-downloader` | 0.7.3 | ⌘2 |
 | `com.zeuve.chat-analyzer` | 0.1.6 | ⌘3 |
-| `com.zeuve.universal-converter` | 0.3.0 | ⌘4 |
+| `com.zeuve.universal-converter` | 0.3.1 | ⌘4 |
 | `com.zeuve.instagram-followers` | 0.1.0 | ⌘5 |
-| `com.zeuve.multimedia-inspector` | 0.7.3 | ⌘6 |
-| `com.zeuve.cleaner` | 0.1.3 | ⌘7 |
+| `com.zeuve.multimedia-inspector` | 0.7.4 | ⌘6 |
+| `com.zeuve.cleaner` | 0.1.4 | ⌘7 |
 
 Historial usa ⌘8 por defecto. `BuiltInModuleCatalog` conserva IDs/defaults; `NavigationPreferences` determina orden y atajos efectivos personalizados.
 

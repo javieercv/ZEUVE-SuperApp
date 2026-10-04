@@ -20,6 +20,11 @@ public enum MediaTrackSource: Codable, Sendable, Equatable {
         if case .original = self { return true }
         return false
     }
+
+    public var originalStreamIndex: Int? {
+        if case .original(let index) = self { return index }
+        return nil
+    }
 }
 
 public struct MediaEditableTrack: Identifiable, Codable, Sendable, Equatable {

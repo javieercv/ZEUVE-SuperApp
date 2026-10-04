@@ -30,6 +30,12 @@ public actor MultimediaResultValidator {
         guard resultAttachedPictures.count == plan.artworks.count else { throw MultimediaInspectorError.validationFailed("el número de carátulas no coincide con el plan") }
         for (planned, actual) in zip(plan.artworks, resultAttachedPictures) {
             guard sameCodec(planned.artwork.codec, actual.codec_name) else { throw MultimediaInspectorError.validationFailed("una carátula no conserva el códec previsto") }
+            if plan.targetContainer == .mkv {
+                guard actual.tags?.firstValue(caseInsensitiveKey: "filename") == planned.artwork.filename,
+                      actual.tags?.firstValue(caseInsensitiveKey: "mimetype")?.lowercased() == planned.artwork.mimeType.lowercased() else {
+                    throw MultimediaInspectorError.validationFailed("el nombre o MIME de la carátula MKV no coincide")
+                }
+            }
             if !planned.artwork.title.isEmpty, planned.artwork.title != actual.title { throw MultimediaInspectorError.validationFailed("el título de una carátula no coincide") }
         }
 
@@ -43,7 +49,7 @@ public actor MultimediaResultValidator {
         }
 
         try validateChapters(plan.chapters, actual: result.chapters ?? [])
-        try validateAttachments(plan.attachments, actual: result.attachmentStreams)
+        try validateAttachments(plan.attachments, actual: result.attachmentStreams, original: original)
         try validateManagedMetadata(plan, actual: result)
 
         guard (result.programs?.count ?? 0) == (original.programs?.count ?? 0) else { throw MultimediaInspectorError.validationFailed("no se han preservado los programas multimedia") }
@@ -53,7 +59,7 @@ public actor MultimediaResultValidator {
     private func validateTrackMetadata(_ expected: MediaEditableTrack, actual: MediaInspectionStream) throws {
         let expLang = expected.language.trimmingCharacters(in: .whitespacesAndNewlines)
         let expTitle = expected.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !expLang.isEmpty, actual.language != expLang { throw MultimediaInspectorError.validationFailed("el idioma de una pista no coincide") }
+        if normalizedLanguage(actual.language) != normalizedLanguage(expLang) { throw MultimediaInspectorError.validationFailed("el idioma de una pista no coincide") }
         if !expTitle.isEmpty, actual.title != expTitle { throw MultimediaInspectorError.validationFailed("el título de una pista no coincide") }
         guard actual.isDefault == expected.isDefault else { throw MultimediaInspectorError.validationFailed("el flag default no coincide") }
         if expected.kind == .subtitle, actual.isForced != expected.isForced { throw MultimediaInspectorError.validationFailed("el flag forced no coincide") }
@@ -73,7 +79,7 @@ public actor MultimediaResultValidator {
         }
     }
 
-    private func validateAttachments(_ expected: [PlannedAttachment], actual: [MediaInspectionStream]) throws {
+    private func validateAttachments(_ expected: [PlannedAttachment], actual: [MediaInspectionStream], original: MediaInspectionResult) throws {
         guard actual.count == expected.count else { throw MultimediaInspectorError.validationFailed("el número de adjuntos no coincide con el plan") }
         for (planned, stream) in zip(expected, actual) {
             let filename = stream.tags?.firstValue(caseInsensitiveKey: "filename") ?? stream.title ?? ""
@@ -82,7 +88,13 @@ public actor MultimediaResultValidator {
             if !planned.attachment.mimeType.isEmpty, mime.caseInsensitiveCompare(planned.attachment.mimeType) != .orderedSame {
                 throw MultimediaInspectorError.validationFailed("el MIME de un adjunto no coincide")
             }
-            if planned.action == .keep, !sameCodec(planned.attachment.codec, stream.codec_name) {
+            if planned.action == .keep,
+               let index = planned.attachment.source.originalStreamIndex,
+               let bytes = original.attachmentStreams.first(where: { $0.index == index })?.extradata_size,
+               stream.extradata_size != bytes {
+                throw MultimediaInspectorError.validationFailed("el tamaño de un adjunto original ha cambiado")
+            }
+            if planned.action == .keep, !sameAttachmentCodec(planned.attachment.codec, stream.codec_name) {
                 throw MultimediaInspectorError.validationFailed("un adjunto original ha cambiado de códec")
             }
         }
@@ -95,16 +107,17 @@ public actor MultimediaResultValidator {
             if actualValue != expected { throw MultimediaInspectorError.validationFailed("el metadato global \(key) no coincide") }
         }
         for (streamIndex, keys) in plan.metadata.touchedVideoKeysByStream {
-            guard let ordinal = plan.originalVideoStreamIndices.firstIndex(of: streamIndex), ordinal < actual.streams.filter({ $0.codec_type == "video" }).count else {
+            guard let ordinal = plan.videoTracks.firstIndex(where: { $0.track.source.originalStreamIndex == streamIndex }), ordinal < actual.videoStreams.count else {
                 throw MultimediaInspectorError.validationFailed("no se ha localizado el stream de vídeo para validar metadatos")
             }
-            let videoStreams = actual.streams.filter { $0.codec_type == "video" }
+            let videoStreams = actual.videoStreams
             let stream = videoStreams[ordinal]
             let values = plan.metadata.videoValuesByStream[streamIndex] ?? [:]
             for key in keys {
                 let expected = values[key] ?? ""
                 let actualValue = stream.tags?.firstValue(caseInsensitiveKey: key) ?? ""
-                if actualValue != expected { throw MultimediaInspectorError.validationFailed("el metadato de vídeo \(key) no coincide") }
+                let matches = key == "language" ? normalizedLanguage(actualValue) == normalizedLanguage(expected) : actualValue == expected
+                if !matches { throw MultimediaInspectorError.validationFailed("el metadato de vídeo \(key) no coincide") }
             }
         }
     }
@@ -115,6 +128,19 @@ public actor MultimediaResultValidator {
             return v == "srt" ? "subrip" : (v == "h265" ? "hevc" : v)
         }
         return n(lhs) == n(rhs)
+    }
+
+    private func normalizedLanguage(_ language: String?) -> String {
+        let value = (language ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return value == "und" ? "" : value
+    }
+
+    private func sameAttachmentCodec(_ lhs: String?, _ rhs: String?) -> Bool {
+        func normalized(_ value: String?) -> String? {
+            let codec = (value ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            return codec.isEmpty || codec == "attachment" ? nil : codec
+        }
+        return sameCodec(normalized(lhs), normalized(rhs))
     }
 }
 

@@ -63,6 +63,13 @@ public final class CleanerRepository: @unchecked Sendable {
         do{fp=try d.decode(CleanerFileFingerprint.self,from:row.blob("fingerprint_blob"))}catch{throw SQLiteDatabaseError.invalidColumn("fingerprint_blob")}
         return .init(id:id,historyID:historyID,originalURL:URL(fileURLWithPath:try row.string("original_path")),trashURL:URL(fileURLWithPath:try row.string("trash_path")),fingerprint:fp)
     } }
+    public func pendingUndoHistoryIDs() throws -> [UUID] {
+        try database.query("SELECT operation_id, MAX(created_at) AS latest FROM cleaner_undo_items GROUP BY operation_id ORDER BY latest DESC, operation_id DESC").map { row in
+            guard let id = UUID(uuidString: try row.string("operation_id")) else { throw SQLiteDatabaseError.invalidColumn("operation_id") }
+            return id
+        }
+    }
+
     public func removeUndoItem(id: UUID) throws { try database.execute("DELETE FROM cleaner_undo_items WHERE id=?",bindings:[.text(id.uuidString)]) }
     public func clearInventoryHistory() throws { try database.transaction { try database.execute("DELETE FROM cleaner_associated_roots");try database.execute("DELETE FROM cleaner_app_inventory");try database.execute("DELETE FROM cleaner_scan_metadata") } }
 

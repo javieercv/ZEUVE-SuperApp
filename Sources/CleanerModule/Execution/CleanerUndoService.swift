@@ -14,17 +14,74 @@ public final class CleanerUndoService: @unchecked Sendable {
     let history: HistoryRepository
     let mutator: any CleanerFileMutating
     let fileManager: FileManager
+    private let trashRoots: [URL]?
 
-    public init(coordinator: OperationCoordinator, repository: CleanerRepository, history: HistoryRepository, mutator: any CleanerFileMutating = SystemCleanerFileMutator(), fileManager: FileManager = .default) {
+    public init(coordinator: OperationCoordinator, repository: CleanerRepository, history: HistoryRepository, mutator: any CleanerFileMutating = SystemCleanerFileMutator(), fileManager: FileManager = .default, trashRoots: [URL]? = nil) {
         self.coordinator = coordinator
         self.repository = repository
         self.history = history
         self.mutator = mutator
         self.fileManager = fileManager
+        self.trashRoots = trashRoots
     }
 
     public func hasPendingItems(historyID: UUID) throws -> Bool {
         try !repository.undoItems(historyID: historyID).isEmpty
+    }
+
+    /// Reconstruye disponibilidad desde las filas persistidas, sin eliminarlas
+    /// cuando un objeto deja de ser recuperable. La ejecución vuelve a verificarlo.
+    public func latestRecoverableHistoryID() async throws -> UUID? {
+        let operationID = try await coordinator.begin(moduleID: cleanerModuleIdentifier, name: "Comprobando Deshacer")
+        do {
+            let task = Task.detached { [self] () async throws -> UUID? in
+                for id in try repository.pendingUndoHistoryIDs() {
+                    for item in try repository.undoItems(historyID: id) {
+                        try Task.checkCancellation()
+                        guard !(await coordinator.shouldCancel(id: operationID)) else { throw CancellationError() }
+                        if canRestore(item, shouldCancel: { Task.isCancelled }) { return id }
+                    }
+                }
+                return Optional<UUID>.none
+            }
+            let result = try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+            try Task.checkCancellation()
+            try await coordinator.finish(id: operationID)
+            return result
+        } catch {
+            try? await coordinator.finish(id: operationID)
+            throw error
+        }
+    }
+
+    private func isTrashLocation(_ item: CleanerUndoItem) -> Bool {
+        let roots: [URL]
+        if let trashRoots { roots = trashRoots }
+        else {
+            #if os(macOS)
+            guard let root = try? fileManager.url(for: .trashDirectory, in: .userDomainMask, appropriateFor: item.trashURL, create: false) else { return false }
+            roots = [root]
+            #else
+            roots = [fileManager.temporaryDirectory.appendingPathComponent("ZEUVE-Test-Trash", isDirectory: true)]
+            #endif
+        }
+        // Resolver solo el padre permite restaurar el enlace mismo, nunca su destino.
+        let parent = item.trashURL.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath().path
+        return roots.contains { root in
+            let path = root.standardizedFileURL.resolvingSymlinksInPath().path
+            return parent == path || parent.hasPrefix(path + "/")
+        }
+    }
+
+    private func originalIsOccupied(_ item: CleanerUndoItem) -> Bool {
+        (try? fileManager.attributesOfItem(atPath: item.originalURL.path)) != nil
+    }
+
+    private func canRestore(_ item: CleanerUndoItem, shouldCancel: (() -> Bool)? = nil) -> Bool {
+        guard isTrashLocation(item), !originalIsOccupied(item),
+              fileManager.isWritableFile(atPath: item.originalURL.deletingLastPathComponent().path),
+              let current = CleanerFileInspection.fingerprint(at: item.trashURL, fileManager: fileManager, shouldCancel: shouldCancel) else { return false }
+        return current == item.fingerprint
     }
 
     public func undo(historyID: UUID) async throws -> CleanerUndoOutput {
@@ -34,11 +91,11 @@ public final class CleanerUndoService: @unchecked Sendable {
             let items = try repository.undoItems(historyID: historyID)
             for item in items {
                 if await coordinator.shouldCancel(id: operationID) { break }
-                if fileManager.fileExists(atPath: item.originalURL.path) {
+                if originalIsOccupied(item) {
                     results.append(.init(sourcePath: item.originalURL.path, trashPath: item.trashURL.path, status: .restoreConflict, message: "La ubicación original ya está ocupada."))
                     continue
                 }
-                guard let current = CleanerFileInspection.fingerprint(at: item.trashURL, fileManager: fileManager), current == item.fingerprint else {
+                guard canRestore(item) else {
                     results.append(.init(sourcePath: item.originalURL.path, trashPath: item.trashURL.path, status: .unavailable, message: "El elemento de la Papelera ya no está disponible o cambió."))
                     continue
                 }

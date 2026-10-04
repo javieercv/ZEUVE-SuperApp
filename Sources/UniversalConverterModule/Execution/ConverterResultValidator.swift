@@ -100,6 +100,10 @@ public actor ConverterResultValidator {
     }
 
     private func validateDetected(_ url: URL, expected: ConverterFormat) throws {
+        if expected == .txt || expected == .markdown {
+            try detector.validateTextContent(url: url)
+            return
+        }
         let detection = try detector.detectDetailed(url: url)
         guard detection.detectedFormat == expected else {
             throw UniversalConverterError.invalidResult(

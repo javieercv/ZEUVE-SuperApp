@@ -74,6 +74,13 @@ final class CleanerViewModel: ObservableObject {
         }
     }
 
+    func refreshUndoAvailability() async {
+        guard !isBusy, let undoService else { return }
+        do { lastHistoryID = try await undoService.latestRecoverableHistoryID() }
+        catch OperationCoordinatorError.busy { }
+        catch { errorMessage = "No se pudo comprobar Deshacer: \(error.localizedDescription)" }
+    }
+
     var selectedCount: Int { plan.selectedCandidates.count }
     var selectedBytes: Int64 { plan.selectedLogicalBytes }
     var canUndoLast: Bool { lastHistoryID != nil && undoService != nil }
@@ -214,6 +221,7 @@ final class CleanerViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
         isBusy = false
+        await refreshUndoAvailability()
         guard errorMessage == nil else { return }
         if let applicationURL, FileManager.default.fileExists(atPath: applicationURL.path),
            let identity = identityProvider.identity(for: applicationURL) {
@@ -234,7 +242,7 @@ final class CleanerViewModel: ObservableObject {
             resultMessage = "\(summary.restoredCount) elementos restaurados; \(summary.skippedCount + summary.failedCount) no se pudieron restaurar."
             if let warning = output.historyWarning { resultMessage = "\(resultMessage ?? "") \(warning)" }
             executionSummary = nil
-            if try !undoService.hasPendingItems(historyID: historyID) { lastHistoryID = nil }
+            lastHistoryID = try await undoService.latestRecoverableHistoryID()
         } catch { errorMessage = error.localizedDescription }
     }
 

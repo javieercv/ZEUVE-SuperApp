@@ -140,6 +140,7 @@ public struct ConverterFormatDetector: Sendable {
         if sample.count >= 68, String(data: sample.subdata(in: 60..<68), encoding: .ascii) == "BOOKMOBI" { return .mobi }
 
         guard let text = String(data: sample.prefix(64 * 1_024), encoding: .utf8) else { return .unknown }
+        guard !text.contains("\0") else { return .unknown }
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let lower = trimmed.lowercased()
         if lower.contains("<fictionbook") { return .fb2 }
@@ -151,8 +152,53 @@ public struct ConverterFormatDetector: Sendable {
         }
         if lower.hasPrefix("<?xml") || (lower.hasPrefix("<") && lower.contains(">")) { return .xml }
         if looksLikeCSV(trimmed) { return .csv }
+        // TXT y Markdown comparten contenido válido: una lista o un párrafo no
+        // demuestra por sí solo que la extensión textual sea incorrecta.
+        if extensionHint == .txt { return .txt }
+        if extensionHint == .markdown { return .markdown }
         if looksLikeMarkdown(trimmed) { return .markdown }
         return trimmed.isEmpty ? .unknown : .txt
+    }
+
+    /// Valida todo el contenido UTF-8 por bloques, incluida una secuencia multibyte
+    /// partida entre lecturas. No acepta una salida por su nombre ni carga el archivo entero.
+    public func validateTextContent(url: URL) throws {
+        let detected = try detectDetailed(url: url).detectedFormat
+        guard [.txt, .markdown, .html, .csv, .json, .xml, .unknown].contains(detected) else {
+            throw UniversalConverterError.invalidResult("El resultado contiene una firma incompatible con texto UTF-8.")
+        }
+        let handle = try FileHandle(forReadingFrom: url)
+        defer { try? handle.close() }
+        var pending = Data()
+        var hasText = false
+        while true {
+            try Task.checkCancellation()
+            let block = try handle.read(upToCount: 64 * 1024) ?? Data()
+            pending.append(block)
+            var decoded: String?
+            var consumed = pending.count
+            for suffix in 0...min(3, pending.count) {
+                consumed = pending.count - suffix
+                if let text = String(data: pending.prefix(consumed), encoding: .utf8) {
+                    decoded = text
+                    break
+                }
+            }
+            guard let text = decoded else {
+                throw UniversalConverterError.invalidResult("El resultado no es texto UTF-8 válido.")
+            }
+            guard !text.unicodeScalars.contains(where: { $0.value < 32 && ![9, 10, 12, 13].contains($0.value) }) else {
+                throw UniversalConverterError.invalidResult("El resultado contiene datos binarios o caracteres de control incompatibles.")
+            }
+            hasText = hasText || !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            pending.removeFirst(consumed)
+            if block.isEmpty {
+                guard pending.isEmpty, hasText else {
+                    throw UniversalConverterError.invalidResult("El resultado textual está vacío o contiene UTF-8 incompleto.")
+                }
+                break
+            }
+        }
     }
 
     private func detectZIPContainer(url: URL) throws -> ConverterFormat {

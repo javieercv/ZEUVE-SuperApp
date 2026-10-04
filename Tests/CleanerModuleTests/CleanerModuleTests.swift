@@ -238,6 +238,41 @@ final class CleanerModuleTests: XCTestCase {
         XCTAssertEqual(output.summary.removedCount, 0); XCTAssertTrue(FileManager.default.fileExists(atPath: related.path))
     }
 
+    func testUndoRehydratesFromReopenedDatabaseAndRejectsChangedOrOccupiedItems() async throws {
+        let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
+        let databaseURL = root.appendingPathComponent("db.sqlite")
+        let db = try SQLiteDatabase(url: databaseURL)
+        let repo = try CleanerRepository(database: db); let history = try HistoryRepository(database: db)
+        let file = root.appendingPathComponent("cache"); let contents = Data("recoverable original".utf8)
+        try contents.write(to: file)
+        let fingerprint = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+        let candidate = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "synthetic", selected: true, fingerprint: fingerprint)
+        let mutator = TestTrashMutator(trashRoot: root.appendingPathComponent("Trash"))
+        let execution = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [candidate]), mode: .trash)
+        let reopened = try SQLiteDatabase(url: databaseURL)
+        let reloadedRepository = try CleanerRepository(database: reopened)
+        let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: reloadedRepository, history: try HistoryRepository(database: reopened), mutator: mutator, trashRoots: [mutator.trashRoot])
+        let recoveredID = try await undo.latestRecoverableHistoryID()
+        XCTAssertEqual(recoveredID, execution.historyID)
+        try Data("conflict".utf8).write(to: file)
+        let conflictedID = try await undo.latestRecoverableHistoryID(); XCTAssertNil(conflictedID)
+        try FileManager.default.removeItem(at: file)
+        let item = try XCTUnwrap(reloadedRepository.undoItems(historyID: execution.historyID).first)
+        let wrongTrash = CleanerUndoService(coordinator: OperationCoordinator(), repository: reloadedRepository, history: history, mutator: mutator, trashRoots: [root.appendingPathComponent("OtherTrash")])
+        let unsafeID = try await wrongTrash.latestRecoverableHistoryID(); XCTAssertNil(unsafeID)
+        let restored = try await undo.undo(historyID: execution.historyID)
+        XCTAssertEqual(restored.summary.restoredCount, 1); XCTAssertEqual(try Data(contentsOf: file), contents)
+        let noID = try await undo.latestRecoverableHistoryID(); XCTAssertNil(noID)
+        let nextFP = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
+        let next = CleanerCandidate(url: file, category: .cache, evidences: [], confidence: .high, status: .probableResidue, risk: .low, consequence: "synthetic", selected: true, fingerprint: nextFP)
+        let moved = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [next]), mode: .trash)
+        let changed = try XCTUnwrap(repo.undoItems(historyID: moved.historyID).first)
+        try Data("changed object".utf8).write(to: changed.trashURL)
+        let changedID = try await undo.latestRecoverableHistoryID(); XCTAssertNil(changedID)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: item.originalURL.path))
+        XCTAssertTrue(try undo.hasPendingItems(historyID: moved.historyID))
+    }
+
     func testTrashOperationCanBeUndoneAndConflictNeverOverwrites() async throws {
         let root = try tempDirectory(); defer { try? FileManager.default.removeItem(at: root) }
         let db = try SQLiteDatabase(url: root.appendingPathComponent("db.sqlite")); let repo = try CleanerRepository(database: db); let history = try HistoryRepository(database: db)
@@ -246,7 +281,7 @@ final class CleanerModuleTests: XCTestCase {
         let mutator = TestTrashMutator(trashRoot: root.appendingPathComponent("TestTrash", isDirectory: true))
         let execution = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [candidate]), mode: .trash)
         XCTAssertFalse(FileManager.default.fileExists(atPath: file.path)); XCTAssertEqual(execution.summary.removedCount, 1)
-        let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator)
+        let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator, trashRoots: [mutator.trashRoot])
         let restored = try await undo.undo(historyID: execution.historyID); XCTAssertEqual(restored.summary.restoredCount, 1); XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
 
         let secondFP = try XCTUnwrap(CleanerFileInspection.fingerprint(at: file))
@@ -302,7 +337,7 @@ final class CleanerModuleTests: XCTestCase {
         let output = try await CleanerExecutionService(coordinator: OperationCoordinator(), cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: candidates), mode: .trash)
         XCTAssertEqual(output.summary.removedCount, 2)
         try Data("conflict".utf8).write(to: files[0])
-        let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator)
+        let undo = CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator, trashRoots: [mutator.trashRoot])
         let partial = try await undo.undo(historyID: output.historyID)
         XCTAssertEqual(partial.summary.restoredCount, 1)
         XCTAssertTrue(try undo.hasPendingItems(historyID: output.historyID))
@@ -331,7 +366,7 @@ final class CleanerModuleTests: XCTestCase {
         XCTAssertTrue(output.undoAvailable)
         XCTAssertNotNil(output.historyWarning)
         XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
-        let undone = try await CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator).undo(historyID: output.historyID)
+        let undone = try await CleanerUndoService(coordinator: OperationCoordinator(), repository: repo, history: history, mutator: mutator, trashRoots: [mutator.trashRoot]).undo(historyID: output.historyID)
         XCTAssertEqual(undone.summary.restoredCount, 1)
         XCTAssertEqual(try Data(contentsOf: file), Data("fixture".utf8))
     }
@@ -350,7 +385,7 @@ final class CleanerModuleTests: XCTestCase {
         let execution = try await CleanerExecutionService(coordinator: coordinator, cleanerRepository: repo, history: history, mutator: mutator).execute(plan: .init(candidates: [candidate]), mode: .trash)
         try db.execute("CREATE TRIGGER qa_history_update_failure BEFORE UPDATE ON operation_history BEGIN SELECT RAISE(ABORT, 'qa history update failure'); END")
 
-        let output = try await CleanerUndoService(coordinator: coordinator, repository: repo, history: history, mutator: mutator).undo(historyID: execution.historyID)
+        let output = try await CleanerUndoService(coordinator: coordinator, repository: repo, history: history, mutator: mutator, trashRoots: [mutator.trashRoot]).undo(historyID: execution.historyID)
 
         XCTAssertEqual(output.summary.restoredCount, 1)
         XCTAssertNotNil(output.historyWarning)

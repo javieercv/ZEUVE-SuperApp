@@ -14,19 +14,29 @@ public struct MediaEditableArtwork: Identifiable, Sendable, Equatable {
     public let source: MediaArtworkSource
     public let codec: String
     public var title: String
+    public let filename: String
+    public let mimeType: String
 
-    public init(id: UUID = UUID(), source: MediaArtworkSource, codec: String, title: String = "") {
+    public init(id: UUID = UUID(), source: MediaArtworkSource, codec: String, title: String = "", filename: String? = nil, mimeType: String? = nil) {
         self.id = id; self.source = source; self.codec = codec.lowercased(); self.title = title
+        self.filename = filename ?? (codec.lowercased() == "png" ? "cover.png" : "cover.jpg")
+        self.mimeType = mimeType ?? (codec.lowercased() == "png" ? "image/png" : "image/jpeg")
     }
 
     public static func from(stream: MediaInspectionStream) -> MediaEditableArtwork? {
         guard stream.codec_type == "video", stream.isAttachedPicture, let index = stream.index else { return nil }
-        return .init(source: .original(streamIndex: index), codec: stream.codec_name ?? "unknown", title: stream.title ?? "")
+        return .init(source: .original(streamIndex: index), codec: stream.codec_name ?? "unknown", title: stream.title ?? "", filename: stream.tags?.first { $0.key.lowercased() == "filename" }?.value, mimeType: stream.tags?.first { $0.key.lowercased() == "mimetype" }?.value)
     }
 }
 
 public struct MediaArtworkCompatibility: Sendable {
     public init() {}
+    public func canPreserve(_ artwork: MediaEditableArtwork, in container: EditableMediaContainer) -> Bool {
+        if container == .mkv { return ["mjpeg", "jpeg", "png"].contains(artwork.codec) }
+        if container == .mov, case .original = artwork.source { return ["mjpeg", "jpeg"].contains(artwork.codec) }
+        return canAdd(artwork, to: container)
+    }
+
     public func canAdd(_ artwork: MediaEditableArtwork, to container: EditableMediaContainer) -> Bool {
         switch container {
         case .mp4, .mov: return ["mjpeg", "jpeg", "png"].contains(artwork.codec)

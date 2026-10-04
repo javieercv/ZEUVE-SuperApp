@@ -143,3 +143,50 @@ private func structuralInspection(_ json: String) throws -> MediaInspectionResul
     let chapterIndex = try #require(args.firstIndex(of: "-map_chapters"))
     #expect(args[chapterIndex + 1] != "-1")
 }
+
+@Test func managedVideoTitleUsesEffectiveTrackAfterReordering() throws {
+    let url = try structuralTempFile(); defer { try? FileManager.default.removeItem(at: url) }
+    let inspection = try structuralInspection(#"{"streams":[{"index":0,"codec_name":"h264","codec_type":"video","tags":{"title":"Anterior"}},{"index":3,"codec_name":"h264","codec_type":"video","tags":{"title":"Otro"}}]}"#)
+    var draft = try MediaEditDraft(originalURL: url, originalFingerprint: .read(from: url), inspection: inspection, container: .mkv)
+    draft.videoTracks.swapAt(0, 1)
+    draft.setVideoMetadata("Nuevo", for: "title", streamIndex: 0)
+    #expect(draft.videoTracks[1].title == "Nuevo")
+    let plan = try MediaEditPlanner().plan(from: draft)
+    #expect(plan.videoTracks[1].track.title == "Nuevo")
+    let args = try FFmpegMediaEditCommandBuilder().command(ffmpeg: URL(fileURLWithPath: "/qa/ffmpeg"), plan: plan, outputURL: url.deletingLastPathComponent().appendingPathComponent("out.mkv")).request.arguments
+    let titleIndexes = args.indices.filter { args[$0] == "title=Nuevo" }
+    #expect(!titleIndexes.isEmpty)
+    #expect(titleIndexes.allSatisfy { $0 > 0 && args[$0 - 1] == "-metadata:s:v:1" })
+    #expect(plan.videoTracks[0].track.title == "Otro")
+}
+
+@Test func removingPNGArtworkUsesEffectiveDraftAndKeepsMP4() throws {
+    let url = try structuralTempFile("mp4"); defer { try? FileManager.default.removeItem(at: url) }
+    let inspection = try structuralInspection(#"{"streams":[{"index":0,"codec_name":"h264","codec_type":"video"},{"index":1,"codec_name":"aac","codec_type":"audio","tags":{"language":"und"}},{"index":2,"codec_name":"png","codec_type":"video","disposition":{"attached_pic":1}}]}"#)
+    var draft = try MediaEditDraft(originalURL: url, originalFingerprint: .read(from: url), inspection: inspection, container: .mp4)
+    #expect(MediaContainerCompatibilityRegistry().isCompatible(draft: draft, container: .mp4, allowAuthorizedSubtitleConversion: true))
+    draft.artworks.removeAll()
+    let plan = try MediaEditPlanner().plan(from: draft)
+    #expect(plan.targetContainer == .mp4)
+    #expect(plan.artworks.isEmpty)
+    #expect(plan.removedArtworks.count == 1)
+}
+
+@Test func mp4ArtworkRejectsUnsupportedTitleAndMKVUsesAttachment() throws {
+    let url = try structuralTempFile("mp4"); defer { try? FileManager.default.removeItem(at: url) }
+    let image = try structuralTempFile("png"); defer { try? FileManager.default.removeItem(at: image) }
+    let inspection = try structuralInspection(#"{"streams":[{"index":0,"codec_name":"h264","codec_type":"video"},{"index":1,"codec_name":"mjpeg","codec_type":"video","disposition":{"attached_pic":1},"tags":{"filename":"cover.jpg","mimetype":"image/jpeg","title":"Portada"}}]}"#)
+    var draft = try MediaEditDraft(originalURL: url, originalFingerprint: .read(from: url), inspection: inspection, container: .mp4)
+    #expect(throws: MultimediaInspectorError.self) { try MediaEditValidator().validateDraft(draft) }
+    draft.artworks = [.init(source: .external(url: image, fingerprint: try .read(from: image), streamIndex: 0), codec: "png")]
+    try MediaEditValidator().validateDraft(draft)
+    draft.artworks = inspection.streams.compactMap(MediaEditableArtwork.from(stream:)); draft.targetContainer = .mkv
+    let plan = try MediaEditPlanner().plan(from: draft)
+    let artwork = try #require(plan.artworks.first)
+    #expect(throws: MultimediaInspectorError.self) { try FFmpegMediaEditCommandBuilder().command(ffmpeg: URL(fileURLWithPath: "/qa/ffmpeg"), plan: plan, outputURL: image) }
+    let args = try FFmpegMediaEditCommandBuilder().command(ffmpeg: URL(fileURLWithPath: "/qa/ffmpeg"), plan: plan, outputURL: image, artworkAttachmentURLs: [artwork.id: image]).request.arguments
+    let attach = try #require(args.firstIndex(of: "-attach")); #expect(args[attach + 1] == image.path)
+    #expect(args.contains("filename=cover.jpg")); #expect(args.contains("mimetype=image/jpeg"))
+    #expect(!args.contains("attached_pic"))
+    #expect(!args.enumerated().contains { $0.offset > 0 && $0.element == "0:1" && args[$0.offset - 1] == "-map" })
+}

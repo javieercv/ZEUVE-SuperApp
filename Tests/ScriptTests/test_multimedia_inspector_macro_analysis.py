@@ -30,7 +30,9 @@ class MultimediaInspectorMacroAnalysisTests(unittest.TestCase):
     def test_video_pause_preserves_source_and_frame(self):
         source = VIDEO_SERVICE.read_text()
         pause = source[source.index("public func pause() async"):source.index("public func stop() async")]
-        self.assertIn("decodeTask?.cancel()", pause)
+        self.assertIn("let previous = decodeTask", pause)
+        self.assertIn("previous?.cancel()", pause)
+        self.assertIn("await previous?.result", pause)
         self.assertIn("state = .paused", pause)
         self.assertNotIn("currentSource = nil", pause)
         self.assertNotIn("currentFrame = nil", pause)

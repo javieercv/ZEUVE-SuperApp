@@ -357,3 +357,63 @@ private struct PortableConverterBookmarkCodec: FolderBookmarkCodec {
         return .init(url: URL(fileURLWithPath: path, isDirectory: true).standardizedFileURL, isStale: false)
     }
 }
+
+@Test func opusPlanningHonorsEffectiveChannelsAndExplicitBitrates() throws {
+    let policy = ConverterMediaPolicy()
+    var options = ConverterOperationOptions()
+    options.quality = .maximum
+    #expect(try policy.opusBitrate(options: options, sourceChannels: 1) == 256)
+    #expect(try policy.opusBitrate(options: options, sourceChannels: 2) == 320)
+    options.audioBitrate = .kbps320
+    #expect(throws: UniversalConverterError.self) { try policy.opusBitrate(options: options, sourceChannels: 1) }
+    #expect(options.audioBitrate == .kbps320)
+    #expect(try policy.opusBitrate(options: options, sourceChannels: 2) == 320)
+    options.audioChannels = .mono
+    #expect(throws: UniversalConverterError.self) { try policy.opusBitrate(options: options, sourceChannels: 2) }
+    options.audioBitrate = .automatic
+    #expect(try policy.opusBitrate(options: options, sourceChannels: 2) == 256)
+    options.audioChannels = .automatic
+    #expect(try policy.opusBitrate(options: options, sourceChannels: nil) == nil)
+}
+
+@Test func webMPlannerRejectsH264BeforeExecutionAndAllowsCompatibleRemux() async throws {
+    let root = try regressionTempDirectory("webm-plan"); defer { try? FileManager.default.removeItem(at: root) }
+    let file = root.appendingPathComponent("source.mp4"); try Data([1, 2, 3]).write(to: file)
+    let input = try regressionInput(url: file, format: .mp4)
+    var options = ConverterOperationOptions(); options.targetFormat = .webm
+    let planner = ConversionPlanner()
+    await #expect(throws: UniversalConverterError.self) { try await planner.plan(inputs: [input], outputFolder: root, options: options, revision: 1) }
+    options.advancedMode = true; options.preferRemuxWhenPossible = true
+    let h264 = try MediaInspectionParser.decode(Data(#"{"streams":[{"index":0,"codec_type":"video","codec_name":"h264"},{"index":1,"codec_type":"audio","codec_name":"aac","channels":1}]}"#.utf8))
+    await #expect(throws: UniversalConverterError.self) { try await planner.plan(inputs: [input], outputFolder: root, options: options, revision: 2, mediaInspections: [input.id: h264]) }
+    let vp9 = try MediaInspectionParser.decode(Data(#"{"streams":[{"index":0,"codec_type":"video","codec_name":"vp9"},{"index":1,"codec_type":"audio","codec_name":"opus","channels":2}]}"#.utf8))
+    let plan = try await planner.plan(inputs: [input], outputFolder: root, options: options, revision: 2, mediaInspections: [input.id: vp9])
+    #expect(plan.items.first?.targetFormat == .webm)
+    let command = try FFmpegCommandBuilder().command(ffmpeg: URL(fileURLWithPath: "/qa/ffmpeg"), source: file, planItem: #require(plan.items.first), options: options, destination: root.appendingPathComponent("out.webm"), probe: vp9)
+    #expect(command.request.arguments.contains("copy"))
+    options.audioBitrate = .kbps320
+    let vp9Mono = try MediaInspectionParser.decode(Data(#"{"streams":[{"index":0,"codec_type":"video","codec_name":"vp9"},{"index":1,"codec_type":"audio","codec_name":"aac","channels":1}]}"#.utf8))
+    await #expect(throws: UniversalConverterError.self) { try await planner.plan(inputs: [input], outputFolder: root, options: options, revision: 2, mediaInspections: [input.id: vp9Mono]) }
+}
+
+@Test func pandocWritersAreExplicitAndTextValidationHandlesAmbiguousTextSafely() async throws {
+    let root = try regressionTempDirectory("text-writers"); defer { try? FileManager.default.removeItem(at: root) }
+    let source = root.appendingPathComponent("source.md"); try Data("Párrafo simple.\n\nOtro párrafo.\n".utf8).write(to: source)
+    for (target, writer) in [(ConverterFormat.txt, "plain"), (.markdown, "markdown"), (.html, "html")] {
+        let request = try PandocCommandBuilder().request(executable: URL(fileURLWithPath: "/qa/pandoc"), source: source, target: target, destination: root.appendingPathComponent("out.\(target.fileExtension)"), metadataPolicy: .allCompatible)
+        let index = try #require(request.arguments.firstIndex(of: "--to"))
+        #expect(request.arguments[index + 1] == writer)
+    }
+    let validator = ConverterResultValidator()
+    try await validator.validate(url: source, expectedFormat: .markdown, directory: false)
+    let text = root.appendingPathComponent("list.txt"); try Data("# símbolo legítimo\n- Uno\n- Dos\n".utf8).write(to: text)
+    #expect(try ConverterFormatDetector().detect(url: text) == .txt)
+    try await validator.validate(url: text, expectedFormat: .txt, directory: false)
+    try Data("%PDF-1.7\n".utf8).write(to: text)
+    await #expect(throws: UniversalConverterError.self) { try await validator.validate(url: text, expectedFormat: .txt, directory: false) }
+    var corrupt = Data(repeating: 65, count: 70_000); corrupt.append(contentsOf: [0xff, 0xfe])
+    try corrupt.write(to: text)
+    await #expect(throws: UniversalConverterError.self) { try await validator.validate(url: text, expectedFormat: .txt, directory: false) }
+    try (Data(repeating: 65, count: 65_535) + Data("á\n".utf8)).write(to: text)
+    try await validator.validate(url: text, expectedFormat: .txt, directory: false)
+}

@@ -184,6 +184,7 @@ final class UniversalConverterViewModel: ObservableObject {
             let formats = inputs.map(\.format)
             guard !formats.isEmpty else { return [] }
             return ConverterCompatibilityRegistry(availability: engineAvailability).outputFormats(for: formats)
+                .filter { $0 != .webm || (ConverterMediaPolicy.permitsWebMRemux(options) && inputs.allSatisfy { $0.category == .video }) }
         }
     }
 
@@ -403,11 +404,17 @@ final class UniversalConverterViewModel: ObservableObject {
     func prepareNow() { schedulePlan(delayNanoseconds: 0) }
 
     func executePlan() {
-        guard let plan else { return }
+        guard canExecute, let plan else { return }
         executionTask?.cancel()
         state = .running; result = nil; errorMessage = nil; warningMessage = nil
         executionTask = Task { [weak self] in
             guard let self else { return }
+            defer {
+                self.archivePassword = ""
+                self.isArchivePasswordVisible = false
+                self.executionTask = nil
+                if self.state == .running { self.state = self.inputs.isEmpty ? .idle : .preview }
+            }
             do {
                 let password = self.archivePassword.trimmingCharacters(in: .whitespacesAndNewlines)
                 let result = try await execution.execute(
@@ -420,13 +427,15 @@ final class UniversalConverterViewModel: ObservableObject {
                         Task { @MainActor [weak self] in self?.warningMessage = warning }
                     }
                 )
-                guard !Task.isCancelled else { return }
                 self.archivePassword = ""
                 self.isArchivePasswordVisible = false
                 self.result = result
                 self.state = .result
             } catch {
-                guard !Task.isCancelled else { return }
+                if Task.isCancelled || error is CancellationError {
+                    self.warningMessage = "Conversión cancelada. Puedes preparar otra operación."
+                    return
+                }
                 self.archivePassword = ""
                 self.isArchivePasswordVisible = false
                 self.errorMessage = error.localizedDescription
@@ -567,7 +576,8 @@ final class UniversalConverterViewModel: ObservableObject {
     }
 
     private func schedulePlan(delayNanoseconds: UInt64 = 180_000_000) {
-        planTask?.cancel(); plan = nil
+        let previous = planTask
+        previous?.cancel(); plan = nil
         guard canPrepare, let outputFolder else { return }
         planRevision &+= 1
         let revision = planRevision
@@ -575,17 +585,20 @@ final class UniversalConverterViewModel: ObservableObject {
         var currentOptions = options
         currentOptions.normalize()
         planTask = Task { [weak self] in
+            _ = await previous?.result
             guard let self else { return }
             if delayNanoseconds > 0 { try? await Task.sleep(nanoseconds: delayNanoseconds) }
             guard !Task.isCancelled else { return }
             do {
-                let planned = try await planner.plan(inputs: currentInputs, outputFolder: outputFolder, options: currentOptions, revision: revision)
+                let inspections = try await execution.inspectForPlanning(inputs: currentInputs, options: currentOptions)
+                try Task.checkCancellation()
+                let planned = try await planner.plan(inputs: currentInputs, outputFolder: outputFolder, options: currentOptions, revision: revision, mediaInspections: inspections)
                 guard !Task.isCancelled, revision == self.planRevision else { return }
                 self.plan = planned
                 if self.state != .running && self.state != .result { self.state = .preview }
             } catch is CancellationError { }
             catch {
-                guard revision == self.planRevision else { return }
+                guard !Task.isCancelled, revision == self.planRevision else { return }
                 self.errorMessage = error.localizedDescription
             }
         }

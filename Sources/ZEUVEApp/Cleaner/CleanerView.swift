@@ -32,6 +32,8 @@ struct CleanerView: View {
             }
         }
         .navigationTitle("Limpiador")
+        .task { await model.refreshUndoAvailability() }
+        .onChange(of: area) { _, _ in Task { await model.refreshUndoAvailability() } }
         .alert("Limpiador", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
             Button("Aceptar", role: .cancel) { model.errorMessage = nil }
         } message: { Text(model.errorMessage ?? "Error desconocido") }

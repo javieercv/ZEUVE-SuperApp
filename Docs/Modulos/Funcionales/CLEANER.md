@@ -1,8 +1,8 @@
-# Limpiador 0.1.3 — ZEUVE 0.20.5.0
+# Limpiador 0.1.4 — ZEUVE 0.20.6.0
 
 ## Estado
 
-`CleanerModule` 0.1.3 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner`, su ZEUVE mínimo declarado es `0.20.0` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
+`CleanerModule` 0.1.4 forma parte de ZEUVE como módulo built-in, local y sin red. Su identificador estable es `com.zeuve.cleaner`, su ZEUVE mínimo declarado es `0.20.0` y su categoría visible es **Sistema**. El módulo se incorporó en ZEUVE 0.20.0.0.
 
 ## Objetivo
 
@@ -61,6 +61,8 @@ Si la app no tiene Bundle ID, su plan solo incluye asociaciones heurísticas con
 ## Ejecución y Undo
 
 El modo predeterminado es **Mover a Papelera** con la API nativa `FileManager.trashItem`. Se registra la ubicación original, la ubicación real devuelta por macOS y un `CleanerFileFingerprint` específico.
+
+Al abrir el Limpiador, Deshacer se reconstruye desde las operaciones persistidas, de la más reciente a la más antigua, buscando una operación con elementos recuperables. La consulta reserva `OperationCoordinator`. La disponibilidad exige ubicación real en Papelera, fingerprint coincidente, padre original escribible y ruta original libre; las filas no recuperables se conservan para trazabilidad. La ejecución repite estas comprobaciones.
 
 El Undo solo restaura cuando el objeto sigue verificable y la ruta original está libre. Nunca sobrescribe silenciosamente un objeto nuevo. Una restauración parcial mantiene los elementos pendientes para otro intento. Si los archivos se restauran pero falla la actualización secundaria del historial global, la restauración sigue siendo válida y se muestra una advertencia; no se revierte el filesystem. El borrado permanente es opt-in, requiere confirmación en UI y no ofrece Undo.
 

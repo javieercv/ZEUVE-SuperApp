@@ -1,4 +1,5 @@
 import Foundation
+import ZEUVEEngines
 
 public actor ConversionPlanner {
     private let filenamePolicy: ConverterFilenamePolicy
@@ -18,7 +19,8 @@ public actor ConversionPlanner {
         inputs: [ConverterInputItem],
         outputFolder: URL,
         options rawOptions: ConverterOperationOptions,
-        revision: UInt64
+        revision: UInt64,
+        mediaInspections: [UUID: MediaInspectionResult] = [:]
     ) throws -> ConversionPlan {
         guard !inputs.isEmpty else { throw UniversalConverterError.noInput }
         guard outputFolder.isFileURL else { throw UniversalConverterError.outputFolderMissing }
@@ -34,7 +36,7 @@ public actor ConversionPlanner {
         }
         try validateBatch(inputs, operation: options.operation)
         let effectiveOutputFolder = try resolvedOutputFolder(base: outputFolder, options: options)
-        let key = PlanCacheKey(inputs: inputs, outputFolder: effectiveOutputFolder, options: options)
+        let key = PlanCacheKey(inputs: inputs, outputFolder: effectiveOutputFolder, options: options, mediaInspections: mediaInspections)
         if let cachedPlan, cachedKey == key {
             return ConversionPlan(
                 id: cachedPlan.id,
@@ -58,7 +60,7 @@ public actor ConversionPlanner {
         case .imagesToVideo:
             rawItems = [try planImagesToVideo(inputs: inputs, options: options)]
         default:
-            rawItems = try inputs.map { try planSingle(input: $0, options: options) }
+            rawItems = try inputs.map { try planSingle(input: $0, options: options, probe: mediaInspections[$0.id]) }
         }
         guard !rawItems.isEmpty else { throw UniversalConverterError.noInput }
         let items = try resolveDestinations(
@@ -122,11 +124,38 @@ public actor ConversionPlanner {
         }
     }
 
-    private func planSingle(input: ConverterInputItem, options: ConverterOperationOptions) throws -> ConversionPlanItem {
+    private func planSingle(input: ConverterInputItem, options: ConverterOperationOptions, probe: MediaInspectionResult?) throws -> ConversionPlanItem {
         let target = try resolvedTarget(for: input, options: options)
         let execution = try executionKind(for: input, target: target, operation: options.operation, options: options)
         let destination = try destinationRelativePath(for: input, target: target, options: options)
         var warnings: [String] = []
+        let policy = ConverterMediaPolicy()
+        if target == .webm {
+            guard input.category == .video else { throw UniversalConverterError.incompatibleRecipe("WebM solo admite la copia de una entrada de vídeo compatible.") }
+            try policy.validateWebM(options: options, probe: probe)
+            if probe == nil { warnings.append("WebM pendiente de inspección de la entrada ZIP: solo se ejecutará si el vídeo admite copia directa.") }
+            if let probe, options.videoAudioMode == .preserve {
+                let streams = probe.audioStreams.filter { options.selectedAudioStreamIndex == nil || $0.index == options.selectedAudioStreamIndex }
+                let copies = options.audioChannels == .automatic && options.audioSampleRate == .automatic
+                    && !options.normalizeAudio && options.audioBitrate == .automatic
+                    && streams.allSatisfy { ["opus", "vorbis"].contains($0.codec_name?.lowercased() ?? "") }
+                if !copies {
+                    for stream in streams {
+                        if let bitrate = try policy.opusBitrate(options: options, sourceChannels: stream.channels) {
+                            warnings.append("Audio WebM: Opus a \(bitrate) kb/s para la pista \(stream.index ?? -1); el vídeo se conserva por copia.")
+                        }
+                    }
+                }
+            }
+        }
+        if [.opus, .ogg].contains(target), !policy.copiesAudio(target: target, options: options, stream: policy.audioStream(probe: probe, options: options)) {
+            let channels = policy.audioStream(probe: probe, options: options)?.channels
+            if let bitrate = try policy.opusBitrate(options: options, sourceChannels: channels) {
+                warnings.append("Opus/OGG: \(options.audioBitrate == .automatic ? "bitrate automático resuelto" : "bitrate elegido") de \(bitrate) kb/s para esta entrada.")
+            } else {
+                warnings.append("Opus/OGG: canales y bitrate pendientes de inspección; se comprobarán antes de iniciar el encoder, sin reducir una elección explícita.")
+            }
+        }
 
         if input.format == target, options.operation == .convert {
             if execution == .copy {
@@ -477,7 +506,9 @@ private struct PlanCacheKey: Equatable, Sendable {
     let inputIdentities: [InputIdentity]
     let outputPath: String
     let options: ConverterOperationOptions
-    init(inputs: [ConverterInputItem], outputFolder: URL, options: ConverterOperationOptions) {
+    let mediaInspections: [UUID: MediaInspectionResult]
+    init(inputs: [ConverterInputItem], outputFolder: URL, options: ConverterOperationOptions, mediaInspections: [UUID: MediaInspectionResult]) {
+        self.mediaInspections = mediaInspections
         inputIdentities = inputs.map(InputIdentity.init)
         outputPath = outputFolder.standardizedFileURL.path
         self.options = options

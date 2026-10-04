@@ -99,45 +99,55 @@ struct MultimediaInspectorView: View {
     }
 
     @ViewBuilder private func inspected(_ inspection: MediaInspectionResult) -> some View {
-        VStack(spacing: 12) {
-            Picker("Vista", selection: $model.selectedTab) {
-                ForEach(MultimediaInspectorTab.allCases) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 20)
-            .padding(.top, 12)
-            if model.isEditing {
-                Label(model.isDirty ? "Editando un borrador con cambios pendientes" : "Modo edición: borrador limpio", systemImage: "pencil.and.outline")
-                    .font(.caption)
-                    .foregroundStyle(model.isDirty ? .orange : .secondary)
-            } else {
-                Label("Modo inspección · solo lectura", systemImage: "lock")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Group {
-                switch model.selectedTab {
-                case .summary: MultimediaSummaryView(model: model, inspection: inspection)
-                case .tracks: MultimediaTracksView(model: model, inspection: inspection)
-                case .spectrogram: MultimediaSpectrogramView(model: model, inspection: inspection)
-                case .metadata: MultimediaMetadataView(model: model, inspection: inspection)
+        GeometryReader { geometry in
+            VStack(spacing: 12) {
+                Picker("Vista", selection: $model.selectedTab) {
+                    ForEach(MultimediaInspectorTab.allCases) { Text($0.title).tag($0) }
                 }
-            }
-            .padding(.horizontal, 20)
-            if model.previewState != .idle || !model.videoTracks.isEmpty {
-                MultimediaPreviewPlayerView(model: model).padding(.horizontal, 20)
-            }
-            if let plan = model.editPlan {
-                MultimediaEditPreview(plan: plan, inspection: inspection, execute: model.executePreparedPlan)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 16)
-            }
-            if let warning = model.warningMessage {
-                Label(warning, systemImage: "info.circle")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 12)
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+                if model.isEditing {
+                    Label(model.isDirty ? "Editando un borrador con cambios pendientes" : "Modo edición: borrador limpio", systemImage: "pencil.and.outline")
+                        .font(.caption)
+                        .foregroundStyle(model.isDirty ? .orange : .secondary)
+                } else {
+                    Label("Modo inspección · solo lectura", systemImage: "lock")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Group {
+                    switch model.selectedTab {
+                    case .summary: MultimediaSummaryView(model: model, inspection: inspection)
+                    case .tracks: MultimediaTracksView(model: model, inspection: inspection)
+                    case .spectrogram: ScrollView { MultimediaSpectrogramView(model: model, inspection: inspection).frame(minHeight: 260) }
+                    case .metadata: MultimediaMetadataView(model: model, inspection: inspection)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .frame(minHeight: 0, maxHeight: .infinity)
+                .layoutPriority(-1)
+                ScrollView {
+                if let plan = model.editPlan {
+                    MultimediaEditPreview(plan: plan, inspection: inspection, execute: model.executePreparedPlan)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 16)
+                }
+                if let warning = model.warningMessage {
+                    Label(warning, systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 12)
+                }
+                }
+                .frame(maxHeight: model.editPlan != nil ? 120 : (model.warningMessage != nil ? 45 : 0))
+                if model.previewState != .idle || !model.videoTracks.isEmpty {
+                    MultimediaPreviewPlayerView(model: model, visualHeight: min(300, max(140, geometry.size.height * 0.32)))
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 12)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
     }

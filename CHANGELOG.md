@@ -1,5 +1,14 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.6.0 — 2026-10-04
+
+- Ajustes: el reset global conserva presets personalizados, reglas y favoritos del Inspector.
+- Conversor 0.3.1: capacidad Opus por canales efectivos, bitrate anunciado y rechazo de elecciones explícitas incompatibles; WebM solo por copia de vídeo compatible; writers Pandoc explícitos y validación textual completa; cancelación con recuperación de controles.
+- Inspector 0.7.4: sustitución serializada de decodificadores y seek pausado con frame nuevo; distribución con transporte reservado; metadata de vídeo coherente; normalización acotada de attachment e idioma ausentes; título de carátula MP4 representable y conservación estructural de portadas MKV; cancelación visible de preflight con descarte de resultados obsoletos.
+- Limpiador 0.1.4: Deshacer rehidratado desde SQLite con verificación de Papelera, identidad y conflictos.
+- Regresiones de métodos reales de la app, persistencia, motores locales y resultados. Sin nuevos motores, dependencias, permisos, red, esquema ni formatos persistidos. Marketing 0.20.6, build 72.
+- Aceptación manual pendiente por fallo del controlador nativo; se conservan los resultados históricos y los 22 ❌ del alcance hasta comprobarlos desde la UI.
+
 ## 0.20.5.0 — 2026-09-25
 
 - Inspector multimedia 0.7.3: el preflight estructural propaga `OperationCoordinator.busy`, atiende cancelación local y global, cancela FFprobe activo y completa `finish` antes de retornar. Los resultados normales por archivo no cambian.

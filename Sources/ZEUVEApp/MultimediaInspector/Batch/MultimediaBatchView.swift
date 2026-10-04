@@ -60,7 +60,12 @@ struct MultimediaBatchView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            if model.isRunning {
+            if model.isPreflighting {
+                Button("Cancelar preflight") { model.cancelStructural() }
+                Button("Cerrar lote", action: close)
+            } else if model.isExecutingStructural {
+                Button("Cancelar edición") { model.cancelStructural() }
+            } else if model.isRunning {
                 Button("Cancelar lote") { model.cancel() }
             } else {
                 Button("Añadir archivos…", action: addFiles)
@@ -107,7 +112,7 @@ struct MultimediaBatchView: View {
                     HelpToggleRow("Analizar sonoridad", topic: ZEUVEHelpTopics.multimediaBatchOperations, isOn: $model.configuration.analyzeLoudness)
                     HelpToggleRow("Exportar espectrograma", topic: ZEUVEHelpTopics.multimediaBatchOperations, isOn: $model.configuration.exportSpectrogram)
                 }
-                .disabled(model.isRunning)
+                .disabled(model.isBusy)
 
                 HStack {
                     HStack(spacing: 5) {
@@ -135,7 +140,7 @@ struct MultimediaBatchView: View {
                         }
                     }
                 }
-                .disabled(model.isRunning)
+                .disabled(model.isBusy)
 
                 if model.isRunning {
                     ProgressView(value: model.overallProgress, total: 1)
@@ -197,7 +202,7 @@ struct MultimediaBatchView: View {
                     Button("Guardar conjunto") { model.saveCurrentRuleSet(named: ruleSetName) }
                         .disabled(model.structuralRuleSet.rules.isEmpty)
                 }
-                .disabled(model.isPreflighting || model.isExecutingStructural)
+                .disabled(model.isBusy)
 
                 HStack(spacing: 8) {
                     Picker("Tipo", selection: $ruleKind) { ForEach(MediaTrackKind.allCases) { Text($0.displayName).tag($0) } }.frame(width: 120)
@@ -216,7 +221,7 @@ struct MultimediaBatchView: View {
                     if ruleAction == "language" || ruleAction == "title" { TextField("Nuevo valor", text: $ruleActionValue).frame(minWidth: 120) }
                     Button("Añadir regla") { addStructuralRule() }.buttonStyle(.bordered)
                 }
-                .disabled(model.isPreflighting || model.isExecutingStructural)
+                .disabled(model.isBusy)
 
                 if model.structuralRuleSet.rules.isEmpty {
                     Text("Sin reglas estructurales. El lote normal de análisis sigue funcionando independientemente.").font(.caption).foregroundStyle(.secondary)
@@ -231,7 +236,7 @@ struct MultimediaBatchView: View {
                     }
                     HStack {
                         Button(model.isPreflighting ? "Preparando…" : "Generar preflight") { model.prepareStructuralPreflight() }
-                            .disabled(model.isPreflighting || model.isExecutingStructural)
+                            .disabled(model.isBusy)
                         ContextualHelpButton(topic: ZEUVEHelpTopics.multimediaStructuralRules)
                         if model.isPreflighting { ProgressView().controlSize(.small) }
                         Spacer()

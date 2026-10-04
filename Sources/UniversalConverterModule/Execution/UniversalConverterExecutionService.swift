@@ -46,6 +46,45 @@ public actor UniversalConverterExecutionService {
         self.resultValidator = ConverterResultValidator()
     }
 
+    public func inspectForPlanning(inputs: [ConverterInputItem], options: ConverterOperationOptions) async throws -> [UUID: MediaInspectionResult] {
+        guard ConverterMediaPolicy.needsInspection(options: options) else { return [:] }
+        let files = inputs.filter { $0.kind == .file && ($0.category == .audio || $0.category == .video) }
+        guard !files.isEmpty else { return [:] }
+        guard let ffprobe = try await engineLocator?.paths(requireMedia: true).ffprobe else { throw UniversalConverterError.engineUnavailable("FFprobe no está disponible.") }
+        try Task.checkCancellation()
+        let id = try await coordinator.begin(moduleID: universalConverterModuleIdentifier, name: "Comprobando compatibilidad")
+        let probe = probeService
+        let cancellationObserver = Task {
+            for await snapshot in await coordinator.snapshots() {
+                guard !Task.isCancelled else { return }
+                if snapshot?.id == id, snapshot?.status == .cancelling {
+                    await probe.cancel()
+                    return
+                }
+            }
+        }
+        defer { cancellationObserver.cancel() }
+        do {
+            var result: [UUID: MediaInspectionResult] = [:]
+            for file in files {
+                try Task.checkCancellation()
+                guard file.fingerprint.matches(file.sourceURL) else { throw UniversalConverterError.sourceChanged(file.displayName) }
+                guard !(await coordinator.shouldCancel(id: id)) else { throw CancellationError() }
+                result[file.id] = try await withTaskCancellationHandler {
+                    try await probe.inspect(url: file.sourceURL, ffprobe: ffprobe, fingerprint: file.fingerprint)
+                } onCancel: { Task { await probe.cancel() } }
+                try Task.checkCancellation()
+                guard !(await coordinator.shouldCancel(id: id)) else { throw CancellationError() }
+                guard file.fingerprint.matches(file.sourceURL) else { throw UniversalConverterError.sourceChanged(file.displayName) }
+            }
+            try await coordinator.finish(id: id)
+            return result
+        } catch {
+            try? await coordinator.finish(id: id)
+            throw error
+        }
+    }
+
     public func execute(
         _ plan: ConversionPlan,
         archivePassword: String? = nil,

@@ -67,11 +67,32 @@ public actor MultimediaEditService {
             } else {
                 chapterMetadataURL = nil
             }
+            var artworkCopies: [UUID: URL] = [:]
+            if plan.targetContainer == .mkv {
+                for item in plan.artworks {
+                    try Task.checkCancellation()
+                    guard !((await coordinator.shouldCancel(id: operationID))) else { throw MultimediaInspectorError.cancelled }
+                    guard case .original(let streamIndex) = item.artwork.source else {
+                        throw MultimediaInspectorError.incompatibleContainer("no se ha autorizado añadir carátulas nuevas a MKV")
+                    }
+                    let ext = item.artwork.codec == "png" ? "png" : "jpg"
+                    let image = workspace.auxiliaryFile(named: "cover-\(item.id.uuidString).\(ext)")
+                    let extracted = try await runner.run(.init(executable: paths.ffmpeg, arguments: [
+                        "-hide_banner", "-nostdin", "-y", "-i", plan.originalURL.path,
+                        "-map", "0:\(streamIndex)", "-frames:v", "1", "-c:v", "copy", "-f", "image2", "-update", "1", image.path
+                    ]))
+                    guard extracted.succeeded, (try image.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])).isRegularFile == true,
+                          (try image.resourceValues(forKeys: [.fileSizeKey])).fileSize ?? 0 > 0 else { throw MultimediaInspectorError.invalidOutput("no se pudo copiar la carátula original") }
+                    artworkCopies[item.id] = image
+                }
+            }
+            try Task.checkCancellation()
             let command = try FFmpegMediaEditCommandBuilder().command(
                 ffmpeg: paths.ffmpeg,
                 plan: plan,
                 outputURL: workspace.output,
-                chapterMetadataURL: chapterMetadataURL
+                chapterMetadataURL: chapterMetadataURL,
+                artworkAttachmentURLs: artworkCopies
             )
             let result = try await runner.run(command.request)
             if await coordinator.shouldCancel(id: operationID) { throw MultimediaInspectorError.cancelled }
@@ -132,6 +153,13 @@ public actor MultimediaEditService {
             let values = try? url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
             guard values?.isRegularFile == true, values?.isSymbolicLink != true else { throw MultimediaInspectorError.inputChanged(url.lastPathComponent) }
             guard fingerprint.matches(url) else { throw MultimediaInspectorError.inputChanged(url.lastPathComponent) }
+        }
+        for item in plan.artworks {
+            guard case .external(let url, let fingerprint, _) = item.artwork.source else { continue }
+            let values = try? url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+            guard values?.isRegularFile == true, values?.isSymbolicLink != true, fingerprint.matches(url) else {
+                throw MultimediaInspectorError.inputChanged(url.lastPathComponent)
+            }
         }
         for item in plan.attachments {
             guard case .external(let url, let fingerprint) = item.attachment.source else { continue }

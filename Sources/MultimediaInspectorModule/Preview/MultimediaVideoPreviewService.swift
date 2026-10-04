@@ -50,6 +50,7 @@ private final class VideoFrameAssembler: @unchecked Sendable {
 public actor MultimediaVideoPreviewService {
     private static let cancellationGracePeriod: Duration = .milliseconds(50)
     private let runner: ExternalProcessRunner
+    private let replacementGate = PreviewSourceReplacementGate()
     private let builder: FFmpegVideoPreviewCommandBuilder
     private var decodeTask: Task<Void, Never>?
     private var generation: UInt64 = 0
@@ -74,9 +75,19 @@ public actor MultimediaVideoPreviewService {
         shouldPlay: Bool = true
     ) async throws {
         guard source.fingerprint.matches(source.url) else { throw MultimediaInspectorError.inputChanged(source.title) }
-        await stop()
+        try Task.checkCancellation()
         generation &+= 1
         let ticket = generation
+        let previous = decodeTask
+        decodeTask = nil
+        previous?.cancel()
+        let runner = self.runner
+        let replacement = try await replacementGate.beginReplacement {
+            try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
+            _ = await previous?.result
+        }
+        try Task.checkCancellation()
+        guard ticket == generation, await replacementGate.isCurrent(replacement) else { throw CancellationError() }
         currentSource = source
         currentFrame = nil
         terminalError = nil
@@ -91,6 +102,7 @@ public actor MultimediaVideoPreviewService {
         decodeTask = Task { [weak self] in
             guard let self else { return }
             do {
+                try Task.checkCancellation()
                 let result = try await runner.run(
                     .init(executable: ffmpeg, arguments: prepared.arguments),
                     onStdout: { assembler.append($0) },
@@ -128,24 +140,34 @@ public actor MultimediaVideoPreviewService {
     public func pause() async {
         guard state == .playing || state == .loading else { return }
         generation &+= 1
-        decodeTask?.cancel()
+        let previous = decodeTask
         decodeTask = nil
+        previous?.cancel()
         pauseAfterFirstFrame = false
         terminalError = nil
         state = .paused
-        try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
+        let runner = self.runner
+        await replacementGate.invalidate {
+            try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
+            _ = await previous?.result
+        }
     }
 
     public func stop() async {
         generation &+= 1
-        decodeTask?.cancel()
+        let previous = decodeTask
         decodeTask = nil
+        previous?.cancel()
         currentFrame = nil
         currentSource = nil
         terminalError = nil
         pauseAfterFirstFrame = false
         state = .idle
-        try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
+        let runner = self.runner
+        await replacementGate.invalidate {
+            try? await runner.cancel(gracePeriod: Self.cancellationGracePeriod)
+            _ = await previous?.result
+        }
     }
 
     public func snapshot(position: TimeInterval) -> MultimediaVideoPreviewSnapshot {
@@ -157,6 +179,7 @@ public actor MultimediaVideoPreviewService {
         // Mantener solo el frame más reciente acota la memoria y aplica backpressure por descarte.
         currentFrame = frame
         if pauseAfterFirstFrame {
+            state = .loading
             await pause()
         } else {
             state = .playing

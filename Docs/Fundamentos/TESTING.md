@@ -1,4 +1,6 @@
-# Pruebas y validación — ZEUVE 0.20.5.0
+# Pruebas y validación — ZEUVE 0.20.6.0
+
+La evidencia de la corrección vigente está en [TEST_RESULTS_0.20.6.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.6.0.md). Las pruebas automáticas e integraciones locales no sustituyen la aceptación desde la UI; los 22 IDs corregidos conservan ❌ hasta su comprobación manual, impedida en esta ronda por pérdida de conexión del controlador nativo.
 
 ## Evidencia de la entrega actual
 

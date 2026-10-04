@@ -151,6 +151,11 @@ struct MultimediaTechnicalStructureView: View {
                                 get: { model.currentDraft?.artworks.first(where: { $0.id == artwork.id })?.title ?? artwork.title },
                                 set: { value in var updated = artwork; updated.title = value; model.updateArtwork(updated) }
                             )).textFieldStyle(.roundedBorder)
+                                .disabled(model.currentDraft?.targetContainer == .mp4 && artwork.title.isEmpty)
+                                .help(model.currentDraft?.targetContainer == .mp4 ? "MP4 no representa títulos de carátula. Un título existente debe eliminarse o conservarse en otro contenedor." : "Título de la carátula")
+                            if model.currentDraft?.targetContainer == .mp4 {
+                                Text("Título no disponible en MP4").font(.caption).foregroundStyle(.secondary)
+                            }
                             if case .original(let streamIndex) = artwork.source {
                                 Button("Extraer…") { model.extractArtwork(streamIndex: streamIndex) }.buttonStyle(.link)
                             }

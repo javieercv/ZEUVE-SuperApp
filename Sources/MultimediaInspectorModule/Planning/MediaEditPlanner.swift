@@ -15,6 +15,11 @@ public struct MediaEditPlanner: Sendable {
 
     public func plan(from inputDraft: MediaEditDraft) throws -> MediaEditPlan {
         var draft = inputDraft
+        for (index, keys) in inputDraft.metadata.touchedVideoKeysByStream {
+            for key in keys {
+                draft.setVideoMetadata(inputDraft.metadata.videoValuesByStream[index]?[key] ?? "", for: key, streamIndex: index)
+            }
+        }
         if let preferred = preferences.preferredContainer,
            compatibility.isCompatible(draft: draft, container: preferred, allowAuthorizedSubtitleConversion: true) {
             draft.targetContainer = preferred

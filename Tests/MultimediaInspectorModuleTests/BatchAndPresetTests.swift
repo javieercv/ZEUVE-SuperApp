@@ -177,3 +177,24 @@ import ZEUVEStorage
     #expect(!text.localizedCaseInsensitiveContains("filename"))
     #expect(!text.localizedCaseInsensitiveContains("outputdirectory"))
 }
+
+@Test func preferencesResetPreservesReusableDataAfterReopeningStorage() throws {
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent("zeuve-reset-persistence-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let database = directory.appendingPathComponent("settings.sqlite")
+    let storage = try StorageContainer(databaseURL: database)
+    let presets = MultimediaInspectorBatchPresetStore(repository: storage.settings)
+    var custom = presets.load(); custom[0].name = "QA personalizado"; custom[0].configuration.analyzeLoudness = true
+    try presets.save(custom)
+    let rule = MultimediaBatchRuleSet(name: "QA reglas", rules: [])
+    try MultimediaInspectorRuleSetStore(repository: storage.settings).save([rule])
+    let favorite = MultimediaInspectorFavorite(kind: .batchPreset, referencedID: custom[0].id, displayName: custom[0].name)
+    try MultimediaInspectorFavoritesStore(repository: storage.settings).save([favorite])
+    _ = try MultimediaInspectorSettingsStore(repository: storage.settings).restoreDefaults()
+    let reopened = try StorageContainer(databaseURL: database)
+    #expect(MultimediaInspectorBatchPresetStore(repository: reopened.settings).load() == custom)
+    #expect(MultimediaInspectorRuleSetStore(repository: reopened.settings).load() == [rule])
+    #expect(MultimediaInspectorFavoritesStore(repository: reopened.settings).load() == [favorite])
+    #expect(MultimediaInspectorSettingsStore(repository: reopened.settings).load() == .defaults)
+}

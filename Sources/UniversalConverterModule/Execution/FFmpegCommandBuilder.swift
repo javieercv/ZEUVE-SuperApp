@@ -52,7 +52,8 @@ public struct FFmpegCommandBuilder: Sendable {
                 for: planItem.targetFormat,
                 options: options,
                 permitCopy: permitCopy,
-                sourceCodec: selectedAudioCodec(probe: probe, requestedIndex: options.selectedAudioStreamIndex)
+                sourceCodec: selectedAudioCodec(probe: probe, requestedIndex: options.selectedAudioStreamIndex),
+                sourceChannels: ConverterMediaPolicy().audioStream(probe: probe, options: options)?.channels
             )
             args += metadataArguments(options)
 
@@ -77,7 +78,7 @@ public struct FFmpegCommandBuilder: Sendable {
             let audioCanCopy = canCopyAudioIntoVideoContainer(codec: probe?.audioStream?.codec_name, target: planItem.targetFormat)
                 && audioProcessingArguments(options).isEmpty
             args += audioProcessingArguments(options)
-            args += try audioCodecArguments(for: .m4a, options: options, permitCopy: audioCanCopy, sourceCodec: probe?.audioStream?.codec_name)
+            args += try audioCodecArguments(for: .m4a, options: options, permitCopy: audioCanCopy, sourceCodec: probe?.audioStream?.codec_name, sourceChannels: probe?.audioStream?.channels)
             args += metadataArguments(options)
             if planItem.targetFormat == .mp4 || planItem.targetFormat == .mov { args += ["-movflags", "+faststart"] }
 
@@ -147,10 +148,11 @@ public struct FFmpegCommandBuilder: Sendable {
                     && audioTransforms.isEmpty
                     && options.audioBitrate == .automatic
                     && canCopyAudio(codec: probe?.audioStream?.codec_name, into: planItem.targetFormat)
-                args += try audioCodecArguments(for: planItem.targetFormat, options: options, permitCopy: permitCopy, sourceCodec: probe?.audioStream?.codec_name)
+                args += try audioCodecArguments(for: planItem.targetFormat, options: options, permitCopy: permitCopy, sourceCodec: probe?.audioStream?.codec_name, sourceChannels: probe?.audioStream?.channels)
                 args += metadataArguments(options)
 
             case .video:
+                if planItem.targetFormat == .webm { try ConverterMediaPolicy().validateWebM(options: options, probe: probe) }
                 args += ["-i", source.path, "-map", "0:v:0"]
                 if options.videoAudioMode != .remove {
                     if let index = options.selectedAudioStreamIndex { args += ["-map", "0:\(index)?"] }
@@ -186,10 +188,21 @@ public struct FFmpegCommandBuilder: Sendable {
                     args += ["-c:a", "aac", "-b:a", selectedAudioBitrate(options)]
                 case .preserve:
                     let audioTransforms = audioProcessingArguments(options)
+                    let selectedStreams = probe?.audioStreams.filter { options.selectedAudioStreamIndex == nil || $0.index == options.selectedAudioStreamIndex } ?? []
                     let canCopy = audioTransforms.isEmpty && options.audioBitrate == .automatic
-                        && canCopyAudioIntoVideoContainer(codec: selectedAudioCodec(probe: probe, requestedIndex: options.selectedAudioStreamIndex), target: planItem.targetFormat)
+                        && !selectedStreams.isEmpty
+                        && selectedStreams.allSatisfy { canCopyAudioIntoVideoContainer(codec: $0.codec_name, target: planItem.targetFormat) }
                     if canCopy { args += ["-c:a", "copy"] }
-                    else if planItem.targetFormat == .webm { args += audioTransforms + ["-c:a", "libopus", "-b:a", selectedAudioBitrate(options)] }
+                    else if planItem.targetFormat == .webm {
+                        args += audioTransforms + ["-c:a", "libopus"]
+                        let streams = probe?.audioStreams.filter { options.selectedAudioStreamIndex == nil || $0.index == options.selectedAudioStreamIndex } ?? []
+                        for (ordinal, stream) in streams.enumerated() {
+                            guard let bitrate = try ConverterMediaPolicy().opusBitrate(options: options, sourceChannels: stream.channels) else {
+                                throw UniversalConverterError.incompatibleRecipe("No se conocen los canales de una pista de audio para WebM.")
+                            }
+                            args += ["-b:a:\(ordinal)", "\(bitrate)k"]
+                        }
+                    }
                     else { args += audioTransforms + ["-c:a", "aac", "-b:a", selectedAudioBitrate(options)] }
                 }
                 if options.preserveSubtitles {
@@ -253,7 +266,7 @@ public struct FFmpegCommandBuilder: Sendable {
         }
     }
 
-    private func audioCodecArguments(for format: ConverterFormat, options: ConverterOperationOptions, permitCopy: Bool, sourceCodec: String?) throws -> [String] {
+    private func audioCodecArguments(for format: ConverterFormat, options: ConverterOperationOptions, permitCopy: Bool, sourceCodec: String?, sourceChannels: Int?) throws -> [String] {
         if permitCopy { return ["-c:a", "copy"] }
         let bitrate = selectedAudioBitrate(options)
         switch format {
@@ -261,7 +274,11 @@ public struct FFmpegCommandBuilder: Sendable {
         case .m4a, .aac: return ["-c:a", "aac", "-b:a", bitrate]
         case .flac: return ["-c:a", "flac", "-compression_level", options.quality == .low ? "8" : "5"]
         case .wav: return ["-c:a", "pcm_s24le"]
-        case .opus, .ogg: return ["-c:a", "libopus", "-b:a", options.audioBitrate == .automatic ? selectedAudioBitrate(options) : bitrate]
+        case .opus, .ogg:
+            guard let opusBitrate = try ConverterMediaPolicy().opusBitrate(options: options, sourceChannels: sourceChannels) else {
+                throw UniversalConverterError.incompatibleRecipe("No se conocen los canales necesarios para comprobar el bitrate de Opus/OGG.")
+            }
+            return ["-c:a", "libopus", "-b:a", "\(opusBitrate)k"]
         default: throw UniversalConverterError.incompatibleRecipe("FFmpeg no admite la salida de audio \(format.displayName).")
         }
     }

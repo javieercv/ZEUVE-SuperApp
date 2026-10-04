@@ -13,7 +13,8 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
         ffmpeg: URL,
         plan: MediaEditPlan,
         outputURL: URL,
-        chapterMetadataURL: URL? = nil
+        chapterMetadataURL: URL? = nil,
+        artworkAttachmentURLs: [UUID: URL] = [:]
     ) throws -> FFmpegMediaEditPreparedCommand {
         var arguments = ["-hide_banner", "-nostdin", "-y", "-i", plan.originalURL.path]
         var externalInputs: [String: Int] = [:]
@@ -28,7 +29,7 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
                 }
             }
         }
-        for item in plan.artworks {
+        for item in plan.artworks where plan.targetContainer != .mkv {
             if case .external(let url, _, _) = item.artwork.source {
                 let key = canonical(url)
                 if externalInputs[key] == nil { externalInputs[key] = nextInput; nextInput += 1; arguments += ["-i", url.path] }
@@ -55,7 +56,7 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
         for item in plan.videoTracks { arguments += ["-map", mapSpecifier(item.track.source, externalInputs: externalInputs)] }
         for item in plan.audioTracks { arguments += ["-map", mapSpecifier(item.track.source, externalInputs: externalInputs)] }
         for item in plan.subtitleTracks { arguments += ["-map", mapSpecifier(item.track.source, externalInputs: externalInputs)] }
-        for item in plan.artworks { arguments += ["-map", artworkMapSpecifier(item.artwork.source, externalInputs: externalInputs)] }
+        for item in plan.artworks where plan.targetContainer != .mkv { arguments += ["-map", artworkMapSpecifier(item.artwork.source, externalInputs: externalInputs)] }
 
         if plan.preserveMetadata { arguments += ["-map_metadata", "0"] }
         else { arguments += ["-map_metadata", "-1"] }
@@ -76,7 +77,7 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
             arguments += ["-metadata:s:s:\(i)", "language=\(item.track.language)", "-metadata:s:s:\(i)", "title=\(item.track.title)", "-disposition:s:\(i)", dispositionValue(item.track, includeForced: true)]
         }
 
-        for (i, item) in plan.artworks.enumerated() {
+        for (i, item) in plan.artworks.enumerated() where plan.targetContainer != .mkv {
             let ordinal = plan.videoTracks.count + i
             arguments += ["-disposition:v:\(ordinal)", "attached_pic"]
             if !item.artwork.title.isEmpty { arguments += ["-metadata:s:v:\(ordinal)", "title=\(item.artwork.title)"] }
@@ -93,6 +94,18 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
             arguments += ["-metadata:s:t:\(ordinal)", "mimetype=\(item.attachment.mimeType)"]
         }
 
+        if plan.targetContainer == .mkv {
+            for (offset, item) in plan.artworks.enumerated() {
+                guard let imageURL = artworkAttachmentURLs[item.id] else {
+                    throw MultimediaInspectorError.invalidOutput("falta la copia temporal propia de una carátula MKV")
+                }
+                let ordinal = existingAttachments.count + addedAttachments.count + offset
+                arguments += ["-attach", imageURL.path,
+                              "-metadata:s:t:\(ordinal)", "filename=\(item.artwork.filename)",
+                              "-metadata:s:t:\(ordinal)", "mimetype=\(item.artwork.mimeType)",
+                              "-metadata:s:t:\(ordinal)", "title=\(item.artwork.title)"]
+            }
+        }
         appendManagedMetadata(plan.metadata, plan: plan, arguments: &arguments)
         arguments.append(outputURL.path)
         return .init(request: ExternalProcessRequest(executable: ffmpeg, arguments: arguments), outputURL: outputURL)
@@ -104,7 +117,7 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
             arguments += ["-metadata", "\(key)=\(value)"]
         }
         for (streamIndex, keys) in metadata.touchedVideoKeysByStream.sorted(by: { $0.key < $1.key }) {
-            guard let ordinal = plan.originalVideoStreamIndices.firstIndex(of: streamIndex) else { continue }
+            guard let ordinal = plan.videoTracks.firstIndex(where: { $0.track.source.originalStreamIndex == streamIndex }) else { continue }
             let values = metadata.videoValuesByStream[streamIndex] ?? [:]
             for key in keys.sorted() {
                 arguments += ["-metadata:s:v:\(ordinal)", "\(key)=\(values[key] ?? "")"]

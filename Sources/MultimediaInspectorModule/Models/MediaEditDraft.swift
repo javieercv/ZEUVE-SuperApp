@@ -32,6 +32,16 @@ public struct MediaEditDraft: Sendable, Equatable {
     public var metadata: MediaMetadataDraft
     public var authorizedSubtitleConversions: Set<UUID>
 
+    /// Título e idioma de vídeo pertenecen a la pista: ambas superficies editan
+    /// el mismo valor y quedan registradas en una única revisión de Undo.
+    public mutating func setVideoMetadata(_ value: String, for key: String, streamIndex: Int) {
+        metadata.setVideoValue(value, for: key, streamIndex: streamIndex)
+        if let index = videoTracks.firstIndex(where: { $0.source.originalStreamIndex == streamIndex }) {
+            if key == "title" { videoTracks[index].title = value }
+            if key == "language" { videoTracks[index].language = value }
+        }
+    }
+
     public init(originalURL: URL, originalFingerprint: FileFingerprint, inspection: MediaInspectionResult, container: EditableMediaContainer) throws {
         let sourceValues = try? originalURL.resourceValues(forKeys: [.isSymbolicLinkKey, .isRegularFileKey])
         guard sourceValues?.isSymbolicLink != true, sourceValues?.isRegularFile == true else {

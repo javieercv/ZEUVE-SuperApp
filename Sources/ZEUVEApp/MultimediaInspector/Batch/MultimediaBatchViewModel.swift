@@ -43,6 +43,7 @@ final class MultimediaBatchViewModel: ObservableObject {
     private var preferences: MultimediaInspectorPreferences
     private var runTask: Task<Void, Never>?
     private var folderTask: Task<Void, Never>?
+    private var structuralRevision = UUID()
     private var structuralTask: Task<Void, Never>?
     private var runStartedAt: Date?
 
@@ -82,8 +83,8 @@ final class MultimediaBatchViewModel: ObservableObject {
     }
 
     var needsOutputFolder: Bool { configuration.exportSpectrogram || configuration.reportFormat != nil }
-    var canStart: Bool { !items.isEmpty && !isRunning && (!needsOutputFolder || outputDirectory != nil) }
-    var canRetryFailures: Bool { !isRunning && items.contains(where: { $0.status == .failed }) }
+    var canStart: Bool { !items.isEmpty && !isBusy && (!needsOutputFolder || outputDirectory != nil) }
+    var canRetryFailures: Bool { !isBusy && items.contains(where: { $0.status == .failed }) }
     var completedCount: Int { items.filter { $0.status.isTerminal }.count }
     var overallProgress: Double { items.isEmpty ? 0 : Double(completedCount) / Double(items.count) }
 
@@ -105,7 +106,7 @@ final class MultimediaBatchViewModel: ObservableObject {
     }
 
     func prepare(urls: [URL], resetConfiguration: Bool = true) {
-        guard !isRunning else { return }
+        guard !isBusy else { return }
         if resetConfiguration {
             let defaultPreset = preferences.defaultBatchPresetID.flatMap { id in presets.first(where: { $0.id == id }) } ?? presets.first
             selectedPresetID = defaultPreset?.id
@@ -139,7 +140,7 @@ final class MultimediaBatchViewModel: ObservableObject {
     }
 
     func append(urls: [URL]) {
-        guard !isRunning else { return }
+        guard !isBusy else { return }
         let existing = Set(items.map { $0.url.standardizedFileURL.resolvingSymlinksInPath().path })
         let additions = urls.filter { !existing.contains($0.standardizedFileURL.resolvingSymlinksInPath().path) }
         let previous = items
@@ -147,13 +148,13 @@ final class MultimediaBatchViewModel: ObservableObject {
     }
 
     func remove(_ item: MultimediaBatchItem) {
-        guard !isRunning else { return }
+        guard !isBusy else { return }
         items.removeAll { $0.id == item.id }
         runSummary = nil
     }
 
     func clear() {
-        guard !isRunning else { return }
+        guard !isBusy else { return }
         items = []
         currentIndex = nil
         currentFraction = nil
@@ -197,18 +198,24 @@ final class MultimediaBatchViewModel: ObservableObject {
 
     func removeStructuralRule(_ id: UUID) { structuralRuleSet.rules.removeAll { $0.id == id }; structuralRuleSet.modifiedAt = Date(); preflightItems = [] }
 
+    var isBusy: Bool { isRunning || isPreflighting || isExecutingStructural }
+
     func prepareStructuralPreflight() {
-        guard !items.isEmpty, !structuralRuleSet.rules.isEmpty, let locator else {
+        guard !isBusy, !items.isEmpty, !structuralRuleSet.rules.isEmpty, let locator else {
             errorMessage = structuralRuleSet.rules.isEmpty ? "Añade al menos una regla estructural." : "FFprobe no está disponible."; return
         }
-        structuralTask?.cancel(); isPreflighting = true; preflightItems = []; errorMessage = nil
+        structuralTask?.cancel(); structuralRevision = UUID()
+        let revision = structuralRevision
+        isPreflighting = true; preflightItems = []; errorMessage = nil
         let files = items.map { MultimediaBatchDiscoveredFile(url: $0.url, fingerprint: $0.fingerprint) }
         let rules = structuralRuleSet; let prefs = preferences
         structuralTask = Task { [weak self] in
-            guard let self else { return }; defer { self.isPreflighting = false }
+            guard let self else { return }; defer { self.isPreflighting = false; self.structuralTask = nil }
             do {
                 let ffprobe = try await locator.ffprobe()
                 let prepared = try await self.preflightService.prepare(files: files, ruleSet: rules, ffprobe: ffprobe, preferences: prefs)
+                try Task.checkCancellation()
+                guard self.structuralRevision == revision else { return }
                 if self.folderOptions.incompatiblePolicy == .skip {
                     let omitted = prepared.filter { $0.classification == .incompatible }.count
                     self.preflightItems = prepared.filter { $0.classification != .incompatible }
@@ -216,26 +223,29 @@ final class MultimediaBatchViewModel: ObservableObject {
                 } else {
                     self.preflightItems = prepared
                 }
-            } catch is CancellationError { } catch { self.errorMessage = error.localizedDescription }
+            } catch is CancellationError { } catch {
+                guard !Task.isCancelled, self.structuralRevision == revision else { return }
+                self.errorMessage = error.localizedDescription
+            }
         }
     }
 
     func chooseStructuralOutputFolder() {
-        guard !isExecutingStructural else { return }
+        guard !isBusy else { return }
         let panel = NSOpenPanel(); panel.title = "Carpeta para ediciones por lotes"; panel.prompt = "Usar carpeta"
         panel.canChooseFiles = false; panel.canChooseDirectories = true; panel.allowsMultipleSelection = false; panel.canCreateDirectories = true
         if panel.runModal() == .OK { structuralOutputDirectory = panel.url }
     }
 
     var structuralApplicableCount: Int { preflightItems.filter { $0.plan != nil && ($0.classification == .applicable || $0.classification == .applicableWithWarnings) }.count }
-    var canExecuteStructural: Bool { structuralApplicableCount > 0 && structuralOutputDirectory != nil && !isExecutingStructural && !isRunning }
+    var canExecuteStructural: Bool { structuralApplicableCount > 0 && structuralOutputDirectory != nil && !isBusy }
 
     func executeStructuralBatch() {
         guard canExecuteStructural, let outputFolder = structuralOutputDirectory, let editService = structuralEditService, let locator else { return }
         structuralTask?.cancel(); isExecutingStructural = true; structuralCompleted = 0; structuralFailed = 0; errorMessage = nil
         let applicable = preflightItems.filter { $0.plan != nil && ($0.classification == .applicable || $0.classification == .applicableWithWarnings) }
         structuralTask = Task { [weak self] in
-            guard let self else { return }; defer { self.isExecutingStructural = false }
+            guard let self else { return }; defer { self.isExecutingStructural = false; self.structuralTask = nil }
             do {
                 let ffprobe = try await locator.ffprobe()
                 for item in applicable {
@@ -253,7 +263,18 @@ final class MultimediaBatchViewModel: ObservableObject {
         }
     }
 
-    func cancelStructural() { structuralTask?.cancel(); Task { await structuralEditService?.cancel() } }
+    func cancelStructural() {
+        structuralRevision = UUID()
+        structuralTask?.cancel()
+        Task { await structuralEditService?.cancel() }
+    }
+
+    func cancelStructuralAndWait() async {
+        let pending = structuralTask
+        cancelStructural()
+        await structuralEditService?.cancel()
+        _ = await pending?.result
+    }
 
     var favoritePresets: [MultimediaInspectorBatchPreset] {
         presets.filter { isFavoritePreset($0.id) }
@@ -329,7 +350,7 @@ final class MultimediaBatchViewModel: ObservableObject {
     }
 
     func applyPreset(_ preset: MultimediaInspectorBatchPreset) {
-        guard !isRunning else { return }
+        guard !isBusy else { return }
         selectedPresetID = preset.id
         configuration = preset.configuration
         configuration.normalize()
@@ -417,7 +438,7 @@ final class MultimediaBatchViewModel: ObservableObject {
     }
 
     func chooseOutputFolder() {
-        guard !isRunning else { return }
+        guard !isBusy else { return }
         let panel = NSOpenPanel()
         panel.title = "Seleccionar carpeta de resultados"
         panel.prompt = "Usar carpeta"
@@ -429,7 +450,7 @@ final class MultimediaBatchViewModel: ObservableObject {
     }
 
     func clearOutputFolder() {
-        guard !isRunning else { return }
+        guard !isBusy else { return }
         outputDirectory = nil
     }
 
@@ -531,6 +552,9 @@ final class MultimediaBatchViewModel: ObservableObject {
 
     func cancelAndWait() async {
         cancel()
+        folderTask?.cancel()
+        await cancelStructuralAndWait()
+        _ = await folderTask?.result
         _ = await runTask?.result
     }
 

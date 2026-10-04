@@ -1,10 +1,10 @@
-# Inspector multimedia 0.7.3 — ZEUVE 0.20.5.0
+# Inspector multimedia 0.7.4 — ZEUVE 0.20.6.0
 
 ## Identidad y alcance
 
 - ID: `com.zeuve.multimedia-inspector`.
 - Target: `MultimediaInspectorModule`.
-- Versión: `0.7.3`.
+- Versión: `0.7.4`.
 - ZEUVE mínimo: `0.13.0`.
 - Categoría: Multimedia.
 - Atajo por defecto: ⌘6.
@@ -46,7 +46,7 @@ FFmpeg decodifica el stream elegido a PCM float32 incremental; `AVAudioEngine`/`
 
 La identidad de preview distingue fuente y stream completos; cambiar de stream no debe confundir dos fuentes que compartan el mismo índice. Las generaciones descartan frames/procesos antiguos.
 
-Pausa conserva fuente/frame para responder de forma inmediata. Los procesos efímeros de preview usan una gracia de cancelación más corta que el valor global de `ExternalProcessRunner`; esa excepción no se extiende a operaciones pesadas.
+Pausa conserva fuente/frame para responder de forma inmediata. Un seek pausado decodifica el frame del destino y mantiene la pausa; el monitor sigue observando hasta recibir ese frame. Las sustituciones serializan cancelación y terminación completa del decodificador anterior y descartan generaciones obsoletas, manteniendo el transporte compartido. Los procesos efímeros de preview usan una gracia de cancelación más corta que el valor global de `ExternalProcessRunner`; esa excepción no se extiende a operaciones pesadas.
 
 La velocidad se normaliza al rango 0,5×–2×; valores no finitos vuelven a 1×. El ajuste no debe provocar recursión ni múltiples actualizaciones del mismo transporte.
 
@@ -137,6 +137,8 @@ Existe un conjunto seguro de tags editables globales/por stream. Tags desconocid
 
 Los streams `codec_type=attachment` se gestionan como attachments reales: conservar, retirar, añadir externos compatibles y extraer de forma segura. `attached_pic` se trata como carátula/stream de vídeo especial, no como attachment genérico.
 
+La compatibilidad se calcula sobre las carátulas del borrador efectivo, incluidas sus retiradas. MP4 admite JPEG/PNG como `attached_pic`, pero no el título de la carátula: las nuevas carátulas usan título vacío y la UI explica esa limitación; un título no representable solicitado se rechaza antes de ejecutar. Una carátula MKV existente se copia a un temporal propio y se vuelve a incorporar como imagen adjunta con filename/MIME, sin remapearla como vídeo ordinario ni recodificarla.
+
 `MultimediaArtworkService` aplica la política apropiada por contenedor para visualizar, extraer, añadir, sustituir o eliminar carátulas cuando sea compatible. Los archivos externos se validan y fingerprintan.
 
 ## Ejecución de una edición
@@ -168,7 +170,7 @@ Hay dos familias de trabajo:
 - análisis/exportación secuencial (inspección, señal, sonoridad, espectrograma, informe según preset);
 - edición estructural por reglas condición → acción, con análisis, plan individual, preflight, revisión y ejecución segura.
 
-El preflight estructural reserva `OperationCoordinator` antes de inspeccionar. Si otra operación está activa propaga `.busy` y no continúa sin registro. La cancelación de la tarea o la cancelación global detienen FFprobe, y el coordinador queda liberado de forma esperada antes de devolver el resultado o el error. Los fallos normales de un archivo siguen representándose en su elemento sin alterar los resultados de los demás.
+El lote ofrece **Cancelar preflight**. La tarea estructural cancelada se espera al cerrar; los resultados de revisiones obsoletas no se publican. El preflight estructural reserva `OperationCoordinator` antes de inspeccionar. Si otra operación está activa propaga `.busy` y no continúa sin registro. La cancelación de la tarea o la cancelación global detienen FFprobe, y el coordinador queda liberado de forma esperada antes de devolver el resultado o el error. Los fallos normales de un archivo siguen representándose en su elemento sin alterar los resultados de los demás.
 
 Con múltiples pistas de audio el módulo no elige silenciosamente una para análisis dependiente de una sola pista. Un fallo aislado no debe invalidar resultados ya publicados de otros elementos; la cancelación conserva únicamente salidas publicadas correctamente y detiene pendientes.
 
@@ -176,7 +178,7 @@ Los resultados pesados de cada elemento se liberan al terminar para evitar creci
 
 ## Presets, reglas y favoritos
 
-Los presets de lote y rule sets se persisten mediante `SettingsRepository`. Los favoritos guardan configuraciones reutilizables, no archivos/rutas privadas. Restaurar valores devuelve defaults sin borrar archivos o historial.
+Los presets de lote y rule sets se persisten mediante `SettingsRepository`. Los favoritos guardan configuraciones reutilizables, no archivos/rutas privadas. El restablecimiento global restaura preferencias conservando presets personalizados, reglas y favoritos; la restauración específica de presets continúa siendo una acción separada. No borra archivos ni historial.
 
 ## Ajustes
 
@@ -185,6 +187,10 @@ Los presets de lote y rule sets se persisten mediante `SettingsRepository`. Los 
 No son configurables las invariantes de seguridad: fingerprints, publicación segura, validación final, rechazo de symlinks donde corresponda, privacidad, hard caps esenciales, stream copy y `OperationCoordinator`.
 
 La UI reutiliza los componentes de ayuda contextual de ZEUVE para conceptos técnicos y métricas ambiguas. Abrir ayuda no ejecuta motores ni modifica estado operativo.
+
+El título e idioma de vídeo gestionados en Metadatos y Pistas representan un único valor efectivo del borrador. El comando y la validación resuelven el ordinal de salida después de reordenar. Un códec de attachment ausente se normaliza con el fallback `attachment`; los códecs conocidos, nombre, MIME y tamaño de extradata conocido siguen verificándose. Idioma ausente y `und` son equivalentes a no especificado; los idiomas reales deben coincidir.
+
+La vista reserva espacio para el transporte inferior. El contenido del espectrograma, los avisos/revisión de edición y la superficie visual del reproductor pueden desplazarse, con altura ajustada al espacio de la ventana.
 
 ## Informes
 

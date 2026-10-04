@@ -54,8 +54,8 @@ public struct MediaContainerCompatibilityRegistry: Sendable {
             for key in keys where !metadataCompatibility.supportsVideoKey(key, container: container) { return false }
         }
         for video in draft.videoTracks where decision(kind: .video, codec: video.codec, container: container) != .streamCopy { return false }
-        for artwork in draft.originalInspection.streams where artwork.codec_type == "video" && artwork.isAttachedPicture {
-            if container != .mkv && !supportsVideo(codec: artwork.codec_name ?? "", container: container) { return false }
+        for artwork in draft.artworks {
+            if !MediaArtworkCompatibility().canPreserve(artwork, in: container) { return false }
         }
         for audio in draft.audioTracks where decision(kind: .audio, codec: audio.codec, container: container) != .streamCopy { return false }
         if !draft.attachments.isEmpty, !supportsAttachments(container: container) { return false }

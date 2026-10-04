@@ -32,7 +32,7 @@ for snippet in required_package:
 for key, expected in {
     "identifier": "com.zeuve.multimedia-inspector",
     "name": "Inspector multimedia",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "minimumZEUVEVersion": "0.13.0",
     "executionMode": "builtIn",
 }.items():
@@ -410,7 +410,7 @@ for required in ["requestedSourceID", "confirmedSourceID", "transportState", "ca
 pause_body = video_service[video_service.index("public func pause() async"):video_service.index("public func stop() async")]
 if "currentSource = nil" in pause_body or "currentFrame = nil" in pause_body:
     raise SystemExit("Pausar vídeo debe conservar la fuente y el último fotograma.")
-for required in ["generation &+= 1", "decodeTask?.cancel()", "state = .paused"]:
+for required in ["generation &+= 1", "let previous = decodeTask", "previous?.cancel()", "await previous?.result", "state = .paused"]:
     if required not in pause_body:
         raise SystemExit("Pausa de vídeo incompleta: " + required)
 if "NSApp.keyWindow" in preview_player:
@@ -815,4 +815,4 @@ for path, snippets in {
         if snippet not in source:
             raise SystemExit(f"Falta cierre 0.19 del Inspector en {path}: {snippet}")
 
-print("Inspector multimedia 0.7.3: transporte multimedia, respuesta interactiva, fullscreen, cancelación, análisis espectral, edición, lotes, OCR, privacidad y ayuda verificados.")
+print("Inspector multimedia 0.7.4: transporte multimedia, respuesta interactiva, fullscreen, cancelación, análisis espectral, edición, lotes, OCR, privacidad y ayuda verificados.")
