@@ -2,7 +2,7 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 556 ✅ OK · 19 ❌ fallidas · 13 ⚠️ parciales · 51 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 559 ✅ OK · 20 ❌ fallidas · 13 ⚠️ parciales · 47 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
@@ -10,7 +10,7 @@ Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 f
 
 Confirmación manual del usuario, 04/10/2026: **F-02 funciona**. El arrastre del ZIP del Comparador se acepta por esta confirmación; no se afirma una repetición por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 27/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 74/75 OK, 1 fallida (L-74), 0 parciales y 0 pendientes; Privacidad transversal 5/16 OK (P-08/P-09/P-10/P-13/P-14), 1 fallida (P-16) y 10 pendientes.
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -19,6 +19,15 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
 **Punto de continuación: Limpiador terminado: 75/75 pruebas abordadas, 74 OK y L-74 fallida (INC-34), sin pendientes.** No se ha corregido producto. Otros módulos y privacidad conservan sus pendientes; Descargador sigue pausado por decisión del usuario.
+
+Reclasificación documental de privacidad, 04/10/2026, autorizada por el usuario: se reutilizan exclusivamente evidencias de pruebas anteriores, sin nuevas pruebas ni cambios de producto.
+
+- **P-08 — ✅, evidencia previa:** C-59 y las conversiones registradas comprobaron que los originales conservaron sus SHA-256; las salidas se publicaron aparte. Aceptación limitada a los archivos y recorridos de QA ejercitados.
+- **P-09 — ✅, evidencia previa:** I-137, I-97 e I-160/I-165 comprobaron originales intactos tras inspección, OCR y ediciones estructurales reales, con salidas independientes y SHA-256 sin cambios.
+- **P-10 — ✅, evidencia previa:** conflictos de Organizador O-42/O-49, Conversor C-60, Comparador F-24, Inspector I-141/I-142 y Limpiador L-52/L-53 no sobrescribieron silenciosamente archivos existentes. F-24 requirió confirmación expresa para reemplazar. Aceptación de los conflictos normales efectivamente probados, no garantía de toda entrada posible.
+- **P-16 — ❌, evidencia previa C-46/INC-14:** cancelar detuvo los motores, pero dejó controles del Conversor deshabilitados hasta reiniciar la app. La recuperación correcta de otros módulos no elimina este fallo transversal. No se ha corregido.
+
+P-01–P-07 continúan pendientes porque no se documentó una ejecución con Internet desconectado. P-11 sigue pendiente de una sesión de Instagram. P-12 continúa pendiente: INC-06 acredita una URL de autenticación con parámetros persistida, no credenciales/tokens utilizables ni fuga de sesión demostrados. P-15 sigue pendiente de comprobar específicamente el Historial tras OCR. P-13/P-14 permanecen OK.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -1640,12 +1649,12 @@ Si Xcode está instalado:
 - [ ] ➖ **P-05** Inspector funciona sin Internet.
 - [ ] ➖ **P-06** Limpiador funciona sin Internet.
 - [ ] ➖ **P-07** Solo el Descargador necesita Internet para su trabajo normal.
-- [ ] ➖ **P-08** Un archivo original convertido permanece intacto.
-- [ ] ➖ **P-09** Un archivo original inspeccionado/editado permanece intacto.
-- [ ] ➖ **P-10** Ningún conflicto normal sobrescribe silenciosamente un archivo existente.
+- [x] ✅ **P-08** Un archivo original convertido permanece intacto.
+- [x] ✅ **P-09** Un archivo original inspeccionado/editado permanece intacto.
+- [x] ✅ **P-10** Ningún conflicto normal sobrescribe silenciosamente un archivo existente.
 - [ ] ➖ **P-11** Después de utilizar una sesión de Instagram, los registros no muestran cookies.
 - [ ] ➖ **P-12** Los registros no muestran tokens/credenciales.
 - [x] ✅ **P-13** Analizar chats no deja mensajes completos en Historial.
 - [x] ✅ **P-14** Comparar seguidores no deja usernames/listas en Historial.
 - [ ] ➖ **P-15** OCR del Inspector no deja el texto OCR completo en Historial.
-- [ ] ➖ **P-16** Cancelar operaciones no deja ZEUVE permanentemente bloqueado.
+- [x] ❌ **P-16** Cancelar operaciones no deja ZEUVE permanentemente bloqueado.
