@@ -2,13 +2,13 @@
 
 Estado acumulado al 04/10/2026 · ZEUVE 0.20.5.0 (marketing 0.20.5, build 71).
 
-**639 pruebas: 511 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 97 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 512 ✅ OK · 18 ❌ fallidas · 13 ⚠️ parciales · 96 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. Los resultados de QA se realizaron sobre una copia Debug con datos aislados y archivos sintéticos; no certifican toda la distribución Release ni cualquier entrada posible.
 
 Confirmación manual del usuario, 28/09/2026: **O-02, A-07, A-39 y A-46–A-48 funcionan**. Estos seis puntos se marcan OK por su confirmación, no como pruebas repetidas por el agente.
 
-Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 30/75 OK, 0 fallidas, 0 parciales y 45 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
+Resumen: General 40/40 OK; Historial 15/15 OK; Ajustes 17/18 OK y S-16 fallido; Organizador 49/50 OK y O-18 parcial; Descargador 44/80 OK, D-13 fallido, D-15/D-60 parciales y 33 pendientes; Analizador 75/75 OK. Conversor 53/63 OK, 4 fallos (C-14/C-15/C-20/C-46) y 2 parcial (C-11/C-48), Comparador 26/27 OK, Inspector 160/180 OK, 12 fallos (I-33/I-38/I-39/I-66/I-120/I-127/I-130/I-131/I-132/I-133/I-136/I-164) y 8 parciales (I-29/I-35/I-93/I-96/I-134/I-135/I-161/I-162); Limpiador 31/75 OK, 0 fallidas, 0 parciales y 44 pendientes; Privacidad transversal 2/16 OK (P-13/P-14).
 
 El Descargador continúa pausado por decisión del usuario para separar limitaciones de Internet de fallos de producto. Primer bloque del Conversor: 11 puntos OK (C-01–C-06, C-41, C-43, C-59, C-60 y C-63), con PNG/JPEG/HEIC/TIFF/BMP, dimensiones, carpeta, copia segura, originales, conflictos e Historial comprobados. Se decodificaron 23 archivos publicados; todas las salidas conservaron 320×180 y los cinco originales conservaron sus hashes. C-62 quedó después comprobado OK con la opción activada y un reinicio real; la prueba inicial con la opción desactivada no era un fallo. C-42 y C-45 no se dan por validados por haber completado un lote de carpeta. El avance posterior se registra prueba a prueba justo debajo. No se ha corregido producto.
 
@@ -16,7 +16,7 @@ El Descargador continúa pausado por decisión del usuario para separar limitaci
 
 Desde el 28/09/2026 se actualiza este archivo inmediatamente al terminar cada ID de prueba, antes de iniciar el siguiente. Los intentos incompletos no se marcan OK. Los problemas de control se anotan separados de los fallos de producto.
 
-**Punto de continuación: Limpiador L-19, repetir el botón Analizar desinstalación con la app sintética presente en la ruta de inventario, tras desbloquear macOS.** Última prueba guardada: L-44, ✅. Limpiador 30 OK y 45 pendientes; Inspector ya abordado completo. Autenticación GitHub restablecida el 04/10/2026; resultados QA publicados y verificados en origin/main. El bloqueo de publicación de los cierres anteriores queda resuelto, sin cambiar los resultados de pruebas.
+**Punto de continuación: Limpiador L-20/L-21, asociados propios y datos persistentes, tras desbloquear macOS.** Última prueba guardada: L-19, ✅. Limpiador 31 OK y 44 pendientes; Inspector ya abordado completo. Fixtures preparados guardados en QA-L.Sil382/Asociados-preparados; .app en QA-L.Sil382/Apps. Queda la raíz sintética de Containers con metadata propia de macOS, sin el archivo de prueba. Autenticación GitHub restablecida; consultar remoto antes de reanudar.
 
 - **C-07 — OK, guardado antes de comenzar C-08:** GIF sintético de 2 s y 10 fotogramas → MP4. UI: 1 correcto, 0 fallidos/omitidos/cancelados. FFprobe confirma H.264, 160×90, 5 FPS, 10 fotogramas y 2 s. El GIF original conserva su SHA-256. Esta prueba verifica GIF como entrada; no se extrapola a todas las paletas, transparencias o bucles.
 - **C-08 — intento incompleto, sin cambio de casilla:** se cerró el resultado C-07 y se intentó preparar Convertir formato → WebP. El control perdió acceso a ventanas; CGSession confirmó screenLocked=1 y el proceso QA seguía vivo. No se verificó WebP seleccionado ni se ejecutó una conversión C-08. Reanudar por este ID después de desbloquear macOS, sin repetir C-07 innecesariamente.
@@ -644,6 +644,10 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - **L-44 — ✅, guardado individual, 04/10/2026:** La confirmación identifica explícitamente «Mover … a Papelera», explica la posibilidad de deshacer movimientos completados y que se revalidará cada elemento y se omitirán cambios. No se confunde con borrado permanente.
 
 - **L-19 — intento incompleto, sin cambiar casilla, 04/10/2026:** Después de cancelar la revisión de Papelera se colocó temporalmente el bundle propio de nuevo en su ruta de inventario de ~/Applications y se envió Analizar desinstalación. No se obtuvo una lectura final: macOS bloqueó la sesión (CGSSessionScreenIsLocked=true), System Events dejó de exponer ventanas y screencapture no pudo capturar. El proceso QA 41759 seguía vivo; no se afirma un fallo de ZEUVE ni se da el ID por terminado. La app sintética se devolvió a QA-L.Sil382/Apps/ZEUVE QA Limpiador.app, hash c3cc867aad12cd57d0b8ef7c59265c7e67ec368611cbe00f6df80c948ba347c7 intacto, sin copia restante en ~/Applications. Antes de reanudar, asegurar que la ruta del candidato coincida con su ubicación actual. No se ejecutó limpieza ni borrado.
+
+- **L-19 — ✅, guardado individual, 04/10/2026:** Repetido el botón nativo Analizar desinstalación con el bundle propio presente en la ruta inventariada de ~/Applications. Se abre plan de 1 candidato (la app), casilla seleccionada y 540 bytes; app e Info.plist siguen existiendo con SHA-256 c3cc867a…347c7 intacto. No se ejecuta retirada. Las lecturas AX inmediatas fueron transitoriamente inaccesibles; lectura posterior y hash confirman el desenlace, sin atribuir ese control al producto.
+
+- **L-20/L-21 — preparados, todavía pendientes, 04/10/2026:** Se crearon seis fixtures propios del Bundle ID com.zeuve.qa.cleaner.sil382 en Caches, Logs, Preferences, Application Support, Containers y Group Containers; no se analizaron ni retiraron desde ZEUVE. macOS volvió a bloquearse (CGSSessionScreenIsLocked=Yes, PID QA 41759 vivo) antes de abrir el nuevo análisis. No se cambian casillas. Cinco raíces se trasladaron recuperablemente a QA-L.Sil382/Asociados-preparados, con subcarpetas por categoría, y la .app se devolvió a QA-L.Sil382/Apps/ZEUVE QA Limpiador.app; Info.plist mantiene SHA c3cc867a…347c7. La raíz sintética de Containers no pudo renombrarse: macOS devuelve Operation not permitted. Su archivo propio ZEUVE-QA-Sil382.txt sí se movió a la carpeta QA; en la raíz solo queda la metadata .com.apple.containermanagerd.metadata.plist creada automáticamente por macOS. Se preserva y no se elude esa protección; comprobar el contenido antes de continuar. No queda la app temporal en ~/Applications. Las otras cinco raíces no quedan en ~/Library. Reanudar tras desbloquear, reponer únicamente los fixtures propios en las ubicaciones documentadas y verificar su plan; no usar el candidato de la ruta antigua si falta la app. No se ejecutó retirada.
 
 ## 1. ZEUVE general
 
@@ -1437,7 +1441,7 @@ Usar siempre una copia prescindible.
 - [x] ✅ **L-16** Buscar una aplicación funciona.
 - [x] ✅ **L-17** Muestra nombre/ubicación correctamente.
 - [x] ✅ **L-18** Arrastrar una `.app` abre su análisis de desinstalación.
-- [ ] ➖ **L-19** «Analizar desinstalación» no elimina nada.
+- [x] ✅ **L-19** «Analizar desinstalación» no elimina nada.
 - [ ] ➖ **L-20** Detecta asociados razonables de la app.
 - [ ] ➖ **L-21** Datos persistentes aparecen pero no preseleccionados.
 - [ ] ➖ **L-22** Si existe un desinstalador oficial, se ofrece.
