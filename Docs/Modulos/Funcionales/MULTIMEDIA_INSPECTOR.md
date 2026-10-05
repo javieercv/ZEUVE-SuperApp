@@ -1,10 +1,10 @@
-# Inspector multimedia 0.7.4 — ZEUVE 0.20.6.0
+# Inspector multimedia 0.7.5 — ZEUVE 0.20.7.0
 
 ## Identidad y alcance
 
 - ID: `com.zeuve.multimedia-inspector`.
 - Target: `MultimediaInspectorModule`.
-- Versión: `0.7.4`.
+- Versión: `0.7.5`.
 - ZEUVE mínimo: `0.13.0`.
 - Categoría: Multimedia.
 - Atajo por defecto: ⌘6.
@@ -105,6 +105,8 @@ El flujo OCR:
 
 El OCR no reemplaza automáticamente la pista original. El texto reconocido no debe entrar en logs ni en el historial global, y los informes solo contienen resúmenes no sensibles.
 
+La extracción fija una base de timestamps de un microsegundo y acota el final a la duración conocida. Las imágenes transparentes cierran eventos; los frames retenidos con el mismo texto se fusionan. Un bitmap visible sin texto reconocido sigue disponible para revisión. SRT omite eventos vacíos o con tiempos no finitos/invertidos.
+
 PGS es la ruta principal prevista; VobSub depende de la capacidad real del FFmpeg empaquetado y del material inspeccionado.
 
 ## Modo edición estructural
@@ -137,7 +139,9 @@ Existe un conjunto seguro de tags editables globales/por stream. Tags desconocid
 
 Los streams `codec_type=attachment` se gestionan como attachments reales: conservar, retirar, añadir externos compatibles y extraer de forma segura. `attached_pic` se trata como carátula/stream de vídeo especial, no como attachment genérico.
 
-La compatibilidad se calcula sobre las carátulas del borrador efectivo, incluidas sus retiradas. MP4 admite JPEG/PNG como `attached_pic`, pero no el título de la carátula: las nuevas carátulas usan título vacío y la UI explica esa limitación; un título no representable solicitado se rechaza antes de ejecutar. Una carátula MKV existente se copia a un temporal propio y se vuelve a incorporar como imagen adjunta con filename/MIME, sin remapearla como vídeo ordinario ni recodificarla.
+MOV conserva el contenedor QuickTime y los paquetes audiovisuales: FFmpeg genera el temporal propio y `QuickTimeArtworkWriter` añade la imagen como `covr` en el `moov` final, antes de FFprobe, la validación y la publicación. El escritor limita memoria, verifica propiedad y estructura de átomos y rechaza estructuras no seguras; no modifica el archivo original. Conservar, añadir, sustituir y retirar la portada usan esa misma validación.
+
+La compatibilidad se calcula sobre las carátulas del borrador efectivo, incluidas sus retiradas. MP4 y MOV admiten JPEG/PNG como carátula, pero no su título: las nuevas carátulas usan título vacío y la UI explica esa limitación; un título no representable solicitado se rechaza antes de ejecutar. Una carátula MKV existente se copia a un temporal propio y se vuelve a incorporar como imagen adjunta con filename/MIME, sin remapearla como vídeo ordinario ni recodificarla.
 
 `MultimediaArtworkService` aplica la política apropiada por contenedor para visualizar, extraer, añadir, sustituir o eliminar carátulas cuando sea compatible. Los archivos externos se validan y fingerprintan.
 
@@ -169,6 +173,8 @@ Hay dos familias de trabajo:
 
 - análisis/exportación secuencial (inspección, señal, sonoridad, espectrograma, informe según preset);
 - edición estructural por reglas condición → acción, con análisis, plan individual, preflight, revisión y ejecución segura.
+
+Cada elemento del preflight ofrece **Revisar plan** con la inspección original y el plan efectivo: pistas conservadas/añadidas/retiradas, valores antes → después, capítulos, adjuntos, portada, avisos y errores. La vista individual usa la misma representación; una pista retirada aparece solo como retirada. La revisión no ejecuta ni publica. Un preflight nuevo invalida el detalle anterior.
 
 El lote ofrece **Cancelar preflight**. La tarea estructural cancelada se espera al cerrar; los resultados de revisiones obsoletas no se publican. El preflight estructural reserva `OperationCoordinator` antes de inspeccionar. Si otra operación está activa propaga `.busy` y no continúa sin registro. La cancelación de la tarea o la cancelación global detienen FFprobe, y el coordinador queda liberado de forma esperada antes de devolver el resultado o el error. Los fallos normales de un archivo siguen representándose en su elemento sin alterar los resultados de los demás.
 

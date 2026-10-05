@@ -32,7 +32,7 @@ for snippet in required_package:
 for key, expected in {
     "identifier": "com.zeuve.multimedia-inspector",
     "name": "Inspector multimedia",
-    "version": "0.7.4",
+    "version": "0.7.5",
     "minimumZEUVEVersion": "0.13.0",
     "executionMode": "builtIn",
 }.items():
@@ -815,4 +815,4 @@ for path, snippets in {
         if snippet not in source:
             raise SystemExit(f"Falta cierre 0.19 del Inspector en {path}: {snippet}")
 
-print("Inspector multimedia 0.7.4: transporte multimedia, respuesta interactiva, fullscreen, cancelación, análisis espectral, edición, lotes, OCR, privacidad y ayuda verificados.")
+print("Inspector multimedia 0.7.5: transporte multimedia, respuesta interactiva, fullscreen, cancelación, análisis espectral, edición, lotes, OCR, privacidad y ayuda verificados.")

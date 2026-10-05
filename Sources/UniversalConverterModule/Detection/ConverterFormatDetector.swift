@@ -250,7 +250,12 @@ public struct ConverterFormatDetector: Sendable {
     private func starts(_ bytes: [UInt8], _ prefix: [UInt8]) -> Bool {
         bytes.count >= prefix.count && Array(bytes.prefix(prefix.count)) == prefix
     }
-    private func isMPEGAudioFrame(_ bytes: [UInt8]) -> Bool { bytes.count >= 2 && bytes[0] == 0xFF && (bytes[1] & 0xE0) == 0xE0 }
+    private func isMPEGAudioFrame(_ bytes: [UInt8]) -> Bool {
+        // ADTS comparte el sync word, pero usa layer 00, reservado en MPEG audio.
+        guard bytes.count >= 4, bytes[0] == 0xFF, (bytes[1] & 0xE0) == 0xE0 else { return false }
+        return (bytes[1] & 0x18) != 0x08 && (bytes[1] & 0x06) != 0
+            && (bytes[2] & 0xF0) != 0xF0 && (bytes[2] & 0x0C) != 0x0C
+    }
     private func isAACFrame(_ bytes: [UInt8]) -> Bool { bytes.count >= 2 && bytes[0] == 0xFF && (bytes[1] & 0xF6) == 0xF0 }
     private func looksLikeCSV(_ text: String) -> Bool {
         let lines = text.split(whereSeparator: \.isNewline).prefix(6)

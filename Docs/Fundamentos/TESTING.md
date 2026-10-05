@@ -1,18 +1,17 @@
-# Pruebas y validación — ZEUVE 0.20.6.0
+# Pruebas y validación — ZEUVE 0.20.7.0
 
-La evidencia de las correcciones está en [TEST_RESULTS_0.20.6.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.6.0.md). La [revalidación manual de 04/10/2026](../Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) completa desde UI los 22 IDs corregidos sobre una copia interna de Release con datos aislados. Checklist acumulada: 590 OK, 1 fallo del Descargador excluido, 14 parciales y 34 pendientes. Los límites de reproducción AV1, sincronía acústica y cobertura restante figuran en ese informe.
+La evidencia técnica de los parciales corregidos está en [TEST_RESULTS_0.20.7.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.7.0.md). Los nueve IDs locales pasan su [aceptación desde UI](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md); las pruebas de servicio complementan ese recorrido. La [revalidación manual de 04/10/2026](../Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) conserva los 22 IDs comprobados en la entrega anterior. Checklist acumulada: 599 OK, 1 fallo del Descargador excluido, 5 parciales y 34 pendientes. I-29/I-35 mantienen su requisito acústico y P-12 su cobertura remota excluida.
 
 ## Evidencia de la entrega actual
 
-La evidencia histórica específica está en:
+La entrega actual conserva sus resultados en:
 
-- `Docs/Historico/Pruebas/TEST_RESULTS_0.20.5.0.md`
-- `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.5.0.md`
-- `Docs/Historico/Entregas/DELIVERY_0.20.5.0.md`
+- `Docs/Historico/Pruebas/TEST_RESULTS_0.20.7.0.md`
+- `Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md`
+- `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.7.0.md`
+- `Docs/Historico/Entregas/DELIVERY_0.20.7.0.md`
 
-Esos archivos reflejan la ejecución realizada para esa entrega y no deben interpretarse como una prueba recién repetida después de cambios posteriores.
-
-Para 0.20.5.0 constan 34 pruebas dirigidas del Limpiador y 5 regresiones específicas del preflight estructural. La evidencia de entrega registra por separado SwiftPM, tests, parseo, builds reales Debug/Release y verificación de la app. La rama portable de Spotlight queda cubierta por el mismo test contractual, aunque su ejecución no puede observarse en macOS.
+Esos archivos distinguen regresiones automáticas, integración con motores reales, builds, firma local y aceptación manual. Los informes anteriores conservan su evidencia, sin interpretarse como pruebas recién repetidas después de cambios posteriores.
 
 ## Comandos base
 

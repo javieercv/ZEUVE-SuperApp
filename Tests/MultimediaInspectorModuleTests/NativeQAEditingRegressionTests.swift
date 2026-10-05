@@ -57,3 +57,55 @@ func nativeQAEditingPreservesStructureAndOriginals(_ scenario: String) async thr
         #expect(copies[0] == copies[1])
     }
 }
+
+@Test(.enabled(if: nativeQAEnvironment["ZEUVE_QA_FIXTURES"] != nil && nativeQAEnvironment["ZEUVE_QA_ENGINES"] != nil))
+func nativeQuickTimeArtworkAddReplaceKeepRemovePreservesPackets() async throws {
+    let fixtures = URL(fileURLWithPath: try #require(nativeQAEnvironment["ZEUVE_QA_FIXTURES"]))
+    let registry = try EngineRegistry(resourceRoot: URL(fileURLWithPath: try #require(nativeQAEnvironment["ZEUVE_QA_ENGINES"])))
+    let root = URL(fileURLWithPath: nativeQAEnvironment["ZEUVE_QA_OUTPUTS"] ?? FileManager.default.temporaryDirectory.path).appendingPathComponent("zeuve-native-mov-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    let ffprobe = try registry.executableURL(named: "ffprobe"), ffmpeg = try registry.executableURL(named: "ffmpeg")
+    let coordinator = OperationCoordinator()
+    let service = MultimediaEditService(coordinator: coordinator, engineRegistry: registry, history: .init(repository: nil))
+    var source = fixtures.appendingPathComponent("I134_base.mov")
+    for action in ["add-jpeg", "replace-png", "keep", "remove"] {
+        let original = try Data(contentsOf: source)
+        let inspection = try await MediaInspectionService().inspect(url: source, ffprobe: ffprobe, useCache: false)
+        var draft = try MediaEditDraft(originalURL: source, originalFingerprint: .read(from: source), inspection: inspection, container: .mov)
+        let image = fixtures.appendingPathComponent(action == "add-jpeg" ? "I128_cover_A.jpg" : "I131_cover_B.png")
+        if action == "add-jpeg" || action == "replace-png" {
+            draft.artworks = [.init(source: .external(url: image, fingerprint: try .read(from: image), streamIndex: 0), codec: action == "add-jpeg" ? "mjpeg" : "png")]
+        } else if action == "remove" { draft.artworks.removeAll() }
+        else { draft.metadata.setContainerValue("Portada conservada", for: "title") }
+        let plan = try MediaEditPlanner().plan(from: draft)
+        let result = try await service.execute(plan: plan, originalInspection: inspection, proposedOutput: root.appendingPathComponent("\(action).mov"))
+        #expect(await coordinator.current() == nil)
+        #expect(try Data(contentsOf: source) == original)
+        #expect(result.inspection.streams.filter(\.isAttachedPicture).count == (action == "remove" ? 0 : 1))
+        let probeData = LockedDataCollector(maximumBytes: 16 * 1024 * 1024)
+        let probe = try await ExternalProcessRunner().run(.init(executable: ffprobe, arguments: ["-v", "error", "-show_entries", "format_tags=major_brand,compatible_brands", "-of", "json", result.outputURL.path]), onStdout: { probeData.append($0) })
+        #expect(probe.succeeded)
+        let json = try #require(JSONSerialization.jsonObject(with: probeData.data) as? [String: Any])
+        let tags = try #require((json["format"] as? [String: Any])?["tags"] as? [String: String])
+        #expect(tags["major_brand"] == "qt  " && tags["compatible_brands"] == "qt  ")
+        for kind in ["v:0", "a:0"] {
+            var hashes: [[String]] = []
+            for media in [source, result.outputURL] {
+                let packetData = LockedDataCollector(maximumBytes: 16 * 1024 * 1024)
+                let packets = try await ExternalProcessRunner().run(.init(executable: ffprobe, arguments: ["-v", "error", "-select_streams", kind, "-show_packets", "-show_data_hash", "sha256", "-show_entries", "packet=data_hash", "-of", "json", media.path]), onStdout: { packetData.append($0) })
+                #expect(packets.succeeded)
+                let object = try #require(JSONSerialization.jsonObject(with: packetData.data) as? [String: Any])
+                hashes.append(try #require(object["packets"] as? [[String: Any]]).compactMap { $0["data_hash"] as? String })
+            }
+            #expect(!hashes[0].isEmpty && hashes[0] == hashes[1])
+        }
+        if action != "remove" {
+            let extracted = root.appendingPathComponent("\(action)-cover.\(action == "add-jpeg" ? "jpg" : "png")")
+            let index = try #require(result.inspection.attachedPictureStream?.index)
+            let extraction = try await ExternalProcessRunner().run(.init(executable: ffmpeg, arguments: ["-v", "error", "-nostdin", "-y", "-i", result.outputURL.path, "-map", "0:\(index)", "-frames:v", "1", "-c:v", "copy", "-f", "image2", "-update", "1", extracted.path]))
+            #expect(extraction.succeeded)
+            #expect(try Data(contentsOf: extracted) == Data(contentsOf: image))
+        }
+        source = result.outputURL
+    }
+}

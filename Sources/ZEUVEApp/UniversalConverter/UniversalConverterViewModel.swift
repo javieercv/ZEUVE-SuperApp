@@ -56,6 +56,7 @@ final class UniversalConverterViewModel: ObservableObject {
     private var archivePasswordTask: Task<Void, Never>?
     private var sourceURLs: [URL] = []
     private var planRevision: UInt64 = 0
+    private var appliedRecipeOptions: ConverterOperationOptions?
     private static let settingsKey = "universalConverter.defaults.v4"
     private static let legacySettingsV3Key = "universalConverter.defaults.v3"
     private static let legacySettingsV2Key = "universalConverter.defaults.v2"
@@ -319,12 +320,17 @@ final class UniversalConverterViewModel: ObservableObject {
     }
 
     func operationChanged() {
+        if options == appliedRecipeOptions { schedulePlan(); return }
+        appliedRecipeOptions = nil
         selectedPresetID = nil
+        selectedFavoriteID = nil
         synchronizeOperation()
         schedulePlan()
     }
 
     func optionsChanged(markQualityAsCustom: Bool = true) {
+        if options == appliedRecipeOptions { schedulePlan(); return }
+        appliedRecipeOptions = nil
         if markQualityAsCustom { options.quality = .custom }
         options.normalize()
         selectedPresetID = nil
@@ -333,6 +339,8 @@ final class UniversalConverterViewModel: ObservableObject {
     }
 
     func qualityChanged() {
+        if options == appliedRecipeOptions { schedulePlan(); return }
+        appliedRecipeOptions = nil
         selectedPresetID = nil
         selectedFavoriteID = nil
         options.normalize()
@@ -350,6 +358,8 @@ final class UniversalConverterViewModel: ObservableObject {
     }
 
     func applyPreset(_ id: UUID?) {
+        selectedFavoriteID = nil
+        appliedRecipeOptions = nil
         selectedPresetID = id
         guard let id, let preset = presets.first(where: { $0.id == id }) else { return }
         options = preset.options
@@ -360,6 +370,7 @@ final class UniversalConverterViewModel: ObservableObject {
         if options.operation != requestedOperation || options.targetFormat != requestedTarget {
             selectedPresetID = nil
         }
+        appliedRecipeOptions = options
         schedulePlan(delayNanoseconds: 0)
     }
 
@@ -623,10 +634,12 @@ extension UniversalConverterViewModel {
         )
         favorites.append(favorite)
         selectedFavoriteID = favorite.id
+        appliedRecipeOptions = options
         persistFavorites()
     }
 
     func applyFavorite(_ id: UUID?) {
+        appliedRecipeOptions = nil
         selectedFavoriteID = id
         guard let id, let favorite = favorites.first(where: { $0.id == id }) else { return }
         options = favorite.options
@@ -635,6 +648,11 @@ extension UniversalConverterViewModel {
             setOutputFolder(folder, persistBookmark: defaultSettings.rememberOutputFolder)
         }
         synchronizeOperation()
+        if options.operation != favorite.options.operation || options.targetFormat != favorite.options.targetFormat {
+            selectedFavoriteID = nil
+            selectedPresetID = nil
+        }
+        appliedRecipeOptions = options
         schedulePlan(delayNanoseconds: 0)
     }
 

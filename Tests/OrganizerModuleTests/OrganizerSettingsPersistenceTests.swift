@@ -15,7 +15,8 @@ final class OrganizerSettingsPersistenceTests: XCTestCase {
             organizationLevel: .simple,
             keepRelated: false,
             conflictPolicy: .skip,
-            includeHidden: false
+            includeHidden: false,
+            customRules: ["xyz": .init(category: "Modelos", formatFolder: "XYZ")]
         )
         let operation = OrganizerOptions(
             recursive: false,

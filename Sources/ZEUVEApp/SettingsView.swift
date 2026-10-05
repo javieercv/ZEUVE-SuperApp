@@ -203,6 +203,9 @@ struct OrganizerModuleSettingsView: View {
     @ObservedObject var model: OrganizerViewModel
     @State private var confirmRestore = false
     @State private var confirmForgetFolders = false
+    @State private var ruleExtension = ""
+    @State private var ruleCategory = ""
+    @State private var ruleFormat = ""
 
     var body: some View {
         Form {
@@ -247,6 +250,31 @@ struct OrganizerModuleSettingsView: View {
                 }
             } footer: {
                 Text("Se aplicarán al comenzar nuevas operaciones. No cambian automáticamente una vista previa o una operación ya preparada.")
+            }
+
+            Section {
+                ForEach(model.defaultOptions.customRules.keys.sorted(), id: \.self) { name in
+                    if let rule = model.defaultOptions.customRules[name] {
+                        HStack {
+                            Text(".\(name) → \(rule.category)/\(rule.formatFolder)")
+                            Spacer()
+                            Button("Editar") { ruleExtension = name; ruleCategory = rule.category; ruleFormat = rule.formatFolder }
+                            Button("Eliminar", role: .destructive) { model.removeCustomRule(name) }
+                        }
+                    }
+                }
+                TextField("Extensión (por ejemplo jpg)", text: $ruleExtension)
+                TextField("Carpeta de categoría", text: $ruleCategory)
+                TextField("Carpeta de formato", text: $ruleFormat)
+                Button(model.defaultOptions.customRules[ruleExtension.lowercased()] == nil ? "Añadir regla" : "Guardar regla") {
+                    if model.saveCustomRule(extensionName: ruleExtension, category: ruleCategory, formatFolder: ruleFormat) {
+                        ruleExtension = ""; ruleCategory = ""; ruleFormat = ""
+                    }
+                }.disabled(ruleExtension.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            } header: {
+                Text("Reglas personalizadas por extensión")
+            } footer: {
+                Text("Una regla sustituye la clasificación de esa extensión. En modo Simple se usa la categoría; en Detallado también la carpeta de formato. Se aplica a nuevas operaciones o al pulsar Aplicar estos valores.")
             }
 
             Section("Operación actual") {

@@ -1,5 +1,13 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.7.0 — 2026-10-05
+
+- Organizador: editor de reglas por extensión en Ajustes con validación de componentes de destino.
+- Conversor: AAC/ADTS deja de confundirse con MP3; favoritos y presets permanecen aplicados hasta una edición real.
+- Inspector: OCR bitmap conserva tiempos reales y elimina duplicados de retención/borrado; revisión efectiva antes/después individual y por archivo en lotes.
+- Portadas MOV JPEG/PNG conservadas como metadata QuickTime, con originales y paquetes audiovisuales protegidos.
+- Marketing 0.20.7, build 73; Organizador 0.1.5, Conversor 0.3.2, Inspector 0.7.5. Descargador excluido del encargo.
+
 ## 0.20.6.0 — 2026-10-04
 
 - Ajustes: el reset global conserva presets personalizados, reglas y favoritos del Inspector.

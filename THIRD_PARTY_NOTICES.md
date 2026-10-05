@@ -2,7 +2,7 @@
 
 Este documento reúne los avisos y referencias de licencia del software de terceros que ZEUVE puede incluir o utilizar en su distribución actual.
 
-**Estado documental:** ZEUVE 0.20.6.0.
+**Estado documental:** ZEUVE 0.20.7.0.
 
 > La fuente técnica de verdad sobre los motores empaquetables es [`Resources/Engines/engines.json`](Resources/Engines/engines.json). Los textos legales completos se conservan en [`Resources/Engines/licenses/`](Resources/Engines/licenses/). Este archivo sirve como índice y aviso consolidado; no sustituye los textos de licencia originales.
 

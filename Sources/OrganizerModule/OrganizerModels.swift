@@ -230,6 +230,7 @@ public enum OrganizerError: LocalizedError, Equatable {
     case noHistoryRecord
     case undoUnavailable
     case invalidManifest
+    case invalidCustomRule(String)
 
     public var errorDescription: String? {
         switch self {
@@ -242,6 +243,7 @@ public enum OrganizerError: LocalizedError, Equatable {
         case .noHistoryRecord: return "No se encuentra la operación en el historial."
         case .undoUnavailable: return "Esta operación ya no se puede deshacer."
         case .invalidManifest: return "No se ha podido cargar el manifiesto del organizador."
+        case .invalidCustomRule(let detail): return "La regla personalizada no es válida: \(detail)."
         }
     }
 }

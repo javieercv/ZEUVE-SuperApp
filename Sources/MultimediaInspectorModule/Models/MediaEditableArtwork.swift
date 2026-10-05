@@ -33,7 +33,6 @@ public struct MediaArtworkCompatibility: Sendable {
     public init() {}
     public func canPreserve(_ artwork: MediaEditableArtwork, in container: EditableMediaContainer) -> Bool {
         if container == .mkv { return ["mjpeg", "jpeg", "png"].contains(artwork.codec) }
-        if container == .mov, case .original = artwork.source { return ["mjpeg", "jpeg"].contains(artwork.codec) }
         return canAdd(artwork, to: container)
     }
 

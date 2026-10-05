@@ -2,7 +2,7 @@
 
 ## Estado
 
-`OrganizerModule` 0.1.4 forma parte de ZEUVE como módulo built-in para macOS. Su identificador estable es `com.zeuve.organizer`, su versión mínima de ZEUVE es `0.1.0`, pertenece a la categoría visible **Archivos** y su atajo de fábrica es `⌘1`. El usuario puede personalizar o desactivar ese atajo desde la navegación central.
+`OrganizerModule` 0.1.5 forma parte de ZEUVE como módulo built-in para macOS. Su identificador estable es `com.zeuve.organizer`, su versión mínima de ZEUVE es `0.1.0`, pertenece a la categoría visible **Archivos** y su atajo de fábrica es `⌘1`. El usuario puede personalizar o desactivar ese atajo desde la navegación central.
 
 El módulo trabaja sobre una carpeta elegida explícitamente por el usuario. Genera primero una vista previa completa y solo mueve los elementos seleccionados después de una confirmación.
 
@@ -52,6 +52,12 @@ La vista principal permite:
 - deshacer una organización válida desde el resultado o el historial.
 
 Las preferencias persistentes del módulo se administran desde los Ajustes centralizados de ZEUVE mediante `SettingsRepository` y `OrganizerStorageKeys`. Las opciones de la operación actual permanecen en la herramienta. También se recuerda la última carpeta y hasta cinco carpetas recientes.
+
+## Reglas personalizadas por extensión
+
+Ajustes → Organizador permite añadir, editar y eliminar reglas con extensión, categoría y carpeta de formato. La extensión se normaliza sin punto y en minúsculas; cada carpeta es un único componente válido, sin separadores, controles ni `..`. El plan revalida también las reglas persistidas antes de analizar.
+
+Las reglas sobrescriben la clasificación de esa extensión. Simple utiliza la categoría y Detallado añade la carpeta de formato. Se guardan en los defaults existentes de `SettingsRepository`: afectan a nuevas operaciones y pueden aplicarse expresamente a la actual desde Ajustes. Los destinos con enlaces simbólicos se rechazan durante el preflight y se revalidan antes de cada movimiento para evitar salir de la carpeta elegida. Editar una regla no mueve archivos; la vista previa, selección, confirmación y Undo mantienen sus protecciones.
 
 ## Niveles de organización
 

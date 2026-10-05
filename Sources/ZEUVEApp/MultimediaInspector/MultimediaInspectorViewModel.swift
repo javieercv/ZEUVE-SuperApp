@@ -880,6 +880,10 @@ final class MultimediaInspectorViewModel: ObservableObject {
         }
     }
 
+    var artworkTitleUnsupported: Bool {
+        currentDraft?.targetContainer == .mp4 || currentDraft?.targetContainer == .mov
+    }
+
     func chooseArtwork() {
         guard isEditing else { return }
         let panel = NSOpenPanel(); panel.title = editableArtworks.isEmpty ? "Añadir carátula" : "Sustituir carátula"; panel.prompt = "Usar"
@@ -897,7 +901,7 @@ final class MultimediaInspectorViewModel: ObservableObject {
                 guard let locator = self.locator else { throw MultimediaInspectorError.ffprobeUnavailable }
                 let probe = try await self.inspector.inspect(url: url, ffprobe: try await locator.ffprobe(), fingerprint: fp, useCache: false)
                 guard let stream = probe.streams.first(where: { $0.codec_type == "video" }), let index = stream.index else { throw MultimediaInspectorError.invalidInput }
-                let artwork = MediaEditableArtwork(source: .external(url: url, fingerprint: fp, streamIndex: index), codec: stream.codec_name ?? url.pathExtension, title: self.currentDraft?.targetContainer == .mp4 ? "" : url.deletingPathExtension().lastPathComponent)
+                let artwork = MediaEditableArtwork(source: .external(url: url, fingerprint: fp, streamIndex: index), codec: stream.codec_name ?? url.pathExtension, title: self.artworkTitleUnsupported ? "" : url.deletingPathExtension().lastPathComponent)
                 self.mutate { $0.artworks = [artwork] }
                 self.artworkPreviewData = (values.fileSize ?? Int.max) <= 32 * 1024 * 1024 ? (try? Data(contentsOf: url, options: [.mappedIfSafe])) : nil
             } catch { self.errorMessage = Self.clean(error) }

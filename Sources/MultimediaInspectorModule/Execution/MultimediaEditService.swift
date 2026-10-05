@@ -68,17 +68,24 @@ public actor MultimediaEditService {
                 chapterMetadataURL = nil
             }
             var artworkCopies: [UUID: URL] = [:]
-            if plan.targetContainer == .mkv {
+            if plan.targetContainer == .mkv || plan.targetContainer == .mov {
                 for item in plan.artworks {
                     try Task.checkCancellation()
                     guard !((await coordinator.shouldCancel(id: operationID))) else { throw MultimediaInspectorError.cancelled }
-                    guard case .original(let streamIndex) = item.artwork.source else {
-                        throw MultimediaInspectorError.incompatibleContainer("no se ha autorizado añadir carátulas nuevas a MKV")
+                    let source: URL
+                    let streamIndex: Int
+                    switch item.artwork.source {
+                    case .original(let index): source = plan.originalURL; streamIndex = index
+                    case .external(let url, _, let index):
+                        guard plan.targetContainer == .mov else {
+                            throw MultimediaInspectorError.incompatibleContainer("no se ha autorizado añadir carátulas nuevas a MKV")
+                        }
+                        source = url; streamIndex = index
                     }
                     let ext = item.artwork.codec == "png" ? "png" : "jpg"
                     let image = workspace.auxiliaryFile(named: "cover-\(item.id.uuidString).\(ext)")
                     let extracted = try await runner.run(.init(executable: paths.ffmpeg, arguments: [
-                        "-hide_banner", "-nostdin", "-y", "-i", plan.originalURL.path,
+                        "-hide_banner", "-nostdin", "-y", "-i", source.path,
                         "-map", "0:\(streamIndex)", "-frames:v", "1", "-c:v", "copy", "-f", "image2", "-update", "1", image.path
                     ]))
                     guard extracted.succeeded, (try image.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])).isRegularFile == true,
@@ -97,6 +104,10 @@ public actor MultimediaEditService {
             let result = try await runner.run(command.request)
             if await coordinator.shouldCancel(id: operationID) { throw MultimediaInspectorError.cancelled }
             guard result.exitCode == 0 else { throw MultimediaInspectorError.processFailed }
+            if plan.targetContainer == .mov, let artwork = plan.artworks.first {
+                guard let image = artworkCopies[artwork.id] else { throw MultimediaInspectorError.invalidOutput("falta la copia temporal de la carátula MOV") }
+                try QuickTimeArtworkWriter().write(image: image, codec: artwork.artwork.codec, workspace: workspace)
+            }
             try verifyInputsUnchanged(plan)
             try await coordinator.update(id: operationID, progress: .init(completed: 8, total: 10, phase: "Validando resultado"))
             let inspected = try await validator.validate(url: workspace.output, plan: plan, original: originalInspection, ffprobe: paths.ffprobe)

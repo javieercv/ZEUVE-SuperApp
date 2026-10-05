@@ -127,4 +127,22 @@ final class OrganizerPlannerTests: OrganizerTestCase {
         XCTAssertTrue(relativeDestinations(plan).contains("Modelos 3D/XYZ/modelo.xyz"))
         XCTAssertEqual(plan.summary().files, 1201)
     }
+
+    func testCustomRuleNormalizationAndSimpleDetailedDestinations() throws {
+        let (ext, rule) = try OrganizerExtensionRules.normalizedRule(extension: " .XYZ ", category: " Modelos 3D ", formatFolder: " XYZ ")
+        XCTAssertEqual(ext, "xyz")
+        try write("modelo.xyz")
+        for level in [OrganizationLevel.simple, .detailed] {
+            let plan = try OrganizerPlanner().buildPlan(folder: root, options: .init(organizationLevel: level, customRules: [ext: rule]))
+            XCTAssertEqual(relativeDestinations(plan), [level == .simple ? "Modelos 3D/modelo.xyz" : "Modelos 3D/XYZ/modelo.xyz"])
+        }
+    }
+
+    func testUnsafeCustomRuleFailsBeforePlanningOrMovingOriginal() throws {
+        let source = try write("modelo.xyz", contents: "original")
+        for unsafe in ["../fuera", "..", "a/b", "a\\b", "a:b", "a\nb"] {
+            XCTAssertThrowsError(try OrganizerPlanner().buildPlan(folder: root, options: .init(customRules: ["xyz": .init(category: unsafe, formatFolder: "XYZ")])))
+            XCTAssertEqual(try String(contentsOf: source, encoding: .utf8), "original")
+        }
+    }
 }

@@ -1,6 +1,6 @@
 # Documentación de ZEUVE
 
-Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.6.0— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
+Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.7.0— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
 
 Si una afirmación histórica contradice una fuente vigente o el código actual, no se reescribe el histórico: se usa la fuente vigente y se corrige cualquier documentación viva desactualizada.
 
@@ -65,11 +65,18 @@ Compatibilidad histórica del antiguo módulo YouTube: [documento legacy](Modulo
 
 La instantánea empaquetable concreta se define en `../Resources/Engines/engines.json`.
 
+## Entrega actual — 0.20.7.0
+
+- [Implementación de parciales](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.7.0.md).
+- [Verificación técnica](Historico/Pruebas/TEST_RESULTS_0.20.7.0.md).
+- [QA manual 0.20.7.0 — 05/10/2026](Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md): nueve parciales locales aceptados desde UI.
+- [Entrega](Historico/Entregas/DELIVERY_0.20.7.0.md).
+
 ## Histórico
 
 `Historico/` conserva lo que se entregó, implementó o probó en cada versión. No se actualiza para hacerlo coincidir con el presente y no debe usarse como especificación vigente cuando exista una fuente equivalente en `Fundamentos/`, `Modulos/` o `Motores/`.
 
-Evidencia de la entrega actual: [implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.6.0.md), [pruebas](Historico/Pruebas/TEST_RESULTS_0.20.6.0.md), [entrega](Historico/Entregas/DELIVERY_0.20.6.0.md) y [revalidación manual de los 22 IDs corregidos](Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md).
+Evidencia de la entrega anterior 0.20.6.0: [implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.6.0.md), [pruebas](Historico/Pruebas/TEST_RESULTS_0.20.6.0.md), [entrega](Historico/Entregas/DELIVERY_0.20.6.0.md) y [revalidación manual de los 22 IDs corregidos](Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md).
 
 - [`Historico/Entregas/`](Historico/Entregas/): notas de entrega.
 - [`Historico/Implementacion/`](Historico/Implementacion/): informes de implementación.

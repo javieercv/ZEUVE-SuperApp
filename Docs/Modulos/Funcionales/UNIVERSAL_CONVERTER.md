@@ -1,9 +1,9 @@
-# Conversor universal 0.3.1 — ZEUVE 0.20.6.0
+# Conversor universal 0.3.2 — ZEUVE 0.20.7.0
 
 ## Identidad
 
 - Identificador: `com.zeuve.universal-converter`.
-- Versión del módulo: `0.3.1`.
+- Versión del módulo: `0.3.2`.
 - ZEUVE mínimo declarado: `0.7.0`.
 - Funcionamiento local; no declara acceso de red.
 
@@ -107,3 +107,9 @@ Desde ZEUVE 0.13.0, el Conversor universal ya no mantiene un parser FFprobe prop
 La migración es deliberadamente no funcional: no cambia la interfaz del Conversor, sus formatos admitidos, códecs, presets, valores por defecto, planner, decisiones de remux/recodificación, publicación, historial, privacidad ni cancelación. El antiguo `MediaProbe.swift` se elimina únicamente después de migrar sus consumidores; las utilidades generales que no pertenecían a FFprobe permanecen separadas para conservar el comportamiento existente.
 
 `MediaInspectionService` se limita a ejecutar FFprobe de forma segura y a transformar su JSON en un modelo técnico común. No conoce presets, UI ni decisiones de conversión. El Conversor sigue siendo el único responsable de decidir cuándo una operación requiere transformación audiovisual.
+
+## Detección AAC y aplicación de recetas
+
+La firma ADTS de AAC se distingue de una trama MPEG por sus bits de capa y cabecera. AAC generado puede reimportarse y planificarse como AAC aunque la extensión sea engañosa; M4A continúa siendo el contenedor de audio correspondiente.
+
+Aplicar un favorito o preset conserva su selección y calidad cuando SwiftUI notifica los cambios programáticos de esa misma receta. Una modificación real de opciones invalida la selección; si la operación o destino guardado no es compatible con la entrada actual, se muestra la configuración compatible sin mantener el favorito como aplicado. No cambia el formato persistido de recetas ni la gestión de favoritos.

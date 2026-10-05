@@ -97,6 +97,55 @@ __METHODS__
 '''.replace('__METHODS__', methods).replace('            precondition(!(await model.execution.busy))', '            let busy = await model.execution.busy\n            precondition(!busy)')
         self.compile_and_run(harness)
 
+    def test_applied_converter_recipe_survives_swiftui_callbacks_until_real_edit(self):
+        path = 'Sources/ZEUVEApp/UniversalConverter/UniversalConverterViewModel.swift'
+        methods = '\n'.join(production_method(path, signature) for signature in [
+            '    func operationChanged()', '    func optionsChanged(', '    func qualityChanged()',
+            '    func applyPreset(', '    func applyFavorite('
+        ])
+        self.compile_and_run(r"""
+import Foundation
+enum Quality { case balanced, custom }
+struct Options: Equatable {
+    var operation = "audio", targetFormat = "flac", quality = Quality.balanced
+    var audioVideoImageURL: URL?
+    mutating func normalize() {}
+}
+struct Recipe { let id: UUID; let options: Options; var presetID: UUID?; var outputFolder: URL? }
+enum ConverterOutputBookmarkStore { static func validate(_ folder: URL) throws {} }
+@MainActor final class Harness {
+    var options = Options(), appliedRecipeOptions: Options?
+    var selectedFavoriteID: UUID?, selectedPresetID: UUID?
+    var presets: [Recipe] = [], favorites: [Recipe] = []
+    var defaultSettings = (rememberOutputFolder: false, other: false)
+    var allowed = true
+    func synchronizeOperation() { if !allowed { options.targetFormat = "wav" } }
+    func schedulePlan(delayNanoseconds: UInt64 = 1) {}
+    func setOutputFolder(_ url: URL, persistBookmark: Bool) {}
+__METHODS__
+}
+@main struct Regression {
+    @MainActor static func main() {
+        let model = Harness(), preset = UUID(), favorite = UUID()
+        model.presets = [.init(id: preset, options: Options())]
+        model.favorites = [.init(id: favorite, options: Options(), presetID: preset)]
+        model.applyFavorite(favorite)
+        model.operationChanged(); model.optionsChanged(); model.qualityChanged()
+        precondition(model.selectedFavoriteID == favorite && model.selectedPresetID == preset)
+        precondition(model.options.quality == .balanced)
+        model.options.targetFormat = "aac"; model.optionsChanged()
+        precondition(model.selectedFavoriteID == nil && model.selectedPresetID == nil && model.options.quality == .custom)
+        model.applyFavorite(favorite); model.applyPreset(preset)
+        model.operationChanged(); model.optionsChanged(); model.qualityChanged()
+        precondition(model.selectedFavoriteID == nil && model.selectedPresetID == preset)
+        model.allowed = false; model.applyFavorite(favorite)
+        model.optionsChanged()
+        precondition(model.selectedFavoriteID == nil && model.selectedPresetID == nil && model.options.targetFormat == "wav")
+        print("PASS: favorito y preset estables; edición real y destino incompatible invalidan selección")
+    }
+}
+""".replace('__METHODS__', methods))
+
     def test_global_reset_preserves_custom_presets_rules_and_favorites(self):
         method = production_method('Sources/ZEUVEApp/MultimediaInspector/MultimediaInspectorViewModel.swift', '    func restorePersistentDefaultsForGlobalReset()')
         self.compile_and_run(r'''

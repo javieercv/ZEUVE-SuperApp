@@ -124,6 +124,26 @@ public enum OrganizerExtensionRules {
         return values
     }
 
+    public static func normalizedRule(extension rawExtension: String, category: String, formatFolder: String) throws -> (extensionName: String, rule: ExtensionRule) {
+        let name = rawExtension.trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased()
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "_-+"))
+        guard !name.isEmpty, name.count <= 64, name.unicodeScalars.allSatisfy(allowed.contains) else {
+            throw OrganizerError.invalidCustomRule("indica una extensión sin rutas, por ejemplo jpg")
+        }
+        let category = category.trimmingCharacters(in: .whitespacesAndNewlines)
+        let format = formatFolder.trimmingCharacters(in: .whitespacesAndNewlines)
+        let forbidden = CharacterSet.controlCharacters.union(CharacterSet(charactersIn: "/\\:"))
+        for (label, component) in [("categoría", category), ("formato", format)] {
+            guard !component.isEmpty else { throw OrganizerError.invalidCustomRule("indica la carpeta de \(label)") }
+            guard component != ".", component != "..", component.utf8.count <= 255,
+                  component.rangeOfCharacter(from: forbidden) == nil else {
+                throw OrganizerError.invalidCustomRule("la categoría y el formato deben ser nombres de carpeta, no rutas")
+            }
+        }
+        return (name, ExtensionRule(category: category, formatFolder: format))
+    }
+
     public static func classify(_ url: URL, custom: [String: ExtensionRule] = [:]) -> ExtensionRule {
         let extensionName = url.pathExtension.lowercased()
         guard !extensionName.isEmpty else {

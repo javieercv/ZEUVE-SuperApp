@@ -16,9 +16,11 @@ public struct MultimediaBatchPreflightItem: Sendable, Identifiable {
     public let warnings: [String]
     public let errorMessage: String?
     public let plan: MediaEditPlan?
+    public let originalInspection: MediaInspectionResult?
 
-    public init(id: UUID = UUID(), url: URL, fingerprint: FileFingerprint, classification: MultimediaBatchPreflightClassification, appliedRules: [String], warnings: [String], errorMessage: String?, plan: MediaEditPlan?) {
+    public init(id: UUID = UUID(), url: URL, fingerprint: FileFingerprint, classification: MultimediaBatchPreflightClassification, appliedRules: [String], warnings: [String], errorMessage: String?, plan: MediaEditPlan?, originalInspection: MediaInspectionResult? = nil) {
         self.id = id; self.url = url; self.fingerprint = fingerprint; self.classification = classification; self.appliedRules = appliedRules; self.warnings = warnings; self.errorMessage = errorMessage; self.plan = plan
+        self.originalInspection = originalInspection
     }
 }
 
@@ -80,7 +82,7 @@ public actor MultimediaBatchPreflightService {
                     }
                     let plan = try MediaEditPlanner(preferences: preferences).plan(from: application.draft)
                     let warnings = application.warnings + plan.warnings
-                    results.append(.init(url: file.url, fingerprint: file.fingerprint, classification: warnings.isEmpty ? .applicable : .applicableWithWarnings, appliedRules: application.appliedRuleNames, warnings: warnings, errorMessage: nil, plan: plan))
+                    results.append(.init(url: file.url, fingerprint: file.fingerprint, classification: warnings.isEmpty ? .applicable : .applicableWithWarnings, appliedRules: application.appliedRuleNames, warnings: warnings, errorMessage: nil, plan: plan, originalInspection: inspection))
                 } catch is CancellationError {
                     throw CancellationError()
                 } catch {

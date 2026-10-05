@@ -136,6 +136,23 @@ final class OrganizerViewModel: ObservableObject {
         persistDefaultOptions()
     }
 
+    func saveCustomRule(extensionName: String, category: String, formatFolder: String) -> Bool {
+        do {
+            let value = try OrganizerExtensionRules.normalizedRule(extension: extensionName, category: category, formatFolder: formatFolder)
+            defaultOptions.customRules[value.extensionName] = value.rule
+            persistDefaultOptions()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func removeCustomRule(_ extensionName: String) {
+        defaultOptions.customRules.removeValue(forKey: extensionName)
+        persistDefaultOptions()
+    }
+
     func applyDefaultOptionsToCurrentOperation() {
         guard !state.isBusy else { return }
         options = defaultOptions

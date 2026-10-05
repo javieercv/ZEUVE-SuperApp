@@ -17,7 +17,7 @@ public struct OrganizerExecutor {
     ) throws -> OrganizerExecutionResult {
         let selected = plan.selectedOperations(selectedIDs)
         let startedAt = Date()
-        try preflight(selected)
+        try preflight(selected, baseFolder: plan.baseFolder)
 
         var createdDirectories = Set<URL>()
         var completed: [OrganizerExecutionItem] = []
@@ -31,6 +31,7 @@ public struct OrganizerExecutor {
                 guard !fileManager.fileExists(atPath: operation.destination.path) else {
                     throw OrganizerError.destinationAppeared(operation.destination.lastPathComponent)
                 }
+                try validateDestination(operation.destination, baseFolder: plan.baseFolder)
 
                 try createDirectoryTree(
                     operation.destination.deletingLastPathComponent(),
@@ -74,9 +75,10 @@ public struct OrganizerExecutor {
         )
     }
 
-    private func preflight(_ operations: [OrganizerMoveOperation]) throws {
+    private func preflight(_ operations: [OrganizerMoveOperation], baseFolder: URL) throws {
         for operation in operations {
             try Task.checkCancellation()
+            try validateDestination(operation.destination, baseFolder: baseFolder)
             guard fileManager.fileExists(atPath: operation.source.path) else {
                 throw OrganizerError.planInvalidated(operation.source.lastPathComponent)
             }
@@ -87,6 +89,21 @@ public struct OrganizerExecutor {
                 throw OrganizerError.destinationAppeared(operation.destination.lastPathComponent)
             }
         }
+    }
+
+    private func validateDestination(_ destination: URL, baseFolder: URL) throws {
+        let base = baseFolder.standardizedFileURL
+        var cursor = destination.standardizedFileURL
+        guard cursor.path.hasPrefix(base.path + "/") else { throw OrganizerError.planInvalidated(destination.lastPathComponent) }
+        while true {
+            // lstat mediante resourceValues también detecta enlaces colgantes.
+            if let values = try? cursor.resourceValues(forKeys: [.isSymbolicLinkKey]), values.isSymbolicLink == true {
+                throw OrganizerError.planInvalidated(destination.lastPathComponent)
+            }
+            if cursor == base { break }
+            cursor.deleteLastPathComponent()
+        }
+        guard base.resolvingSymlinksInPath() == base else { throw OrganizerError.planInvalidated(destination.lastPathComponent) }
     }
 
     private func createDirectoryTree(_ directory: URL, baseFolder: URL, created: inout Set<URL>) throws {

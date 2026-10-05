@@ -1,20 +1,32 @@
 # Decisiones aprobadas de ZEUVE
 
-Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.6.0 el 4 de octubre de 2026.
+Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.7.0 el 5 de octubre de 2026.
 
 > **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
 
-## Estado vigente de referencia — ZEUVE 0.20.6.0
+## Estado vigente de referencia — ZEUVE 0.20.7.0
 
 Este bloque resume las decisiones actualmente efectivas que más fácilmente pueden confundirse con registros antiguos. No sustituye los detalles de cada sección ni las fuentes vivas.
 
-- Built-ins: Organizador 0.1.4, Descargador 0.7.3, Analizador de chats 0.1.6, Conversor 0.3.1, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.4 y Limpiador 0.1.4.
-- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.6.0.
+- Built-ins: Organizador 0.1.5, Descargador 0.7.3, Analizador de chats 0.1.6, Conversor 0.3.2, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.5 y Limpiador 0.1.4.
+- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.7.0.
 - Ajustes: centralizados. Orden de secciones: Organizador 10, Descargador 20, Analizador 30, Conversor 40, Inspector 50 y Limpiador 60; el Comparador no tiene sección propia.
 - Inspector: inspección + preview + análisis + edición estructural segura sin transcode audiovisual; la transformación que requiere recodificación pertenece al Conversor.
 - Limpiador: `scanLocalStorage` autoriza análisis local documentado; cualquier retirada exige `removeLocalItems`, plan visible, selección y revalidación. Papelera es el modo seguro predeterminado y Undo solo aparece cuando es verificable.
 - Motores requeridos por la instantánea actual: yt-dlp, Deno, FFmpeg, FFprobe, gallery-dl e instaloader-zeuve. Pandoc sigue soportado como opcional del Conversor cuando se prepara. Playwright no participa en la ruta efectiva actual. Calibre, Ghostscript y LibreOffice están retirados.
-- Versión: ZEUVE 0.20.6.0, marketing 0.20.6, build 72.
+- Versión: ZEUVE 0.20.7.0, marketing 0.20.7, build 73.
+
+## Corrección de parciales aprobada — 0.20.7.0
+
+El usuario solicita corregir los parciales y mantiene su autorización de ejecución. El 05/10/2026 confirma «Mantener el Descargador excluido»: D-15, D-60 y la cobertura remota de P-12 no se amplían.
+
+- Reglas del Organizador editables desde Ajustes, validadas y persistidas en el contrato existente.
+- Detección AAC/ADTS diferenciada de MP3 y selección estable al aplicar favoritos/presets.
+- OCR PGS con timestamps explícitos, cierre por borrado, fusión de frames retenidos y SRT revisado.
+- Revisión individual y por elemento de lote sobre el plan efectivo, con valores antes/después.
+- Portada JPEG/PNG en MOV QuickTime mediante metadata `covr` sobre el temporal propio, sin transcode audiovisual ni cambio de contenedor.
+- ZEUVE 0.20.7.0, marketing 0.20.7, build 73; Organizador 0.1.5, Conversor 0.3.2, Inspector 0.7.5. Sin dependencias, motores, permisos, red, esquema SQLite ni formatos persistidos nuevos.
+- Solo la aceptación comprobada transforma ⚠️ en ✅. I-29/I-35 requieren evidencia acústica; P-12 conserva el límite de cobertura remota.
 
 ## Correcciones de QA aprobadas — 0.20.6.0
 

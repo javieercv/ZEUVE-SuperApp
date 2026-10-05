@@ -3,7 +3,7 @@
   "identifier": "com.zeuve.organizer",
   "name": "Organizador de archivos",
   "summary": "Clasifica, revisa y organiza archivos de forma segura.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "minimumZEUVEVersion": "0.1.0",
   "moduleAPI": "1.0",
   "technology": "swift",

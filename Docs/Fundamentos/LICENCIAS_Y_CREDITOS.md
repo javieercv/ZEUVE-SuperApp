@@ -1,4 +1,4 @@
-# Licencias y créditos — ZEUVE 0.20.6.0
+# Licencias y créditos — ZEUVE 0.20.7.0
 
 Este documento explica cómo se separan el código propio de ZEUVE, los componentes del sistema y el software de terceros utilizado o empaquetado por el proyecto.
 

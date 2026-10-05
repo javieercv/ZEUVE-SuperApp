@@ -29,7 +29,7 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
                 }
             }
         }
-        for item in plan.artworks where plan.targetContainer != .mkv {
+        for item in plan.artworks where plan.targetContainer == .mp4 {
             if case .external(let url, _, _) = item.artwork.source {
                 let key = canonical(url)
                 if externalInputs[key] == nil { externalInputs[key] = nextInput; nextInput += 1; arguments += ["-i", url.path] }
@@ -56,7 +56,7 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
         for item in plan.videoTracks { arguments += ["-map", mapSpecifier(item.track.source, externalInputs: externalInputs)] }
         for item in plan.audioTracks { arguments += ["-map", mapSpecifier(item.track.source, externalInputs: externalInputs)] }
         for item in plan.subtitleTracks { arguments += ["-map", mapSpecifier(item.track.source, externalInputs: externalInputs)] }
-        for item in plan.artworks where plan.targetContainer != .mkv { arguments += ["-map", artworkMapSpecifier(item.artwork.source, externalInputs: externalInputs)] }
+        for item in plan.artworks where plan.targetContainer == .mp4 { arguments += ["-map", artworkMapSpecifier(item.artwork.source, externalInputs: externalInputs)] }
 
         if plan.preserveMetadata { arguments += ["-map_metadata", "0"] }
         else { arguments += ["-map_metadata", "-1"] }
@@ -77,7 +77,7 @@ public struct FFmpegMediaEditCommandBuilder: Sendable {
             arguments += ["-metadata:s:s:\(i)", "language=\(item.track.language)", "-metadata:s:s:\(i)", "title=\(item.track.title)", "-disposition:s:\(i)", dispositionValue(item.track, includeForced: true)]
         }
 
-        for (i, item) in plan.artworks.enumerated() where plan.targetContainer != .mkv {
+        for (i, item) in plan.artworks.enumerated() where plan.targetContainer == .mp4 {
             let ordinal = plan.videoTracks.count + i
             arguments += ["-disposition:v:\(ordinal)", "attached_pic"]
             if !item.artwork.title.isEmpty { arguments += ["-metadata:s:v:\(ordinal)", "title=\(item.artwork.title)"] }

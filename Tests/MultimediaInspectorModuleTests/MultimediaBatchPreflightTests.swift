@@ -134,3 +134,20 @@ private func waitForPreflightOperation(_ coordinator: OperationCoordinator) asyn
     }
     #expect(await coordinator.current() == nil)
 }
+
+@Test func multimediaBatchReviewRetainsOriginalValuesAndEffectivePlanWithoutOutput() async throws {
+    let helper = try makePreflightFFprobe()
+    defer { try? FileManager.default.removeItem(at: helper.directory) }
+    let file = try preflightFile(in: helper.directory)
+    let originalBytes = try Data(contentsOf: file.url)
+    let rule = MultimediaBatchStructuralRule(name: "FLAC español", conditions: [.init(kind: .audio, field: .codec, value: "flac")], action: .setLanguage("spa"))
+    let result = try await MultimediaBatchPreflightService().prepare(files: [file], ruleSet: .init(name: "Revisión", rules: [rule]), ffprobe: helper.executable, preferences: .defaults)
+    let item = try #require(result.first), plan = try #require(item.plan), original = try #require(item.originalInspection)
+    #expect(item.appliedRules == ["FLAC español"])
+    #expect(original.audioStreams.first?.language == nil)
+    #expect(plan.audioTracks.first?.track.language == "spa")
+    let review = MediaEditReview(plan: plan, original: original)
+    #expect(review.changes.contains { $0.field.contains("Idioma") && $0.before == "Sin indicar" && $0.after == "spa" })
+    #expect(try Data(contentsOf: file.url) == originalBytes)
+    #expect(try FileManager.default.contentsOfDirectory(atPath: helper.directory.path).sorted() == ["fake_ffprobe", "fake_ffprobe.c", "input.mkv"])
+}

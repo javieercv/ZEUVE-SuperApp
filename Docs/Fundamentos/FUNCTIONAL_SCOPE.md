@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.6.0
+# Alcance funcional vigente — ZEUVE 0.20.7.0
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 
@@ -8,7 +8,7 @@ ZEUVE integra siete módulos built-in, Inicio, Historial y Ajustes centralizados
 
 Las operaciones pesadas comparten `OperationCoordinator`; la aplicación evita ejecutar dos operaciones principales pesadas simultáneas. La privacidad, logs mínimos, protección de archivos y ejecución segura de motores son criterios transversales.
 
-## Organizador de archivos 0.1.4
+## Organizador de archivos 0.1.5
 
 - Selección/arrastre de carpetas y análisis previo.
 - Clasificación por categorías/extensiones con vista previa y selección por operación.
@@ -39,7 +39,7 @@ No elude DRM, CAPTCHA, paywalls ni controles de acceso. El navegador Playwright 
 
 No usa red ni conserva contenido privado completo en el historial global.
 
-## Conversor universal 0.3.1
+## Conversor universal 0.3.2
 
 - Conversión local de imágenes, audio, vídeo, PDF, texto y datos en las rutas documentadas.
 - FFmpeg/FFprobe para multimedia; APIs nativas cuando corresponda; Pandoc opcional para rutas compatibles cuando está preparado.
@@ -53,7 +53,7 @@ Calibre, Ghostscript y LibreOffice no forman parte del producto actual. Ebook/EP
 - Compara seguidores y seguidos localmente, tolera variantes previstas del formato y permite exportar resultados.
 - Sin red, sesión de Instagram ni scraping.
 
-## Inspector multimedia 0.7.4
+## Inspector multimedia 0.7.5
 
 - Inspección FFprobe de contenedores/streams, vídeo, audio, subtítulos, capítulos, metadata, attachments y carátulas.
 - Preview local de audio y vídeo con transporte compartido, waveform, espectrograma y subtítulos cuando son viables.

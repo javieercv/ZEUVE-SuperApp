@@ -33,28 +33,31 @@ public actor BitmapSubtitleOCRService {
         defer { workspace.cleanup() }
         let pattern = workspace.root.appendingPathComponent("ocr-%012d.png").path
         let filter = "[0:\(request.streamIndex)]format=rgba[ocr]"
-        let args = [
+        var args = [
             "-hide_banner", "-nostdin", "-v", "error", "-i", request.url.path,
-            "-filter_complex", filter, "-map", "[ocr]", "-vsync", "0", "-frame_pts", "1",
-            "-c:v", "png", pattern,
+            "-filter_complex", filter, "-map", "[ocr]", "-vsync", "0",
+            "-enc_time_base", "1:1000000", "-frame_pts", "1", "-c:v", "png",
         ]
+        if let duration = request.duration, duration.isFinite, duration > 0 { args += ["-t", String(duration)] }
+        args.append(pattern)
         let result = try await runner.run(.init(executable: ffmpeg, arguments: args))
         guard result.succeeded else { throw MultimediaInspectorError.processFailed }
         let urls = try FileManager.default.contentsOfDirectory(at: workspace.root, includingPropertiesForKeys: nil)
             .filter { $0.lastPathComponent.hasPrefix("ocr-") && $0.pathExtension.lowercased() == "png" }
             .sorted { framePTS($0) < framePTS($1) }
         guard !urls.isEmpty else { throw MultimediaInspectorError.invalidOutput("FFmpeg no ha producido imágenes de subtítulos bitmap") }
-        let timeBase = parseRational(request.timeBase) ?? (1.0 / 1000.0)
-        var events: [BitmapSubtitleOCREvent] = []
-        for (index, url) in urls.enumerated() {
+        var frames: [BitmapSubtitleOCRFrame] = []
+        for url in urls {
             try Task.checkCancellation()
+            if let activeID, await coordinator?.shouldCancel(id: activeID) == true { throw CancellationError() }
             guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil), let image = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else { continue }
-            let observation = try await recognize(image: image, options: options)
-            let start = Double(framePTS(url)) * timeBase
-            let nextStart = index + 1 < urls.count ? Double(framePTS(urls[index + 1])) * timeBase : min(request.duration ?? (start + 2), start + 2)
-            let end = max(start + 0.05, nextStart)
-            events.append(.init(start: start, end: end, text: observation.text, confidence: observation.confidence, needsReview: observation.confidence < options.lowConfidenceThreshold || observation.text.isEmpty))
+            let start = Double(framePTS(url)) / 1_000_000
+            if let duration = request.duration, duration.isFinite, start >= duration { continue }
+            let clear = try isClear(image)
+            let observation = clear ? (text: "", confidence: 0.0) : try await recognize(image: image, options: options)
+            frames.append(.init(timestamp: start, text: observation.text, confidence: observation.confidence, isClear: clear))
         }
+        let events = BitmapSubtitleOCRTimeline().events(frames: frames, duration: request.duration, threshold: options.lowConfidenceThreshold)
         let output = BitmapSubtitleOCRDraft(events: events, sourceCodec: request.codec, sourceStreamIndex: request.streamIndex, language: options.language ?? request.language)
         if let activeID, let coordinator { try? await coordinator.finish(id: activeID) }
         operationID = nil
@@ -75,6 +78,21 @@ public actor BitmapSubtitleOCRService {
     }
 
     #if canImport(Vision) && canImport(ImageIO)
+    private func isClear(_ image: CGImage) throws -> Bool {
+        guard image.width > 0, image.height > 0, image.width <= 8192, image.height <= 8192 else {
+            throw MultimediaInspectorError.invalidOutput("imagen de OCR fuera de los límites de seguridad")
+        }
+        guard let context = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8,
+                                      bytesPerRow: image.width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue), let data = context.data else {
+            throw MultimediaInspectorError.invalidOutput("no se pudo revisar la transparencia del subtítulo")
+        }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        let bytes = data.assumingMemoryBound(to: UInt8.self)
+        for offset in stride(from: 3, to: image.width * image.height * 4, by: 4) where bytes[offset] != 0 { return false }
+        return true
+    }
+
     private func recognize(image: CGImage, options: BitmapSubtitleOCROptions) async throws -> (text: String, confidence: Double) {
         try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { request, error in
@@ -102,10 +120,4 @@ public actor BitmapSubtitleOCRService {
         return Int64(stem.split(separator: "-").last ?? "0") ?? 0
     }
 
-    private func parseRational(_ raw: String?) -> Double? {
-        guard let raw else { return nil }
-        let p = raw.split(separator: "/")
-        guard p.count == 2, let n = Double(p[0]), let d = Double(p[1]), d != 0 else { return nil }
-        return n / d
-    }
 }

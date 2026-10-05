@@ -56,8 +56,8 @@ public struct MediaEditValidator: Sendable {
         let policy = MediaArtworkCompatibility()
         guard artworks.count <= 1 else { throw MultimediaInspectorError.incompatibleContainer("solo se admite una carátula attached_pic por salida") }
         for artwork in artworks {
-            guard targetContainer != .mp4 || artwork.title.isEmpty else {
-                throw MultimediaInspectorError.unsupportedMetadata("MP4 no representa el título de la carátula; elimina ese título o elige un contenedor que lo conserve")
+            guard ![.mp4, .mov].contains(targetContainer) || artwork.title.isEmpty else {
+                throw MultimediaInspectorError.unsupportedMetadata("MP4/MOV no representan el título de la carátula; elimina ese título o elige un contenedor que lo conserve")
             }
             guard policy.canPreserve(artwork, in: targetContainer) else {
                 throw MultimediaInspectorError.incompatibleContainer("la carátula no puede preservarse en \(targetContainer.displayName)")

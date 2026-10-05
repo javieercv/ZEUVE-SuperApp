@@ -1,10 +1,32 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Estado acumulado al 04/10/2026 · revalidación de ZEUVE 0.20.6.0 (marketing 0.20.6, build 72). Se conserva la evidencia anterior de 0.20.5.0/build 71.
+Estado acumulado al 05/10/2026 · correcciones de parciales en ZEUVE 0.20.7.0 (marketing 0.20.7, build 73). Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
-**639 pruebas: 590 ✅ OK · 1 ❌ fallida · 14 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 599 ✅ OK · 1 ❌ fallida · 5 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
 
-Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. Ambas usan datos aislados y archivos sintéticos; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. Los recorridos de aceptación de las tres versiones usan datos aislados y archivos sintéticos; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Corrección de parciales — 05/10/2026 · 0.20.7.0/build 73
+
+Nueve IDs locales corregidos, con regresiones automáticas y aceptación completada desde UI en Release. La ronda manual comenzó tras recuperar la sesión de macOS. Cada aceptación se guarda individualmente; los casos restantes conservan su estado anterior. Evidencia: `Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md`. La exclusión del Descargador se confirma expresamente, incluida la cobertura remota de P-12. I-29/I-35 conservan el límite acústico anterior.
+
+- **O-18 — ✅, guardado individual:** Creación .XYZ normalizada a .xyz, edición a Modelos QA/XYZ, movimiento real del archivo y Deshacer íntegro; persistencia comprobada al reabrir la app, rechazo visible de ../fuera y eliminación de la regla en Ajustes. Datos y archivos sintéticos propios.
+
+- **C-11 — ✅, guardado individual:** Conversión manual WAV → M4A y WAV → AAC correcta; AAC publicado reimportado como AAC sin aviso falso de MP3 y convertido a FLAC. Integración nativa y validación FFprobe complementan la prueba de interfaz.
+
+- **C-48 — ✅, guardado individual:** Guardado, renombrado, fijado, duplicado, exportación JSON, eliminación e importación desde Ajustes; ambas favoritas sobreviven al reinicio. Aplicar favorita restaura FLAC y mantiene ★ Favorita QA 207 tras callbacks; un cambio real a M4A vuelve a Ninguna. Receta/calidad verificadas también con métodos Swift reales.
+
+- **I-93 — ✅, guardado individual:** PGS propio de 12 s abierto por UI; OCR local presenta exactamente tres filas ZEUVE QA UNO/DOS/TRES, 3 incluidos/0 por revisar y tiempos 0–2, 4–6, 8–10 segundos. Sin filas vacías ni duplicados. Captura y AX guardados; original intacto.
+
+- **I-96 — ✅, guardado individual:** En la hoja OCR se edita UNO a ZEUVE QA UNO revisado y se exporta I96_UI_final.srt desde el selector nativo. Lectura de salida confirma tres entradas no vacías, texto editado y tiempos 00:00:00–00:00:02, 00:00:04–00:00:06 y 00:00:08–00:00:10. Original intacto.
+
+- **I-134 — ✅, guardado individual:** Desde UI: añadir JPEG a MOV H264/AAC, sustituir por PNG, conservar editando título global y retirar; cuatro publicaciones correctas y resultados abiertos en solo lectura. Major/compatible brands qt; carátulas extraídas idénticas, paquetes de vídeo/audio SHA-256 intactos y decodificación completa. Fuentes intactas. MP4 quedó revalidado en 0.20.6.0 y conserva regresiones automáticas.
+
+- **I-135 — ✅, guardado individual:** En I99_estructura.mkv, UI elimina Video B y Video A y abre Revisar cambios. Ambas aparecen únicamente como Se eliminará, con antes/después; Copia exacta solo en los dos audios y dos subtítulos efectivos. La revisión enumera capítulos y adjunto; la portada también se revisó explícitamente en I-134. No se publica durante revisión y original intacto.
+
+- **I-161 — ✅, guardado individual:** Lote manual de MOV y MKV: regla Audio 440 → idioma deu produce 1 aplicable y 1 sin cambios. Revisar plan permite abrir ambos; MOV muestra que no genera salida y MKV identifica la regla aplicada y la clasificación. Originales intactos, sin ejecutar el lote.
+
+- **I-162 — ✅, guardado individual:** Revisión manual individual del MKV dentro del lote: cambio spa → deu, seis pistas conservadas, dos capítulos y adjunto text/plain visibles antes de ejecutar. Cambiar/eliminar la regla invalida el preflight anterior; regenerar actualiza clasificación y valores. Revisión sin publicar archivos.
 
 ## Revalidación manual — 04/10/2026 · 0.20.6.0/build 72
 
@@ -1009,7 +1031,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **O-15** Clasifica fuentes/diseño.
 - [x] ✅ **O-16** Una extensión desconocida va a «Otros».
 - [x] ✅ **O-17** Un archivo sin extensión se maneja correctamente.
-- [ ] ⚠️ **O-18** Las reglas personalizadas funcionan.
+- [x] ✅ **O-18** Las reglas personalizadas funcionan.
 
 ## Archivos relacionados
 
@@ -1288,7 +1310,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 ## Audio
 
 - [x] ✅ **C-10** MP3.
-- [ ] ⚠️ **C-11** M4A/AAC.
+- [x] ✅ **C-11** M4A/AAC.
 - [x] ✅ **C-12** FLAC.
 - [x] ✅ **C-13** WAV.
 - [x] ✅ **C-14** Opus.
@@ -1340,7 +1362,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **C-45** El progreso de lote funciona.
 - [x] ✅ **C-46** Cancelar un lote funciona.
 - [x] ✅ **C-47** Presets funcionan.
-- [ ] ⚠️ **C-48** Favoritos funcionan.
+- [x] ✅ **C-48** Favoritos funcionan.
 
 ## Rechazos deliberados
 
@@ -1524,10 +1546,10 @@ Con un archivo que tenga PGS compatible:
 - [x] ✅ **I-90** Detecta la pista bitmap.
 - [x] ✅ **I-91** Inicia OCR.
 - [x] ✅ **I-92** Puede cancelarse.
-- [ ] ⚠️ **I-93** Produce borrador revisable.
+- [x] ✅ **I-93** Produce borrador revisable.
 - [x] ✅ **I-94** Muestra confianza/idioma cuando corresponda.
 - [x] ✅ **I-95** Permite revisar/corregir el texto.
-- [ ] ⚠️ **I-96** Exportar SRT funciona.
+- [x] ✅ **I-96** Exportar SRT funciona.
 - [x] ✅ **I-97** No sustituye automáticamente el subtítulo original.
 
 ## Edición de streams
@@ -1582,11 +1604,11 @@ Usar siempre una copia prescindible.
 - [x] ✅ **I-131** Sustituir carátula.
 - [x] ✅ **I-132** Eliminar carátula.
 - [x] ✅ **I-133** Resultado correcto en MKV.
-- [ ] ⚠️ **I-134** Resultado correcto en MP4/MOV compatible.
+- [x] ✅ **I-134** Resultado correcto en MP4/MOV compatible.
 
 ## Ejecutar edición
 
-- [ ] ⚠️ **I-135** Antes de ejecutar se puede revisar el plan.
+- [x] ✅ **I-135** Antes de ejecutar se puede revisar el plan.
 - [x] ✅ **I-136** Ejecutar genera un archivo nuevo.
 - [x] ✅ **I-137** El original permanece intacto.
 - [x] ✅ **I-138** El resultado contiene exactamente los streams previstos.
@@ -1618,8 +1640,8 @@ Usar siempre una copia prescindible.
 
 - [x] ✅ **I-159** Crear conjunto de reglas.
 - [x] ✅ **I-160** Condición → acción funciona.
-- [ ] ⚠️ **I-161** Preflight muestra qué ocurrirá.
-- [ ] ⚠️ **I-162** Se puede revisar antes de ejecutar.
+- [x] ✅ **I-161** Preflight muestra qué ocurrirá.
+- [x] ✅ **I-162** Se puede revisar antes de ejecutar.
 - [x] ✅ **I-163** Una operación pesada ya activa impide empezar indebidamente el preflight.
 - [x] ✅ **I-164** Cancelar el preflight funciona.
 - [x] ✅ **I-165** Ejecutar edición secuencial funciona.

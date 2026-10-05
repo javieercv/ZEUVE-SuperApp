@@ -3,6 +3,19 @@ import XCTest
 @testable import OrganizerModule
 
 final class OrganizerExecutionTests: OrganizerTestCase {
+    func testCustomDestinationSymlinkCannotMoveOutsideChosenFolder() throws {
+        let source = try write("modelo.xyz", contents: "original")
+        let outside = root.deletingLastPathComponent().appendingPathComponent("outside-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: outside, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: outside) }
+        let options = OrganizerOptions(customRules: ["xyz": .init(category: "Modelos", formatFolder: "XYZ")])
+        let plan = try OrganizerPlanner().buildPlan(folder: root, options: options)
+        try FileManager.default.createSymbolicLink(at: root.appendingPathComponent("Modelos"), withDestinationURL: outside)
+        XCTAssertThrowsError(try OrganizerExecutor().execute(plan: plan))
+        XCTAssertEqual(try String(contentsOf: source, encoding: .utf8), "original")
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: outside.path), [])
+    }
+
     func testExecuteSelectedFilesAndUndo() throws {
         let first = try write("a.pdf", contents: "a")
         let second = try write("b.pdf", contents: "b")

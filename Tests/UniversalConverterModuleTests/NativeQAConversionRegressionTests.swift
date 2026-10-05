@@ -39,3 +39,37 @@ func nativeQAConversionHonorsMediaPolicyAndTextWriters(_ scenario: String) async
         #expect(!text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
 }
+
+@Test(.enabled(if: conversionQAEnvironment["ZEUVE_QA_FIXTURES"] != nil && conversionQAEnvironment["ZEUVE_QA_ENGINES"] != nil))
+func nativeAACAndM4AOutputsReimportAsAACAndConvertToFLAC() async throws {
+    let fixtures = URL(fileURLWithPath: try #require(conversionQAEnvironment["ZEUVE_QA_FIXTURES"]))
+    let registry = try EngineRegistry(resourceRoot: URL(fileURLWithPath: try #require(conversionQAEnvironment["ZEUVE_QA_ENGINES"])))
+    let root = URL(fileURLWithPath: conversionQAEnvironment["ZEUVE_QA_OUTPUTS"] ?? FileManager.default.temporaryDirectory.path).appendingPathComponent("zeuve-aac-roundtrip-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    let coordinator = OperationCoordinator()
+    let service = UniversalConverterExecutionService(coordinator: coordinator, history: nil, logger: nil, engineLocator: .init(registry: registry))
+    let detector = ConverterFormatDetector()
+    let original = fixtures.appendingPathComponent("mono.wav")
+    let bytes = try Data(contentsOf: original)
+    var aacOutput: URL?
+    for (ordinal, target) in [ConverterFormat.aac, .m4a, .flac].enumerated() {
+        let source = target == .flac ? try #require(aacOutput) : original
+        let detected = try detector.detectDetailed(url: source)
+        #expect(detected.detectedFormat == (target == .flac ? .aac : .wav))
+        #expect(detected.warning == nil)
+        let fingerprint = try FileFingerprint.read(from: source)
+        let input = ConverterInputItem(kind: .file, sourceURL: source, relativePath: source.lastPathComponent, displayName: source.lastPathComponent, size: fingerprint.size, format: detected.detectedFormat, fingerprint: fingerprint, sourceRootName: source.deletingPathExtension().lastPathComponent)
+        var options = ConverterOperationOptions(); options.targetFormat = target; options.quality = .maximum
+        let inspections = try await service.inspectForPlanning(inputs: [input], options: options)
+        let plan = try await ConversionPlanner().plan(inputs: [input], outputFolder: root, options: options, revision: UInt64(ordinal + 1), mediaInspections: inspections)
+        let result = try await service.execute(plan)
+        #expect(result.completedCount == 1 && result.failedCount == 0)
+        let output = try #require(result.items.first?.outputURLs.first)
+        let info = try await MediaInspectionService().inspect(url: output, ffprobe: registry.executableURL(named: "ffprobe"), useCache: false)
+        #expect(info.audioStreams.first?.codec_name == (target == .flac ? "flac" : "aac"))
+        #expect(try detector.detectDetailed(url: output).warning == nil)
+        if target == .aac { aacOutput = output }
+        #expect(await coordinator.current() == nil)
+        #expect(try Data(contentsOf: original) == bytes)
+    }
+}

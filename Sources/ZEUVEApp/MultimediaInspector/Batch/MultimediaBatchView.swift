@@ -14,6 +14,7 @@ struct MultimediaBatchView: View {
     @State private var ruleActionValue = ""
     @State private var confirmStructuralExecution = false
     @State private var ruleSetName = ""
+    @State private var reviewedPreflightID: UUID?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -38,6 +39,36 @@ struct MultimediaBatchView: View {
                 }
                 .padding(20)
             }
+        }
+        .sheet(isPresented: Binding(get: { reviewedPreflightID != nil }, set: { if !$0 { reviewedPreflightID = nil } })) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("Revisión del preflight").font(.headline)
+                    Spacer()
+                    Button("Cerrar") { reviewedPreflightID = nil }
+                }
+                ScrollView {
+                    if let item = model.preflightItems.first(where: { $0.id == reviewedPreflightID }) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(item.url.lastPathComponent).font(.title3)
+                            Text(preflightLabel(item.classification))
+                            ForEach(item.appliedRules, id: \.self) { Text("Regla aplicada: \($0)").font(.caption) }
+                            if let plan = item.plan, let inspection = item.originalInspection {
+                                MultimediaEditPreview(plan: plan, inspection: inspection)
+                                ForEach(item.warnings.filter { !plan.warnings.contains($0) }, id: \.self) {
+                                    Label($0, systemImage: "exclamationmark.triangle").foregroundStyle(.orange)
+                                }
+                            } else {
+                                ForEach(item.warnings, id: \.self) { Label($0, systemImage: "exclamationmark.triangle") }
+                                if let error = item.errorMessage { Text(error).foregroundStyle(.red) }
+                                if item.classification == .noChanges { Text("Las reglas no modifican este archivo. No se generará una salida.") }
+                            }
+                        }
+                    } else {
+                        Text("El preflight ha cambiado. Cierra esta revisión y vuelve a prepararlo.")
+                    }
+                }
+            }.padding(20).frame(width: 720, height: 560)
         }
         .confirmationDialog("¿Ejecutar la edición estructural por lotes?", isPresented: $confirmStructuralExecution, titleVisibility: .visible) {
             Button("Ejecutar", role: .destructive) { model.executeStructuralBatch() }
@@ -264,6 +295,7 @@ struct MultimediaBatchView: View {
                             Spacer()
                             Text(preflightLabel(item.classification)).font(.caption).foregroundStyle(.secondary)
                             if !item.warnings.isEmpty { Text("\(item.warnings.count) avisos").font(.caption).foregroundStyle(.orange) }
+                            Button("Revisar plan") { reviewedPreflightID = item.id }.disabled(model.isBusy)
                         }
                     }
                     HStack {

@@ -22,6 +22,9 @@ public struct OrganizerPlanner {
         options: OrganizerOptions = OrganizerOptions(),
         progress: OrganizerProgressHandler? = nil
     ) throws -> OrganizerPlan {
+        for (name, rule) in options.customRules {
+            _ = try OrganizerExtensionRules.normalizedRule(extension: name, category: rule.category, formatFolder: rule.formatFolder)
+        }
         let baseFolder = try validate(folder)
         let rules = OrganizerExtensionRules.merged(with: options.customRules)
         let managedFolders = Set(rules.values.map(\.category)).union(["Otros", organizerRelatedFolder])
