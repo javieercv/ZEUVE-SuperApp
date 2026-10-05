@@ -1,6 +1,6 @@
 # Pruebas y validación — ZEUVE 0.20.7.0
 
-La evidencia técnica de los parciales corregidos está en [TEST_RESULTS_0.20.7.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.7.0.md). Los nueve IDs locales pasan su [aceptación desde UI](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md); las pruebas de servicio complementan ese recorrido. La [revalidación manual de 04/10/2026](../Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) conserva los 22 IDs comprobados en la entrega anterior. Checklist acumulada: 599 OK, 1 fallo del Descargador excluido, 5 parciales y 34 pendientes. I-29/I-35 mantienen su requisito acústico y P-12 su cobertura remota excluida.
+La evidencia técnica de los parciales corregidos está en [TEST_RESULTS_0.20.7.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.7.0.md). Los nueve IDs locales pasan su [aceptación desde UI](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md); las pruebas de servicio complementan ese recorrido. La [revalidación manual de 04/10/2026](../Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) conserva los 22 IDs comprobados en la entrega anterior. El [cierre de I-29/I-35](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md) mide la salida de audio capturada y los frames presentados, incluidos mute/ganancia, salto/reanudación y cambio de pista. Checklist acumulada: 601 OK, 1 fallo del Descargador excluido, 3 parciales y 34 pendientes. Todo estado sin OK restante pertenece al Descargador o a su autenticación remota, incluidos P-11/P-12.
 
 ## Evidencia de la entrega actual
 
@@ -8,6 +8,7 @@ La entrega actual conserva sus resultados en:
 
 - `Docs/Historico/Pruebas/TEST_RESULTS_0.20.7.0.md`
 - `Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md`
+- `Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md`
 - `Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.7.0.md`
 - `Docs/Historico/Entregas/DELIVERY_0.20.7.0.md`
 

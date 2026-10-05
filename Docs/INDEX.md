@@ -70,6 +70,7 @@ La instantánea empaquetable concreta se define en `../Resources/Engines/engines
 - [Implementación de parciales](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.7.0.md).
 - [Verificación técnica](Historico/Pruebas/TEST_RESULTS_0.20.7.0.md).
 - [QA manual 0.20.7.0 — 05/10/2026](Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md): nueve parciales locales aceptados desde UI.
+- [Cierre local: volumen y sincronía](Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md): captura de salida digital y vídeo presentado; todo el alcance local aceptado.
 - [Entrega](Historico/Entregas/DELIVERY_0.20.7.0.md).
 
 ## Histórico

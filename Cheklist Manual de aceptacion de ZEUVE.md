@@ -2,9 +2,19 @@
 
 Estado acumulado al 05/10/2026 · correcciones de parciales en ZEUVE 0.20.7.0 (marketing 0.20.7, build 73). Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
-**639 pruebas: 599 ✅ OK · 1 ❌ fallida · 5 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 601 ✅ OK · 1 ❌ fallida · 3 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. Los recorridos de aceptación de las tres versiones usan datos aislados y archivos sintéticos; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Cierre de las comprobaciones locales — 05/10/2026 · 0.20.7.0/build 73
+
+I-29 e I-35 pasan mediante control desde UI y captura de la salida efectiva de la app y del vídeo mostrado. El cierre sustituye su falta anterior de evidencia loopback; no sustituye una escucha humana que no se ha realizado. El alcance local de la checklist está completado. Los 38 estados sin OK restantes pertenecen exclusivamente al Descargador o a su autenticación remota: D-13 fallido, D-15/D-60 y P-12 parciales, 33 IDs D y P-11 pendientes.
+
+- **I-29 — ✅, guardado individual:** Control real del slider en Release y captura ScreenCaptureKit limitada a la app QA: máximo 0,200083, valor intermedio 0,494444 con pico 0,098925 (ganancia medida 0,494420), mute con salida PCM cero y cuatro flashes de vídeo activos. Se restituye volumen exactamente a 1. Prueba de salida de la app; no afirma escucha humana ni calibración de altavoces.
+
+- **I-35 — ✅, guardado individual:** Captura conjunta de salida de audio de la app y flashes realmente mostrados: 21 pulsos emparejados a 1×, incluida reproducción inicial, salto/reanudación y sustitución A/B. Desfase audio−vídeo entre −32,79 y +93,53 ms; tonos capturados 880/1760 Hz confirman el cambio de pista. Captura 60 FPS, fixture 30 FPS, límite observado inferior a 100 ms; sin afirmar sincronía perfecta ni latencia de altavoces externos.
+
+Evidencia: `Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md`. Las notas de rondas anteriores se conservan como historia.
 
 ## Corrección de parciales — 05/10/2026 · 0.20.7.0/build 73
 
@@ -1456,7 +1466,7 @@ Estos deben rechazarse claramente, no convertirse:
 - [x] ✅ **I-26** 0,5× funciona.
 - [x] ✅ **I-27** 1× funciona.
 - [x] ✅ **I-28** 2× funciona.
-- [ ] ⚠️ **I-29** Volumen funciona.
+- [x] ✅ **I-29** Volumen funciona.
 - [x] ✅ **I-30** Cambiar pista de audio conserva el instante.
 - [x] ✅ **I-31** Cambiar pista mientras reproduce conserva Play.
 - [x] ✅ **I-32** Cambiar pista estando pausado conserva Pausa.
@@ -1465,7 +1475,7 @@ Estos deben rechazarse claramente, no convertirse:
 ## Preview de vídeo
 
 - [x] ✅ **I-34** El vídeo se reproduce.
-- [ ] ⚠️ **I-35** Vídeo y audio están sincronizados.
+- [x] ✅ **I-35** Vídeo y audio están sincronizados.
 - [x] ✅ **I-36** Pausar conserva el frame.
 - [x] ✅ **I-37** Reanudar no reinicia desde cero.
 - [x] ✅ **I-38** Seek de vídeo funciona.

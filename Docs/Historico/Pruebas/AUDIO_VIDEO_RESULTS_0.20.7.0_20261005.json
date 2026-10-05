@@ -1,0 +1,41 @@
+{
+  "version": "0.20.7.0",
+  "build": 73,
+  "baseCommit": "d50a2a1c48f2c852be5875659d11aa02891955ac",
+  "capture": "ScreenCaptureKit; verified QA process only; no microphone; no third-party audio",
+  "volume": {
+    "fullPeak": 0.2000829428434372,
+    "halfPeak": 0.09892498701810837,
+    "controlHalf": 0.494444444444,
+    "measuredRatio": 0.49441989213201515,
+    "mutePeak": 0.0,
+    "muteVideoPulses": 4,
+    "restoredControl": 1
+  },
+  "sync": {
+    "rate": 1,
+    "sourceFPS": 30,
+    "captureFPS": 60,
+    "matchedPulses": 21,
+    "minDeltaMs": -32.78837466496043,
+    "maxDeltaMs": 93.53266665129922,
+    "maxAbsDeltaMs": 93.53266665129922,
+    "acceptanceBoundMs": 100,
+    "scenarios": [
+      "playing",
+      "volume-full",
+      "volume-half",
+      "seek-resumed",
+      "track-B"
+    ],
+    "trackMeasuredHz": [
+      880.0017403302514,
+      1760.015300942706
+    ]
+  },
+  "qaExitedNormally": true,
+  "initialOriginalHashesUnchanged": true,
+  "fixtureSHA256": "19b73dcbc756623c1fbfcc15ae7f0b81fb28f4bb83611bf851c7be35a8dd885f",
+  "I29": "PASS: captured app output mute/gain, no claim of human listening or speaker calibration",
+  "I35": "PASS: displayed flashes vs app output pulses including seek/resume and track replacement"
+}

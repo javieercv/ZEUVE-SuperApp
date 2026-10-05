@@ -143,6 +143,6 @@ Para consultar la evolución del proyecto:
 
 Desarrollo activo para macOS · Apple Silicon
 
-Nueve parciales locales corregidos y comprobados desde la interfaz: reglas del Organizador, AAC/favoritos, OCR, revisión de planes y portada MOV. [QA manual](Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md) y [evidencia técnica](Docs/Historico/Pruebas/TEST_RESULTS_0.20.7.0.md). La checklist conserva 599 OK, 1 fallo del Descargador excluido, 5 parciales y 34 pendientes. Los parciales restantes corresponden al Descargador/cobertura remota excluidos y a comprobaciones acústicas pendientes. La [QA manual de 0.20.6.0](Docs/Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) conserva los 22 IDs revalidados anteriormente.
+Nueve parciales locales corregidos y comprobados desde la interfaz: reglas del Organizador, AAC/favoritos, OCR, revisión de planes y portada MOV. [QA manual](Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md) y [evidencia técnica](Docs/Historico/Pruebas/TEST_RESULTS_0.20.7.0.md). El [cierre de volumen y sincronía](Docs/Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md) completa el alcance local: 601 OK, 1 fallo, 3 parciales y 34 pendientes. Todo lo que permanece sin OK pertenece al Descargador o a su autenticación remota excluidos. La [QA manual de 0.20.6.0](Docs/Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) conserva los 22 IDs revalidados anteriormente.
 
 </div>
