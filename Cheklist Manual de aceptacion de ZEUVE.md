@@ -1,10 +1,37 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Estado acumulado al 05/10/2026 · correcciones de parciales en ZEUVE 0.20.7.0 (marketing 0.20.7, build 73). Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
+Estado acumulado al 09/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
-**639 pruebas: 601 ✅ OK · 1 ❌ fallida · 3 ⚠️ parciales · 34 ➖ pendientes.** Ninguna marcada como no aplicable.
+**639 pruebas: 606 ✅ OK · 6 ❌ fallidas · 8 ⚠️ parciales · 19 ➖ pendientes.** **620 probadas, incluidas las parciales; 19 sin probar.** Ninguna marcada como no aplicable.
 
-Leyenda: ✅ aceptación comprobada; ❌ fallo observado; ⚠️ aceptación parcial; ➖ todavía no validada. Una casilla marcada indica prueba ejecutada con resultado concluyente; el símbolo distingue OK de fallo. Los parciales y pendientes conservan casilla vacía. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. Los recorridos de aceptación de las tres versiones usan datos aislados y archivos sintéticos; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Registro de las pruebas remotas ejecutadas — 09/10/2026
+
+El usuario solicita rellenar como probadas las comprobaciones ya realizadas. Se registran resultados por requisito, sin esperar una futura repetición en Release para reconocer que el recorrido Debug ya se ejecutó. Esto no autoriza corregir producto ni usar sesiones. Evidencia: [QA del Descargador](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261009.md), estados AX, capturas, resultados y verificación de archivos en la carpeta externa `QA-descargador-20261009` del chat.
+
+- **D-11 — ⚠️, probada:** L05/L06/L07 descargan foto, reel y diez fotos de un carrusel público sin sesión. L04 no resuelve el perfil por `request_blocked`; cobertura de perfiles y autenticación incompleta.
+- **D-13 — ❌, probada de nuevo:** L01 publica tres JPEG válidos, pero anuncia un cuarto elemento de audio y guarda como MP3 una copia JPEG de la tercera foto. La pantalla indica 4 correctos/0 fallidos. Se mantiene el fallo anterior, con nueva evidencia.
+- **D-15 — ❌, probada:** L02 publica cuatro variantes del mismo vídeo como elementos distintos, pese a la deduplicación anunciada. L03 produce una foto frente a las cuatro esperadas en el Excel; esa discrepancia queda sin atribuir hasta contrastar el origen. El fallo confirmado de duplicación sustituye el parcial anterior.
+- **D-16 — ✅, probada:** L11 se analiza y descarga desde UI; un vídeo H.264/AAC de 97,097 s aparece en la salida, con 1 correcto/0 fallidos. FFprobe y decodificación muestral correctos. Aceptación acotada al vídeo público aportado.
+- **D-17 — ⚠️, probada:** L12 descarga un vídeo H.264/AAC de 156,17 s y se verifica el archivo. L13 no completa el análisis de galería dentro de 180 s; sin descarga de galería ni causa concreta confirmada.
+- **D-18 — ⚠️, probada:** L14 publica un clip H.264/AAC de 5,007 s válido. El estado AX posterior conserva un aviso pendiente de otro análisis, por lo que el cierre visual limpio no queda certificado. No se extrapola a VOD.
+- **D-22 — ❌, probada:** el validador rechaza L15 antes de acceder a la red porque exige `/post/`. La URL concreta aportada no puede analizarse. No se afirma que el post siga disponible ni se atribuye el resultado a un fallo remoto.
+- **D-23 — ❌, probada:** L16 termina sin contenido compatible y muestra error con referencia técnica. Ningún archivo descargado. Fallo de esta prueba; disponibilidad en origen y causa no comprobadas independientemente.
+- **D-24 — ❌, probada:** L17 publica tres vídeos idénticos por SHA-256 y cuenta un VTT como elemento principal correcto. UI: 4 correctos/1 fallido. Descarga con duplicación y clasificación incorrecta.
+- **D-34 — ❌, probada:** la URL pública de perfil L04 se consulta sin sesión, pero el motor devuelve `request_blocked` y el fallback no resuelve contenido. La UI muestra catálogo vacío con consejo de activar secciones en lugar de explicar la causa. Resultado fallido con ese perfil, no prueba de que todo perfil falle.
+- **D-35 — ✅, probada:** las publicaciones públicas individuales L05/L06/L07 se resuelven desde UI y generan archivos independientes en la salida. No cubre publicaciones privadas, stories ni destacados.
+- **D-36 — ✅, probada:** L05 publica un JPEG 584×584 sin sesión; tipo y decodificación de imagen correctos.
+- **D-37 — ✅, probada:** L06 publica un MP4 H.264/AAC, 720×1280, 37,9618 s, sin sesión; tipo y decodificación muestral correctos.
+- **D-38 — ⚠️, probada:** L07 muestra diez elementos y publica diez JPEG distintos de 1000×1250 con índices 01–10. Falta comparar visualmente todos los elementos y su orden con la publicación original; no se convierte esa numeración en prueba completa de orden.
+- **D-39 — ⚠️, probada:** L04 no fuerza inicio de sesión ni adjunta cookies, pero no consigue un catálogo público utilizable. Comprobada la ausencia de exigencia de sesión; análisis efectivo del perfil sin validar.
+- **D-60 — ⚠️, probada:** se verifican salidas reales organizadas con los defaults, incluidas fotos/reel/carrusel de Instagram y fotos de TikTok. No se ejercitan cambios entre todas las configuraciones de carpetas ni highlights; conserva cobertura parcial.
+- **D-74 — ⚠️, probada:** L20 se analiza como emisión finalizada descargable, de 6:22:51, y queda seleccionable. No se ejecuta la descarga por duración. Análisis comprobado; descarga pendiente.
+- **D-78 — ✅, probada:** L17 continúa la descarga después del elemento fallido y publica elementos posteriores. Separadamente, L21+L22 conserva el enlace válido seleccionable después del fallo de análisis del primero. La continuidad no convierte los falsos éxitos/duplicados de D-24 en resultados válidos.
+
+Se añaden también evidencias de regresión a requisitos ya probados: D-03/D-04 recuperan disponibilidad tras Cancelar y permiten analizar el lote siguiente; D-05 confirma archivos físicos; D-12/D-14/D-19 vuelven a descargar el vídeo TikTok, la foto Pinterest y el vídeo Vimeo. D-10/D-26 publican YouTube sin sesión, pero la decodificación del nuevo AV1 queda limitada por el FFmpeg incluido. D-21 publica audio AAC válido de SoundCloud, con incidencia de etiqueta Vídeo; su aceptación de descarga no certifica esa presentación. D-20 conserva su aceptación anterior: esta ronda solo analiza una emisión de 282:01, sin volver a descargarla. No se declara ninguna de estas limitaciones como una nueva aceptación completa de Release.
+
+P-12 conserva ⚠️ y queda marcado como probado por su evidencia local anterior, sin ampliar cobertura de sesiones/tokens remotos. D-25, D-33, D-40–D-52, D-54, D-56, D-73 y P-11 permanecen sin probar: no se convierte una dependencia bloqueada, una vista incidental o un enlace ausente en ejecución de esos requisitos. Todo estado sin OK restante pertenece al Descargador o a su autenticación.
 
 ## Cierre de las comprobaciones locales — 05/10/2026 · 0.20.7.0/build 73
 
@@ -1109,20 +1136,20 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 ## Plataformas
 
 - [x] ✅ **D-10** YouTube.
-- [ ] ➖ **D-11** Instagram.
+- [x] ⚠️ **D-11** Instagram.
 - [x] ✅ **D-12** TikTok vídeo.
 - [x] ❌ **D-13** TikTok foto/carrusel.
 - [x] ✅ **D-14** Pinterest.
-- [ ] ⚠️ **D-15** X/Twitter.
-- [ ] ➖ **D-16** Facebook.
-- [ ] ➖ **D-17** Reddit.
-- [ ] ➖ **D-18** Twitch con contenido ya publicado.
+- [x] ❌ **D-15** X/Twitter.
+- [x] ✅ **D-16** Facebook.
+- [x] ⚠️ **D-17** Reddit.
+- [x] ⚠️ **D-18** Twitch con contenido ya publicado.
 - [x] ✅ **D-19** Vimeo.
 - [x] ✅ **D-20** Dailymotion.
 - [x] ✅ **D-21** SoundCloud.
-- [ ] ➖ **D-22** Tumblr.
-- [ ] ➖ **D-23** Threads.
-- [ ] ➖ **D-24** Snapchat público.
+- [x] ❌ **D-22** Tumblr.
+- [x] ❌ **D-23** Threads.
+- [x] ❌ **D-24** Snapchat público.
 - [ ] ➖ **D-25** EroMe mediante enlace concreto, si se quiere probar esa compatibilidad.
 
 ## YouTube
@@ -1138,12 +1165,12 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 ## Instagram
 
 - [ ] ➖ **D-33** `@usuario` funciona.
-- [ ] ➖ **D-34** URL de perfil funciona.
-- [ ] ➖ **D-35** Publicación individual funciona.
-- [ ] ➖ **D-36** Foto funciona.
-- [ ] ➖ **D-37** Vídeo/Reel funciona.
-- [ ] ➖ **D-38** Carrusel muestra todos los elementos y en el orden correcto.
-- [ ] ➖ **D-39** Un perfil público se analiza sin obligar a iniciar sesión.
+- [x] ❌ **D-34** URL de perfil funciona.
+- [x] ✅ **D-35** Publicación individual funciona.
+- [x] ✅ **D-36** Foto funciona.
+- [x] ✅ **D-37** Vídeo/Reel funciona.
+- [x] ⚠️ **D-38** Carrusel muestra todos los elementos y en el orden correcto.
+- [x] ⚠️ **D-39** Un perfil público se analiza sin obligar a iniciar sesión.
 - [ ] ➖ **D-40** Muestra publicaciones.
 - [ ] ➖ **D-41** Muestra Reels.
 - [ ] ➖ **D-42** Muestra foto de perfil.
@@ -1167,7 +1194,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-57** Selección individual funciona.
 - [x] ✅ **D-58** Selección múltiple funciona.
 - [x] ✅ **D-59** «Seleccionar solo contenido nuevo» funciona.
-- [ ] ⚠️ **D-60** Organización en carpetas por plataforma/sección/publicación funciona según configuración.
+- [x] ⚠️ **D-60** Organización en carpetas por plataforma/sección/publicación funciona según configuración.
 
 ## Perfiles y presets
 
@@ -1187,11 +1214,11 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-71** El bloqueo de contenido adulto aparece cuando corresponde y está desactivado.
 - [x] ✅ **D-72** Activarlo desde Ajustes cambia ese comportamiento.
 - [ ] ➖ **D-73** Un directo activo/programado se rechaza.
-- [ ] ➖ **D-74** Una repetición ya publicada como vídeo normal puede descargarse.
+- [x] ⚠️ **D-74** Una repetición ya publicada como vídeo normal puede descargarse.
 - [x] ✅ **D-75** Guardar descripción opcional funciona.
 - [x] ✅ **D-76** Guardar JSON de metadatos funciona.
 - [x] ✅ **D-77** Una descarga correcta aparece en Historial.
-- [ ] ➖ **D-78** Si un elemento de un lote falla, los demás pueden continuar.
+- [x] ✅ **D-78** Si un elemento de un lote falla, los demás pueden continuar.
 - [x] ✅ **D-79** La carpeta de salida recordada persiste correctamente.
 - [x] ✅ **D-80** Restaurar ajustes globales olvida la carpeta de salida pero no borra archivos descargados.
 
@@ -1810,7 +1837,7 @@ Si Xcode está instalado:
 - [x] ✅ **P-09** Un archivo original inspeccionado/editado permanece intacto.
 - [x] ✅ **P-10** Ningún conflicto normal sobrescribe silenciosamente un archivo existente.
 - [ ] ➖ **P-11** Después de utilizar una sesión de Instagram, los registros no muestran cookies.
-- [ ] ⚠️ **P-12** Los registros no muestran tokens/credenciales.
+- [x] ⚠️ **P-12** Los registros no muestran tokens/credenciales.
 - [x] ✅ **P-13** Analizar chats no deja mensajes completos en Historial.
 - [x] ✅ **P-14** Comparar seguidores no deja usernames/listas en Historial.
 - [x] ✅ **P-15** OCR del Inspector no deja el texto OCR completo en Historial.

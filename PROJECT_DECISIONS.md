@@ -1,6 +1,6 @@
 # Decisiones aprobadas de ZEUVE
 
-Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.7.0 el 5 de octubre de 2026.
+Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.7.0 el 9 de octubre de 2026.
 
 > **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
 
@@ -15,6 +15,10 @@ Este bloque resume las decisiones actualmente efectivas que más fácilmente pue
 - Limpiador: `scanLocalStorage` autoriza análisis local documentado; cualquier retirada exige `removeLocalItems`, plan visible, selección y revalidación. Papelera es el modo seguro predeterminado y Undo solo aparece cuando es verificable.
 - Motores requeridos por la instantánea actual: yt-dlp, Deno, FFmpeg, FFprobe, gallery-dl e instaloader-zeuve. Pandoc sigue soportado como opcional del Conversor cuando se prepara. Playwright no participa en la ruta efectiva actual. Calibre, Ghostscript y LibreOffice están retirados.
 - Versión: ZEUVE 0.20.7.0, marketing 0.20.7, build 73.
+
+## Registro de pruebas del Descargador — 09/10/2026
+
+El usuario aporta enlaces y autoriza su QA aislada, incluido AppleScript/System Events. Posteriormente solicita «rellena lo que ya hayas probado como probado». Se registran las ejecuciones existentes en la checklist: casilla marcada para prueba ejecutada, también parcial; ✅/❌/⚠️ distingue el resultado y ➖ conserva lo no probado. Estado acumulado: 606 OK, 6 fallidas, 8 parciales y 19 pendientes; 620 ejecutadas. La evidencia remota nueva corresponde a Debug, no a una repetición completa en Release. Esta autorización amplía las comprobaciones anteriormente excluidas, pero no aprueba correcciones de producto, importación de sesiones ni acceso protegido. Se conservan los cierres históricos y sus límites.
 
 ## Corrección de parciales aprobada — 0.20.7.0
 

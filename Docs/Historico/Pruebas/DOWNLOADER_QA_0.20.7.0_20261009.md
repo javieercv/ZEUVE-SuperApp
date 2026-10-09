@@ -19,7 +19,11 @@ Se recorren las 22 entradas únicas: 21 intentos de análisis por red y un recha
 - Un WebVTT se cuenta como elemento principal correcto, aunque solo contiene subtítulos.
 - Un WebM AV1/Opus de YouTube se identifica correctamente, pero el FFmpeg incluido no puede decodificar su vídeo en este entorno. No se atribuye corrupción al archivo.
 
-Los perfiles completos, emisiones largas, sesiones y casos sin enlace no se descargan indiscriminadamente. La checklist acumulada anterior **601 OK / 1 fallo / 3 parciales / 34 pendientes** no se reclasifica: esta ronda exploratoria Debug no constituye aceptación completa de Release ni de todos los requisitos asociados a cada ID.
+Los perfiles completos, emisiones largas, sesiones y casos sin enlace no se descargan indiscriminadamente. Al cerrar inicialmente esta ronda se conservó la checklist anterior **601 OK / 1 fallo / 3 parciales / 34 pendientes**. Esta ronda exploratoria Debug no constituye aceptación completa de Release ni de todos los requisitos asociados a cada ID.
+
+## Actualización documental posterior — 09/10/2026
+
+El usuario solicita marcar como probadas las comprobaciones ya ejecutadas. La checklist canónica (`Cheklist Manual de aceptacion de ZEUVE.md`, en la raíz) incorpora los resultados por requisito y conserva sus límites: **606 OK / 6 fallidas / 8 parciales / 19 pendientes**, con **620 pruebas ejecutadas**, incluidas las parciales. La casilla indica ejecución, no éxito; el símbolo indica resultado. No se repiten descargas, no se modifica producto y no se presenta la evidencia Debug como aceptación completa de Release. Los cierres históricos conservan los resultados de su fecha.
 
 ## Resultado por fixture
 
