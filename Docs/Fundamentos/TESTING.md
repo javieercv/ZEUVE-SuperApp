@@ -4,6 +4,8 @@ La evidencia técnica de los parciales corregidos está en [TEST_RESULTS_0.20.7.
 
 ## Evidencia de la entrega actual
 
+La [QA exploratoria remota del Descargador del 09/10/2026](../Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261009.md) utiliza enlaces aportados por el usuario y datos aislados en Debug. Registra fallos de tipo, duplicación y presentación, además de cancelación y continuidad. No modifica producto ni sustituye las aceptaciones Release o la checklist acumulada del cierre anterior.
+
 La entrega actual conserva sus resultados en:
 
 - `Docs/Historico/Pruebas/TEST_RESULTS_0.20.7.0.md`
