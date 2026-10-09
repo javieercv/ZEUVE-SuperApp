@@ -25,6 +25,22 @@ Los perfiles completos, emisiones largas, sesiones y casos sin enlace no se desc
 
 El usuario solicita marcar como probadas las comprobaciones ya ejecutadas. La checklist canónica (`Cheklist Manual de aceptacion de ZEUVE.md`, en la raíz) incorpora los resultados por requisito y conserva sus límites: **606 OK / 6 fallidas / 8 parciales / 19 pendientes**, con **620 pruebas ejecutadas**, incluidas las parciales. La casilla indica ejecución, no éxito; el símbolo indica resultado. No se repiten descargas, no se modifica producto y no se presenta la evidencia Debug como aceptación completa de Release. Los cierres históricos conservan los resultados de su fecha.
 
+## Continuación autorizada: comprobaciones sin sesión — 09/10/2026
+
+Después de registrar las pruebas previas, el usuario solicita «haz las que puedas». Se sincroniza `main` en `5b31d37ef0a8d72da21dbb6fc02bba5a40e54ede`, sin cambios locales ni divergencia. Se utiliza la app Debug existente 0.20.7.0/build 73 en DerivedData, sin recompilar ni modificar producto; los commits posteriores a `d1dc2d0` eran documentales. SHA-256 del ejecutable ensayado: `3bd73c91ebba276a8b76f606b6b2bb51223e65395fe580eb3a2809bf6cb568fe`.
+
+La app se lanza directamente con `ZEUVE_DATA_DIR` apuntando a `QA-descargador-20261009/UI` (esta continuación tiene SQLite/logs propios en esa raíz; la primera ronda usó `UI/Data`). Control mediante AppleScript/System Events ya autorizado. Sin cookies, importación de sesión, búsqueda de enlaces nuevos, descargas adicionales, acceso a ajustes personales ni restauración global. Se reutilizan `@nasa`, derivado del perfil aportado, y L07.
+
+| Requisito | Resultado ejecutado | Evidencia externa |
+| --- | --- | --- |
+| D-33 | ⚠️ En Automático, `@nasa` es rechazado como enlace. En Instagram se acepta, habilita Analizar y normaliza al perfil NASA. La operación finaliza con `request_blocked`, fallback sin contenido y 0 elementos visibles. Entrada comprobada; análisis completo sin validar. | `D33-auto-input`, `D33-instagram-input`, `D33-analysis`, `D33-result` (TXT/PNG) y `UI/Logs/zeuve-2026-10-09.jsonl`. |
+| D-52 | ✅ L07 presenta diez fotos en cuadrícula, incluidas las diez al desplazar. Desmarcar/marcar un elemento cambia 10 → 9 → 10. Cambio desde Ajustes a Lista y vuelta a Cuadrícula conserva contenido y selección. | `D52-grid160`, `D52-deselect-one`, `D52-grid-scroll`, `D52-list`, `D54-grid-restored160` (TXT/PNG). |
+| D-54 | ✅ Stepper de Ajustes: 160 → 240 → 160 px. Miniaturas aumentan y la cuadrícula pasa de seis a cuatro columnas; vuelve a seis al restaurar. Sin afirmar todos los valores o persistencia tras reinicio. | `catalog-settings-before`, `D54-settings240`, `D54-grid240`, `D54-settings-restored160`, `D54-grid-restored160` (TXT/PNG). |
+
+D-40–D-43/D-56 no se ejercitan: el perfil no produce contenido, secciones ni cursor de paginación utilizable. D-25/D-73 siguen sin los enlaces necesarios y D-44–D-51/P-11 requieren pruebas de sesión no realizadas. No se sustituyen por fixtures inyectados ni se marcan como fallidos por una dependencia no disponible. D-38 conserva su parcial: ver diez tarjetas no compara toda la publicación original.
+
+Se devuelven los ajustes aislados a Automático, Cuadrícula y 160 px (`catalog-settings-final`), y se cierra normalmente la app (PID 66129, exit 0). Comprobación posterior sin procesos de app ni motores; siguen los 33 archivos originales en `UI/Downloads`, sin nuevas descargas. Checklist posterior: **608 OK / 6 fallidas / 9 parciales / 16 pendientes**, **623 ejecutadas**. Solo se actualiza documentación; sigue sin ser aceptación completa de Release.
+
 ## Resultado por fixture
 
 | Caso | Plataforma | Resultado observado y límite |

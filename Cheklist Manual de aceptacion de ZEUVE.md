@@ -2,9 +2,19 @@
 
 Estado acumulado al 09/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
-**639 pruebas: 606 ✅ OK · 6 ❌ fallidas · 8 ⚠️ parciales · 19 ➖ pendientes.** **620 probadas, incluidas las parciales; 19 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 608 ✅ OK · 6 ❌ fallidas · 9 ⚠️ parciales · 16 ➖ pendientes.** **623 probadas, incluidas las parciales; 16 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Continuación de las pruebas posibles sin sesión — 09/10/2026
+
+Tras «haz las que puedas», se ejecutan tres requisitos más desde la app nativa Debug 0.20.7.0/build 73, con datos aislados y los mismos enlaces públicos aportados. Base remota actualizada `5b31d37`. Sin código modificado, enlaces alternativos, cookies, sesión, descargas adicionales ni ajustes personales. Evidencias AX y capturas `D33-*`, `D52-*`, `D54-*` y `catalog-settings-*` en `QA-descargador-20261009`; detalle en la [QA del Descargador](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261009.md).
+
+- **D-33 — ⚠️, probada:** en Automático, `@nasa` se rechaza como enlace; al elegir Instagram se acepta, habilita Analizar y resuelve `instagram-profile:nasa` / `https://www.instagram.com/nasa/`. El motor devuelve `request_blocked`, el fallback no obtiene contenido y la UI muestra 0 elementos. Entrada y normalización comprobadas en Instagram; resolución completa del perfil no validada.
+- **D-52 — ✅, probada:** L07 muestra diez fotos en cuadrícula; scroll permite ver las diez, desmarcar/marcar una cambia la selección 10 → 9 → 10. Ajustes > Descargador > Catálogo permite cambiar a Lista y volver a Cuadrícula sin perder elementos ni selección. No certifica correspondencia u orden con el origen (D-38 sigue parcial).
+- **D-54 — ✅, probada:** desde el Stepper de Ajustes se cambia 160 → 240 → 160 px. Las capturas muestran miniaturas ampliadas y reorganización de seis a cuatro columnas, y la vuelta a seis al restaurar 160. No se afirma ensayo de todos los tamaños ni persistencia tras reinicio.
+
+Se restituyen Automático, Cuadrícula y 160 px en los datos de QA; la app se cierra normalmente y no quedan procesos de app/motores. Los 33 archivos previos permanecen, sin nuevas descargas. D-40–D-43 y D-56 siguen pendientes porque el perfil no devuelve contenido ni paginación; mostrar vacío no ejecuta esos requisitos. Los otros pendientes requieren enlaces ausentes (D-25/D-73) o pruebas de sesión no realizadas (D-44–D-51/P-11). Quedan 16 sin probar.
 
 ## Registro de las pruebas remotas ejecutadas — 09/10/2026
 
@@ -31,7 +41,7 @@ El usuario solicita rellenar como probadas las comprobaciones ya realizadas. Se 
 
 Se añaden también evidencias de regresión a requisitos ya probados: D-03/D-04 recuperan disponibilidad tras Cancelar y permiten analizar el lote siguiente; D-05 confirma archivos físicos; D-12/D-14/D-19 vuelven a descargar el vídeo TikTok, la foto Pinterest y el vídeo Vimeo. D-10/D-26 publican YouTube sin sesión, pero la decodificación del nuevo AV1 queda limitada por el FFmpeg incluido. D-21 publica audio AAC válido de SoundCloud, con incidencia de etiqueta Vídeo; su aceptación de descarga no certifica esa presentación. D-20 conserva su aceptación anterior: esta ronda solo analiza una emisión de 282:01, sin volver a descargarla. No se declara ninguna de estas limitaciones como una nueva aceptación completa de Release.
 
-P-12 conserva ⚠️ y queda marcado como probado por su evidencia local anterior, sin ampliar cobertura de sesiones/tokens remotos. D-25, D-33, D-40–D-52, D-54, D-56, D-73 y P-11 permanecen sin probar: no se convierte una dependencia bloqueada, una vista incidental o un enlace ausente en ejecución de esos requisitos. Todo estado sin OK restante pertenece al Descargador o a su autenticación.
+Al cerrar este registro inicial, P-12 conserva ⚠️ y queda marcado como probado por su evidencia local anterior, sin ampliar cobertura de sesiones/tokens remotos. Entonces D-25, D-33, D-40–D-52, D-54, D-56, D-73 y P-11 permanecían sin probar: no se convierte una dependencia bloqueada, una vista incidental o un enlace ausente en ejecución de esos requisitos. La continuación posterior de D-33/D-52/D-54 se registra arriba. Todo estado sin OK restante pertenece al Descargador o a su autenticación.
 
 ## Cierre de las comprobaciones locales — 05/10/2026 · 0.20.7.0/build 73
 
@@ -1164,7 +1174,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 ## Instagram
 
-- [ ] ➖ **D-33** `@usuario` funciona.
+- [x] ⚠️ **D-33** `@usuario` funciona.
 - [x] ❌ **D-34** URL de perfil funciona.
 - [x] ✅ **D-35** Publicación individual funciona.
 - [x] ✅ **D-36** Foto funciona.
@@ -1186,9 +1196,9 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 ## Catálogos y selección
 
-- [ ] ➖ **D-52** Vista cuadrícula funciona.
+- [x] ✅ **D-52** Vista cuadrícula funciona.
 - [x] ✅ **D-53** Vista lista funciona.
-- [ ] ➖ **D-54** Cambiar tamaño de miniaturas funciona.
+- [x] ✅ **D-54** Cambiar tamaño de miniaturas funciona.
 - [x] ✅ **D-55** Carga inicial del catálogo funciona.
 - [ ] ➖ **D-56** «Cargar más» funciona.
 - [x] ✅ **D-57** Selección individual funciona.
