@@ -6,6 +6,16 @@ Estado acumulado al 10/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), i
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
 
+## QA de Story privada — 10/10/2026
+
+- **D-11 — ⚠️, 10/10/2026:** Story activa privada aportada y acceso en Brave confirmado por control Pausar/Reproducir. Análisis nativo de la URL aportada sin sesión finaliza con 0 elementos, motor yt-dlp, «Activa más secciones» y descarga deshabilitada. No aparece el panel de sesión; no se considera perfil vacío ni Story inexistente. Se continúa con archivo de sesión autorizado; cobertura de Stories sigue parcial.
+
+- **D-48 — ⚠️, 10/10/2026:** Exportación explícita del motor incluido desde Brave completada (exit 0): 8 cookies, solo dominios Instagram y sessionid presente; archivo temporal modo 0600. No equivale al botón nativo «Importar sesión», que sigue sin aparecer. Una fila de sesión lleva caducidad vacía; se prepara solo una copia QA con 0 para continuar, sin corregir producto.
+
+Registro de Story: [informe](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PRIVATE_STORY.md). Sesión y Story autorizadas; Reddit aplazado por el usuario. Sin correcciones de producto.
+
+La Story existe y se reproduce en Brave, pero el análisis anónimo termina vacío y sin panel de sesión. Exportación limitada a Instagram completada; el siguiente análisis con sesión queda **sin ejecutar en esta ronda** porque macOS se bloquea y no expone ventanas a System Events. No se marca como fallo de ZEUVE ni como éxito autenticado. Dos copias temporales de cookies QA eliminadas; Brave intacto y Llavero sin item de ZEUVE. Continuación: desbloquear el Mac, exportar una copia nueva y repetir desde selección nativa del archivo. Los estados acumulados no cambian.
+
 ## QA de perfil público adicional — 10/10/2026
 
 - **D-34 — ❌, 10/10/2026:** Nuevo perfil público aportado por el usuario: navegador anónimo confirma foto, enlaces de publicaciones/Reels y destacadas; ZEUVE analiza sin sesión y termina con 0 elementos, «Activa más secciones» y descarga deshabilitada. Se mantiene fallo de catálogo/presentación, ahora con origen público accesible contrastado. Evidencia public-profile-result.txt; no se atribuye todavía la causa completa a la app o al bloqueo del extractor.

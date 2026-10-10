@@ -24,6 +24,8 @@ Autorización posterior específica de sesión (10/10/2026): el usuario identifi
 
 El usuario aporta después un perfil público adicional con contenido para las pruebas de catálogo. Se analiza anónimamente, sin extender la autorización de sesión al nuevo objetivo. El navegador confirma publicaciones/Reels/foto; ZEUVE devuelve 0 elementos con request_blocked y secciones activas. Una publicación concreta resuelve 17 elementos y un Reel concreto se descarga y decodifica completo. Se amplía evidencia de D-34/D-11/D-37, sin cambiar los 639 IDs ni estados ni aprobar correcciones. Registro: `Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PUBLIC_PROFILE.md`. Continúan 9 pendientes por dependencia de catálogo/panel de sesión; no se piden más perfiles por ausencia de contenido en el fixture.
 
+El usuario aplaza Reddit, no dispone ahora de publicación/Reel privado y aporta una Story activa privada del objetivo ya autorizado, manteniendo la sesión de Brave y el permiso para QA. Se confirma acceso en navegador y se ejecuta el análisis anónimo, vacío y sin panel; la exportación Instagram completa funciona. El análisis con sesión queda pendiente por bloqueo efectivo de macOS, no por falta de autorización ni de enlace. Se eliminan las dos copias temporales de cookies; no se guarda sesión en Llavero ni se modifica producto. Registro: `Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PRIVATE_STORY.md`. Estados acumulados conservados; no se amplía el encargo a corregir código ni a eludir controles de acceso.
+
 ## Corrección de parciales aprobada — 0.20.7.0
 
 El usuario solicita corregir los parciales y mantiene su autorización de ejecución. El 05/10/2026 confirma «Mantener el Descargador excluido»: D-15, D-60 y la cobertura remota de P-12 no se amplían.
