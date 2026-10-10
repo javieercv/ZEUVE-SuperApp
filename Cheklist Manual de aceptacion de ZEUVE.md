@@ -2,9 +2,29 @@
 
 Estado acumulado al 10/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
-**639 pruebas: 611 ✅ OK · 6 ❌ fallidas · 7 ⚠️ parciales · 15 ➖ pendientes.** **624 probadas, incluidas las parciales; 15 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 612 ✅ OK · 8 ❌ fallidas · 5 ⚠️ parciales · 14 ➖ pendientes.** **625 probadas, incluidas las parciales; 14 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Remate QA — 10/10/2026
+
+- **D-74 — ⚠️, 10/10/2026:** Descarga completa de L20 desde UI en Vídeo/360p/MP4: 1 correcto/0 fallidos, salida de 845.130.447 bytes, FFprobe detecta AV1 640×360 y Opus, duración 22.971,434 s (6:22:51). Archivo publicado y temporales limpios. La comprobación de decodificación con FFmpeg incluido falla porque su decoder AV1 intenta aceleración hardware no disponible; no se confunde con corrupción del archivo. Se completa la verificación alternativa antes de aceptar. Evidencia remate-replay-360-plan/result.txt.
+
+- **D-74 — ✅, 10/10/2026:** Repetición publicada descargada completamente desde UI: MP4 de 845.130.447 bytes, AV1 640×360/Opus, 22.971,434 s. FFmpeg externo ya instalado 8.1 con libdav1d decodifica vídeo y audio en inicio, mitad y tramo final (15 s cada uno), exit 0; confirma que el rechazo del FFmpeg incluido es limitación de su decoder, no corrupción demostrada. Alcance aceptado en Vídeo/360p; no se afirma comprobación completa de descarga original 4K. Se conserva la discrepancia de estimación anterior.
+
+- **D-25 — ⚠️, 10/10/2026:** Enlace concreto EroMe aportado ahora por el usuario; permiso adulto activado solo en QA tras confirmación nativa. UI analiza 12 vídeos y descarga 12 correctos/0 fallidos. Los 12 MP4 H.264/AAC decodifican íntegros con FFmpeg incluido (exit 0), pero solo hay 6 SHA-256 distintos: seis pares idénticos. Se contrasta cantidad en origen antes de atribuir duplicación; no se publica el título ni contenido multimedia en Git. Evidencia remate-erome-analysis/completed.txt. Compatibilidad de descarga probada, resultado aún parcial por duplicados.
+
+- **D-25 — ❌, 10/10/2026:** Contraste del álbum en navegador, sin reproducir ni mostrar contenido: la página indica 6 vídeos y 3 imágenes, con seis reproductores lógicos y tres fuentes de imagen únicas. DOM contiene 12 etiquetas video (estructura duplicada por reproductor); ZEUVE presenta/publica 12 vídeos, seis pares idénticos por SHA-256, y no publica las tres imágenes. Los 12 archivos se decodifican íntegros: fallo observado de duplicación/cobertura de galería, no de integridad ni disponibilidad. Posible causa: extracción cuenta nodos duplicados como entradas, pendiente de diagnóstico. Permiso adulto QA restaurado a OFF; navegador cerrado.
+
+- **D-74 — ✅, 10/10/2026:** Verificación adicional completa: FFmpeg externo ya instalado/libdav1d decodifica todas las pistas de vídeo y audio de los 6:22:51 de la repetición, exit 0. No se instala ni cambia ningún motor de ZEUVE. Complementa las tres muestras y confirma integridad de la descarga completa.
+
+- **P-12 — ⚠️, 10/10/2026:** Ensayo remoto real con valores sintéticos de token/password/sessionid en la query del vídeo público L22: análisis correcto, 170 entradas de log producidas, 0 coincidencias de los tres canarios y 0 queries en la clave primaria url. Sin credenciales reales ni descarga adicional. Se comprueba además la rama de error de una página pública sin multimedia; cobertura de cookies autenticadas sigue pendiente de sesión de pruebas. Evidencia remate-privacy-canary-analysis.txt.
+
+- **P-12 — ❌, 10/10/2026:** Canarios remotos en rama de error: análisis de example.com sin multimedia con token/password/sessionid sintéticos en query. Tras 176 entradas de log hay una coincidencia de cada uno de los tres valores, aunque en la rama correcta de YouTube había 0. Fallo efectivo de saneamiento de logs: no se usaron secretos reales, pero los valores de prueba se persistieron. Se localiza la clave responsable sin publicar el log bruto. Evidencia remate-canary-error.txt y auditoría por conteo. Cobertura de cookies reales P-11 sigue pendiente.
+
+- **P-12 — ❌, 10/10/2026:** Localización de fuga sintética: clave metadata.error del aviso «Un motor no ha resuelto la URL», no metadata.url. Lectura de la base actual muestra que se añade error.localizedDescription al extra y log() sanea solo la URL primaria antes de escribir. Esto explica la diferencia entre URL saneada y texto de error con query, sin afirmar exposición de secretos reales ni corregir producto.
+
+Registro del remate: [informe](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_CONTINUATION.md). Sin correcciones de producto.
 
 ## Continuación QA — 10/10/2026
 
@@ -1192,7 +1212,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ❌ **D-22** Tumblr.
 - [x] ❌ **D-23** Threads.
 - [x] ❌ **D-24** Snapchat público.
-- [ ] ➖ **D-25** EroMe mediante enlace concreto, si se quiere probar esa compatibilidad.
+- [x] ❌ **D-25** EroMe mediante enlace concreto, si se quiere probar esa compatibilidad.
 
 ## YouTube
 
@@ -1256,7 +1276,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-71** El bloqueo de contenido adulto aparece cuando corresponde y está desactivado.
 - [x] ✅ **D-72** Activarlo desde Ajustes cambia ese comportamiento.
 - [x] ✅ **D-73** Un directo activo/programado se rechaza.
-- [x] ⚠️ **D-74** Una repetición ya publicada como vídeo normal puede descargarse.
+- [x] ✅ **D-74** Una repetición ya publicada como vídeo normal puede descargarse.
 - [x] ✅ **D-75** Guardar descripción opcional funciona.
 - [x] ✅ **D-76** Guardar JSON de metadatos funciona.
 - [x] ✅ **D-77** Una descarga correcta aparece en Historial.
@@ -1879,7 +1899,7 @@ Si Xcode está instalado:
 - [x] ✅ **P-09** Un archivo original inspeccionado/editado permanece intacto.
 - [x] ✅ **P-10** Ningún conflicto normal sobrescribe silenciosamente un archivo existente.
 - [ ] ➖ **P-11** Después de utilizar una sesión de Instagram, los registros no muestran cookies.
-- [x] ⚠️ **P-12** Los registros no muestran tokens/credenciales.
+- [x] ❌ **P-12** Los registros no muestran tokens/credenciales.
 - [x] ✅ **P-13** Analizar chats no deja mensajes completos en Historial.
 - [x] ✅ **P-14** Comparar seguidores no deja usernames/listas en Historial.
 - [x] ✅ **P-15** OCR del Inspector no deja el texto OCR completo en Historial.
