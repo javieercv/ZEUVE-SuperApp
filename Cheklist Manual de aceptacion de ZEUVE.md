@@ -2,9 +2,31 @@
 
 Estado acumulado al 10/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
-**639 pruebas: 612 ✅ OK · 8 ❌ fallidas · 5 ⚠️ parciales · 14 ➖ pendientes.** **625 probadas, incluidas las parciales; 14 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 613 ✅ OK · 9 ❌ fallidas · 8 ⚠️ parciales · 9 ➖ pendientes.** **630 probadas, incluidas las parciales; 9 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## QA de sesión de Instagram — 10/10/2026
+
+- **D-34 — ❌, 10/10/2026:** Contraste con el perfil concreto indicado por el usuario, sin sesión: análisis finaliza con 0 elementos, «Activa más secciones» y descarga deshabilitada; tampoco aparece el panel de sesión. Se mantiene el fallo previo; no demuestra ausencia de contenido ni que sea privado. Cuenta/perfil no se publican.
+
+- **D-48 — ⚠️, 10/10/2026:** Exportación explícita mediante el motor incluido desde Brave, filtrada a Instagram, exit 0; se comprueban cantidad, dominio y presencia de sesión sin mostrar valores. El panel «Importar sesión» no aparece ni para el perfil ni para una destacada que el navegador puede ver. Cobertura del motor sí, importación nativa por ese botón no verificable; no se marca OK.
+
+- **D-47 — ❌, 10/10/2026:** Selector nativo: archivo Netscape válido exportado por motor incluido (8 cookies de Instagram, sessionid presente, 848 bytes, 0600), existente y legible. Dos selecciones; en la segunda se confirma fila cookies.txt seleccionada antes de aceptar. ZEUVE rechaza «El archivo cookies.txt ya no está disponible» y conserva «No se utilizan». No se atribuye al primer intento ambiguo; segundo fallo reproducido con selección comprobada.
+
+- **D-47 — ❌, 10/10/2026:** Tercer intento con exportación nueva en /private/tmp reproduce el rechazo. Causa probable respaldada: el exportador incluido genera una cookie de sesión con expiración vacía; NetscapeCookieFile exige Int64 en esa columna y lanza el mismo error de archivo «no disponible». No es ausencia del fichero ni permisos 0600 ni Sandbox (entitlements sin App Sandbox). Se prepara una copia QA con expiración de sesión 0 para continuar; no se cambia producto ni la exportación original.
+
+- **D-47 — ❌, 10/10/2026:** Contraste: el mismo selector acepta la copia QA con la única caducidad vacía convertida a 0 y muestra cookies-normalized.txt, sin alertas. Refuerza incompatibilidad exportador/lector; la selección funciona con ese formato, pero se mantiene fallo para la exportación original.
+
+- **D-44 — ⚠️, 10/10/2026:** Sesión real autorizada exportada de Brave y archivo normalizado aceptado por UI. En Brave se abre una destacada del perfil objetivo (reproductor Pausar/Reproducir disponible); cuenta con acceso confirmado, sin publicar contenido. ZEUVE registra sesión aportada sí, pero el análisis del perfil no acaba en ≈180 s; Cancelar desde UI. No se confirma validación de sesión por el motor ni catálogo autenticado. No se clasifica como ausencia de contenido.
+
+- **D-46 — ⚠️, 10/10/2026:** La UI acepta y utiliza cookies-normalized.txt como archivo de sesión (8 cookies, campo de expiración de sesión 0), pero el archivo original generado por el motor se rechaza (D-47). No se consigue catálogo tras ≈180 s; importación/preparación de archivo comprobadas, acceso efectivo y pegado de texto Netscape en panel de sesión no verificados.
+
+- **D-44 — ⚠️, 10/10/2026:** Segundo recorrido nativo con el enlace directo de una destacada accesible en Brave, conservando cookies-normalized.txt: análisis finaliza con 0 elementos, descarga deshabilitada y sin panel de sesión. Log: sesión aportada sí; fallback sin resultados, no consta validación efectiva. No se descarga ni publica contenido privado. Se mantiene parcial, con bloqueo de integración/consulta sin atribuir toda la causa al origen.
+
+- **P-11 — ✅, 10/10/2026:** Tras usar la sesión real autorizada en análisis de perfil (cancelado ≈180 s) y destacada directa (terminada sin resultados), se auditan 202 entradas del log QA frente a los 8 valores reales de cookies: 0 coincidencias. Comprobación acotada a estos recorridos; no certifica una descarga autenticada correcta ni invalida el fallo sintético de P-12. Valores y log bruto no se publican.
+
+Registro de sesión: [informe](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_SESSION.md). Autorización específica del usuario; sin correcciones de producto. Perfil con cinco destacadas visibles en navegador, sin publicaciones. Archivo exportado incompatible con el lector por caducidad vacía; copia normalizada aceptada, análisis del perfil cancelado a ≈180 s y destacada directa con catálogo vacío. Nueve IDs siguen sin probar: D-40–D-43/D-56 por ausencia de catálogo utilizable (el perfil aportado tampoco tiene publicaciones/Reels); D-45/D-49–D-51 porque no aparece el panel de sesión, no se logra importar/recordar por ese flujo y no se puede comprobar recuperación/borrado de una sesión que ZEUVE no ha guardado. No se simulan con fixtures internos para declarar éxito manual. Las tres copias de cookies QA se eliminan al cerrar; sesión original de Brave intacta y Llavero sin item de ZEUVE (exit 44).
 
 ## Remate QA — 10/10/2026
 
@@ -1237,11 +1259,11 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [ ] ➖ **D-41** Muestra Reels.
 - [ ] ➖ **D-42** Muestra foto de perfil.
 - [ ] ➖ **D-43** Sin sesión, Stories/Destacadas restringidas no bloquean el resto del perfil.
-- [ ] ➖ **D-44** Con una sesión válida se puede acceder a las secciones que esa cuenta ya puede ver.
+- [x] ⚠️ **D-44** Con una sesión válida se puede acceder a las secciones que esa cuenta ya puede ver.
 - [ ] ➖ **D-45** Pegar una cabecera Cookie funciona.
-- [ ] ➖ **D-46** Importar `cookies.txt` funciona.
-- [ ] ➖ **D-47** Seleccionar archivo Netscape funciona.
-- [ ] ➖ **D-48** Importar expresamente desde un navegador compatible funciona.
+- [x] ⚠️ **D-46** Importar `cookies.txt` funciona.
+- [x] ❌ **D-47** Seleccionar archivo Netscape funciona.
+- [x] ⚠️ **D-48** Importar expresamente desde un navegador compatible funciona.
 - [ ] ➖ **D-49** «Recordar» conserva la sesión.
 - [ ] ➖ **D-50** Reiniciar ZEUVE recupera la sesión recordada.
 - [ ] ➖ **D-51** Restaurar ajustes globales elimina esa sesión recordada.
@@ -1898,7 +1920,7 @@ Si Xcode está instalado:
 - [x] ✅ **P-08** Un archivo original convertido permanece intacto.
 - [x] ✅ **P-09** Un archivo original inspeccionado/editado permanece intacto.
 - [x] ✅ **P-10** Ningún conflicto normal sobrescribe silenciosamente un archivo existente.
-- [ ] ➖ **P-11** Después de utilizar una sesión de Instagram, los registros no muestran cookies.
+- [x] ✅ **P-11** Después de utilizar una sesión de Instagram, los registros no muestran cookies.
 - [x] ❌ **P-12** Los registros no muestran tokens/credenciales.
 - [x] ✅ **P-13** Analizar chats no deja mensajes completos en Historial.
 - [x] ✅ **P-14** Comparar seguidores no deja usernames/listas en Historial.

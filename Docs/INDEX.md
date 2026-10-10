@@ -72,6 +72,7 @@ La instantánea empaquetable concreta se define en `../Resources/Engines/engines
 - [QA manual 0.20.7.0 — 05/10/2026](Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md): nueve parciales locales aceptados desde UI.
 - [Cierre local: volumen y sincronía](Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md): captura de salida digital y vídeo presentado; todo el alcance local aceptado.
 - [Remate QA del Descargador — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_CONTINUATION.md): repetición completa aceptada; EroMe fallido por duplicados/fotos omitidas y logs fallidos con canarios sintéticos; autenticación pendiente de sesión autorizada.
+- [QA de sesión de Instagram — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_SESSION.md): sesión autorizada de Brave; incompatibilidad del exportador/lector, análisis sin catálogo y auditoría de cookies en logs. Estado vigente: 630 ejecutadas, 9 pendientes; sin correcciones.
 - [Continuación QA del Descargador — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010.md): Twitch, orden del carrusel y rechazo de directos aceptados; carpetas ampliadas, repetición parcial, sesión macOS bloqueada y batería automatizada sin fallos.
 - [QA exploratoria del Descargador — 09/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261009.md): enlaces aportados por el usuario, descargas reales, falsos éxitos, duplicados y límites pendientes; resultados registrados en la checklist sin certificar aceptación completa de Release.
 - [Entrega](Historico/Entregas/DELIVERY_0.20.7.0.md).
