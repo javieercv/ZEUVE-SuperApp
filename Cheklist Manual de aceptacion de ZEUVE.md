@@ -6,6 +6,20 @@ Estado acumulado al 10/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), i
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
 
+## QA de perfil público adicional — 10/10/2026
+
+- **D-34 — ❌, 10/10/2026:** Nuevo perfil público aportado por el usuario: navegador anónimo confirma foto, enlaces de publicaciones/Reels y destacadas; ZEUVE analiza sin sesión y termina con 0 elementos, «Activa más secciones» y descarga deshabilitada. Se mantiene fallo de catálogo/presentación, ahora con origen público accesible contrastado. Evidencia public-profile-result.txt; no se atribuye todavía la causa completa a la app o al bloqueo del extractor.
+
+- **D-11 — ⚠️, 10/10/2026:** Contraste del mismo perfil: un enlace concreto de publicación pública resuelve 17 elementos por Catálogo de Instagram sin sesión; la cuadrícula muestra fotos y vídeo. No se realiza nueva descarga ni se acepta catálogo de perfil por este éxito. Todos los tipos de catálogo están activos en Ajustes (Fotos/Vídeos/Reels/Stories/Destacadas/Foto de perfil); el aviso «Activa más secciones» del perfil vacío no corresponde a filtros desactivados. Evidencias public-profile-concrete-post.txt y public-profile-catalog-settings.txt.
+
+- **D-11 — ⚠️, 10/10/2026:** Segundo contraste del mismo perfil: enlace directo de Reel resuelve 1 elemento clasificado Reel, seleccionado y descargable, sin sesión. El log confirma elementos_unicos=17 para publicación mixta y =1 para Reel, mientras la consulta de perfil registra request_blocked y fallback vacío. Confirma rutas concretas operativas y bloqueo específico del recorrido de catálogo; no acepta D-40/D-41 del perfil por mostrar contenido desde enlaces independientes. Evidencia public-profile-concrete-reel.txt.
+
+- **D-37 — ✅, 10/10/2026:** Contraste adicional con Reel del nuevo perfil: descarga desde UI sin sesión, 1 correcto/0 omitidos/0 fallidos y 1 archivo publicado bajo Instagram/perfil/Reels. FFprobe: H.264 720×1280/AAC, 23,635057 s, 5.573.473 bytes. Decodificación íntegra de vídeo/audio con FFmpeg incluido, exit 0; SHA-256 0797d638f27c0202929b2a296c14030dc5da9f93b1f1b6da64758ba9f7eca272. Se conserva aceptación de enlace concreto, no de listado de Reels del perfil (D-41). Evidencia public-profile-reel-download.txt.
+
+Registro del perfil adicional: [informe](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PUBLIC_PROFILE.md). Sin sesión de Instagram ni cambios de producto.
+
+El nuevo perfil tiene publicaciones/Reels/foto visibles sin sesión y confirma que no falta un fixture público. ZEUVE sigue sin devolver catálogo de perfil (`request_blocked`, fallback vacío), aunque una publicación concreta resuelve 17 elementos y un Reel se descarga/verifica completo. D-40–D-43/D-56 no se aceptan por éxitos de enlaces independientes y mantienen su bloqueo. Estados/IDs conservados: 613 OK, 9 fallidas, 8 parciales y 9 pendientes; 630 ejecutadas. Cierre limpio, 45 archivos QA publicados acumulados, sin sesiones importadas.
+
 ## QA de sesión de Instagram — 10/10/2026
 
 - **D-34 — ❌, 10/10/2026:** Contraste con el perfil concreto indicado por el usuario, sin sesión: análisis finaliza con 0 elementos, «Activa más secciones» y descarga deshabilitada; tampoco aparece el panel de sesión. Se mantiene el fallo previo; no demuestra ausencia de contenido ni que sea privado. Cuenta/perfil no se publican.
