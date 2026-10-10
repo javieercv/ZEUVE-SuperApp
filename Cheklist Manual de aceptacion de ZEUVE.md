@@ -1,10 +1,42 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Estado acumulado al 09/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
+Estado acumulado al 10/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
-**639 pruebas: 608 ✅ OK · 6 ❌ fallidas · 9 ⚠️ parciales · 16 ➖ pendientes.** **623 probadas, incluidas las parciales; 16 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 611 ✅ OK · 6 ❌ fallidas · 7 ⚠️ parciales · 15 ➖ pendientes.** **624 probadas, incluidas las parciales; 15 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Continuación QA — 10/10/2026
+
+- **D-34 — ❌, 10/10/2026:** Reintento nativo del perfil L04 en datos nuevos, sin sesión: análisis termina con 0 elementos y consejo «Activa más secciones», sin catálogo utilizable. Se mantiene fallo de resolución/presentación; no se atribuye todo el rechazo a ZEUVE ni se certifica disponibilidad del origen. Evidencia `profile-result.txt`; D-40–D-43/D-56 siguen sin ejecutarse.
+
+- **D-18 — ✅, 10/10/2026:** Nueva descarga del clip público L14 desde UI en sesión limpia: 1 correcto/0 fallidos; `Twitch/bubble.mp4` publicado. FFprobe confirma H.264/AAC y 5,007 s; decodificación íntegra exit 0. Cerrar resumen deja UI disponible sin aviso heredado de Reddit. Aceptación acotada al clip aportado, no a cualquier VOD. Evidencia `twitch-analysis/plan/result/clean.txt`.
+
+- **D-38 — ✅, 10/10/2026:** Contrastadas visualmente las diez imágenes de L07 en el carrusel público original, recorriendo Siguiente hasta desaparecer en la décima, frente a los diez JPEG publicados el 09/10 con índices 01–10. Orden coincidente: Luna; objetos sobre madera; tablet/libros/cámara; ilustración unicornio; niña/gafas; astronauta ilustrado; diario/foto; niño/oso; dibujo de equipaje; astronauta flotante. Complementa catálogo nativo de diez tarjetas ya probado; no se deduce el orden solo de los nombres. Sin login ni importación de cookies; capturas del navegador visibles en este chat.
+
+- **D-34 — ❌, 10/10/2026:** Contraste independiente del mismo perfil en navegador sin login: la página pública muestra nasa, foto, Publicaciones y enlaces de reels/carruseles; no se importa esa sesión de navegador en ZEUVE. Confirma que el perfil existe y es visible públicamente en ese recorrido, pero no demuestra acceso idéntico para endpoints del motor. `request_blocked` de la app y ausencia de mensaje útil siguen sin resolver.
+
+- **D-17 — ⚠️, 10/10/2026:** L13 reintentado desde UI: el análisis acaba sin multimedia compatible alrededor de 180 s; al comprobar a los 189 s la operación ya había terminado y Cancelar no existía. Se cierra el aviso y no se publica ningún archivo de esta entrada. El clic tardío de cancelación es un incidente de control, no una cancelación efectiva. El vídeo L12 conserva su aceptación previa. Contraste público en navegador: Reddit muestra «Prove your humanity» y reCAPTCHA; no se resuelve ni elude. Esto limita la comprobación del origen, pero no demuestra que el CAPTCHA sea la causa exacta del timeout del motor. Se mantiene parcial.
+
+- **D-60 — ⚠️, 10/10/2026:** Configuración plataforma/perfil OFF y subcarpeta multi ON probada desde Ajustes nativos: L07 publica 10 JPEG en Downloads/Publicación - CGadBvyJNix, sin Instagram/nasa/Publicaciones. UI 10 correctos/0 fallidos. El clic de control por ordinal alcanzó Descargar, no el selector esperado; la carpeta era la salida QA ya comprobada, sin originales afectados. Evidencia folders-off-on-ready/folder-picker.txt. Se mantiene parcial hasta restantes combinaciones y destacadas.
+
+- **D-60 — ⚠️, 10/10/2026:** Segunda combinación real: plataforma/perfil OFF y subcarpeta multi OFF. L07 publica 10 JPEG en Downloads/CGadBvyJNix (queda activa la opción general «Crear una carpeta para la lista»), no directamente en la raíz. UI 10 correctos/0 fallidos; se conservan los 10 de la combinación anterior en su subcarpeta, sin sobrescritura. Evidencia folders-off-off-ready/result.txt. Queda combinación ON/OFF y contenido de destacadas.
+
+- **D-60 — ⚠️, 10/10/2026:** Tercera combinación real ON/OFF: L07 publica 10 JPEG en Downloads/Instagram/nasa/Publicaciones, sin subcarpeta de publicación; UI 10 correctos/0 fallidos. ON/ON ya probado el 09/10 en Instagram/nasa/Publicaciones/Publicación - CGadBvyJNix. Quedan cubiertas las cuatro combinaciones de estos dos ajustes con fotos de carrusel; destacadas no disponibles y requisito completo conserva parcial. Evidencia folders-on-off-ready/result.txt.
+
+- **D-73 — ⚠️, 10/10/2026:** Primer caso programado oficial NASA (13/10, enlace publicado en nasa.gov/live y navegador «La emisión comenzará en 2 días»): formato /live/f8FE2R7esZ0 rechazado inmediatamente con explicación explícita de emisiones activas/programadas y repeticiones normales; Analizar deshabilitado, ningún archivo. Se prueba ahora la URL canónica /watch del mismo ID para verificar detección por estado, no solo por ruta. Evidencia scheduled-live-url.txt. No se importan sesiones del navegador.
+
+- **D-73 — ⚠️, 10/10/2026:** Mismo programado en /watch?v=f8FE2R7esZ0: yt-dlp detecta «This live event will begin in 2 days»; termina sin catálogo/descarga tras fallbacks. Rechazo efectivo, aunque UI reemplaza la causa por «No se ha podido extraer contenido multimedia compatible» (YT-EBA5A209CDC2583B). Ajustes abierto recibió además aviso titulado «No se ha podido guardar el ajuste» con texto de análisis: incongruencia de presentación observada, no fallo demostrado de persistencia. Evidencias scheduled-watch-result/main.txt. Queda directo activo.
+
+- **D-73 — ✅, 10/10/2026:** Directo activo oficial NASA awQzjn72bI0 comprobado desde listado oficial y navegador («En directo», usuarios viéndolo ahora), luego analizado en ZEUVE sin sesión: identifica emisión en directo, avisa «no puede descargarse en esta versión», 0 seleccionados y Descargar deshabilitado. Junto al programado f8FE2R7esZ0 cubre ambas ramas; no se publica archivo. Se conserva nota de mensaje genérico del programado y aviso incongruente de Ajustes. Evidencia active-live-result.txt. Enlaces públicos adicionales obtenidos de https://www.nasa.gov/live/, no fuentes privadas.
+
+- **P-12 — ⚠️, 10/10/2026:** Auditoría de logs de esta sesión aislada tras tráfico real: 115 entradas, sin marcador sessionid= ni referencias a importación de cookies; no se usaron credenciales. Persiste 1 mensaje de error con URL Google de query técnica (fallback del programado), no prueba de filtración de una sesión aportada. Sin ensayo con canarios/credenciales y sin sesión autenticada no se certifica redacción completa; se mantiene parcial. Archivos QA privados fuera del repositorio, no se publica el log bruto.
+
+- **D-74 — ⚠️, 10/10/2026:** Repetición L20 vuelve a analizarse: 6:22:51, 35 formatos, emisión finalizada admitida. Descarga original iniciada con estimación UI 867,6 MB; temporal f401 supera 1.286.883.351 bytes sin finalizar. Se cancela desde UI para acotar disco/tráfico: resumen «Descarga cancelada», 0 correctos/0 fallidos, controles recuperados. Se conserva discrepancia de estimación como observación (no tamaño final conocido). Aún no hay repetición completa publicada; se intentará formato explícito más ligero. Evidencia replay-ready/download-progress/cancel.txt.
+
+- **D-74 — ⚠️, 10/10/2026:** Después de cancelar, se elige modo Vídeo: «Mejor disponible» estima 20,95 GB frente a 867,6 MB en Automático/Original para el mismo contenido. Se abre el menú de resolución; macOS bloquea la sesión y el control pierde acceso a la ventana al intentar 360p. No se selecciona ni se inicia la descarga ligera; este impedimento es del control, no un nuevo fallo de ZEUVE. Proceso app vivo, sin motores; punto de continuación: elegir 360p y confirmar plan antes de descargar. Cancelación previa eliminó automáticamente los ~1,3 GB temporales propios, conservando las salidas publicadas.
+
+Registro por prueba: [informe del 10/10](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010.md). Enlaces aportados y dos enlaces públicos oficiales NASA adicionales; datos aislados, sin importar sesiones ni corregir producto.
 
 ## Continuación de las pruebas posibles sin sesión — 09/10/2026
 
@@ -1153,7 +1185,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ❌ **D-15** X/Twitter.
 - [x] ✅ **D-16** Facebook.
 - [x] ⚠️ **D-17** Reddit.
-- [x] ⚠️ **D-18** Twitch con contenido ya publicado.
+- [x] ✅ **D-18** Twitch con contenido ya publicado.
 - [x] ✅ **D-19** Vimeo.
 - [x] ✅ **D-20** Dailymotion.
 - [x] ✅ **D-21** SoundCloud.
@@ -1179,7 +1211,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-35** Publicación individual funciona.
 - [x] ✅ **D-36** Foto funciona.
 - [x] ✅ **D-37** Vídeo/Reel funciona.
-- [x] ⚠️ **D-38** Carrusel muestra todos los elementos y en el orden correcto.
+- [x] ✅ **D-38** Carrusel muestra todos los elementos y en el orden correcto.
 - [x] ⚠️ **D-39** Un perfil público se analiza sin obligar a iniciar sesión.
 - [ ] ➖ **D-40** Muestra publicaciones.
 - [ ] ➖ **D-41** Muestra Reels.
@@ -1223,7 +1255,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 - [x] ✅ **D-71** El bloqueo de contenido adulto aparece cuando corresponde y está desactivado.
 - [x] ✅ **D-72** Activarlo desde Ajustes cambia ese comportamiento.
-- [ ] ➖ **D-73** Un directo activo/programado se rechaza.
+- [x] ✅ **D-73** Un directo activo/programado se rechaza.
 - [x] ⚠️ **D-74** Una repetición ya publicada como vídeo normal puede descargarse.
 - [x] ✅ **D-75** Guardar descripción opcional funciona.
 - [x] ✅ **D-76** Guardar JSON de metadatos funciona.
