@@ -26,6 +26,8 @@ El usuario aporta después un perfil público adicional con contenido para las p
 
 El usuario aplaza Reddit, no dispone ahora de publicación/Reel privado y aporta una Story activa privada del objetivo ya autorizado, manteniendo la sesión de Brave y el permiso para QA. Se confirma acceso en navegador y se ejecuta el análisis anónimo, vacío y sin panel; la exportación Instagram completa funciona. El análisis con sesión queda pendiente por bloqueo efectivo de macOS, no por falta de autorización ni de enlace. Se eliminan las dos copias temporales de cookies; no se guarda sesión en Llavero ni se modifica producto. Registro: `Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PRIVATE_STORY.md`. Estados acumulados conservados; no se amplía el encargo a corregir código ni a eludir controles de acceso.
 
+El usuario confirma después el desbloqueo. Se repite la Story con archivo normalizado aceptado: catálogo vacío, sin panel ni validación efectiva. Contraste por perfil con sesión cancelado a ≈184 s sin catálogo. Auditoría final de 234 logs frente a 8 valores reales de cookies: 0 coincidencias, alcance limitado a análisis. App cerrada, dos nuevas copias de cookies y pestañas QA retiradas; Brave original intacto, Llavero sin item. Se conservan 613 OK, 9 fallidas, 8 parciales y 9 pendientes (630 ejecutadas). El impedimento ya no es el bloqueo de macOS sino catálogo/panel no operativos; no se simulan pruebas de recuerdo/recuperación/reset ni se aprueban correcciones.
+
 ## Corrección de parciales aprobada — 0.20.7.0
 
 El usuario solicita corregir los parciales y mantiene su autorización de ejecución. El 05/10/2026 confirma «Mantener el Descargador excluido»: D-15, D-60 y la cobertura remota de P-12 no se amplían.
