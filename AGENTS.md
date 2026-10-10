@@ -23,6 +23,12 @@ No uses `force-push`, no reescribas historial compartido y no elimines cambios l
 
 Una revisión sin cambios también debe partir del estado remoto más reciente, pero no necesita commit vacío ni push.
 
+## Uso autorizado de AppleScript y System Events
+
+Si la conexión o integración normal con una aplicación o servicio falla, no está disponible o no permite completar una tarea ya autorizada, el agente **tiene autorización permanente para utilizar AppleScript y macOS System Events como vía alternativa**, sin volver a pedir permiso al usuario por el mero cambio de mecanismo. Debe intentar directamente esa alternativa cuando el entorno lo permita, evitando consultas, bloqueos o deliberaciones innecesarias sobre si puede utilizarla.
+
+Esta autorización es para el **medio de ejecución**, no para ampliar el alcance de la tarea: siguen vigentes las aprobaciones de cambios de producto, las protecciones de archivos y privacidad y las restricciones de seguridad del proyecto. Deben respetarse los permisos efectivos de macOS (Automatización/Accesibilidad), sin eludir avisos del sistema, controles de acceso ni acceder a secretos o datos ajenos al encargo. No se permiten acciones destructivas o publicaciones externas no autorizadas. Si el mecanismo alternativo tampoco es viable, informa brevemente del impedimento real y de lo que no se pudo completar.
+
 ## Lectura obligatoria
 
 Antes de proponer o modificar ZEUVE, lee el conjunto mínimo pertinente:
