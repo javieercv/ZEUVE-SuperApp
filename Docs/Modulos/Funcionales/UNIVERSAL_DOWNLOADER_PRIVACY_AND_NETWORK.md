@@ -24,13 +24,13 @@ Cada operación contacta únicamente con la URL introducida, sus servidores mult
 - La opción «Recordar» utiliza el Llavero de macOS.
 - No se registran nombres o valores de cookies, tokens, cabeceras, contraseñas o URLs firmadas.
 
-Los enlaces concretos públicos de Instagram se analizan y descargan anónimamente incluso cuando existe una sesión temporal o recordada. La secuencia pública es `instaloader-zeuve` → `gallery-dl` → `yt-dlp` → descubrimiento genérico. ZEUVE no pasa `--cookies`, `--cookies-from-browser` ni una cabecera Cookie durante esos intentos. Solo el contenido confirmado como privado o restringido puede activar una sesión ya autorizada. Los mensajes ambiguos de login, rate limit o bloqueo del extractor no se consideran confirmación de privacidad.
+Los enlaces concretos públicos de Instagram se analizan y descargan anónimamente incluso cuando existe una sesión temporal o recordada. La secuencia pública es `instaloader-zeuve` → `gallery-dl` → `yt-dlp` → descubrimiento genérico. ZEUVE no pasa `--cookies`, `--cookies-from-browser` ni una cabecera Cookie durante esos intentos. Solo el contenido confirmado como privado o restringido puede activar una sesión ya autorizada. Las URLs concretas de Stories/Destacadas son contenido que requiere sesión por tipo, sin inferir privacidad a partir de un error HTTP. Los mensajes ambiguos de login, rate limit o bloqueo del extractor no se consideran confirmación de privacidad.
 
 Las URLs multimedia firmadas que devuelve la resolución específica de Instagram permanecen en memoria y se consumen mediante una sesión efímera. El nombre final usa el formato expuesto por el CDN y el `Content-Type` realmente recibido; no se guarda la URL firmada en historial, registros, presets o metadatos.
 
 Los vídeos públicos de YouTube utilizan por defecto clientes públicos anónimos de yt-dlp y no leen cookies ni almacenes del navegador. La importación desde navegador solo se ejecuta cuando el usuario la activa expresamente para contenido realmente restringido y puede requerir permisos de macOS. yt-dlp lee entonces la sesión del navegador elegido durante esa operación, sin copiarla a ZEUVE ni conservar la selección en ajustes, presets, historial o registros. Un `cookies.txt` seleccionado manualmente tiene prioridad. ZEUVE no pide la contraseña.
 
-Los enlaces públicos de TikTok se vuelven a resolver desde su página estable durante la descarga. `gallery-dl` puede probar varias rutas temporales del CDN; si falla o termina vacío, el respaldo con el `yt-dlp` incluido reutiliza únicamente la misma URL pública estable. Las URLs firmadas solo existen durante la operación y no se codifican en planes persistidos, historial, metadatos ni registros. Los registros del respaldo conservan solo el motor, cantidades, resultado y referencia técnica saneada.
+Los enlaces públicos de TikTok se vuelven a resolver desde su página estable durante la descarga. `gallery-dl` puede probar varias rutas temporales del CDN; si falla, termina vacío o no produce contenido válido, el respaldo con el `yt-dlp` incluido reutiliza únicamente la misma URL pública estable. Las URLs firmadas solo existen durante la operación y no se codifican en planes persistidos, historial, metadatos ni registros. Los registros del respaldo conservan solo el motor, cantidades, resultado y referencia técnica saneada.
 
 Los dos motores sociales empaquetados con PyInstaller reciben una autorización de firma limitada a sus propios procesos para cargar el framework Python que extraen temporalmente. Esta excepción no se aplica a `ZEUVE.app`, no habilita red adicional y no cambia el acceso a archivos del usuario.
 
@@ -44,13 +44,13 @@ La búsqueda histórica es manual y envía el nombre o URL pública del perfil a
 
 ## Navegador opcional
 
-En 0.7.3 el fallback automatizado se encuentra temporalmente deshabilitado y no participa en el routing. Ajustes conserva una sección informativa heredada llamada «Navegador opcional», pero no ofrece un selector, instalador ni activación funcional del navegador. Se conserva únicamente la compatibilidad de lectura de la preferencia histórica, que se normaliza a desactivada. No se descarga, instala ni ejecuta un navegador automatizado y no cambia ninguna política de CAPTCHA, DRM o controles de acceso.
+En 0.7.4 el fallback automatizado se encuentra temporalmente deshabilitado y no participa en el routing. Ajustes conserva una sección informativa heredada llamada «Navegador opcional», pero no ofrece un selector, instalador ni activación funcional del navegador. Se conserva únicamente la compatibilidad de lectura de la preferencia histórica, que se normaliza a desactivada. No se descarga, instala ni ejecuta un navegador automatizado y no cambia ninguna política de CAPTCHA, DRM o controles de acceso.
 
 ## Registros e historial
 
-Los registros contienen fases, cantidades, motores, tiempos y errores técnicos saneados. El historial conserva identificadores canónicos y resultados, pero no URLs completas, cookies, sesiones o texto privado de publicaciones.
+Los registros aceptan metadata estructurada de fases, cantidades, motores, tiempos, categorías y referencias técnicas. No persisten localizedDescription, stderr, IDs libres de motores ni URLs como detalle de errores. Las advertencias de secciones del adaptador son mensajes cerrados sin contenido de excepciones. El historial conserva identificadores canónicos y resultados, pero no URLs completas, cookies, sesiones o texto privado de publicaciones.
 
 
-## Saneamiento interno 0.7.3
+## Organización interna
 
-La reorganización de nombres, carpetas y responsabilidades no modifica la política de red ni privacidad. Continúan sin cambiar el routing, los argumentos de motores, la prioridad de sesiones, las restricciones DRM/CAPTCHA/paywall, la redacción de logs, la ausencia de telemetría y la prohibición de persistir URLs firmadas, cookies, tokens, cabeceras o credenciales.
+La reorganización de nombres, carpetas y responsabilidades no modifica la política de red ni privacidad. Se conservan las restricciones DRM/CAPTCHA/paywall, la ausencia de telemetría y la prohibición de persistir URLs firmadas, cookies, tokens, cabeceras o credenciales. La selección por identidad y las rutas autenticadas explícitas se describen en la fuente funcional vigente.

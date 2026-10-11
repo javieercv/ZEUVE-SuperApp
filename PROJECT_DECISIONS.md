@@ -1,20 +1,28 @@
 # Decisiones aprobadas de ZEUVE
 
-Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.7.0 el 9 de octubre de 2026.
+Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.8.0 el 11 de octubre de 2026.
 
 > **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
 
-## Estado vigente de referencia — ZEUVE 0.20.7.0
+## Correcciones del Descargador aprobadas — 0.20.8.0
+
+El 11/10/2026 el usuario aprueba el plan investigado de las nueve fallidas y ocho parciales. Autoriza las correcciones de selección/identidad, validación/publicación, metadata segura de errores, cookies Netscape de sesión, estados y panel de Instagram, adaptador propio sobre Instaloader 4.15.3, URLs Tumblr y diagnóstico condicionado de Threads/Reddit. No autoriza todavía iniciar pruebas manuales reales: se avisará tras terminar la implementación y las comprobaciones automáticas, y se esperará su indicación. Reddit online continúa aplazado; cualquier nuevo motor, endpoint o navegador necesita decisión separada.
+
+La entrega implementada es 0.20.8.0, marketing 0.20.8/build 74, Descargador 0.7.4, instaloader-zeuve 4.15.3-zeuve.3. No cambia SQLite, dependencias upstream ni permisos. Los análisis afectados tienen presupuesto de 120 s por acción/página y usan el timeout de red configurado por petición. La identidad del recurso se distingue del número visible y del ordinal; la validación exige contenido primario real. Las señales ambiguas de bloqueo no prueban privacidad ni invalidez de sesión.
+
+La checklist conserva 613 OK, nueve fallidas, ocho parciales y nueve pendientes hasta la siguiente aceptación manual. Las evidencias y exclusiones anteriores conservan su alcance histórico; no sustituyen esta aprobación de correcciones.
+
+## Estado vigente de referencia — ZEUVE 0.20.8.0
 
 Este bloque resume las decisiones actualmente efectivas que más fácilmente pueden confundirse con registros antiguos. No sustituye los detalles de cada sección ni las fuentes vivas.
 
-- Built-ins: Organizador 0.1.5, Descargador 0.7.3, Analizador de chats 0.1.6, Conversor 0.3.2, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.5 y Limpiador 0.1.4.
-- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.7.0.
+- Built-ins: Organizador 0.1.5, Descargador 0.7.4, Analizador de chats 0.1.6, Conversor 0.3.2, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.5 y Limpiador 0.1.4.
+- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.8.0.
 - Ajustes: centralizados. Orden de secciones: Organizador 10, Descargador 20, Analizador 30, Conversor 40, Inspector 50 y Limpiador 60; el Comparador no tiene sección propia.
 - Inspector: inspección + preview + análisis + edición estructural segura sin transcode audiovisual; la transformación que requiere recodificación pertenece al Conversor.
 - Limpiador: `scanLocalStorage` autoriza análisis local documentado; cualquier retirada exige `removeLocalItems`, plan visible, selección y revalidación. Papelera es el modo seguro predeterminado y Undo solo aparece cuando es verificable.
 - Motores requeridos por la instantánea actual: yt-dlp, Deno, FFmpeg, FFprobe, gallery-dl e instaloader-zeuve. Pandoc sigue soportado como opcional del Conversor cuando se prepara. Playwright no participa en la ruta efectiva actual. Calibre, Ghostscript y LibreOffice están retirados.
-- Versión: ZEUVE 0.20.7.0, marketing 0.20.7, build 73.
+- Versión: ZEUVE 0.20.8.0, marketing 0.20.8, build 74.
 
 ## Registro de pruebas del Descargador — 09/10/2026
 

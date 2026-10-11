@@ -21,7 +21,8 @@ struct GalleryDLAnalysisAdapter: Sendable {
         engines: DownloadEnginePaths,
         cookiesFile: URL?,
         proxy: String?,
-        proxyCredentials: DownloadProxyCredentials?
+        proxyCredentials: DownloadProxyCredentials?,
+        timeoutSeconds: Int = 20
     ) async throws -> GalleryDLAnalysisAdapterResult {
         guard let executable = engines.galleryDL else {
             throw UniversalDownloaderError.optionalEngineUnavailable("gallery-dl")
@@ -30,7 +31,8 @@ struct GalleryDLAnalysisAdapter: Sendable {
             for: input,
             cookiesFile: cookiesFile,
             proxy: proxy,
-            proxyCredentials: proxyCredentials
+            proxyCredentials: proxyCredentials,
+            timeoutSeconds: timeoutSeconds
         )
         let stdout = LockedDataCollector(maximumBytes: 64 * 1_048_576)
         let stderr = LockedDataCollector(maximumBytes: 1_048_576)

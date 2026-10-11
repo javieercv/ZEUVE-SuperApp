@@ -67,6 +67,7 @@ public struct YTDLPAnalysisParser: Sendable {
             thumbnailURL: raw.thumbnail.flatMap(URL.init(string:)),
             description: raw.description,
             formats: formats,
+            deferredMediaResolution: ["url", "url_transparent"].contains(raw.type ?? "") && raw.url?.isEmpty == false,
             subtitles: subtitles.sorted { $0.languageCode < $1.languageCode },
             chaptersCount: raw.chapters?.count ?? 0,
             liveStatus: liveStatus(raw.liveStatus, isLive: raw.isLive, wasLive: raw.wasLive),

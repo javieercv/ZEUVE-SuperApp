@@ -41,9 +41,11 @@ struct UniversalDownloaderCatalogView: View {
             }
             if visibleEntries.isEmpty {
                 ContentUnavailableView(
-                    "No hay elementos visibles",
+                    analysis.playlistEntries.isEmpty ? "No se ha obtenido contenido" : "No hay elementos visibles",
                     systemImage: "line.3.horizontal.decrease.circle",
-                    description: Text("Activa más secciones en Ajustes > Descargador universal > Catálogo.")
+                    description: Text(analysis.playlistEntries.isEmpty
+                        ? (analysis.description ?? "El origen no ha devuelto recursos descargables en este intento.")
+                        : "Activa más secciones en Ajustes > Descargador universal > Catálogo.")
                 )
                 .frame(minHeight: 150)
             } else if usesGrid {

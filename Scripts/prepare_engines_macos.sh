@@ -409,7 +409,7 @@ manifest = {
         entry('gallery-dl', 'gallery-dl', 'gallery-dl/gallery-dl', os.environ['GALLERY_DL_VERSION'], 'arm64',
               f"https://pypi.org/project/gallery-dl/{os.environ['GALLERY_DL_VERSION']}/",
               'licenses/gallery-dl/LICENSE', 'Analizar y descargar fotografías, vídeos, carruseles, álbumes y galerías compatibles.', ['--version']),
-        entry('instaloader-zeuve', 'instaloader-zeuve', 'instaloader/instaloader-zeuve', os.environ['INSTALOADER_VERSION'] + '-zeuve.2', 'arm64',
+        entry('instaloader-zeuve', 'instaloader-zeuve', 'instaloader/instaloader-zeuve', os.environ['INSTALOADER_VERSION'] + '-zeuve.3', 'arm64',
               f"https://pypi.org/project/instaloader/{os.environ['INSTALOADER_VERSION']}/",
               'licenses/instaloader/LICENSE', 'Resolver publicaciones directas y catalogar perfiles y contenido multimedia de Instagram.', ['--version']),
         optional_entry('playwright-browser', 'zeuve-browser-helper', 'playwright/zeuve-browser-helper', 'not-provided-0.10.0', 'arm64',

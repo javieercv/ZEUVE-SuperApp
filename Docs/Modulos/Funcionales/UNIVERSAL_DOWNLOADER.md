@@ -1,4 +1,4 @@
-# Descargador universal 0.7.3 — ZEUVE 0.20.5.0
+# Descargador universal 0.7.4 — ZEUVE 0.20.8.0
 
 ## Identidad
 
@@ -7,7 +7,7 @@
 - Tecnología: Swift 6 con motores locales incluidos u opcionales.
 - Versión mínima declarada en el manifest: ZEUVE 0.10.4.
 
-## Organización interna 0.7.3
+## Organización interna 0.7.4
 
 El target vigente es `UniversalDownloaderModule` y la UI vive en `Sources/ZEUVEApp/UniversalDownloader`. La organización vigente diferencia explícitamente:
 
@@ -32,7 +32,7 @@ El módulo no obliga a utilizar un único extractor. `UniversalEngineRouter` eli
 - `instaloader-zeuve`: resolución directa y catálogo progresivo de Instagram.
 - extractor HTML de ZEUVE: archivos directos, reproductores y manifiestos encontrados en páginas concretas.
 - FFmpeg/FFprobe: unión, remultiplexado y validación multimedia.
-- navegador opcional: reservado como compatibilidad futura; en 0.7.3 no existe una opción funcional de instalación/activación ni participa en el routing porque el contrato ejecutable anterior estaba incompleto. Ajustes conserva únicamente una sección informativa heredada sobre esta posibilidad.
+- navegador opcional: reservado como compatibilidad futura; en 0.7.4 no existe una opción funcional de instalación/activación ni participa en el routing porque el contrato ejecutable anterior estaba incompleto. Ajustes conserva únicamente una sección informativa heredada sobre esta posibilidad.
 
 El orden puede usar motores de respaldo aprobados. No se rastrea un sitio completo desde una página genérica.
 
@@ -67,7 +67,7 @@ La compatibilidad efectiva depende de que la plataforma continúe exponiendo el 
 - El análisis interpreta el protocolo vigente de `gallery-dl 1.32.9` y conserva compatibilidad con el protocolo anterior.
 - La descarga parte otra vez de la URL pública estable y selecciona el elemento por su posición. Así el motor puede renovar URLs firmadas y probar sus rutas alternativas ante un HTTP 403.
 - Una ejecución no se considera correcta hasta que el espacio temporal contiene al menos un archivo candidato. Un código de salida cero con resultado vacío se trata como fallo.
-- Si `gallery-dl` falla o termina vacío, ZEUVE limpia el espacio temporal y reintenta únicamente ese TikTok con el `yt-dlp` incluido y la misma URL pública estable. El respaldo debe terminar correctamente y producir archivos antes de publicar.
+- Si `gallery-dl` falla, termina vacío o produce contenido inválido, ZEUVE limpia el espacio temporal y reintenta únicamente ese TikTok con el `yt-dlp` incluido y la misma URL pública estable. El respaldo debe terminar correctamente y producir archivos antes de publicar.
 - Si ambos motores fallan, la operación queda marcada como fallo total, no publica restos parciales y muestra una referencia técnica saneada con acceso a los registros.
 - El contenido se guarda en su formato original y se valida con FFprobe; no se recodifica.
 - Las URLs firmadas, cookies y cabeceras de sesión permanecen fuera del historial, los metadatos, los registros y el ZIP del proyecto.
@@ -80,11 +80,23 @@ La compatibilidad efectiva depende de que la plataforma continúe exponiendo el 
 - Un HTTP 403 o la ausencia de un PO token no se presentan por sí solos como una exigencia de iniciar sesión. ZEUVE informa de un rechazo temporal o de que no existe un formato público compatible.
 - Las sesiones continúan disponibles únicamente como una opción expresa para contenido que realmente esté protegido por edad, cuenta o permisos. Un `cookies.txt` seleccionado conserva prioridad sobre la importación temporal del navegador.
 
+## Resultados, selección y errores
+
+El catálogo distingue recursos independientes y variantes del mismo vídeo. Las variantes conocidas de X se agrupan por identificador del recurso y se conserva la referencia de mayor resolución; elementos distintos de una publicación no se agrupan por título o duración. Los resultados genéricos de EroMe se complementan con imágenes originales de grupos multimedia del álbum, sin recoger avatares ni posters de vídeo.
+
+La selección de gallery-dl conserva un ordinal del motor independiente del número visible. Al descargar aplica un filtro de identidad del recurso y limita la salida a una coincidencia; una identidad que no se pueda verificar no permite sustituir el elemento por otro. El nombre usa la extensión real del motor. Subtítulos y metadatos son auxiliares, no contenido primario ni criterio de éxito.
+
+Antes de publicar se valida formato y pistas reales de audio/vídeo con FFprobe y las firmas de imágenes. Una imagen renombrada a MP3 se rechaza; un MP4 con solo audio sigue siendo válido para audio. Un JSON de análisis vacío no detiene un fallback permitido. Las referencias explícitas de playlists planas siguen resolviéndose durante la descarga.
+
+Las peticiones de análisis usan el tiempo configurado de red (20 s de fábrica). Instagram, TikTok, X, Tumblr, Threads, Snapchat, EroMe y Reddit tienen un presupuesto total de 120 s por acción/página. Al agotarlo se cancelan los procesos; los recursos válidos ya emitidos se conservan como catálogo parcial, con aviso. Este presupuesto no limita descargas ni playlists de otros servicios.
+
+Tumblr admite publicaciones concretas con ID numérico, incluidas /blog/ID, /post/ID e /image/ID; rechaza perfiles y rutas de navegación. Threads mantiene motores genéricos: reconocer su dominio no garantiza compatibilidad con cualquier publicación.
+
 ## Instagram
 
 Se puede introducir:
 
-- `@usuario` o un nombre de usuario;
+- `@usuario` o un nombre de usuario, seleccionando Instagram;
 - enlace de perfil;
 - publicación, fotografía, carrusel, vídeo o reel;
 - story activa;
@@ -92,13 +104,19 @@ Se puede introducir:
 
 El perfil se cataloga progresivamente. Puede mostrar publicaciones, fotos, vídeos, reels, stories activas, highlights y foto de perfil actual. No incluye publicaciones etiquetadas ni directos.
 
-Las publicaciones y Reels directos públicos se resuelven primero con `instaloader-zeuve 4.15.3-zeuve.2`, sin cookies. El adaptador devuelve cada foto o vídeo del sidecar como un elemento independiente, conservando orden, tipo y formato. Si no puede resolverlo, ZEUVE continúa anónimamente con `gallery-dl`, `yt-dlp` y el descubrimiento genérico aprobado. Esta ruta conserva prioridad aunque exista una sesión guardada. Solo una señal explícita de contenido privado permite repetir con una sesión ya autorizada.
+Las publicaciones y Reels directos públicos se resuelven primero con `instaloader-zeuve 4.15.3-zeuve.3`, sin cookies. El adaptador devuelve cada foto o vídeo del sidecar como un elemento independiente, conservando orden, tipo y formato. Si no puede resolverlo, ZEUVE continúa anónimamente con `gallery-dl`, `yt-dlp` y el descubrimiento genérico aprobado. Esta ruta conserva prioridad aunque exista una sesión guardada. Solo una señal explícita de contenido privado permite repetir con una sesión ya autorizada.
+
+Los enlaces concretos de Stories y Destacadas se encaminan a gallery-dl con una sesión aportada expresamente; sin ella se muestra el panel de autenticación. No se envían como shortcodes de publicaciones al comando direct. Cada Story/Destacada conserva su necesidad de sesión al pasar a la descarga, incluso si el perfil es público.
 
 Redirecciones al inicio de sesión, respuestas 401, 403 o 429, límites temporales y mensajes ambiguos como `login required` no demuestran por sí solos que el contenido sea privado. No autorizan a adjuntar una sesión a una petición que todavía pueda resolverse públicamente.
 
-## Perfiles por plataforma 0.7.3
+El panel de sesión es opcional y accesible para perfiles y análisis no disponibles; no afirma que un bloqueo remoto pruebe privacidad. El mensaje de filtros solo aparece si existen recursos ocultos. Se muestran las secciones fallidas y el carácter parcial de un respaldo limitado a publicaciones. El adaptador emite los elementos de la página progresivamente; cambiar a un cliente anónimo limpia su estado de sesión validada. Una validación bloqueada no prueba caducidad de cookies.
 
-«Por defecto de la plataforma» se resuelve para cada elemento, no para el lote completo. Todos los perfiles incorporados son editables desde Ajustes y pueden restaurarse individualmente o en conjunto. En 0.7.3, sus valores de fábrica son los mismos para todas las plataformas, incluido YouTube:
+Los archivos Netscape aceptan caducidad vacía para cookies de sesión, equivalente a 0 internamente. Acceso imposible, formato inválido y ausencia de cookies tienen errores distintos. Los originales seleccionados no se modifican.
+
+## Perfiles por plataforma 0.7.4
+
+«Por defecto de la plataforma» se resuelve para cada elemento, no para el lote completo. Todos los perfiles incorporados son editables desde Ajustes y pueden restaurarse individualmente o en conjunto. En 0.7.4, sus valores de fábrica son los mismos para todas las plataformas, incluido YouTube:
 
 - contenido: «Original sin convertir»;
 - calidad: mejor disponible;
@@ -213,7 +231,7 @@ La versión incluida dentro de la aplicación no se modifica. Puede restaurarse 
 - Una respuesta ambigua, un límite temporal o un endpoint que pida inicio de sesión no convierten el perfil en privado ni abren automáticamente la tarjeta obligatoria de autenticación.
 - Si una sesión aportada es inválida, ZEUVE vuelve a intentar el perfil de forma anónima antes de declarar la consulta no disponible.
 - `gallery-dl` continúa como respaldo público cuando `instaloader-zeuve` no resuelve el perfil.
-- `instaloader-zeuve 4.15.3-zeuve.2` añade la resolución directa anónima de publicaciones, Reels y sidecars completos sobre Instaloader 4.15.3.
+- `instaloader-zeuve 4.15.3-zeuve.3` añade la resolución directa anónima de publicaciones, Reels y sidecars completos sobre Instaloader 4.15.3.
 - La sesión sigue siendo obligatoria para perfiles privados sin acceso, stories, destacadas y enlaces concretos que Instagram proteja expresamente.
 - Los registros indican solo si se aportó y validó una sesión, el motor, el fallback y las secciones restringidas; nunca guardan cookies, tokens ni el usuario de la cuenta iniciada.
 

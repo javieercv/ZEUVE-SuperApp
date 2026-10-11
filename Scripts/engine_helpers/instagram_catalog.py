@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlsplit
 
-VERSION = "4.15.3-zeuve.2"
+VERSION = "4.15.3-zeuve.3"
 
 
 def emit(value: dict[str, Any]) -> None:
@@ -159,6 +159,20 @@ def classify_profile_lookup_error(
     }
 
 
+
+def section_failure(error: Exception, section: str) -> dict[str, Any]:
+    lower = f"{type(error).__name__} {error}".lower()
+    if any(value in lower for value in ("403", "429", "timeout", "timed out", "connection", "checkpoint", "challenge_required")):
+        code = "section_request_blocked"
+        message = f"Instagram no ha permitido completar la consulta de {section}."
+    elif any(value in lower for value in ("loginrequired", "login required", "authentication required")):
+        code = "section_requires_authentication"
+        message = f"La sección {section} requiere una sesión con acceso autorizado."
+    else:
+        code = "section_failed"
+        message = f"No se ha podido completar la sección {section}."
+    return {"record": "warning", "section": section, "code": code, "message": message}
+
 def post_records(post: Any, section: str, source_page: str | None = None) -> Iterable[dict[str, Any]]:
     base = {
         "record": "media",
@@ -242,7 +256,7 @@ def direct(args: argparse.Namespace) -> int:
     try:
         import instaloader
     except Exception as error:
-        emit({"record": "error", "code": "engine_missing", "message": str(error)})
+        emit({"record": "error", "code": "engine_missing", "message": "El motor no ha podido completar esta fase."})
         return 20
 
     loader = instaloader.Instaloader(
@@ -255,6 +269,7 @@ def direct(args: argparse.Namespace) -> int:
         compress_json=False,
         quiet=True,
         max_connection_attempts=2,
+        request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
     )
     session_supplied = bool(args.cookies or args.cookie_header_file)
     try:
@@ -331,7 +346,7 @@ def catalog(args: argparse.Namespace) -> int:
     try:
         import instaloader
     except Exception as error:
-        emit({"record": "error", "code": "engine_missing", "message": str(error)})
+        emit({"record": "error", "code": "engine_missing", "message": "El motor no ha podido completar esta fase."})
         return 20
 
     loader = instaloader.Instaloader(
@@ -344,6 +359,7 @@ def catalog(args: argparse.Namespace) -> int:
         compress_json=False,
         quiet=True,
         max_connection_attempts=2,
+        request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
     )
     session_supplied = bool(args.cookies or args.cookie_header_file or args.browser)
     session_username: str | None = None
@@ -375,17 +391,18 @@ def catalog(args: argparse.Namespace) -> int:
             compress_json=False,
             quiet=True,
             max_connection_attempts=2,
+            request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
         )
         session_validated = False
 
     if session_supplied:
         try:
             session_username = activate_session(loader)
-            session_validated = bool(session_username)
+            session_validated = True if session_username else None
         except Exception:
             # A failed validation request must not discard the cookies before the
             # actual profile lookup; Instagram may allow one endpoint and reject another.
-            session_validated = False
+            session_validated = None
 
     try:
         profile = instaloader.Profile.from_username(loader.context, args.username)
@@ -401,15 +418,18 @@ def catalog(args: argparse.Namespace) -> int:
                 compress_json=False,
                 quiet=True,
                 max_connection_attempts=2,
+                request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
             )
             try:
                 profile = instaloader.Profile.from_username(anonymous_loader.context, args.username)
                 loader = anonymous_loader
+                session_username = None
+                session_validated = False
                 emit({
                     "record": "warning",
                     "section": "session",
                     "code": "session_ignored_for_public_lookup",
-                    "message": "La sesión aportada no se ha validado, pero el perfil público se ha consultado sin ella.",
+                    "message": "La consulta con sesión ha fallado; el perfil se ha consultado sin sesión.",
                     "session_supplied": True,
                     "session_validated": False,
                 })
@@ -450,66 +470,13 @@ def catalog(args: argparse.Namespace) -> int:
     all_records: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
 
-    def add_posts(iterator: Iterable[Any], section: str) -> None:
-        try:
-            for post in iterator:
-                for record in post_records(post, section):
-                    key = str(record["id"])
-                    if key not in seen_ids:
-                        seen_ids.add(key)
-                        all_records.append(record)
-                if len(all_records) >= args.offset + args.limit + 50:
-                    break
-        except Exception as error:
-            emit({"record": "warning", "section": section, "message": str(error)})
-
-    add_posts(profile.get_posts(), "posts")
-    if args.reels:
-        add_posts(profile.get_reels(), "reels")
-
-    if args.stories:
-        if not session_validated:
-            emit({
-                "record": "warning",
-                "section": "stories",
-                "code": "section_requires_authentication",
-                "message": "Stories no disponibles sin una sesión de Instagram.",
-            })
-        else:
-            try:
-                for story in loader.get_stories(userids=[profile.userid]):
-                    for index, item in enumerate(story.get_items(), start=1):
-                        all_records.append(story_record(item, "stories", index=index))
-            except Exception as error:
-                emit({
-                    "record": "warning",
-                    "section": "stories",
-                    "code": "section_requires_authentication",
-                    "message": "Stories no disponibles con la sesión actual.",
-                    "technical_error_type": type(error).__name__,
-                })
-
-    if args.highlights:
-        if not session_validated:
-            emit({
-                "record": "warning",
-                "section": "highlights",
-                "code": "section_requires_authentication",
-                "message": "Destacadas no disponibles sin una sesión de Instagram.",
-            })
-        else:
-            try:
-                for highlight in loader.get_highlights(profile):
-                    for index, item in enumerate(highlight.get_items(), start=1):
-                        all_records.append(story_record(item, "highlights", highlight.title, index))
-            except Exception as error:
-                emit({
-                    "record": "warning",
-                    "section": "highlights",
-                    "code": "section_requires_authentication",
-                    "message": "Destacadas no disponibles con la sesión actual.",
-                    "technical_error_type": type(error).__name__,
-                })
+    def append_record(record: dict[str, Any]) -> None:
+        record["requires_authentication"] = bool(profile.is_private or record.get("section") in ("stories", "highlights"))
+        position = len(all_records)
+        all_records.append(record)
+        start = max(0, int(args.offset))
+        if start <= position < start + max(1, int(args.limit)):
+            emit(record)
 
     # The current profile picture is always available as an independently selectable item.
     profile_picture = {
@@ -525,13 +492,60 @@ def catalog(args: argparse.Namespace) -> int:
         "extension": media_extension(str(profile.profile_pic_url), "jpg"),
         "source_page": f"https://www.instagram.com/{profile.username}/",
     }
-    all_records.insert(0, profile_picture)
+    append_record(profile_picture)
+
+    def add_posts(iterator_factory: Any, section: str) -> None:
+        try:
+            for post in iterator_factory():
+                for record in post_records(post, section):
+                    key = str(record["id"])
+                    if key not in seen_ids:
+                        seen_ids.add(key)
+                        append_record(record)
+                if len(all_records) >= args.offset + args.limit + 50:
+                    break
+        except Exception as error:
+            emit(section_failure(error, section))
+
+    add_posts(profile.get_posts, "posts")
+    if args.reels:
+        add_posts(profile.get_reels, "reels")
+
+    if args.stories:
+        if not session_validated:
+            emit({
+                "record": "warning",
+                "section": "stories",
+                "code": "section_requires_authentication",
+                "message": "Stories no disponibles sin una sesión de Instagram.",
+            })
+        else:
+            try:
+                for story in loader.get_stories(userids=[profile.userid]):
+                    for index, item in enumerate(story.get_items(), start=1):
+                        append_record(story_record(item, "stories", index=index))
+            except Exception as error:
+                emit(section_failure(error, "stories"))
+
+    if args.highlights:
+        if not session_validated:
+            emit({
+                "record": "warning",
+                "section": "highlights",
+                "code": "section_requires_authentication",
+                "message": "Destacadas no disponibles sin una sesión de Instagram.",
+            })
+        else:
+            try:
+                for highlight in loader.get_highlights(profile):
+                    for index, item in enumerate(highlight.get_items(), start=1):
+                        append_record(story_record(item, "highlights", highlight.title, index))
+            except Exception as error:
+                emit(section_failure(error, "highlights"))
 
     start = max(0, int(args.offset))
     end = start + max(1, int(args.limit))
     page = all_records[start:end]
-    for record in page:
-        emit(record)
     emit({
         "record": "page",
         "offset": start,
@@ -547,7 +561,7 @@ def export_cookies(args: argparse.Namespace) -> int:
     try:
         import browser_cookie3  # type: ignore
     except Exception as error:
-        emit({"record": "error", "code": "browser_cookie_missing", "message": str(error)})
+        emit({"record": "error", "code": "browser_cookie_missing", "message": "El motor no ha podido completar esta fase."})
         return 30
     # Use MozillaCookieJar so the result is directly accepted by all ZEUVE engines.
     jar = http.cookiejar.MozillaCookieJar(args.output)
@@ -590,6 +604,7 @@ def parser() -> argparse.ArgumentParser:
     cat.add_argument("--highlights", action="store_true")
     cat.add_argument("--reels", action="store_true")
     cat.add_argument("--profile-picture", action="store_true")
+    cat.add_argument("--request-timeout", type=int, default=20)
     cat.add_argument("--cookies")
     cat.add_argument("--cookie-header-file")
     cat.add_argument("--browser")
@@ -598,6 +613,7 @@ def parser() -> argparse.ArgumentParser:
     direct_post.add_argument("--shortcode", required=True)
     direct_post.add_argument("--source-url", required=True)
     direct_post.add_argument("--content-kind", choices=("post", "reel"), default="post")
+    direct_post.add_argument("--request-timeout", type=int, default=20)
     direct_post.add_argument("--cookies")
     direct_post.add_argument("--cookie-header-file")
     exp = sub.add_parser("export-cookies")

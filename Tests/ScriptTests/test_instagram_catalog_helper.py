@@ -184,6 +184,87 @@ class InstagramCatalogHelperTests(unittest.TestCase):
         self.assertEqual(result["code"], "public_direct_lookup_blocked")
         self.assertFalse(result["requires_authentication"])
 
+    def test_section_errors_are_safe_and_network_is_not_authentication(self) -> None:
+        for section in ("posts", "stories", "highlights"):
+            value = MODULE.section_failure(RuntimeError("HTTP 429 https://example.com/private?token=SYNTHETIC_CANARY"), section)
+            self.assertEqual(value["code"], "section_request_blocked")
+            self.assertNotIn("SYNTHETIC_CANARY", MODULE.json.dumps(value))
+        value = MODULE.section_failure(LoginRequiredException("Login required"), "stories")
+        self.assertEqual(value["code"], "section_requires_authentication")
+
+    def test_anonymous_fallback_clears_validated_session_and_preserves_partial_media(self) -> None:
+        loaders = []
+        story_calls = []
+
+        class FakeLoader:
+            def __init__(self, **kwargs):
+                self.context = SimpleNamespace(username=None, index=len(loaders))
+                loaders.append((self.context, kwargs))
+
+            def test_login(self):
+                return "synthetic_user"
+
+            def get_stories(self, **kwargs):
+                story_calls.append(self.context.index)
+                raise AssertionError("Anonymous loader must not query Stories")
+
+            def get_highlights(self, profile):
+                raise AssertionError("Anonymous loader must not query Highlights")
+
+        class FakeProfile:
+            username = "zeuve"
+            full_name = "ZEUVE"
+            biography = ""
+            is_private = False
+            followed_by_viewer = False
+            profile_pic_url = "https://cdn.example/avatar.jpg"
+            profile_pic_url_no_iphone = profile_pic_url
+            mediacount = 1
+            userid = 123
+            has_public_story = True
+
+            @staticmethod
+            def from_username(context, username):
+                if context.index == 0:
+                    raise RuntimeError("synthetic authenticated endpoint blocked")
+                return FakeProfile()
+
+            def get_posts(self):
+                # An eager failure previously escaped add_posts before its try.
+                raise RuntimeError("HTTP 429 token=SYNTHETIC_CANARY")
+
+            def get_reels(self):
+                return []
+
+        args = SimpleNamespace(username="zeuve", limit=24, offset=0, cursor=None,
+            stories=True, highlights=True, reels=True, profile_picture=True,
+            cookies=None, cookie_header_file="synthetic", browser=None, browser_cookie_file=None, request_timeout=7)
+        output = io.StringIO()
+        fake = SimpleNamespace(Instaloader=FakeLoader, Profile=FakeProfile)
+        with patch.dict(sys.modules, {"instaloader": fake}), patch.object(MODULE, "load_cookie_header", lambda *args: None), patch("sys.stdout", output):
+            self.assertEqual(MODULE.catalog(args), 0)
+        records = [MODULE.json.loads(line) for line in output.getvalue().splitlines()]
+        profile = next(r for r in records if r.get("record") == "profile")
+        self.assertFalse(profile["session_validated"])
+        self.assertEqual(story_calls, [])
+        self.assertTrue(all(kwargs["request_timeout"] == 7 for _, kwargs in loaders))
+        self.assertNotIn("SYNTHETIC_CANARY", output.getvalue())
+        media_index = next(i for i, r in enumerate(records) if r.get("record") == "media")
+        warning_index = next(i for i, r in enumerate(records) if r.get("section") == "posts")
+        self.assertLess(media_index, warning_index)
+        self.assertEqual(records[media_index]["kind"], "profilePicture")
+
+    def test_netscape_export_uses_empty_session_expiry(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic.txt"
+            jar = MODULE.http.cookiejar.MozillaCookieJar(str(path))
+            jar.set_cookie(MODULE.http.cookiejar.Cookie(0, "sessionid", "SYNTHETIC", None, False,
+                ".instagram.com", True, True, "/", True, True, None, True, None, None, {}, False))
+            jar.save(ignore_discard=True, ignore_expires=True)
+            row = next(line for line in path.read_text().splitlines() if line and not line.startswith("#"))
+            self.assertEqual(row.split("\t")[4], "")
+
 
 if __name__ == "__main__":
     unittest.main()

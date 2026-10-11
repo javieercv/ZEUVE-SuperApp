@@ -1,5 +1,7 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
+Implementación 0.20.8.0/build 74 preparada tras el plan aprobado del 11/10/2026. Pruebas manuales reales a la espera de indicación expresa del usuario; esta checklist conserva los resultados anteriores y no reclasifica ningún ID por pruebas automáticas.
+
 Estado acumulado al 10/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
 
 **639 pruebas: 613 ✅ OK · 9 ❌ fallidas · 8 ⚠️ parciales · 9 ➖ pendientes.** **630 probadas, incluidas las parciales; 9 sin probar.** Ninguna marcada como no aplicable.

@@ -53,6 +53,7 @@ public struct InstagramCatalogParser: Sendable {
         var page: [String: Any] = [:]
         var entries: [DownloadCatalogItem] = []
         var warnings: [String] = []
+        var failedSections = Set<String>()
         var authenticationRestrictedSections = Set<UniversalCatalogSection>()
         var hardError: [String: Any]?
 
@@ -69,8 +70,13 @@ public struct InstagramCatalogParser: Sendable {
                    let sectionName = object["section"] as? String,
                    let section = authenticationRestrictedSection(sectionName) {
                     authenticationRestrictedSections.insert(section)
-                } else if let message = object["message"] as? String {
-                    warnings.append(message)
+                } else if let section = object["section"] as? String,
+                          ["posts", "reels", "stories", "highlights", "session"].contains(section) {
+                    let code = object["code"] as? String ?? "section_failed"
+                    if section != "session" { failedSections.insert(section) }
+                    warnings.append(code == "section_request_blocked"
+                        ? "Instagram ha bloqueado o limitado una sección del catálogo."
+                        : "No se ha podido completar una sección del catálogo con el acceso actual.")
                 }
             case "error":
                 hardError = object
@@ -78,7 +84,7 @@ public struct InstagramCatalogParser: Sendable {
             }
         }
 
-        let issueCode = nonEmpty(hardError?["code"] as? String)
+        let issueCode = nonEmpty(hardError?["code"] as? String) ?? (failedSections.isEmpty ? nil : "catalog_partial")
         let sessionSupplied = bool(profile["session_supplied"] ?? hardError?["session_supplied"])
         let sessionValidated = optionalBool(profile["session_validated"] ?? hardError?["session_validated"])
 
@@ -116,7 +122,7 @@ public struct InstagramCatalogParser: Sendable {
             channelID: int(profile["userid"]).map(String.init),
             thumbnailURL: profilePicture,
             description: warningText ?? nonEmpty(profile["biography"] as? String),
-            availability: requiresAuthentication ? "needs_auth" : (isPrivate ? "private_accessible" : "public"),
+            availability: requiresAuthentication ? "needs_auth" : (issueCode == "catalog_partial" ? "partial" : (isPrivate ? "private_accessible" : "public")),
             playlistTitle: username,
             playlistCount: knownTotal ?? entries.count,
             playlistEntries: entries,
@@ -258,7 +264,7 @@ public struct InstagramCatalogParser: Sendable {
         }
     }
 
-    private func mediaEntry(_ object: [String: Any], username: String) -> DownloadCatalogItem? {
+    func mediaEntry(_ object: [String: Any], username: String) -> DownloadCatalogItem? {
         guard let mediaURL = url(object["media_url"]),
               let rawKind = object["kind"] as? String else { return nil }
         let kind = UniversalMediaKind(rawValue: rawKind) ?? .unknown
@@ -305,6 +311,7 @@ public struct InstagramCatalogParser: Sendable {
         return DownloadCatalogItem(
             canonicalID: "instagram:\(id)",
             playlistIndex: index,
+            requiresAuthentication: kind.requiresInstagramSession || bool(object["requires_authentication"]),
             title: title.isEmpty ? "Instagram - \(id)" : title,
             duration: double(object["duration"]),
             uploader: username,

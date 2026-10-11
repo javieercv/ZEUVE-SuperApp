@@ -35,7 +35,7 @@ El script fija `gallery-dl 1.32.9`, `Instaloader 4.15.3`, `browser-cookie3 0.20.
 
 ## Navegador opcional
 
-El navegador Playwright **no participa en la ruta efectiva actual del Descargador**. La instantánea `Resources/Engines/engines.json` no contiene un navegador ejecutable. `prepare_engines_macos.sh` conserva compatibilidad para generar un marcador opcional/no proporcionado, pero no instala un navegador funcional ni habilita un selector o una ruta de ejecución. Ajustes sí conserva una sección informativa heredada llamada «Navegador opcional»; su texto describe una posibilidad futura, no una capacidad efectiva de 0.7.3. No se descarga, instala ni actualiza un navegador en segundo plano.
+El navegador Playwright **no participa en la ruta efectiva actual del Descargador**. La instantánea `Resources/Engines/engines.json` no contiene un navegador ejecutable. `prepare_engines_macos.sh` conserva compatibilidad para generar un marcador opcional/no proporcionado, pero no instala un navegador funcional ni habilita un selector o una ruta de ejecución. Ajustes sí conserva una sección informativa heredada llamada «Navegador opcional»; su texto describe una posibilidad futura, no una capacidad efectiva de 0.7.4. No se descarga, instala ni actualiza un navegador en segundo plano.
 
 ## Modificar motores
 

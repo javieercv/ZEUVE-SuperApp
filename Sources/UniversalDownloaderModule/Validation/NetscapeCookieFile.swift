@@ -24,7 +24,7 @@ public struct NetscapeCookie: Sendable, Equatable {
 public enum NetscapeCookieFile {
     public static func parse(_ data: Data) throws -> [NetscapeCookie] {
         guard let text = String(data: data, encoding: .utf8) else {
-            throw UniversalDownloaderError.cookiesFileUnavailable
+            throw UniversalDownloaderError.invalidCookiesFormat
         }
         var cookies: [NetscapeCookie] = []
         var sawHeader = false
@@ -41,8 +41,11 @@ public enum NetscapeCookieFile {
             }
             let columns = line.split(separator: "\t", omittingEmptySubsequences: false).map(String.init)
             guard columns.count >= 7,
-                  let expires = Int64(columns[4]) else {
-                throw UniversalDownloaderError.cookiesFileUnavailable
+                  let expires = columns[4].isEmpty ? 0 : Int64(columns[4]), expires >= 0,
+                  !columns[0].isEmpty, !columns[5].isEmpty,
+                  ["TRUE", "FALSE"].contains(columns[1].uppercased()),
+                  ["TRUE", "FALSE"].contains(columns[3].uppercased()) else {
+                throw UniversalDownloaderError.invalidCookiesFormat
             }
             cookies.append(.init(
                 domain: columns[0],
@@ -54,7 +57,8 @@ public enum NetscapeCookieFile {
                 value: columns[6...].joined(separator: "\t")
             ))
         }
-        guard sawHeader || !cookies.isEmpty else { throw UniversalDownloaderError.cookiesFileUnavailable }
+        guard sawHeader || !cookies.isEmpty else { throw UniversalDownloaderError.invalidCookiesFormat }
+        guard !cookies.isEmpty else { throw UniversalDownloaderError.emptyCookiesFile }
         return cookies
     }
 

@@ -143,7 +143,7 @@ class SocialEnginePreparationPolicyTests(unittest.TestCase):
             self.assertEqual(entries["gallery-dl"]["licenseFile"], "licenses/gallery-dl/LICENSE")
             self.assertEqual(entries["gallery-dl"]["requirement"], "required")
             self.assertEqual(entries["instaloader-zeuve"]["sha256"], hashlib.sha256(b"instagram").hexdigest())
-            self.assertEqual(entries["instaloader-zeuve"]["version"], "4.15.3-zeuve.2")
+            self.assertEqual(entries["instaloader-zeuve"]["version"], "4.15.3-zeuve.3")
             self.assertEqual(entries["instaloader-zeuve"]["requirement"], "required")
 
 
@@ -156,7 +156,7 @@ class SocialEnginePreparationPolicyTests(unittest.TestCase):
         self.assertIn('INSTALOADER_VERSION="4.15.3"', social)
         self.assertIn('INSTALOADER_VERSION="4.15.3"', complete)
         for current in (social, helper, checker, refresher):
-            self.assertIn("4.15.3-zeuve.2", current)
+            self.assertIn("4.15.3-zeuve.3", current)
 
     def test_manifest_never_treats_stale_instaloader_as_current(self) -> None:
         root = Path("Resources/Engines")
@@ -165,7 +165,7 @@ class SocialEnginePreparationPolicyTests(unittest.TestCase):
         if not matches:
             return
         entry = matches[0]
-        self.assertEqual(entry["version"], "4.15.3-zeuve.2")
+        self.assertEqual(entry["version"], "4.15.3-zeuve.3")
         self.assertEqual(entry["source"], "https://pypi.org/project/instaloader/4.15.3/")
         executable = root / entry["relativePath"]
         if executable.is_file():

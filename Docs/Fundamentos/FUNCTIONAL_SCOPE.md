@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.7.0
+# Alcance funcional vigente — ZEUVE 0.20.8.0
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 
@@ -20,7 +20,7 @@ Las operaciones pesadas comparten `OperationCoordinator`; la aplicación evita e
 
 No modifica rutas críticas del sistema, no sigue symlinks como archivos ordinarios y no usa red.
 
-## Descargador universal 0.7.3
+## Descargador universal 0.7.4
 
 - Análisis y descarga desde URLs compatibles mediante rutas públicas y motores aprobados.
 - YouTube, Instagram/social y descubrimiento web según las capacidades documentadas.
@@ -28,7 +28,7 @@ No modifica rutas críticas del sistema, no sigue symlinks como archivos ordinar
 - Sesiones/cookies solo cuando el usuario las aporta o autoriza y la fuente realmente las requiere.
 - Motores locales empaquetados/validados; overrides manuales desde archivo local para el subconjunto soportado.
 
-No elude DRM, CAPTCHA, paywalls ni controles de acceso. El navegador Playwright no participa en el routing efectivo de 0.7.3.
+No elude DRM, CAPTCHA, paywalls ni controles de acceso. El navegador Playwright no participa en el routing efectivo de 0.7.4.
 
 ## Analizador de chats 0.1.6
 

@@ -22,6 +22,8 @@ public struct DownloadOutputPublisher {
                 && (values.fileSize ?? 0) > 0
                 && url.pathExtension.lowercased() != "part"
                 && !url.lastPathComponent.hasSuffix(".ytdl")
+                && (DownloadOutputValidator.isMediaFile(url)
+                    || DownloadOutputValidator.auxiliaryExtensions.contains(url.pathExtension.lowercased()))
         }
     }
 

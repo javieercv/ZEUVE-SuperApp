@@ -273,7 +273,7 @@ final class UniversalDownloadURLAndCommandTests: XCTestCase {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
         let cookies = root.appendingPathComponent("cookies.txt")
-        try Data("# Netscape HTTP Cookie File".utf8).write(to: cookies)
+        try Data("# Netscape HTTP Cookie File\n.example.com\tTRUE\t/\tTRUE\t0\tsynthetic\ttest\n".utf8).write(to: cookies)
         var settings = UniversalDownloadSettings(mode: .audio, audioOutput: .mp3)
         settings.subtitles = .init(languages: ["es", "en"], includeAutomatic: true, embed: true, convertToSRT: true)
         settings.network.speedLimit = "10m"

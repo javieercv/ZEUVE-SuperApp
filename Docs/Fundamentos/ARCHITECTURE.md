@@ -1,4 +1,4 @@
-# Arquitectura de ZEUVE 0.20.7.0
+# Arquitectura de ZEUVE 0.20.8.0
 
 Este documento describe la arquitectura vigente. La evolución por versiones se conserva en `CHANGELOG.md` y `Docs/Historico/`.
 
@@ -42,7 +42,7 @@ Registro, diagnóstico, verificación, overrides manuales y ejecución segura de
 | Módulo | Target | Versión | Ajustes |
 | --- | --- | ---: | ---: |
 | Organizador | `OrganizerModule` | 0.1.5 | orden 10 |
-| Descargador universal | `UniversalDownloaderModule` | 0.7.3 | orden 20 |
+| Descargador universal | `UniversalDownloaderModule` | 0.7.4 | orden 20 |
 | Analizador de chats | `ChatAnalyzerModule` | 0.1.6 | orden 30 |
 | Conversor universal | `UniversalConverterModule` | 0.3.2 | orden 40 |
 | Comparador de seguidores de Instagram | `InstagramFollowersModule` | 0.1.0 | sin sección propia |
@@ -57,7 +57,7 @@ Los manifests bajo `Sources/*Module/Resources/manifest.json` describen identidad
 
 Defaults actuales: Organizador ⌘1, Descargador ⌘2, Analizador ⌘3, Conversor ⌘4, Comparador ⌘5, Inspector ⌘6, Limpiador ⌘7 e Historial ⌘8.
 
-La validación rechaza duplicados, teclas de escritura sin modificador seguro y combinaciones reservadas fundamentales. No existe ocultación de módulos como preferencia de navegación en 0.20.7.0. El orden de secciones de Ajustes (`settingsOrder`) es independiente del orden de navegación.
+La validación rechaza duplicados, teclas de escritura sin modificador seguro y combinaciones reservadas fundamentales. No existe ocultación de módulos como preferencia de navegación en 0.20.8.0. El orden de secciones de Ajustes (`settingsOrder`) es independiente del orden de navegación.
 
 ## Ajustes
 
@@ -103,7 +103,7 @@ Los targets de módulo dependen de las capas compartidas que necesitan, no de ot
 
 ## Extensibilidad
 
-La API y manifests están diseñados para una arquitectura modular, pero 0.20.7.0 integra módulos built-in compilados con la app. No existe loader de plugins externos ni importación arbitraria de módulos de terceros.
+La API y manifests están diseñados para una arquitectura modular, pero 0.20.8.0 integra módulos built-in compilados con la app. No existe loader de plugins externos ni importación arbitraria de módulos de terceros.
 
 ## Fuentes de verdad
 

@@ -8,6 +8,7 @@ public struct UniversalDownloadItem: Codable, Sendable, Equatable, Identifiable 
     public let title: String
     public let playlistTitle: String?
     public let playlistIndex: Int?
+    public let gallerySelector: GalleryDLResourceSelector?
     public let estimatedBytes: Int64?
     public let sourceKind: DownloadSource?
     public let pageOrigin: DownloadPageOrigin?
@@ -32,6 +33,7 @@ public struct UniversalDownloadItem: Codable, Sendable, Equatable, Identifiable 
         title: String,
         playlistTitle: String? = nil,
         playlistIndex: Int? = nil,
+        gallerySelector: GalleryDLResourceSelector? = nil,
         estimatedBytes: Int64? = nil,
         downloadSource: DownloadSource = .directContent,
         pageOrigin: DownloadPageOrigin? = nil,
@@ -52,6 +54,7 @@ public struct UniversalDownloadItem: Codable, Sendable, Equatable, Identifiable 
         self.title = title
         self.playlistTitle = playlistTitle
         self.playlistIndex = playlistIndex
+        self.gallerySelector = gallerySelector
         self.estimatedBytes = estimatedBytes
         self.sourceKind = downloadSource
         self.pageOrigin = pageOrigin

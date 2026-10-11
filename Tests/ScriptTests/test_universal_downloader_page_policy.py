@@ -93,8 +93,8 @@ class UniversalDownloaderPagePolicyTests(unittest.TestCase):
         self.assertIn("markingAuthenticationRestrictedSections", service)
         self.assertIn('"requires_authentication": False', helper)
         self.assertIn("section_requires_authentication", helper)
-        self.assertIn("Perfil público analizado sin sesión", view)
-        self.assertIn("no disponibles sin sesión", view)
+        self.assertIn("Secciones con acceso restringido", view)
+        self.assertIn("requieren una sesión con permiso de acceso", view)
 
     def test_tiktok_empty_gallery_result_uses_real_fallback_and_visible_failure(self):
         service = (ROOT / "Sources/UniversalDownloaderModule/Download/UniversalDownloadService.swift").read_text()

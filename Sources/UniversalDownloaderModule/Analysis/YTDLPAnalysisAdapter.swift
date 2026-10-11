@@ -24,6 +24,7 @@ struct YTDLPAnalysisAdapter: Sendable {
         browserCookies: DownloadBrowserCookieSource?,
         proxy: String?,
         proxyCredentials: DownloadProxyCredentials?,
+        timeoutSeconds: Int = 20,
         onAnalysis: @escaping @Sendable (DownloadAnalysis, Int) -> Void
     ) async throws -> YTDLPAnalysisAdapterResult {
         let arguments = try YTDLPAnalysisCommandBuilder().arguments(
@@ -32,7 +33,8 @@ struct YTDLPAnalysisAdapter: Sendable {
             cookiesFile: cookiesFile,
             browserCookies: browserCookies,
             proxy: proxy,
-            proxyCredentials: proxyCredentials
+            proxyCredentials: proxyCredentials,
+            timeoutSeconds: timeoutSeconds
         )
         let stderr = LockedDataCollector(maximumBytes: 1_048_576)
         let decoder = IncrementalLineDecoder(maximumBufferedBytes: 4_194_304)

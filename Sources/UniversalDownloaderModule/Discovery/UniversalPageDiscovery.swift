@@ -46,6 +46,9 @@ public struct UniversalHTMLMediaParser: Sendable {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 
         var values: [UniversalMediaCandidate] = []
+        if UniversalDownloadPlatform.detect(from: baseURL) == .erome {
+            values += eromeAlbumCandidates(html: html, baseURL: baseURL)
+        }
         values += tagCandidates(html: html, tagName: "video", baseURL: baseURL, kind: .directMedia)
         values += tagCandidates(html: html, tagName: "source", baseURL: baseURL, kind: .directMedia)
         values += tagCandidates(html: html, tagName: "iframe", baseURL: baseURL, kind: .embeddedPlayer)
@@ -65,6 +68,21 @@ public struct UniversalHTMLMediaParser: Sendable {
             }
         }
         return .init(pageTitle: pageTitle?.isEmpty == false ? pageTitle : nil, candidates: unique, duplicateCount: duplicates)
+    }
+
+    private func eromeAlbumCandidates(html: String, baseURL: URL) -> [UniversalMediaCandidate] {
+        let pattern = #"(?is)<div\b[^>]*class\s*=\s*["'][^"']*\bmedia-group\b[^"']*["'][^>]*>(.*?)(?=<div\b[^>]*class\s*=\s*["'][^"']*\bmedia-group\b|$)"#
+        return matches(in: html, pattern: pattern, captureGroup: 1).compactMap { group in
+            if let video = tagCandidates(html: group, tagName: "source", baseURL: baseURL, kind: .directMedia).first { return video }
+            for tag in matches(in: group, pattern: #"(?is)<img\b[^>]*>"#) {
+                let attributes = parseAttributes(tag)
+                guard let url = resolve(attributes["data-src"] ?? attributes["src"], relativeTo: baseURL),
+                      DownloadOutputValidator.imageExtensions.contains(url.pathExtension.lowercased()),
+                      (attributes["class"] ?? "").split(separator: " ").contains("img-front") else { continue }
+                return .init(url: url, kind: .directMedia)
+            }
+            return nil
+        }
     }
 
     private func tagCandidates(html: String, tagName: String, baseURL: URL, kind: UniversalMediaCandidateKind) -> [UniversalMediaCandidate] {

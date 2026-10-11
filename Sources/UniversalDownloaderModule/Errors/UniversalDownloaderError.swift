@@ -20,6 +20,9 @@ public enum UniversalDownloaderError: LocalizedError, Equatable {
     case unavailableMedia(String)
     case outputFolderUnavailable
     case cookiesFileUnavailable
+    case invalidCookiesFormat
+    case emptyCookiesFile
+    case analysisTimedOut
     case invalidProxy
     case insufficientDiskSpace(required: Int64, available: Int64)
     case unsafeOutputName
@@ -52,6 +55,9 @@ public enum UniversalDownloaderError: LocalizedError, Equatable {
         case .unavailableMedia(let message): return "El contenido no está disponible: \(message)"
         case .outputFolderUnavailable: return "La carpeta de salida ya no está disponible. Selecciónala de nuevo."
         case .cookiesFileUnavailable: return "El archivo cookies.txt ya no está disponible. Selecciónalo de nuevo."
+        case .invalidCookiesFormat: return "El archivo de cookies no tiene un formato Netscape válido."
+        case .emptyCookiesFile: return "El archivo no contiene cookies utilizables."
+        case .analysisTimedOut: return "Se ha agotado el tiempo de análisis. Las secciones pendientes no se han podido comprobar."
         case .invalidProxy: return "La configuración del proxy no es válida."
         case .insufficientDiskSpace(let required, let available): return "No hay espacio suficiente. Se estiman \(required) bytes y hay \(available) bytes disponibles."
         case .unsafeOutputName: return "El nombre de salida no es seguro."

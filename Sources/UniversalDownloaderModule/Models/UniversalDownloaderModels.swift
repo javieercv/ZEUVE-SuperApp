@@ -110,6 +110,10 @@ public enum UniversalMediaKind: String, Codable, Sendable, CaseIterable, Equatab
         }
     }
 
+    public var requiresInstagramSession: Bool {
+        [.storyPhoto, .storyVideo, .highlightPhoto, .highlightVideo].contains(self)
+    }
+
     public var spanishName: String {
         switch self {
         case .photo: return "Foto"

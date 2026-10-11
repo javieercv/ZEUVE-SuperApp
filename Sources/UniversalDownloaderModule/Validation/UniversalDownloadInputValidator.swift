@@ -250,7 +250,7 @@ public struct UniversalDownloadInputValidator: Sendable {
         case .soundcloud:
             return parts.count < 2
         case .tumblr:
-            return !components.path.lowercased().contains("/post/")
+            return tumblrPostIdentifier(components: components) == nil
         case .threads:
             return !components.path.lowercased().contains("/post/")
         case .snapchat:
@@ -275,13 +275,27 @@ public struct UniversalDownloadInputValidator: Sendable {
             candidate = parts.last
         case .x:
             candidate = parts.last
-        case .facebook, .reddit, .vimeo, .dailymotion, .tumblr, .threads, .snapchat, .erome:
+        case .tumblr:
+            candidate = tumblrPostIdentifier(components: components)
+        case .facebook, .reddit, .vimeo, .dailymotion, .threads, .snapchat, .erome:
             candidate = parts.last
         case .youtube, .twitch, .soundcloud, .webpage, .automatic:
             candidate = nil
         }
         guard let candidate, !candidate.isEmpty else { return nil }
         return "\(platform.rawValue):\(candidate)"
+    }
+
+    private static func tumblrPostIdentifier(components: URLComponents) -> String? {
+        let parts = components.path.split(separator: "/").map(String.init)
+        let host = components.host?.lowercased() ?? ""
+        let offset = host == "tumblr.com" || host == "www.tumblr.com" ? 1 : 0
+        guard parts.count > offset else { return nil }
+        if offset == 1, ["search", "tagged", "dashboard", "explore", "likes", "following", "settings", "login", "register"].contains(parts[0].lowercased()) { return nil }
+        let index = ["post", "image"].contains(parts[offset].lowercased()) ? offset + 1 : offset
+        guard parts.count > index, !parts[index].isEmpty,
+              parts[index].allSatisfy({ $0.isASCII && $0.isNumber }) else { return nil }
+        return parts[index]
     }
 
     private static func inferredKind(components: URLComponents, platform: UniversalDownloadPlatform) -> DownloadContentKind {

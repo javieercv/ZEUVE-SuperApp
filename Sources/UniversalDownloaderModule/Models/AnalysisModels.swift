@@ -1,10 +1,22 @@
 import Foundation
 
+public struct GalleryDLResourceSelector: Codable, Sendable, Equatable {
+    public let index: Int
+    public let identity: [String: String]
+
+    public init(index: Int, identity: [String: String]) {
+        self.index = index
+        self.identity = identity
+    }
+}
+
 public struct DownloadCatalogItem: Codable, Sendable, Equatable, Identifiable {
     // El nombre codificado `videoID` se conserva para compatibilidad con datos históricos.
     private let videoID: String
     public var canonicalID: String { videoID }
     public let playlistIndex: Int?
+    public let gallerySelector: GalleryDLResourceSelector?
+    public let requiresAuthentication: Bool?
     public let title: String
     public let duration: Double?
     public let uploader: String?
@@ -32,6 +44,8 @@ public struct DownloadCatalogItem: Codable, Sendable, Equatable, Identifiable {
     public init(
         canonicalID: String,
         playlistIndex: Int? = nil,
+        gallerySelector: GalleryDLResourceSelector? = nil,
+        requiresAuthentication: Bool? = nil,
         title: String,
         duration: Double? = nil,
         uploader: String? = nil,
@@ -54,6 +68,8 @@ public struct DownloadCatalogItem: Codable, Sendable, Equatable, Identifiable {
     ) {
         self.videoID = canonicalID
         self.playlistIndex = playlistIndex
+        self.gallerySelector = gallerySelector
+        self.requiresAuthentication = requiresAuthentication
         self.title = title
         self.duration = duration
         self.uploader = uploader
@@ -87,6 +103,7 @@ public struct DownloadAnalysis: Codable, Sendable, Equatable, Identifiable {
     public let thumbnailURL: URL?
     public let description: String?
     public let formats: [YTDLPFormat]
+    public let deferredMediaResolution: Bool?
     public let subtitles: [YTDLPSubtitleTrack]
     public let chaptersCount: Int
     public let liveStatus: DownloadLiveStatus
@@ -115,7 +132,12 @@ public struct DownloadAnalysis: Codable, Sendable, Equatable, Identifiable {
 
     public var downloadSource: DownloadSource { sourceKind ?? .directContent }
     public var id: String { "\(kind.rawValue):\(canonicalID):\(sourceURL?.absoluteString ?? "")" }
-    public var isDownloadable: Bool { liveStatus.canDownloadInVersion020 && availability != "private" && availability != "needs_auth" && availability != "unavailable" }
+    public var hasUsableMedia: Bool {
+        if !playlistEntries.isEmpty { return playlistEntries.contains(where: \.isAvailable) }
+        guard kind == .video else { return false }
+        return resolvedMedia != nil || !formats.isEmpty || deferredMediaResolution == true
+    }
+    public var isDownloadable: Bool { hasUsableMedia && liveStatus.canDownloadInVersion020 && availability != "private" && availability != "needs_auth" && availability != "unavailable" }
 
     public init(
         canonicalID: String,
@@ -128,6 +150,7 @@ public struct DownloadAnalysis: Codable, Sendable, Equatable, Identifiable {
         thumbnailURL: URL? = nil,
         description: String? = nil,
         formats: [YTDLPFormat] = [],
+        deferredMediaResolution: Bool? = nil,
         subtitles: [YTDLPSubtitleTrack] = [],
         chaptersCount: Int = 0,
         liveStatus: DownloadLiveStatus = .notLive,
@@ -164,6 +187,7 @@ public struct DownloadAnalysis: Codable, Sendable, Equatable, Identifiable {
         self.thumbnailURL = thumbnailURL
         self.description = description
         self.formats = formats
+        self.deferredMediaResolution = deferredMediaResolution
         self.subtitles = subtitles
         self.chaptersCount = chaptersCount
         self.liveStatus = liveStatus

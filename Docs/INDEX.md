@@ -1,6 +1,6 @@
 # Documentación de ZEUVE
 
-Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.7.0— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
+Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.8.0— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
 
 Si una afirmación histórica contradice una fuente vigente o el código actual, no se reescribe el histórico: se usa la fuente vigente y se corrige cualquier documentación viva desactualizada.
 
@@ -65,7 +65,14 @@ Compatibilidad histórica del antiguo módulo YouTube: [documento legacy](Modulo
 
 La instantánea empaquetable concreta se define en `../Resources/Engines/engines.json`.
 
-## Entrega actual — 0.20.7.0
+## Entrega actual — 0.20.8.0
+
+- [Implementación del Descargador](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.0.md).
+- [Resultados automáticos](Historico/Pruebas/TEST_RESULTS_0.20.8.0.md).
+- [Entrega y límites de aceptación](Historico/Entregas/DELIVERY_0.20.8.0.md).
+- Pruebas manuales reales en espera de indicación explícita del usuario; checklist sin reclasificar.
+
+## Última aceptación manual — 0.20.7.0
 
 - [Implementación de parciales](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.7.0.md).
 - [Verificación técnica](Historico/Pruebas/TEST_RESULTS_0.20.7.0.md).

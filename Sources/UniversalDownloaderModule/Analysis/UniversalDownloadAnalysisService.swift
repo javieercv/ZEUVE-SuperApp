@@ -27,11 +27,51 @@ public actor UniversalDownloadAnalysisService {
         browserCookies: DownloadBrowserCookieSource? = nil,
         proxy: String? = nil,
         proxyCredentials: DownloadProxyCredentials? = nil,
+        connectionTimeoutSeconds: Int = 20,
         catalogLimit: Int = 24,
         paginationCursor: String? = nil,
         browserFallbackEnabled: Bool = false,
         onPlaylistEntry: @escaping @Sendable (DownloadCatalogItem) -> Void = { _ in },
         onProgress: @escaping @Sendable (Int) -> Void = { _ in }
+    ) async throws -> DownloadAnalysis {
+        let snapshot = AnalysisCatalogSnapshot()
+        let limited: Set<UniversalDownloadPlatform> = [.instagram, .tiktok, .x, .tumblr, .threads, .snapchat, .erome, .reddit]
+        do {
+            return try await AnalysisExecutionBudget.run(seconds: limited.contains(input.platform) ? 120 : nil) {
+                try await self.analyzeCore(
+                    input, cookiesFile: cookiesFile, cookieHeaderFile: cookieHeaderFile,
+                    browserCookies: browserCookies, proxy: proxy, proxyCredentials: proxyCredentials,
+                    connectionTimeoutSeconds: connectionTimeoutSeconds, catalogLimit: catalogLimit,
+                    paginationCursor: paginationCursor, browserFallbackEnabled: browserFallbackEnabled,
+                    onPlaylistEntry: { entry in snapshot.append(entry); onPlaylistEntry(entry) }, onProgress: onProgress
+                )
+            }
+        } catch UniversalDownloaderError.analysisTimedOut {
+            let entries = snapshot.values
+            if !entries.isEmpty {
+                return DownloadAnalysis(
+                    canonicalID: input.canonicalID, kind: input.kind == .profile ? .profile : .playlist,
+                    title: input.profileUsername ?? input.platform.spanishName,
+                    description: UniversalDownloaderError.analysisTimedOut.localizedDescription,
+                    availability: "partial", playlistEntries: entries, sourceURL: input.canonicalURL,
+                    platform: input.platform, mediaKind: .gallery, profileUsername: input.profileUsername,
+                    availableSections: Array(Set(entries.compactMap(\.catalogSection))).sorted { $0.rawValue < $1.rawValue }
+                )
+            }
+            if input.platform == .instagram {
+                return instagramPublicContentUnavailableAnalysis(input: input, message: UniversalDownloaderError.analysisTimedOut.localizedDescription)
+            }
+            throw UniversalDownloaderError.analysisTimedOut
+        }
+    }
+
+    private func analyzeCore(
+        _ input: ValidatedDownloadURL,
+        cookiesFile: URL?, cookieHeaderFile: URL?, browserCookies: DownloadBrowserCookieSource?,
+        proxy: String?, proxyCredentials: DownloadProxyCredentials?, connectionTimeoutSeconds: Int,
+        catalogLimit: Int, paginationCursor: String?, browserFallbackEnabled: Bool,
+        onPlaylistEntry: @escaping @Sendable (DownloadCatalogItem) -> Void,
+        onProgress: @escaping @Sendable (Int) -> Void
     ) async throws -> DownloadAnalysis {
         let cookiesSecurityScope = SecurityScopedResourceAccess(cookiesFile)
         let headerSecurityScope = SecurityScopedResourceAccess(cookieHeaderFile)
@@ -64,10 +104,12 @@ public actor UniversalDownloadAnalysisService {
                     cookiesFile: cookiesFile,
                     cookieHeaderFile: cookieHeaderFile,
                     limit: catalogLimit,
-                    cursor: paginationCursor
+                    cursor: paginationCursor,
+                    timeoutSeconds: connectionTimeoutSeconds,
+                    onPlaylistEntry: onPlaylistEntry
                 )
                 catalogAttempt = result
-                if result.issueCode == nil {
+                if result.issueCode == nil, result.analysis.hasUsableMedia {
                     for entry in result.analysis.playlistEntries { onPlaylistEntry(entry) }
                     onProgress(result.analysis.playlistEntries.count)
                     return result.analysis
@@ -97,20 +139,20 @@ public actor UniversalDownloadAnalysisService {
                     engines: engines,
                     cookiesFile: cookiesFile,
                     proxy: proxy,
-                    proxyCredentials: proxyCredentials
+                    proxyCredentials: proxyCredentials,
+                    timeoutSeconds: connectionTimeoutSeconds
                 )
                 await log(.info, "Perfil de Instagram resuelto mediante fallback", input: input, extra: [
                     "motor": UniversalEngineKind.galleryDL.rawValue,
                     "sesion_aportada": sessionSupplied ? "sí" : "no",
                     "resultados": String(fallback.playlistEntries.count),
                 ])
-                let publicProfile = sessionSupplied
-                    ? fallback
-                    : markingAuthenticationRestrictedSections(
-                        fallback,
-                        sections: [.stories, .highlights],
-                        message: "El perfil público se ha analizado sin sesión. Stories y Destacadas no están disponibles."
-                    )
+                let combined = Self.merge((catalogAttempt.map { [$0.analysis] } ?? []) + [fallback], input: input, pageTitle: nil, discoveryDuplicateCount: 0)
+                let publicProfile = markingAuthenticationRestrictedSections(
+                    combined,
+                    sections: sessionSupplied ? [] : [.stories, .highlights],
+                    message: "Catálogo parcial: el respaldo ha recuperado publicaciones. No se ha comprobado el catálogo completo de Reels, Stories y Destacadas."
+                )
                 for entry in publicProfile.playlistEntries { onPlaylistEntry(entry) }
                 onProgress(publicProfile.playlistEntries.count)
                 return publicProfile
@@ -142,14 +184,20 @@ public actor UniversalDownloadAnalysisService {
         // con sesión queda disponible únicamente si los motores anónimos confirman
         // que la cuenta o la publicación es privada.
         var concreteInstagramSessionFallback = false
+        let protectedInstagramLink = input.platform == .instagram && InstagramCatalogCommandBuilder.requiresSession(input.canonicalURL)
+        if protectedInstagramLink, !sessionSupplied {
+            return instagramAuthenticationAnalysis(input: input, message: "Stories y Destacadas requieren una sesión de Instagram autorizada.")
+        }
+        if protectedInstagramLink { concreteInstagramSessionFallback = sessionSupplied }
         if input.platform == .instagram,
            input.kind != .profile,
-           sessionSupplied {
+           sessionSupplied, !protectedInstagramLink {
             let anonymous = try await analyzeConcreteInstagramAnonymously(
                input,
                engines: engines,
                proxy: proxy,
                proxyCredentials: proxyCredentials,
+               timeoutSeconds: connectionTimeoutSeconds,
                onPlaylistEntry: onPlaylistEntry,
                onProgress: onProgress
             )
@@ -186,6 +234,7 @@ public actor UniversalDownloadAnalysisService {
                         browserCookies: browserCookies,
                         proxy: proxy,
                         proxyCredentials: proxyCredentials,
+                        timeoutSeconds: connectionTimeoutSeconds,
                         onPlaylistEntry: onPlaylistEntry,
                         onProgress: onProgress
                     )
@@ -195,7 +244,8 @@ public actor UniversalDownloadAnalysisService {
                         engines: engines,
                         cookiesFile: cookiesFile,
                         proxy: proxy,
-                        proxyCredentials: proxyCredentials
+                        proxyCredentials: proxyCredentials,
+                        timeoutSeconds: connectionTimeoutSeconds
                     )]
                     for entry in values.flatMap(\.playlistEntries) { onPlaylistEntry(entry) }
                     onProgress(values.flatMap(\.playlistEntries).count)
@@ -204,12 +254,13 @@ public actor UniversalDownloadAnalysisService {
                 case .browser:
                     throw UniversalDownloaderError.optionalEngineUnavailable(engine.rawValue)
                 case .instagramCatalog:
-                    if input.platform == .instagram, input.kind != .profile {
+                    if input.platform == .instagram, input.kind != .profile, !protectedInstagramLink {
                         values = [try await analyzeInstagramDirect(
                             input,
                             engines: engines,
                             cookiesFile: cookiesFile,
-                            cookieHeaderFile: cookieHeaderFile
+                            cookieHeaderFile: cookieHeaderFile,
+                            timeoutSeconds: connectionTimeoutSeconds
                         )]
                         for entry in values.flatMap(\.playlistEntries) { onPlaylistEntry(entry) }
                         onProgress(values.flatMap(\.playlistEntries).count)
@@ -233,16 +284,22 @@ public actor UniversalDownloadAnalysisService {
 
         var pageTitle: String?
         var discoveryDuplicateCount = 0
-        if input.kind == .webpage || analyses.isEmpty {
+        var discoveryOrder: [String: Int] = [:]
+        let needsAlbumCompletion = input.platform == .erome && !analyses.contains { $0.engineKind == .galleryDL }
+        if input.kind == .webpage || analyses.isEmpty || needsAlbumCompletion {
             do {
                 let result = try await discovery.discover(
                     pageURL: input.canonicalURL,
                     cookiesFile: cookiesFile,
                     proxy: proxy,
-                    proxyCredentials: proxyCredentials
+                    proxyCredentials: proxyCredentials,
+                    timeoutSeconds: connectionTimeoutSeconds
                 )
                 pageTitle = result.pageTitle
                 discoveryDuplicateCount = result.duplicateCount
+                for (index, candidate) in result.candidates.enumerated() {
+                    discoveryOrder[UniversalURLNormalizer.duplicateKey(for: candidate.url)] = index
+                }
                 var knownKeys = Set(analyses.flatMap(Self.sourceKeys))
                 for candidate in result.candidates {
                     guard !Task.isCancelled else { throw CancellationError() }
@@ -252,6 +309,22 @@ public actor UniversalDownloadAnalysisService {
                         continue
                     }
                     do {
+                        if input.platform == .erome, DownloadOutputValidator.imageExtensions.contains(candidate.url.pathExtension.lowercased()) {
+                            let validated = try UniversalDownloadInputValidator().validate(candidate.url.absoluteString, allowInsecureLocalNetwork: input.allowInsecureLocalNetwork, allowAdultContent: true)
+                            let entry = DownloadCatalogItem(
+                                canonicalID: "media:\(UniversalURLNormalizer.stableIdentifier(for: candidateKey))",
+                                title: candidate.url.deletingPathExtension().lastPathComponent,
+                                sourceURL: validated.canonicalURL,
+                                downloadSource: .pageDiscovered,
+                                pageOrigin: .init(pageURL: input.canonicalURL),
+                                resolvedMedia: .init(mediaURL: validated.canonicalURL, kind: .directFile, extensionName: candidate.url.pathExtension, httpHeaders: ["Referer": input.canonicalURL.absoluteString]),
+                                platform: input.platform, mediaKind: .photo, thumbnailURL: candidate.url,
+                                engineKind: .genericPage, catalogSection: .photos, expectedExtension: candidate.url.pathExtension
+                            )
+                            analyses.append(DownloadAnalysis(canonicalID: entry.canonicalID, kind: .gallery, title: entry.title, playlistEntries: [entry], sourceURL: input.canonicalURL, platform: input.platform, mediaKind: .photo))
+                            onPlaylistEntry(entry)
+                            continue
+                        }
                         let validated = try UniversalDownloadInputValidator().validate(
                             candidate.url.absoluteString,
                             allowInsecureLocalNetwork: input.allowInsecureLocalNetwork,
@@ -265,6 +338,7 @@ public actor UniversalDownloadAnalysisService {
                             browserCookies: browserCookies,
                             proxy: proxy,
                             proxyCredentials: proxyCredentials,
+                            timeoutSeconds: connectionTimeoutSeconds,
                             onPlaylistEntry: onPlaylistEntry,
                             onProgress: onProgress
                         )
@@ -317,11 +391,12 @@ public actor UniversalDownloadAnalysisService {
             throw UniversalDownloaderError.analysisFailed("No se ha encontrado contenido multimedia descargable en la página.")
         }
 
-        let merged = merge(
+        let merged = Self.merge(
             analyses,
             input: input,
             pageTitle: pageTitle,
-            discoveryDuplicateCount: discoveryDuplicateCount
+            discoveryDuplicateCount: discoveryDuplicateCount,
+            mediaOrder: input.platform == .erome ? discoveryOrder : [:]
         )
         let result = concreteInstagramSessionFallback
             ? markingRequiresAuthentication(merged)
@@ -383,6 +458,7 @@ public actor UniversalDownloadAnalysisService {
         engines: DownloadEnginePaths,
         proxy: String?,
         proxyCredentials: DownloadProxyCredentials?,
+        timeoutSeconds: Int = 20,
         onPlaylistEntry: @escaping @Sendable (DownloadCatalogItem) -> Void,
         onProgress: @escaping @Sendable (Int) -> Void
     ) async throws -> (analysis: DownloadAnalysis?, failureMessages: [String]) {
@@ -392,7 +468,8 @@ public actor UniversalDownloadAnalysisService {
                 input,
                 engines: engines,
                 cookiesFile: nil,
-                cookieHeaderFile: nil
+                cookieHeaderFile: nil,
+                timeoutSeconds: timeoutSeconds
             )
             for entry in value.playlistEntries { onPlaylistEntry(entry) }
             onProgress(value.playlistEntries.count)
@@ -418,7 +495,8 @@ public actor UniversalDownloadAnalysisService {
                 engines: engines,
                 cookiesFile: nil,
                 proxy: proxy,
-                proxyCredentials: proxyCredentials
+                proxyCredentials: proxyCredentials,
+                timeoutSeconds: timeoutSeconds
             )
             for entry in value.playlistEntries { onPlaylistEntry(entry) }
             onProgress(value.playlistEntries.count)
@@ -445,6 +523,7 @@ public actor UniversalDownloadAnalysisService {
                 browserCookies: nil,
                 proxy: proxy,
                 proxyCredentials: proxyCredentials,
+                timeoutSeconds: timeoutSeconds,
                 onPlaylistEntry: onPlaylistEntry,
                 onProgress: onProgress
             )
@@ -456,7 +535,7 @@ public actor UniversalDownloadAnalysisService {
                 "motor": UniversalEngineKind.ytDLP.rawValue,
                 "sesion_aportada": "no",
             ])
-            return (merge(values, input: input, pageTitle: nil, discoveryDuplicateCount: 0), [])
+            return (Self.merge(values, input: input, pageTitle: nil, discoveryDuplicateCount: 0), [])
         } catch is CancellationError {
             throw CancellationError()
         } catch {
@@ -473,14 +552,16 @@ public actor UniversalDownloadAnalysisService {
         _ input: ValidatedDownloadURL,
         engines: DownloadEnginePaths,
         cookiesFile: URL?,
-        cookieHeaderFile: URL?
+        cookieHeaderFile: URL?,
+        timeoutSeconds: Int = 20
     ) async throws -> DownloadAnalysis {
         let started = Date()
         let result = try await InstagramAnalysisAdapter(runner: runner).analyzeDirect(
             input: input,
             engines: engines,
             cookiesFile: cookiesFile,
-            cookieHeaderFile: cookieHeaderFile
+            cookieHeaderFile: cookieHeaderFile,
+            timeoutSeconds: timeoutSeconds
         )
         await logTiming("Resolución directa específica de Instagram", startedAt: started, input: input, extra: [
             "codigo_salida": String(result.process.exitCode),
@@ -502,7 +583,9 @@ public actor UniversalDownloadAnalysisService {
         cookiesFile: URL?,
         cookieHeaderFile: URL?,
         limit: Int,
-        cursor: String?
+        cursor: String?,
+        timeoutSeconds: Int = 20,
+        onPlaylistEntry: @escaping @Sendable (DownloadCatalogItem) -> Void = { _ in }
     ) async throws -> InstagramCatalogParseResult {
         let started = Date()
         let result = try await InstagramAnalysisAdapter(runner: runner).analyzeProfile(
@@ -511,7 +594,9 @@ public actor UniversalDownloadAnalysisService {
             cookiesFile: cookiesFile,
             cookieHeaderFile: cookieHeaderFile,
             limit: limit,
-            cursor: cursor
+            cursor: cursor,
+            timeoutSeconds: timeoutSeconds,
+            onPlaylistEntry: onPlaylistEntry
         )
         await logTiming("Catálogo progresivo de Instagram", startedAt: started, input: input, extra: ["codigo_salida": String(result.process.exitCode)])
         guard let parsed = result.parsed else {
@@ -593,6 +678,7 @@ public actor UniversalDownloadAnalysisService {
             thumbnailURL: analysis.thumbnailURL,
             description: analysis.description,
             formats: analysis.formats,
+            deferredMediaResolution: analysis.deferredMediaResolution,
             subtitles: analysis.subtitles,
             chaptersCount: analysis.chaptersCount,
             liveStatus: analysis.liveStatus,
@@ -659,11 +745,12 @@ public actor UniversalDownloadAnalysisService {
             thumbnailURL: analysis.thumbnailURL,
             description: description,
             formats: analysis.formats,
+            deferredMediaResolution: analysis.deferredMediaResolution,
             subtitles: analysis.subtitles,
             chaptersCount: analysis.chaptersCount,
             liveStatus: analysis.liveStatus,
             ageLimit: analysis.ageLimit,
-            availability: analysis.availability,
+            availability: "partial",
             playlistTitle: analysis.playlistTitle,
             playlistCount: analysis.playlistCount,
             playlistEntries: analysis.playlistEntries,
@@ -726,7 +813,8 @@ public actor UniversalDownloadAnalysisService {
         engines: DownloadEnginePaths,
         cookiesFile: URL?,
         proxy: String?,
-        proxyCredentials: DownloadProxyCredentials?
+        proxyCredentials: DownloadProxyCredentials?,
+        timeoutSeconds: Int = 20
     ) async throws -> DownloadAnalysis {
         let started = Date()
         let result = try await GalleryDLAnalysisAdapter(runner: runner).analyze(
@@ -734,7 +822,8 @@ public actor UniversalDownloadAnalysisService {
             engines: engines,
             cookiesFile: cookiesFile,
             proxy: proxy,
-            proxyCredentials: proxyCredentials
+            proxyCredentials: proxyCredentials,
+            timeoutSeconds: timeoutSeconds
         )
         await logTiming("Análisis especializado con gallery-dl", startedAt: started, input: input, extra: ["codigo_salida": String(result.process.exitCode)])
         guard let analysis = result.analysis else {
@@ -751,6 +840,7 @@ public actor UniversalDownloadAnalysisService {
         browserCookies: DownloadBrowserCookieSource?,
         proxy: String?,
         proxyCredentials: DownloadProxyCredentials?,
+        timeoutSeconds: Int = 20,
         onPlaylistEntry: @escaping @Sendable (DownloadCatalogItem) -> Void,
         onProgress: @escaping @Sendable (Int) -> Void
     ) async throws -> [DownloadAnalysis] {
@@ -762,13 +852,14 @@ public actor UniversalDownloadAnalysisService {
             browserCookies: browserCookies,
             proxy: proxy,
             proxyCredentials: proxyCredentials,
+            timeoutSeconds: timeoutSeconds,
             onAnalysis: { raw, count in
                 let analysis = Self.annotated(raw, input: input)
                 for entry in Self.entries(analysis) { onPlaylistEntry(entry) }
                 onProgress(count)
             }
         )
-        let values = result.analyses.map { Self.annotated($0, input: input) }
+        let values = result.analyses.map { Self.annotated($0, input: input) }.filter(\.hasUsableMedia)
         await logTiming("Análisis con yt-dlp", startedAt: processStarted, input: input, extra: ["codigo_salida": String(result.process.exitCode), "resultados": String(values.count)])
         if values.isEmpty {
             if let failure = result.parseFailures.first, !failure.isEmpty {
@@ -779,11 +870,12 @@ public actor UniversalDownloadAnalysisService {
         return values
     }
 
-    private func merge(
+    static func merge(
         _ analyses: [DownloadAnalysis],
         input: ValidatedDownloadURL,
         pageTitle: String?,
-        discoveryDuplicateCount: Int
+        discoveryDuplicateCount: Int,
+        mediaOrder: [String: Int] = [:]
     ) -> DownloadAnalysis {
         let pageOrigin: DownloadPageOrigin? = input.kind == .webpage
             ? DownloadPageOrigin(
@@ -792,39 +884,59 @@ public actor UniversalDownloadAnalysisService {
                 pageIdentifier: UniversalURLNormalizer.pageIdentifier(for: input.canonicalURL)
             )
             : nil
-        let flattened = analyses.flatMap(Self.entries)
-        var seen = Set<String>()
+        var flattened = analyses.flatMap(Self.entries)
+        if !mediaOrder.isEmpty {
+            flattened = flattened.enumerated().sorted { lhs, rhs in
+                let left = mediaOrder[UniversalURLNormalizer.duplicateKey(for: lhs.element.resolvedMedia?.mediaURL ?? lhs.element.sourceURL)] ?? Int.max
+                let right = mediaOrder[UniversalURLNormalizer.duplicateKey(for: rhs.element.resolvedMedia?.mediaURL ?? rhs.element.sourceURL)] ?? Int.max
+                return (left, lhs.offset) < (right, rhs.offset)
+            }.map(\.element)
+        }
         var unique: [DownloadCatalogItem] = []
         var duplicates = discoveryDuplicateCount
-        for (offset, entry) in flattened.enumerated() {
-            let key = Self.deduplicationKey(entry)
-            if seen.insert(key).inserted {
-                unique.append(DownloadCatalogItem(
-                    canonicalID: entry.canonicalID,
-                    playlistIndex: entry.playlistIndex ?? offset + 1,
-                    title: entry.title,
-                    duration: entry.duration,
-                    uploader: entry.uploader,
-                    availability: entry.availability,
-                    isAvailable: entry.isAvailable,
-                    sourceURL: entry.sourceURL,
-                    serviceName: entry.serviceName,
-                    extractor: entry.extractor,
-                    downloadSource: input.kind == .webpage ? .pageDiscovered : entry.downloadSource,
-                    pageOrigin: pageOrigin ?? entry.pageOrigin,
-                    resolvedMedia: entry.resolvedMedia,
-                    platform: entry.platform ?? input.platform,
-                    mediaKind: entry.mediaKind,
-                    thumbnailURL: entry.thumbnailURL,
-                    engineKind: entry.engineKind,
-                    catalogSection: entry.catalogSection,
-                    folderComponents: entry.folderComponents,
-                    expectedExtension: entry.expectedExtension,
-                    safeMetadata: entry.safeMetadata
-                ))
-            } else {
+        var positions: [String: Int] = [:]
+        var preferred: [DownloadCatalogItem] = []
+        for entry in flattened {
+            let keys = Self.deduplicationKeys(entry)
+            let position: Int
+            if let existing = keys.compactMap({ positions[$0] }).min() {
+                position = existing
                 duplicates += 1
+                if DownloadMediaIdentity.qualityRank(for: entry) > DownloadMediaIdentity.qualityRank(for: preferred[existing]) {
+                    preferred[existing] = entry
+                }
+            } else {
+                position = preferred.count
+                preferred.append(entry)
             }
+            for key in keys { positions[key] = position }
+        }
+        for (offset, entry) in preferred.enumerated() {
+            unique.append(DownloadCatalogItem(
+                canonicalID: entry.canonicalID,
+                playlistIndex: entry.playlistIndex ?? offset + 1,
+                gallerySelector: entry.gallerySelector,
+                requiresAuthentication: entry.requiresAuthentication,
+                title: entry.title,
+                duration: entry.duration,
+                uploader: entry.uploader,
+                availability: entry.availability,
+                isAvailable: entry.isAvailable,
+                sourceURL: entry.sourceURL,
+                serviceName: entry.serviceName,
+                extractor: entry.extractor,
+                downloadSource: input.kind == .webpage ? .pageDiscovered : entry.downloadSource,
+                pageOrigin: pageOrigin ?? entry.pageOrigin,
+                resolvedMedia: entry.resolvedMedia,
+                platform: entry.platform ?? input.platform,
+                mediaKind: entry.mediaKind,
+                thumbnailURL: entry.thumbnailURL,
+                engineKind: entry.engineKind,
+                catalogSection: entry.catalogSection,
+                folderComponents: entry.folderComponents,
+                expectedExtension: entry.expectedExtension,
+                safeMetadata: entry.safeMetadata
+            ))
         }
 
         if input.kind == .video, unique.count == 1, let original = analyses.first(where: { $0.kind == .video }) {
@@ -839,6 +951,7 @@ public actor UniversalDownloadAnalysisService {
                 thumbnailURL: original.thumbnailURL,
                 description: original.description,
                 formats: original.formats,
+                deferredMediaResolution: original.deferredMediaResolution,
                 subtitles: original.subtitles,
                 chaptersCount: original.chaptersCount,
                 liveStatus: original.liveStatus,
@@ -849,7 +962,7 @@ public actor UniversalDownloadAnalysisService {
                 extractor: original.extractor,
                 duplicateCount: duplicates,
                 downloadSource: .directContent,
-                resolvedMedia: original.resolvedMedia,
+                resolvedMedia: unique[0].resolvedMedia ?? original.resolvedMedia,
                 platform: original.platform ?? input.platform,
                 mediaKind: original.mediaKind ?? .video,
                 engineKind: original.engineKind ?? .ytDLP
@@ -880,6 +993,8 @@ public actor UniversalDownloadAnalysisService {
             mediaKind: .gallery,
             engineKind: analyses.first?.engineKind,
             profileUsername: input.profileUsername,
+            isPrivateProfile: analyses.contains(where: \.isPrivateProfile),
+            requiresAuthentication: analyses.contains(where: \.requiresAuthentication),
             availableSections: sections,
             authenticationRestrictedSections: restrictedSections.isEmpty ? nil : restrictedSections
         )
@@ -890,6 +1005,8 @@ public actor UniversalDownloadAnalysisService {
             DownloadCatalogItem(
                 canonicalID: entry.canonicalID,
                 playlistIndex: entry.playlistIndex,
+                gallerySelector: entry.gallerySelector,
+                requiresAuthentication: entry.requiresAuthentication,
                 title: entry.title,
                 duration: entry.duration,
                 uploader: entry.uploader,
@@ -922,6 +1039,7 @@ public actor UniversalDownloadAnalysisService {
             thumbnailURL: analysis.thumbnailURL,
             description: analysis.description,
             formats: analysis.formats,
+            deferredMediaResolution: analysis.deferredMediaResolution,
             subtitles: analysis.subtitles,
             chaptersCount: analysis.chaptersCount,
             liveStatus: analysis.liveStatus,
@@ -952,7 +1070,7 @@ public actor UniversalDownloadAnalysisService {
 
     private static func entries(_ analysis: DownloadAnalysis) -> [DownloadCatalogItem] {
         if !analysis.playlistEntries.isEmpty { return analysis.playlistEntries }
-        guard let url = analysis.sourceURL else { return [] }
+        guard analysis.hasUsableMedia, let url = analysis.sourceURL else { return [] }
         return [DownloadCatalogItem(
             canonicalID: analysis.canonicalID,
             title: analysis.title,
@@ -975,12 +1093,11 @@ public actor UniversalDownloadAnalysisService {
     }
 
     private static func sourceKeys(_ analysis: DownloadAnalysis) -> [String] {
-        entries(analysis).map { UniversalURLNormalizer.duplicateKey(for: $0.sourceURL) }
+        entries(analysis).map { UniversalURLNormalizer.duplicateKey(for: $0.resolvedMedia?.mediaURL ?? $0.sourceURL) }
     }
 
-    private static func deduplicationKey(_ entry: DownloadCatalogItem) -> String {
-        if entry.canonicalID.contains(":"), !entry.canonicalID.hasPrefix("media:") { return "id:\(entry.canonicalID.lowercased())" }
-        return "url:\(UniversalURLNormalizer.duplicateKey(for: entry.sourceURL))"
+    private static func deduplicationKeys(_ entry: DownloadCatalogItem) -> Set<String> {
+        DownloadMediaIdentity.keys(for: entry)
     }
 
     private func logTiming(_ message: String, startedAt: Date, input: ValidatedDownloadURL, extra: [String: String] = [:]) async {
@@ -991,11 +1108,8 @@ public actor UniversalDownloadAnalysisService {
 
     private func log(_ level: LogLevel, _ message: String, input: ValidatedDownloadURL, extra: [String: String] = [:]) async {
         guard let logger else { return }
-        var metadata = extra
-        metadata["id"] = input.canonicalID
+        var metadata = DownloadDiagnosticMetadata.sanitized(extra)
         metadata["tipo"] = input.kind.rawValue
-        metadata["dominio"] = input.host
-        metadata["url"] = UniversalURLNormalizer.sanitizedLogURL(input.canonicalURL)
         _ = try? await logger.write(level, category: "universal-downloader", message: message, metadata: metadata)
     }
 }

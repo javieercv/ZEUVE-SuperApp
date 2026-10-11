@@ -12,12 +12,14 @@ public struct InstagramCatalogCommandBuilder: Sendable {
         includeStories: Bool = true,
         includeHighlights: Bool = true,
         includeReels: Bool = true,
-        includeProfilePicture: Bool = true
+        includeProfilePicture: Bool = true,
+        timeoutSeconds: Int = 20
     ) throws -> [String] {
         var result = [
             "catalog",
             "--username", username,
-            "--limit", String(max(1, min(limit, 500)))
+            "--limit", String(max(1, min(limit, 500))),
+            "--request-timeout", String(max(1, min(timeoutSeconds, 300)))
         ]
         if let cursor, !cursor.isEmpty { result += ["--cursor", cursor] }
         if includeStories { result.append("--stories") }
@@ -36,7 +38,8 @@ public struct InstagramCatalogCommandBuilder: Sendable {
     public func directArguments(
         for input: ValidatedDownloadURL,
         cookiesFile: URL? = nil,
-        cookieHeaderFile: URL? = nil
+        cookieHeaderFile: URL? = nil,
+        timeoutSeconds: Int = 20
     ) throws -> [String] {
         guard input.platform == .instagram,
               input.kind != .profile,
@@ -48,6 +51,7 @@ public struct InstagramCatalogCommandBuilder: Sendable {
             "direct",
             "--shortcode", shortcode,
             "--source-url", input.canonicalURL.absoluteString,
+            "--request-timeout", String(max(1, min(timeoutSeconds, 300))),
             "--content-kind", (path.contains("/reel/") || path.contains("/reels/")) ? "reel" : "post",
         ]
         if let cookiesFile = try DownloadPathValidator.validateCookiesFile(cookiesFile) {
@@ -66,5 +70,10 @@ public struct InstagramCatalogCommandBuilder: Sendable {
         let value = parts[marker + 1]
         guard value.range(of: "^[A-Za-z0-9_-]{3,64}$", options: .regularExpression) != nil else { return nil }
         return value
+    }
+
+    public static func requiresSession(_ url: URL) -> Bool {
+        let parts = url.path.lowercased().split(separator: "/")
+        return parts.first == "stories" || parts.first == "s"
     }
 }

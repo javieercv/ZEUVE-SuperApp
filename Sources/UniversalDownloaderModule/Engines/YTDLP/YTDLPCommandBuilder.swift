@@ -9,12 +9,14 @@ public struct YTDLPAnalysisCommandBuilder: Sendable {
         cookiesFile: URL? = nil,
         browserCookies: DownloadBrowserCookieSource? = nil,
         proxy: String? = nil,
-        proxyCredentials: DownloadProxyCredentials? = nil
+        proxyCredentials: DownloadProxyCredentials? = nil,
+        timeoutSeconds: Int = 20
     ) throws -> [String] {
         var result = common(engines: engines)
         result += [
             "--skip-download", "--ignore-errors", "--flat-playlist",
-            "--lazy-playlist", "--dump-json"
+            "--lazy-playlist", "--dump-json",
+            "--socket-timeout", String(max(1, min(timeoutSeconds, 300)))
         ]
         appendPrivateOptions(
             to: &result,

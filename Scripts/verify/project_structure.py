@@ -13,11 +13,11 @@ import json
 version = Path('VERSION').read_text().strip()
 parts = version.split('.')
 assert len(parts) == 4 and all(part.isdigit() for part in parts), 'VERSION debe usar MAJOR.MINOR.PATCH.REVISION'
-assert version == '0.20.7.0'
+assert version == '0.20.8.0'
 marketing_version = '.'.join(parts[:3])
 release_revision = parts[3]
 pbx = Path('ZEUVE.xcodeproj/project.pbxproj').read_text()
-for required in [f'MARKETING_VERSION = {marketing_version};', 'CURRENT_PROJECT_VERSION = 73;', f'INFOPLIST_KEY_ZEUVEReleaseRevision = {release_revision};', 'ENABLE_HARDENED_RUNTIME = YES;', 'ZEUVEEngines', 'UniversalDownloaderModule', 'ChatAnalyzerModule', 'UniversalConverterModule', 'InstagramFollowersModule', 'MultimediaInspectorModule', 'CleanerModule', 'Engines in Resources']:
+for required in [f'MARKETING_VERSION = {marketing_version};', 'CURRENT_PROJECT_VERSION = 74;', f'INFOPLIST_KEY_ZEUVEReleaseRevision = {release_revision};', 'ENABLE_HARDENED_RUNTIME = YES;', 'ZEUVEEngines', 'UniversalDownloaderModule', 'ChatAnalyzerModule', 'UniversalConverterModule', 'InstagramFollowersModule', 'MultimediaInspectorModule', 'CleanerModule', 'Engines in Resources']:
     if required not in pbx:
         raise SystemExit('El proyecto Xcode no contiene: ' + required)
 package = Path('Package.swift').read_text()
@@ -26,7 +26,7 @@ for required in ['ZEUVEEngines', 'UniversalDownloaderModule', 'ChatAnalyzerModul
         raise SystemExit('Package.swift no contiene: ' + required)
 manifest = json.loads(Path('Sources/UniversalDownloaderModule/Resources/manifest.json').read_text())
 assert manifest['identifier'] == 'com.zeuve.universal-downloader'
-assert manifest['version'] == '0.7.3'
+assert manifest['version'] == '0.7.4'
 assert manifest['minimumZEUVEVersion'] == '0.10.4'
 assert manifest['technology'] == 'mixed' and manifest['executionMode'] == 'builtIn'
 assert 'browserCookies' in manifest['permissions']

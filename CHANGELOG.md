@@ -1,5 +1,16 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.8.0 — 2026-10-11
+
+- Descargador 0.7.4: selección de recursos gallery-dl por identidad, numeración independiente y extensión real; auxiliares fuera del catálogo y del criterio de éxito.
+- Validación de formato y streams con FFprobe; JPEG como MP3 rechazado, MP4 de audio conservado y respaldo TikTok tras resultados inválidos.
+- Duplicados por recurso, variantes X con resolución preferente y complemento de imágenes originales de álbumes EroMe cuando falla el extractor nativo.
+- Cookies de sesión Netscape con caducidad vacía; errores diferenciados de acceso, formato y archivo vacío.
+- Instagram: rutas explícitas de Stories/destacadas, autenticación por elemento, catálogo parcial progresivo, estados de sesión coherentes y panel opcional accesible. Adaptador propio 4.15.3-zeuve.3 sobre la misma base Instaloader 4.15.3.
+- Límites de red configurados y presupuesto de análisis de 120 s en las rutas afectadas; resultados parciales válidos conservados y cancelación de procesos.
+- Tumblr acepta publicaciones concretas /blog/ID. Logs del análisis aceptan metadata estructurada y eliminan texto libre de errores/URLs.
+- Marketing 0.20.8, build 74. Pruebas manuales reales pendientes de indicación explícita del usuario; checklist histórica sin reclasificar. Threads necesita contraste real y Reddit online continúa aplazado.
+
 ## 0.20.7.0 — 2026-10-05
 
 - Organizador: editor de reglas por extensión en Ajustes con validación de componentes de destino.

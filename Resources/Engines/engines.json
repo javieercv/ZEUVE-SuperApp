@@ -89,14 +89,14 @@
       "relativePath": "instaloader/instaloader-zeuve",
       "executable": "instaloader-zeuve",
       "licenseFile": "licenses/instaloader/LICENSE",
-      "version": "4.15.3-zeuve.2",
+      "version": "4.15.3-zeuve.3",
       "source": "https://pypi.org/project/instaloader/4.15.3/",
       "purpose": "Resolver publicaciones públicas y catalogar contenido de Instagram, con sesión solo cuando sea necesaria.",
       "diagnosticArguments": [
         "--version"
       ],
-      "sha256": "222697495f88e4d5e193dfea7315a60403080dff239d5fc582c6eab72536bb87",
-      "size": 11825632,
+      "sha256": "56c394a28106b2b5aed00ffcb8d07041846769ae72be5ad99796a4dc0ae50cf6",
+      "size": 11848640,
       "architecture": "arm64",
       "requirement": "required"
     }

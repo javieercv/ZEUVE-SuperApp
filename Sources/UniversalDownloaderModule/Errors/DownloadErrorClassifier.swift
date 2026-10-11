@@ -19,6 +19,20 @@ public struct ClassifiedDownloadError: Sendable, Equatable {
 public struct DownloadErrorClassifier: Sendable {
     public init() {}
 
+    public static func safeMessage(for error: Error) -> String {
+        if let known = error as? UniversalDownloaderError {
+            switch known {
+            case .noPublishedFiles, .invalidTemporaryWorkspace, .unsafeOutputName, .overwriteNotConfirmed,
+                 .outputFolderUnavailable, .cookiesFileUnavailable, .invalidCookiesFormat, .emptyCookiesFile,
+                 .analysisTimedOut, .invalidProxy, .enginesUnavailable, .liveContentUnsupported,
+                 .insufficientDiskSpace:
+                return known.localizedDescription
+            default: break
+            }
+        }
+        return DownloadErrorClassifier().classify(stderr: error.localizedDescription).userMessage
+    }
+
     public func classify(stderr: String) -> ClassifiedDownloadError {
         let lower = stderr.lowercased()
         let category: DownloadErrorCategory

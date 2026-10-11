@@ -18,12 +18,25 @@ public struct GalleryDLAnalysisParser: Sendable {
         for (offset, record) in records.enumerated() {
             let key = UniversalURLNormalizer.duplicateKey(for: record.url)
             guard seen.insert(key).inserted else { continue }
-            let metadata = directoryMetadata.merging(record.metadata) { _, new in new }
+            let metadata = record.metadata
             let extensionName = normalizedExtension(metadata["extension"] as? String, url: record.url)
+            guard let extensionName,
+                  DownloadOutputValidator.audioVideoExtensions.contains(extensionName)
+                    || DownloadOutputValidator.imageExtensions.contains(extensionName)
+                    || ["m3u8", "mpd"].contains(extensionName) else { continue }
             let kind = mediaKind(for: extensionName, metadata: metadata, url: record.url)
             let identifier = string(metadata, keys: ["id", "post_id", "shortcode", "tweet_id", "pin_id"])
                 ?? "media-\(Self.stableIdentifier(key))"
-            let index = int(metadata, keys: ["num", "index", "position"]) ?? offset + 1
+            let index = entries.count + 1
+            var identity: [String: String] = [:]
+            for name in ["id", "post_id", "shortcode", "tweet_id", "pin_id", "album_id", "file_id", "num", "filename"] {
+                if let value = string(metadata, keys: [name]),
+                   value.range(of: "^[A-Za-z0-9_.:-]{1,256}$", options: .regularExpression) != nil {
+                    identity[name] = value
+                }
+            }
+            let resourceID = string(metadata, keys: ["file_id"])
+                ?? "\(int(metadata, keys: ["num", "index", "position"]) ?? offset + 1):\(kind.rawValue)"
             let username = string(metadata, keys: ["username", "user", "account", "author", "uploader"])
             let title = displayTitle(metadata: metadata, username: username, identifier: identifier, index: index, kind: kind)
             let thumbnail = url(metadata, keys: ["thumbnail", "thumbnail_url", "display_url", "preview"])
@@ -41,8 +54,10 @@ public struct GalleryDLAnalysisParser: Sendable {
                 httpHeaders: [:]
             )
             entries.append(DownloadCatalogItem(
-                canonicalID: "\(input.platform.rawValue):\(identifier):\(index)",
+                canonicalID: "\(input.platform.rawValue):\(identifier):\(resourceID)",
                 playlistIndex: index,
+                gallerySelector: .init(index: offset + 1, identity: identity),
+                requiresAuthentication: input.platform == .instagram && kind.requiresInstagramSession,
                 title: title,
                 duration: double(metadata, keys: ["duration"]),
                 uploader: username,
@@ -106,26 +121,26 @@ public struct GalleryDLAnalysisParser: Sendable {
                 case 1:
                     // Contrato heredado usado por las primeras pruebas de integración.
                     if array.count > 1, let metadata = array[1] as? [String: Any] {
-                        directoryMetadata.merge(metadata) { _, new in new }
+                        directoryMetadata = metadata
                     }
                     return
                 case 2:
                     // gallery-dl 1.32.9: Message.Directory = 2. El formato
                     // heredado utilizaba 2 para una URL; se conservan ambos.
                     if array.count > 1, let metadata = array[1] as? [String: Any] {
-                        directoryMetadata.merge(metadata) { _, new in new }
+                        directoryMetadata = metadata
                         return
                     }
                     if array.count > 1, let raw = array[1] as? String, let mediaURL = URL(string: raw) {
                         let metadata = array.count > 2 ? (array[2] as? [String: Any] ?? [:]) : [:]
-                        records.append((mediaURL, metadata))
+                        records.append((mediaURL, directoryMetadata.merging(metadata) { _, new in new }))
                     }
                     return
                 case 3:
                     // gallery-dl 1.32.9: Message.Url = 3.
                     if array.count > 1, let raw = array[1] as? String, let mediaURL = URL(string: raw) {
                         let metadata = array.count > 2 ? (array[2] as? [String: Any] ?? [:]) : [:]
-                        records.append((mediaURL, metadata))
+                        records.append((mediaURL, directoryMetadata.merging(metadata) { _, new in new }))
                     }
                     return
                 case 6:
@@ -140,7 +155,7 @@ public struct GalleryDLAnalysisParser: Sendable {
         }
         if let dictionary = object as? [String: Any] {
             if let raw = string(dictionary, keys: ["url", "media_url", "download_url"]), let mediaURL = URL(string: raw) {
-                records.append((mediaURL, dictionary))
+                records.append((mediaURL, directoryMetadata.merging(dictionary) { _, new in new }))
             } else {
                 for value in dictionary.values { collect(value, directoryMetadata: &directoryMetadata, records: &records) }
             }

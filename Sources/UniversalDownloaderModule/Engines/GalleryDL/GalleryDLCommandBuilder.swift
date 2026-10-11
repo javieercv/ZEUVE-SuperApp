@@ -7,7 +7,8 @@ public struct GalleryDLAnalysisCommandBuilder: Sendable {
         for input: ValidatedDownloadURL,
         cookiesFile: URL?,
         proxy: String?,
-        proxyCredentials: DownloadProxyCredentials? = nil
+        proxyCredentials: DownloadProxyCredentials? = nil,
+        timeoutSeconds: Int = 20
     ) throws -> [String] {
         var result = [
             "--config-ignore",
@@ -15,7 +16,8 @@ public struct GalleryDLAnalysisCommandBuilder: Sendable {
             "--simulate",
             "--no-mtime",
             "--sleep-request", "0.5",
-            "--retries", "3"
+            "--retries", "2",
+            "--http-timeout", String(max(1, min(timeoutSeconds, 300)))
         ]
         appendPrivateOptions(
             to: &result,
@@ -39,18 +41,25 @@ public struct GalleryDLDownloadCommandBuilder: Sendable {
         proxyCredentials: DownloadProxyCredentials? = nil
     ) throws -> [String] {
         let safeBase = try DownloadFilenamePolicy().sanitize(item.outputFilenameBase ?? item.title, maximumUTF8Bytes: 160)
-        let extensionTemplate = item.expectedExtension.map { ".\($0.lowercased())" } ?? ".{extension}"
         var result = [
             "--config-ignore",
             "--destination", downloadDirectory.path,
             "--directory", "",
-            "--filename", DownloadFilenamePolicy().escapedOutputTemplateLiteral(safeBase) + extensionTemplate,
+            "--filename", DownloadFilenamePolicy().escapedOutputTemplateLiteral(safeBase) + ".{extension}",
             "--no-part",
             "--no-mtime",
             "--retries", String(max(0, min(settings.network.retryCount, 100))),
             "--http-timeout", String(max(1, min(settings.network.connectionTimeoutSeconds, 300)))
         ]
-        if let index = item.playlistIndex, index > 0 {
+        if let selector = item.gallerySelector {
+            guard selector.index > 0,
+                  ["file_id", "num", "filename"].contains(where: { selector.identity[$0]?.isEmpty == false }) else {
+                throw UniversalDownloaderError.unavailableMedia("La selección no identifica un recurso único. Vuelve a analizar el enlace.")
+            }
+            // gallery-dl aplica el filtro antes de contar --range. La identidad
+            // selecciona el recurso y el rango limita la salida a una coincidencia.
+            result += ["--filter", try identityFilter(selector.identity), "--range", "1"]
+        } else if let index = item.playlistIndex, index > 0 {
             result += ["--range", String(index)]
         }
         appendPrivateOptions(
@@ -60,6 +69,19 @@ public struct GalleryDLDownloadCommandBuilder: Sendable {
         )
         result += ["--", item.sourceURL.absoluteString]
         return result
+    }
+
+    private func identityFilter(_ identity: [String: String]) throws -> String {
+        let keys: Set<String> = ["id", "post_id", "shortcode", "tweet_id", "pin_id", "album_id", "file_id", "num", "filename"]
+        return try identity.sorted { $0.key < $1.key }.map { key, value in
+            guard keys.contains(key), !value.isEmpty, value.utf8.count <= 256,
+                  !value.contains("\n"), !value.contains("\r") else { throw UniversalDownloaderError.unsafeOutputName }
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.withoutEscapingSlashes]
+            let quoted = String(decoding: try encoder.encode(value), as: UTF8.self)
+            if let number = Int64(value) { return "(\(key) == \(quoted) or \(key) == \(number))" }
+            return "\(key) == \(quoted)"
+        }.joined(separator: " and ")
     }
 
     public func redacted(arguments: [String]) -> [String] {

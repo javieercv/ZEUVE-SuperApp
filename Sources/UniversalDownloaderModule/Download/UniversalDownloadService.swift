@@ -109,7 +109,6 @@ public actor UniversalDownloadService {
                         category: "universal-downloader",
                         message: "Los motores no han producido un archivo descargable",
                         metadata: [
-                            "id": item.canonicalID,
                             "motor_inicial": item.engineKind.rawValue,
                             "referencia": classified.technicalReference,
                         ]
@@ -131,7 +130,6 @@ public actor UniversalDownloadService {
                 }
                 progressCoalescer.flush()
                 var candidates = try DownloadOutputPublisher(fileManager: fileManager).candidateFiles(in: workspace)
-                var alreadyVerified = Set<URL>()
                 if item.isPageDiscovered, itemSettings.pageSource.embedSourceMetadata, let origin = item.pageOrigin {
                     onProgress(.init(phase: .embeddingMetadata, currentItem: item.title, itemIndex: itemIndex, itemTotal: plan.items.count, completedItems: completed(itemResults), failedItems: failed(itemResults), skippedItems: skipped(itemResults)))
                     let metadataResult = await embedPageOriginMetadata(
@@ -142,14 +140,13 @@ public actor UniversalDownloadService {
                         ffprobe: engines.ffprobe
                     )
                     warnings.append(contentsOf: metadataResult.warnings)
-                    alreadyVerified.formUnion(metadataResult.verifiedFiles.map { $0.standardizedFileURL })
                     if cancellationRequested || Task.isCancelled { throw CancellationError() }
                     candidates = try DownloadOutputPublisher(fileManager: fileManager).candidateFiles(in: workspace)
                 }
                 let destination = try destinationFolder(for: item, base: output, settings: itemSettings)
                 onProgress(.init(phase: .verifying, currentItem: item.title, itemIndex: itemIndex, itemTotal: plan.items.count, completedItems: completed(itemResults), failedItems: failed(itemResults), skippedItems: skipped(itemResults)))
                 let verificationStarted = Date()
-                try await outputValidator.verifyMediaFiles(candidates.filter { !alreadyVerified.contains($0.standardizedFileURL) }, ffprobe: engines.ffprobe)
+                try await outputValidator.verifyMediaFiles(candidates, ffprobe: engines.ffprobe, expectedKind: Self.expectedOutputKind(item, settings: itemSettings))
                 await logTiming(
                     "Validación de resultados con FFprobe",
                     startedAt: verificationStarted,
@@ -187,7 +184,7 @@ public actor UniversalDownloadService {
                         }
                     }
                 }
-                if published.isEmpty, itemSettings.conflictPolicy == .skip, !candidates.isEmpty {
+                if !published.contains(where: DownloadOutputValidator.isMediaFile), itemSettings.conflictPolicy == .skip, candidates.contains(where: DownloadOutputValidator.isMediaFile) {
                     itemResults.append(.init(
                         canonicalID: item.canonicalID,
                         title: item.title,
@@ -195,7 +192,7 @@ public actor UniversalDownloadService {
                         userMessage: "Se ha omitido porque ya existían todos los archivos de salida."
                     ))
                 } else {
-                    guard !published.isEmpty else { throw UniversalDownloaderError.noPublishedFiles }
+                    guard published.contains(where: DownloadOutputValidator.isMediaFile) else { throw UniversalDownloaderError.noPublishedFiles }
                     itemResults.append(.init(canonicalID: item.canonicalID, title: item.title, status: .completed, outputFiles: published))
                 }
                 try workspace.clean(fileManager: fileManager)
@@ -209,8 +206,8 @@ public actor UniversalDownloadService {
             } catch {
                 progressCoalescer.cancel()
                 let reference = "YT-\(UUID().uuidString.prefix(8))"
-                itemResults.append(.init(canonicalID: item.canonicalID, title: item.title, status: .failed, errorReference: reference, userMessage: error.localizedDescription))
-                _ = try? await logger?.write(.error, category: "universal-downloader", message: "Fallo de descarga", metadata: ["id": item.canonicalID, "referencia": reference])
+                itemResults.append(.init(canonicalID: item.canonicalID, title: item.title, status: .failed, errorReference: reference, userMessage: DownloadErrorClassifier.safeMessage(for: error)))
+                _ = try? await logger?.write(.error, category: "universal-downloader", message: "Fallo de descarga", metadata: ["referencia": reference])
                 try? workspace.clean(fileManager: fileManager)
             }
         }
@@ -318,21 +315,26 @@ public actor UniversalDownloadService {
                 "Descarga con gallery-dl",
                 startedAt: galleryStarted,
                 metadata: [
-                    "id": item.canonicalID,
                     "codigo_salida": String(result.exitCode),
                     "archivos": String(galleryCandidates.count),
                     "plataforma": item.platform.rawValue,
                 ]
             )
 
-            if result.succeeded, !galleryCandidates.isEmpty {
-                return DownloadAttemptOutcome(succeeded: true, stderr: galleryError)
+            var validGalleryOutput = false
+            if result.succeeded {
+                do {
+                    try await outputValidator.verifyMediaFiles(galleryCandidates, ffprobe: engines.ffprobe, expectedKind: Self.expectedOutputKind(item, settings: settings))
+                    validGalleryOutput = true
+                } catch is CancellationError { throw CancellationError() }
+                catch { validGalleryOutput = false }
             }
+            if validGalleryOutput { return DownloadAttemptOutcome(succeeded: true, stderr: galleryError) }
 
             guard TikTokDownloadFallbackPolicy.shouldRetryWithYTDLP(
                 platform: item.platform,
                 processSucceeded: result.succeeded,
-                candidateCount: galleryCandidates.count
+                candidateCount: 0
             ) else {
                 let detail = galleryError.isEmpty
                     ? "gallery-dl terminó sin producir archivos."
@@ -344,7 +346,6 @@ public actor UniversalDownloadService {
             await logPerformance(
                 "gallery-dl no ha producido un TikTok; se activa el respaldo yt-dlp",
                 metadata: [
-                    "id": item.canonicalID,
                     "causa": result.succeeded ? "sin_archivos" : "fallo_motor",
                     "codigo_salida": String(result.exitCode),
                 ]
@@ -373,7 +374,6 @@ public actor UniversalDownloadService {
             await logPerformance(
                 "Resultado del respaldo TikTok con yt-dlp",
                 metadata: [
-                    "id": item.canonicalID,
                     "resultado": fallback.succeeded ? "proceso_correcto" : "fallo_motor",
                     "archivos": String(fallbackCandidates.count),
                 ]
@@ -550,7 +550,7 @@ public actor UniversalDownloadService {
     }
 
     private func logPerformance(_ message: String, metadata: [String: String]) async {
-        _ = try? await logger?.write(.debug, category: "universal-downloader-performance", message: message, metadata: metadata)
+        _ = try? await logger?.write(.debug, category: "universal-downloader-performance", message: message, metadata: DownloadDiagnosticMetadata.sanitized(metadata))
     }
 
     private func destinationFolder(for item: UniversalDownloadItem, base: URL, settings: UniversalDownloadSettings) throws -> URL {
@@ -685,7 +685,16 @@ public actor UniversalDownloadService {
         guard let logger else { return }
         var values = metadata
         values["duracion_ms"] = String(Int(Date().timeIntervalSince(startedAt) * 1_000))
-        _ = try? await logger.write(.debug, category: "universal-downloader-performance", message: message, metadata: values)
+        _ = try? await logger.write(.debug, category: "universal-downloader-performance", message: message, metadata: DownloadDiagnosticMetadata.sanitized(values))
+    }
+
+    private static func expectedOutputKind(_ item: UniversalDownloadItem, settings: UniversalDownloadSettings) -> UniversalMediaKind? {
+        switch settings.mode {
+        case .audio: return .audio
+        case .video: return .video
+        case .original: return item.mediaKind == .webpageMedia ? nil : item.mediaKind
+        case .automatic: return item.mediaKind == .audio ? .audio : nil
+        }
     }
 
     nonisolated private func completed(_ values: [UniversalDownloadItemResult]) -> Int { values.filter { $0.status == .completed }.count }

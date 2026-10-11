@@ -211,8 +211,13 @@ struct UniversalDownloaderView: View {
                                 Toggle("Seleccionar", isOn: selectionBinding(analysis: analysis)).toggleStyle(.checkbox).disabled(!analysis.isDownloadable)
                             }
                         }
-                        if analysis.requiresAuthentication, analysis.platform == .instagram {
+                        if analysis.platform == .instagram,
+                           analysis.requiresAuthentication || analysis.kind == .profile || analysis.availability == "unavailable" {
                             instagramSessionCard(analysis)
+                        }
+                        if !analysis.requiresAuthentication, let description = analysis.description,
+                           analysis.availability == "unavailable" || analysis.availability == "partial" {
+                            Text(description).font(.callout).foregroundStyle(.orange).textSelection(.enabled)
                         }
                         if analysis.kind == .profile,
                            analysis.platform == .instagram,
@@ -251,13 +256,13 @@ struct UniversalDownloaderView: View {
 
     private func instagramRestrictedSectionsCard(_ sections: [UniversalCatalogSection]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Label("Perfil público analizado sin sesión", systemImage: "person.crop.circle.badge.checkmark")
+            Label("Secciones con acceso restringido", systemImage: "person.crop.circle.badge.checkmark")
                 .font(.headline)
             Text("El contenido público disponible puede seleccionarse y descargarse normalmente.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             ForEach(sections) { section in
-                Label("\(section.spanishName): no disponibles sin sesión", systemImage: "lock")
+                Label("\(section.spanishName): requieren una sesión con permiso de acceso", systemImage: "lock")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -269,9 +274,9 @@ struct UniversalDownloaderView: View {
     private func instagramSessionCard(_ analysis: DownloadAnalysis) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Label(
-                analysis.kind == .profile
-                    ? "Instagram no ha permitido comprobar este perfil"
-                    : "Instagram exige una sesión para este contenido",
+                analysis.requiresAuthentication
+                    ? "Instagram exige una sesión para este contenido"
+                    : "Sesión de Instagram (opcional)",
                 systemImage: "lock.shield"
             )
             .font(.headline).foregroundStyle(.orange)
