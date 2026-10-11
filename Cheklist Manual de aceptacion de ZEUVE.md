@@ -1,12 +1,30 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-Implementación 0.20.8.0/build 74 preparada tras el plan aprobado del 11/10/2026. Pruebas manuales reales a la espera de indicación expresa del usuario; esta checklist conserva los resultados anteriores y no reclasifica ningún ID por pruebas automáticas.
+QA real autorizada y ejecutada el 11/10/2026 en Release 0.20.8.0/build 74. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
 
-Estado acumulado al 10/10/2026 · ZEUVE 0.20.7.0 (marketing 0.20.7, build 73), incluida la QA remota del Descargador en Debug. Se conservan las aceptaciones anteriores de 0.20.5.0/build 71 y 0.20.6.0/build 72.
+Estado acumulado al 11/10/2026 · ZEUVE 0.20.8.0 (marketing 0.20.8, build 74), incluida la QA real del Descargador en Release. Los IDs no repetidos conservan las evidencias anteriores de 0.20.5.0, 0.20.6.0 y 0.20.7.0.
 
-**639 pruebas: 613 ✅ OK · 9 ❌ fallidas · 8 ⚠️ parciales · 9 ➖ pendientes.** **630 probadas, incluidas las parciales; 9 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 621 ✅ OK · 7 ❌ fallidas · 6 ⚠️ parciales · 5 ➖ pendientes.** **634 probadas, incluidas las parciales; 5 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## QA real de Release — 11/10/2026
+
+La autorización posterior «puedes empezar a probar» permite la ronda real. [Informe completo](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md) con resultados, diagnósticos, privacidad y cierre. Solo se prueban los recorridos documentados; Reddit online sigue aplazado.
+
+- **D-13 — ❌:** tres fotos TikTok válidas; audio falla también al repetirlo solo. Diagnóstico del motor: AAC en MP4 anunciado como MP3; la extensión incompatible se rechaza y el respaldo falla.
+- **D-15 — ❌:** cuatro vídeos X descargados y decodificados, pero persisten variantes duplicadas entre motores.
+- **D-21 — ❌:** regresión SoundCloud, dos intentos con 0 correctos/1 fallido y sin archivo; catálogo Vídeo para audio, motor termina con código 0. La exigencia de stream de vídeo es causa probable respaldada.
+- **D-22/D-23 — ❌:** Tumblr acepta la URL, pero Tumblr y Threads no resuelven multimedia real. Disponibilidad actual del origen no contrastada independientemente.
+- **D-24 — ✅:** Snapchat, un MP4 correcto de 7.038.893 bytes, H.264/AAC y decodificación completa; no publica VTT como recurso primario.
+- **D-25 — ✅:** EroMe, nueve recursos coincidentes con el HTML de origen: seis vídeos y tres fotos. Nueve correctos, nueve SHA distintos y cero errores de decodificación.
+- **D-34 — ❌; D-11/D-39/D-44 — ⚠️:** perfil público adicional sin sesión sigue vacío/bloqueado. Sesión preparada para el objetivo privado, sin acceso efectivo demostrado. El análisis de perfil autenticado termina por presupuesto automáticamente, con controles liberados.
+- **D-45/D-46/D-47/D-48 — ✅:** cabecera Cookie, pegado Netscape, selector del archivo original con caducidad vacía e importación nativa expresa desde Brave aceptados. Preparación/importación no certifican D-44.
+- **D-49 — ✅; D-50 — ❌:** recordar crea y conserva el item de Llavero tras reinicio, pero la app no lo recupera: opción desactivada y campo vacío. La preferencia del panel no se persiste.
+- **D-51 — ✅:** reset global nativo elimina el item QA; existencia final código 44, historial y archivos conservados.
+- **P-12 — ✅; P-11 revalidado:** auditoría de 167 logs frente a ocho valores reales y tres canarios, sin coincidencias en logs, ajustes, historial ni stdout. Alcance de análisis con sesión y rutas públicas; no hubo descarga privada exitosa.
+
+D-33/D-17/D-60 conservan su cobertura parcial; D-40–D-43/D-56 siguen pendientes por catálogo no utilizable. Cierre: 17 archivos QA, cero `.part`, cookies propias eliminadas, Llavero sin item, contenido adulto QA desactivado y app cerrada. Sin correcciones de producto en esta ronda. Estado acumulado: 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 ejecutadas.
 
 ## QA de Story privada — 10/10/2026
 
@@ -1264,11 +1282,11 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-18** Twitch con contenido ya publicado.
 - [x] ✅ **D-19** Vimeo.
 - [x] ✅ **D-20** Dailymotion.
-- [x] ✅ **D-21** SoundCloud.
+- [x] ❌ **D-21** SoundCloud.
 - [x] ❌ **D-22** Tumblr.
 - [x] ❌ **D-23** Threads.
-- [x] ❌ **D-24** Snapchat público.
-- [x] ❌ **D-25** EroMe mediante enlace concreto, si se quiere probar esa compatibilidad.
+- [x] ✅ **D-24** Snapchat público.
+- [x] ✅ **D-25** EroMe mediante enlace concreto, si se quiere probar esa compatibilidad.
 
 ## YouTube
 
@@ -1294,13 +1312,13 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [ ] ➖ **D-42** Muestra foto de perfil.
 - [ ] ➖ **D-43** Sin sesión, Stories/Destacadas restringidas no bloquean el resto del perfil.
 - [x] ⚠️ **D-44** Con una sesión válida se puede acceder a las secciones que esa cuenta ya puede ver.
-- [ ] ➖ **D-45** Pegar una cabecera Cookie funciona.
-- [x] ⚠️ **D-46** Importar `cookies.txt` funciona.
-- [x] ❌ **D-47** Seleccionar archivo Netscape funciona.
-- [x] ⚠️ **D-48** Importar expresamente desde un navegador compatible funciona.
-- [ ] ➖ **D-49** «Recordar» conserva la sesión.
-- [ ] ➖ **D-50** Reiniciar ZEUVE recupera la sesión recordada.
-- [ ] ➖ **D-51** Restaurar ajustes globales elimina esa sesión recordada.
+- [x] ✅ **D-45** Pegar una cabecera Cookie funciona.
+- [x] ✅ **D-46** Importar `cookies.txt` funciona.
+- [x] ✅ **D-47** Seleccionar archivo Netscape funciona.
+- [x] ✅ **D-48** Importar expresamente desde un navegador compatible funciona.
+- [x] ✅ **D-49** «Recordar» conserva la sesión.
+- [x] ❌ **D-50** Reiniciar ZEUVE recupera la sesión recordada.
+- [x] ✅ **D-51** Restaurar ajustes globales elimina esa sesión recordada.
 
 ## Catálogos y selección
 
@@ -1955,7 +1973,7 @@ Si Xcode está instalado:
 - [x] ✅ **P-09** Un archivo original inspeccionado/editado permanece intacto.
 - [x] ✅ **P-10** Ningún conflicto normal sobrescribe silenciosamente un archivo existente.
 - [x] ✅ **P-11** Después de utilizar una sesión de Instagram, los registros no muestran cookies.
-- [x] ❌ **P-12** Los registros no muestran tokens/credenciales.
+- [x] ✅ **P-12** Los registros no muestran tokens/credenciales.
 - [x] ✅ **P-13** Analizar chats no deja mensajes completos en Historial.
 - [x] ✅ **P-14** Comparar seguidores no deja usernames/listas en Historial.
 - [x] ✅ **P-15** OCR del Inspector no deja el texto OCR completo en Historial.

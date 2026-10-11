@@ -1,10 +1,10 @@
 # Pruebas y validación — ZEUVE 0.20.8.0
 
-La entrega actual del Descargador tiene [regresiones y verificación automática](../Historico/Pruebas/TEST_RESULTS_0.20.8.0.md). Por instrucción del 11/10/2026, no se inician pruebas manuales reales hasta que el usuario lo indique después del aviso de implementación lista. La checklist conserva sus resultados previos, sin convertir tests sintéticos en aceptación remota.
+La entrega actual del Descargador tiene [regresiones y verificación automática](../Historico/Pruebas/TEST_RESULTS_0.20.8.0.md) y [QA real de Release autorizada posteriormente](../Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md). Estado al 11/10/2026: 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 pruebas ejecutadas de 639. La ronda confirma correcciones, fallos pendientes y regresiones de SoundCloud y recuperación del Llavero. No convierte tests sintéticos en aceptación remota; las pruebas no repetidas conservan evidencia histórica.
 
 La evidencia técnica de los parciales corregidos está en [TEST_RESULTS_0.20.7.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.7.0.md). Los nueve IDs locales pasan su [aceptación desde UI](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md); las pruebas de servicio complementan ese recorrido. La [revalidación manual de 04/10/2026](../Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) conserva los 22 IDs comprobados en la entrega anterior. El [cierre de I-29/I-35](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md) mide la salida de audio capturada y los frames presentados, incluidos mute/ganancia, salto/reanudación y cambio de pista. La checklist acumulada al 10/10/2026 (`Cheklist Manual de aceptacion de ZEUVE.md`, en la raíz) registra 613 OK, 9 fallidas, 8 parciales y 9 pendientes: 630 pruebas ejecutadas, incluidas las parciales. Todo estado sin OK restante pertenece al Descargador o a su autenticación remota, incluido P-12; P-11 pasa en el alcance de análisis documentado.
 
-## Evidencia de la última aceptación manual
+## Evidencia de aceptaciones anteriores
 
 El [perfil público adicional del 10/10/2026](../Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PUBLIC_PROFILE.md) confirma un fixture con publicaciones/Reels/foto, pero el análisis de perfil sigue con request_blocked y catálogo vacío pese a todos los filtros activos. Enlaces concretos del mismo origen sí resuelven 17 elementos y un Reel, que se descarga y decodifica entero. Se amplía evidencia sin cambiar estados: las pruebas de catálogo no se sustituyen por enlaces independientes.
 

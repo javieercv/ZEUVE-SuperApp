@@ -28,10 +28,14 @@ Fixtures propios y cookies exclusivamente sintéticas; no se leen valores de ses
 
 Los primeros recorridos detectaron expectativas de versión anteriores en comprobadores/pruebas y una referencia a Ajustes fuera de ámbito en el ViewModel. Se corrigen antes de repetir la verificación Xcode, que pasa con el código final. El respaldo de perfiles queda marcado explícitamente como parcial. Persisten warnings previos de Sendable/Vision del Inspector y de metadata AppIntents; no se afirma compilación sin avisos.
 
-`./Scripts/build_macos.sh Release`: pasa la compilación Xcode Release, comprobación de todos los motores empaquetados y `codesign --verify --deep --strict`. Info.plist confirma marketing 0.20.8/build 74. La app permanece en el directorio de build; no se abre ni se utiliza para pruebas manuales.
+`./Scripts/build_macos.sh Release`: pasa la compilación Xcode Release, comprobación de todos los motores empaquetados y `codesign --verify --deep --strict`. Info.plist confirma marketing 0.20.8/build 74. Al cierre de la implementación, la app permanece en el directorio de build sin abrir para pruebas manuales.
 
-## Aceptación manual reservada
+## Estado manual al cierre de la implementación
 
 No se inicia UI ni funcionamiento remoto real. El usuario debe indicar cuándo empezar. La checklist conserva 639 IDs: 613 OK, 9 fallidas, 8 parciales y 9 pendientes. No se reclasifica ningún resultado por pruebas automáticas. Reddit en línea sigue aplazado; perfiles, sesión efectiva, Stories/destacadas, Threads y correspondencia de descargas con el origen requieren evidencia real. La firma de desarrollo no equivale a notarización ni distribución certificada.
 
 Consulta [implementación](../Implementacion/IMPLEMENTATION_REPORT_0.20.8.0.md) y [entrega](../Entregas/DELIVERY_0.20.8.0.md).
+
+## QA real autorizada posteriormente — 11/10/2026
+
+El usuario indica «puedes empezar a probar» y después «sigue». La [ronda nativa de Release](DOWNLOADER_QA_0.20.8.0_20261011.md) actualiza la checklist: 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 pruebas ejecutadas de 639. Confirma Snapchat, EroMe, preparación/importación/guardado/reset de sesión y privacidad en el alcance ejercitado. Persisten fallos y se detectan regresiones de SoundCloud y recuperación del Llavero. No se cambia código ni se sustituye esta evidencia automática; no se certifica descarga privada. Reddit online sigue aplazado.

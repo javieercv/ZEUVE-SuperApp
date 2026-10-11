@@ -70,16 +70,16 @@ La instantánea empaquetable concreta se define en `../Resources/Engines/engines
 - [Implementación del Descargador](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.0.md).
 - [Resultados automáticos](Historico/Pruebas/TEST_RESULTS_0.20.8.0.md).
 - [Entrega y límites de aceptación](Historico/Entregas/DELIVERY_0.20.8.0.md).
-- Pruebas manuales reales en espera de indicación explícita del usuario; checklist sin reclasificar.
+- [QA real autorizada — 11/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md): 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 pruebas ejecutadas de 639; fallos pendientes y regresiones de SoundCloud/Llavero.
 
-## Última aceptación manual — 0.20.7.0
+## Aceptación manual anterior — 0.20.7.0
 
 - [Implementación de parciales](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.7.0.md).
 - [Verificación técnica](Historico/Pruebas/TEST_RESULTS_0.20.7.0.md).
 - [QA manual 0.20.7.0 — 05/10/2026](Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md): nueve parciales locales aceptados desde UI.
 - [Cierre local: volumen y sincronía](Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md): captura de salida digital y vídeo presentado; todo el alcance local aceptado.
 - [Remate QA del Descargador — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_CONTINUATION.md): repetición completa aceptada; EroMe fallido por duplicados/fotos omitidas y logs fallidos con canarios sintéticos; autenticación pendiente de sesión autorizada.
-- [QA de sesión de Instagram — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_SESSION.md): sesión autorizada de Brave; incompatibilidad del exportador/lector, análisis sin catálogo y auditoría de cookies en logs. Estado vigente: 630 ejecutadas, 9 pendientes; sin correcciones.
+- [QA de sesión de Instagram — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_SESSION.md): sesión autorizada de Brave; incompatibilidad del exportador/lector, análisis sin catálogo y auditoría de cookies en logs. Estado al cierre de esa ronda: 630 ejecutadas, 9 pendientes; sin correcciones.
 - [QA de perfil público adicional — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PUBLIC_PROFILE.md): origen público con contenido confirmado, catálogo de perfil vacío y publicación/Reel concretos operativos; estados conservados, sin correcciones.
 - [QA de Story privada autorizada — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010_PRIVATE_STORY.md): Story visible en Brave, análisis vacío sin sesión y con archivo aceptado tras desbloqueo; perfil cancelado ≈184 s, logs sin cookies reales y cierre limpio; estados conservados, sin correcciones.
 - [Continuación QA del Descargador — 10/10/2026](Historico/Pruebas/DOWNLOADER_QA_0.20.7.0_20261010.md): Twitch, orden del carrusel y rechazo de directos aceptados; carpetas ampliadas, repetición parcial, sesión macOS bloqueada y batería automatizada sin fallos.

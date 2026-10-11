@@ -10,7 +10,7 @@ El 11/10/2026 el usuario aprueba el plan investigado de las nueve fallidas y och
 
 La entrega implementada es 0.20.8.0, marketing 0.20.8/build 74, Descargador 0.7.4, instaloader-zeuve 4.15.3-zeuve.3. No cambia SQLite, dependencias upstream ni permisos. Los análisis afectados tienen presupuesto de 120 s por acción/página y usan el timeout de red configurado por petición. La identidad del recurso se distingue del número visible y del ordinal; la validación exige contenido primario real. Las señales ambiguas de bloqueo no prueban privacidad ni invalidez de sesión.
 
-La checklist conserva 613 OK, nueve fallidas, ocho parciales y nueve pendientes hasta la siguiente aceptación manual. Las evidencias y exclusiones anteriores conservan su alcance histórico; no sustituyen esta aprobación de correcciones.
+La checklist conservó 613 OK, nueve fallidas, ocho parciales y nueve pendientes durante la implementación. Después el usuario autoriza «puedes empezar a probar» y «sigue»: se ejecuta la [QA real](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md) en Release, incluyendo la sesión previamente autorizada de Brave limitada a Instagram y al objetivo privado original; el perfil público adicional se mantiene anónimo. Estado posterior: 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 pruebas ejecutadas de 639. Se documentan fallos pendientes y regresiones de SoundCloud y recuperación del Llavero; no se cambian producto ni alcance por esta ronda. Las evidencias anteriores conservan su alcance histórico.
 
 ## Estado vigente de referencia — ZEUVE 0.20.8.0
 
