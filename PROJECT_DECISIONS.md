@@ -1,8 +1,12 @@
 # Decisiones aprobadas de ZEUVE
 
-Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.8.0 el 11 de octubre de 2026.
+Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.20.8.1 el 11 de octubre de 2026.
 
 > **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
+
+## Continuación autorizada de fallidas y parciales — 0.20.8.1
+
+El usuario indica «sigue solucionando las que estén fallando y parciales» tras revisar los resultados de Release. Se corrigen los defectos del alcance vigente: audio/validación sin recodificar, deduplicación entre motores, recursos de la publicación Tumblr ya presentes en HTML público, persistencia de la opción Recordar y carga coherente de cookies de Instagram. El rechazo 429 en la validación termina sin repetir ni declarar la sesión inválida. No se añaden APIs, permisos ni dependencias upstream. La revisión propia pasa a 4.15.3-zeuve.4, Descargador 0.7.5 y app 0.20.8.1/build 75. La autorización de QA real y de sesión previa continúa con su alcance; Reddit online permanece aplazado.
 
 ## Correcciones del Descargador aprobadas — 0.20.8.0
 
@@ -12,17 +16,17 @@ La entrega implementada es 0.20.8.0, marketing 0.20.8/build 74, Descargador 0.7.
 
 La checklist conservó 613 OK, nueve fallidas, ocho parciales y nueve pendientes durante la implementación. Después el usuario autoriza «puedes empezar a probar» y «sigue»: se ejecuta la [QA real](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md) en Release, incluyendo la sesión previamente autorizada de Brave limitada a Instagram y al objetivo privado original; el perfil público adicional se mantiene anónimo. Estado posterior: 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 pruebas ejecutadas de 639. Se documentan fallos pendientes y regresiones de SoundCloud y recuperación del Llavero; no se cambian producto ni alcance por esta ronda. Las evidencias anteriores conservan su alcance histórico.
 
-## Estado vigente de referencia — ZEUVE 0.20.8.0
+## Estado vigente de referencia — ZEUVE 0.20.8.1
 
 Este bloque resume las decisiones actualmente efectivas que más fácilmente pueden confundirse con registros antiguos. No sustituye los detalles de cada sección ni las fuentes vivas.
 
-- Built-ins: Organizador 0.1.5, Descargador 0.7.4, Analizador de chats 0.1.6, Conversor 0.3.2, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.5 y Limpiador 0.1.4.
-- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.8.0.
+- Built-ins: Organizador 0.1.5, Descargador 0.7.5, Analizador de chats 0.1.6, Conversor 0.3.2, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.5 y Limpiador 0.1.4.
+- Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.20.8.1.
 - Ajustes: centralizados. Orden de secciones: Organizador 10, Descargador 20, Analizador 30, Conversor 40, Inspector 50 y Limpiador 60; el Comparador no tiene sección propia.
 - Inspector: inspección + preview + análisis + edición estructural segura sin transcode audiovisual; la transformación que requiere recodificación pertenece al Conversor.
 - Limpiador: `scanLocalStorage` autoriza análisis local documentado; cualquier retirada exige `removeLocalItems`, plan visible, selección y revalidación. Papelera es el modo seguro predeterminado y Undo solo aparece cuando es verificable.
 - Motores requeridos por la instantánea actual: yt-dlp, Deno, FFmpeg, FFprobe, gallery-dl e instaloader-zeuve. Pandoc sigue soportado como opcional del Conversor cuando se prepara. Playwright no participa en la ruta efectiva actual. Calibre, Ghostscript y LibreOffice están retirados.
-- Versión: ZEUVE 0.20.8.0, marketing 0.20.8, build 74.
+- Versión: ZEUVE 0.20.8.1, marketing 0.20.8, build 75.
 
 ## Registro de pruebas del Descargador — 09/10/2026
 

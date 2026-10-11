@@ -31,5 +31,18 @@ xcodebuild \
   clean build
 
 APP_PATH="build/DerivedData/Build/Products/$CONFIGURATION/ZEUVE.app"
+python3 - "$APP_PATH" <<'PY'
+from pathlib import Path
+import plistlib
+import sys
+version = Path("VERSION").read_text().strip().split(".")
+with (Path(sys.argv[1]) / "Contents/Info.plist").open("rb") as stream:
+    info = plistlib.load(stream)
+actual = [info.get("CFBundleShortVersionString"), info.get("ZEUVEReleaseRevision")]
+expected = [".".join(version[:3]), version[3]]
+if actual != expected:
+    raise SystemExit(f"La versión del bundle no coincide con VERSION: {actual!r} != {expected!r}")
+print(f"Versión del bundle verificada: {'.'.join(version)} (build {info.get('CFBundleVersion')})")
+PY
 Scripts/verify_packaged_engines_macos.sh "$APP_PATH"
 /usr/bin/codesign --verify --deep --strict --verbose=2 "$APP_PATH"

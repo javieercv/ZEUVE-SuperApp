@@ -15,13 +15,15 @@ public struct UniversalMediaCandidate: Sendable, Equatable, Identifiable {
     public let url: URL
     public let kind: UniversalMediaCandidateKind
     public let titleHint: String?
+    public let mediaKind: UniversalMediaKind?
 
     public var id: String { UniversalURLNormalizer.duplicateKey(for: url) }
 
-    public init(url: URL, kind: UniversalMediaCandidateKind, titleHint: String? = nil) {
+    public init(url: URL, kind: UniversalMediaCandidateKind, titleHint: String? = nil, mediaKind: UniversalMediaKind? = nil) {
         self.url = url
         self.kind = kind
         self.titleHint = titleHint
+        self.mediaKind = mediaKind
     }
 }
 
@@ -53,8 +55,15 @@ public struct UniversalHTMLMediaParser: Sendable {
         values += tagCandidates(html: html, tagName: "source", baseURL: baseURL, kind: .directMedia)
         values += tagCandidates(html: html, tagName: "iframe", baseURL: baseURL, kind: .embeddedPlayer)
         values += metadataCandidates(html: html, baseURL: baseURL)
-        values += jsonLDCandidates(html: html, baseURL: baseURL)
-        values += rawMediaURLCandidates(html: html, baseURL: baseURL)
+        let tumblr = tumblrPostCandidates(html: html, baseURL: baseURL)
+        if !tumblr.isEmpty {
+            // El estado de la página también contiene recomendaciones y avatares.
+            // Para Tumblr usamos solo los bloques del post solicitado.
+            values = tumblr
+        } else {
+            values += jsonLDCandidates(html: html, baseURL: baseURL)
+            values += rawMediaURLCandidates(html: html, baseURL: baseURL)
+        }
 
         var seen = Set<String>()
         var unique: [UniversalMediaCandidate] = []
@@ -68,6 +77,53 @@ public struct UniversalHTMLMediaParser: Sendable {
             }
         }
         return .init(pageTitle: pageTitle?.isEmpty == false ? pageTitle : nil, candidates: unique, duplicateCount: duplicates)
+    }
+
+    private func tumblrPostCandidates(html: String, baseURL: URL) -> [UniversalMediaCandidate] {
+        guard UniversalDownloadPlatform.detect(from: baseURL) == .tumblr,
+              let input = try? UniversalDownloadInputValidator().validate(baseURL.absoluteString),
+              input.canonicalID.hasPrefix("tumblr:") else { return [] }
+        let postID = String(input.canonicalID.dropFirst("tumblr:".count))
+        let scripts = matches(in: html, pattern: #"(?is)<script\b[^>]*id\s*=\s*["']___INITIAL_STATE___["'][^>]*>(.*?)</script>"#, captureGroup: 1)
+        var blocks: [[String: Any]] = []
+        func collect(_ value: Any, depth: Int = 0) {
+            guard depth < 64 else { return }
+            if let object = value as? [String: Any] {
+                if (object["idString"] as? String ?? (object["id"] as? NSNumber)?.stringValue ?? object["id"] as? String) == postID,
+                   let content = object["content"] as? [[String: Any]] {
+                    blocks.append(contentsOf: content)
+                    return
+                }
+                for child in object.values { collect(child, depth: depth + 1) }
+            } else if let array = value as? [Any] {
+                for child in array { collect(child, depth: depth + 1) }
+            }
+        }
+        for script in scripts {
+            if let data = script.data(using: .utf8), let object = try? JSONSerialization.jsonObject(with: data) { collect(object) }
+        }
+        return blocks.compactMap { block in
+            let type = block["type"] as? String
+            if type == "image", let media = block["media"] as? [[String: Any]] {
+                let ranked = media.sorted {
+                    let left = min(16_384, max(0, ($0["width"] as? Int) ?? 0)) * min(16_384, max(0, ($0["height"] as? Int) ?? 0))
+                    let right = min(16_384, max(0, ($1["width"] as? Int) ?? 0)) * min(16_384, max(0, ($1["height"] as? Int) ?? 0))
+                    return left > right
+                }
+                guard let selected = ranked.first,
+                      let mime = selected["type"] as? String,
+                      ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"].contains(mime),
+                      let url = resolve(selected["url"] as? String, relativeTo: baseURL) else { return nil }
+                return .init(url: url, kind: .directMedia, titleHint: block["altText"] as? String, mediaKind: .photo)
+            }
+            if type == "video" {
+                let media = block["media"] as? [String: Any]
+                guard let url = resolve(media?["url"] as? String ?? block["embedUrl"] as? String, relativeTo: baseURL),
+                      isCandidateURL(url, kind: .embeddedPlayer) else { return nil }
+                return .init(url: url, kind: inferredKind(for: url, fallback: .embeddedPlayer))
+            }
+            return nil
+        }
     }
 
     private func eromeAlbumCandidates(html: String, baseURL: URL) -> [UniversalMediaCandidate] {

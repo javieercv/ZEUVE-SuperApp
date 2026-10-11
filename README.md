@@ -8,7 +8,7 @@ Herramientas distintas, una sola aplicación, con especial cuidado por la privac
 
 <br>
 
-![Versión](https://img.shields.io/badge/ZEUVE-0.20.8.0-2f81f7?style=flat-square)
+![Versión](https://img.shields.io/badge/ZEUVE-0.20.8.1-2f81f7?style=flat-square)
 ![macOS](https://img.shields.io/badge/macOS-14%2B-000000?style=flat-square&logo=apple&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-nativo-000000?style=flat-square&logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/Swift-6-F05138?style=flat-square&logo=swift&logoColor=white)
@@ -139,11 +139,15 @@ Para consultar la evolución del proyecto:
 
 <div align="center">
 
-### ZEUVE 0.20.8.0
+### ZEUVE 0.20.8.1
+
+Marketing 0.20.8, revisión 1/build 75; Descargador 0.7.5; instaloader-zeuve 4.15.3-zeuve.4, con upstream sin cambios. Continuación autorizada tras la QA: audio TikTok/SoundCloud, identidad de variantes X, recursos Tumblr desde HTML público, recuperación de sesión y eliminación de cookies anónimas duplicadas. [Implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.1.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.20.8.1.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.20.8.1.md). [QA nativa](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.1_20261011.md): cinco fallos pasan a OK y 14 archivos se decodifican sin errores. Verificación completa y Release comprobadas. Checklist actual: 626 OK, 2 fallidas, 6 parciales y 5 pendientes de 639; Instagram/Threads siguen limitados y Reddit online aplazado; sin ZIP.
+
+### Entrega anterior — ZEUVE 0.20.8.0
 
 Marketing 0.20.8, build 74; Descargador 0.7.4. Correcciones de privacidad de logs, selección y validación de recursos, cookies Netscape, estados de Instagram, duplicados, complemento de álbumes y URLs Tumblr. Adaptador propio instaloader-zeuve 4.15.3-zeuve.3 sobre la misma base 4.15.3. [Implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.0.md), [verificación automática](Docs/Historico/Pruebas/TEST_RESULTS_0.20.8.0.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.20.8.0.md).
 
-El usuario autoriza posteriormente las pruebas reales. La [QA de Release](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md) acepta Snapchat, EroMe, importación/guardado/reset de sesión y privacidad en el alcance ejercitado; persisten fallos y se detectan regresiones de SoundCloud y recuperación del Llavero. Checklist actual: 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 pruebas ejecutadas de 639. Reddit online sigue aplazado. Sin cambios de producto ni ZIP en esta ronda.
+El usuario autoriza posteriormente las pruebas reales. La [QA de Release](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md) acepta Snapchat, EroMe, importación/guardado/reset de sesión y privacidad en el alcance ejercitado; persisten fallos y se detectan regresiones de SoundCloud y recuperación del Llavero. Checklist al cierre de esa ronda: 621 OK, 7 fallidas, 6 parciales y 5 pendientes; 634 pruebas ejecutadas de 639. Reddit online sigue aplazado. Sin cambios de producto ni ZIP en esta ronda.
 
 ### Aceptación manual anterior — ZEUVE 0.20.7.0
 

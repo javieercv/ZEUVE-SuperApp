@@ -1,4 +1,5 @@
 from pathlib import Path
+import plistlib
 import re
 import unittest
 
@@ -25,6 +26,13 @@ class VersioningPolicyTests(unittest.TestCase):
         product_info = (ROOT / "Sources/ZEUVECore/ZEUVEProductInfo.swift").read_text()
         self.assertIn('"ZEUVEReleaseRevision"', product_info)
         self.assertIn("releaseVersion", product_info)
+
+    def test_custom_revision_is_supplied_as_an_expanded_plist_input(self):
+        with (ROOT / "Resources/ZEUVE-Info.plist").open("rb") as stream:
+            template = plistlib.load(stream)
+        self.assertEqual(template["ZEUVEReleaseRevision"], "$(INFOPLIST_KEY_ZEUVEReleaseRevision)")
+        for path in ("Scripts/generate_xcode_project.py", "ZEUVE.xcodeproj/project.pbxproj"):
+            self.assertIn("INFOPLIST_FILE = Resources/ZEUVE-Info.plist;", (ROOT / path).read_text())
 
     def test_module_manifests_keep_three_component_semver(self):
         manifest_contract = (ROOT / "Sources/ZEUVECore/ModuleManifest.swift").read_text()

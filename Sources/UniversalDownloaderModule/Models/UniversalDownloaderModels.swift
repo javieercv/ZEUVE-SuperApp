@@ -68,6 +68,7 @@ public enum UniversalDownloadPlatform: String, Codable, Sendable, CaseIterable, 
         if matches(["vimeo.com"]) { return .vimeo }
         if matches(["dailymotion.com", "dai.ly"]) { return .dailymotion }
         if matches(["soundcloud.com"]) { return .soundcloud }
+        if host == "media.tumblr.com" || host.hasSuffix(".media.tumblr.com") { return .webpage }
         if matches(["tumblr.com"]) { return .tumblr }
         if matches(["threads.net", "threads.com"]) { return .threads }
         if matches(["snapchat.com"]) { return .snapchat }

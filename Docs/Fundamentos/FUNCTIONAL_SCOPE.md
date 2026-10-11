@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.8.0
+# Alcance funcional vigente — ZEUVE 0.20.8.1
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 
@@ -20,7 +20,7 @@ Las operaciones pesadas comparten `OperationCoordinator`; la aplicación evita e
 
 No modifica rutas críticas del sistema, no sigue symlinks como archivos ordinarios y no usa red.
 
-## Descargador universal 0.7.4
+## Descargador universal 0.7.5
 
 - Análisis y descarga desde URLs compatibles mediante rutas públicas y motores aprobados.
 - YouTube, Instagram/social y descubrimiento web según las capacidades documentadas.

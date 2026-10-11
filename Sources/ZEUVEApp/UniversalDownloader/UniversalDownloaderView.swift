@@ -320,6 +320,7 @@ struct UniversalDownloaderView: View {
             }
             HStack {
                 Toggle("Recordar en el Llavero", isOn: $model.rememberInstagramSession)
+                    .onChange(of: model.rememberInstagramSession) { _, _ in model.persistUniversalPreferences() }
                 Spacer()
                 Button("Volver a analizar", systemImage: "arrow.clockwise") { model.analyse() }
                     .buttonStyle(.borderedProminent)

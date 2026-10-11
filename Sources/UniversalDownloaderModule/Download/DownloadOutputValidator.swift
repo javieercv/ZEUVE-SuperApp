@@ -8,6 +8,42 @@ public struct DownloadOutputValidator: Sendable {
         self.runner = runner
     }
 
+    /// Corrige únicamente audio MP4/M4A que el extractor de galería anuncia como
+    /// MP3. No convierte ni acepta imágenes, vídeo o contenedores desconocidos.
+    func normalizeGalleryAudioFiles(_ files: [URL], ffprobe: URL) async throws -> [URL] {
+        var normalized: [URL] = []
+        for file in files {
+            try Task.checkCancellation()
+            guard file.pathExtension.lowercased() == "mp3" else {
+                normalized.append(file)
+                continue
+            }
+            let values = try file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+            guard values.isRegularFile == true, values.isSymbolicLink != true else {
+                throw UniversalDownloaderError.noPublishedFiles
+            }
+            let output = LockedDataCollector(maximumBytes: 262_144)
+            let result = try await runner.run(
+                ExternalProcessRequest(executable: ffprobe, arguments: ["-v", "error", "-show_entries", "format=format_name:stream=codec_type:stream_disposition=attached_pic", "-of", "json", "-i", file.path]),
+                onStdout: { output.append($0) }
+            )
+            guard result.succeeded,
+                  !Self.isCompatibleProbe(output.data, extensionName: "mp3", expectedKind: .audio),
+                  Self.isCompatibleProbe(output.data, extensionName: "m4a", expectedKind: .audio) else {
+                normalized.append(file)
+                continue
+            }
+            let destination = file.deletingPathExtension().appendingPathExtension("m4a")
+            guard !FileManager.default.fileExists(atPath: destination.path) else {
+                throw UniversalDownloaderError.overwriteNotConfirmed
+            }
+            try Task.checkCancellation()
+            try FileManager.default.moveItem(at: file, to: destination)
+            normalized.append(destination)
+        }
+        return normalized
+    }
+
     public func verifyMediaFiles(_ files: [URL], ffprobe: URL, expectedKind: UniversalMediaKind? = nil) async throws {
         guard files.contains(where: Self.isMediaFile) else { throw UniversalDownloaderError.noPublishedFiles }
         for file in files {

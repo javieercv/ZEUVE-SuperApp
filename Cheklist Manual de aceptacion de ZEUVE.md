@@ -1,14 +1,28 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-QA real autorizada y ejecutada el 11/10/2026 en Release 0.20.8.0/build 74. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
+QA real autorizada y ejecutada el 11/10/2026 en Release 0.20.8.1/build 75. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.1_20261011.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
 
-Estado acumulado al 11/10/2026 · ZEUVE 0.20.8.0 (marketing 0.20.8, build 74), incluida la QA real del Descargador en Release. Los IDs no repetidos conservan las evidencias anteriores de 0.20.5.0, 0.20.6.0 y 0.20.7.0.
+Estado acumulado al 11/10/2026 · ZEUVE 0.20.8.1 (marketing 0.20.8, build 75), incluida la QA real del Descargador en Release. Los IDs no repetidos conservan las evidencias anteriores de 0.20.5.0, 0.20.6.0 y 0.20.7.0.
 
-**639 pruebas: 621 ✅ OK · 7 ❌ fallidas · 6 ⚠️ parciales · 5 ➖ pendientes.** **634 probadas, incluidas las parciales; 5 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 626 ✅ OK · 2 ❌ fallidas · 6 ⚠️ parciales · 5 ➖ pendientes.** **634 probadas, incluidas las parciales; 5 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
 
-## QA real de Release — 11/10/2026
+## Correcciones y QA de Release 0.20.8.1 — 11/10/2026
+
+[Informe completo](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.1_20261011.md). Se repiten los cinco fallos corregidos desde la app nativa con datos aislados.
+
+- **D-13 — ✅:** TikTok, tres JPEG y un audio AAC en M4A; 4 correctos/0 fallidos. El audio conserva los bytes del contenedor original y se corrige su extensión tras FFprobe.
+- **D-15 — ✅:** X, un solo vídeo 1280×720 de 60,046803 s; nueve referencias duplicadas omitidas, 1 correcto/0 fallidos.
+- **D-21 — ✅:** SoundCloud aparece como Audio y publica un MP4 exclusivamente AAC de 85,046440 s; 1 correcto/0 fallidos.
+- **D-22 — ✅:** Tumblr, ocho recursos del post solicitado obtenidos desde su HTML público: tres JPEG y cinco GIF; 8 correctos/0 fallidos. El extractor responde con cuota diaria agotada.
+- **D-50 — ✅:** Recordar crea el item; tras reinicio nativo permanece activado y recupera exactamente los 693 caracteres del texto autorizado. El reset final vuelve a eliminar el item (revalidación D-51).
+- **D-23/D-34 — ❌; D-11/D-33/D-39/D-44/D-60 — ⚠️:** Threads no ofrece recursos verificables en el HTML recibido ni extractor compatible; Instagram aún no entrega catálogo/secciones. Cookies duplicadas corregidas y recuperación de sesión aceptada no certifican acceso remoto. El perfil privado acaba en ≈18,6 s con aviso de rechazo/limitación y controles liberados; Story sin contenido. Perfil público adicional diagnosticado sin sesión. D-60 conserva las cuatro combinaciones de carrusel, destacadas sin verificar.
+- **D-17 — ⚠️:** Reddit online sigue aplazado; **D-40–D-43/D-56 — ➖** conservan su dependencia de un catálogo operativo.
+
+14 archivos, 20.844.927 bytes, 14 SHA-256 distintos y cero errores de decodificación. Auditoría: siete valores reales de cookies/nueve variantes frente a 76 entradas JSONL, ajustes, historial y stdout; cero coincidencias. Cookies QA eliminadas, Llavero sin item, contenido adulto desactivado, cero `.part` y app QA cerrada. Los otros 634 IDs conservan su estado y las evidencias anteriores.
+
+## QA anterior de Release 0.20.8.0 — 11/10/2026
 
 La autorización posterior «puedes empezar a probar» permite la ronda real. [Informe completo](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.0_20261011.md) con resultados, diagnósticos, privacidad y cierre. Solo se prueban los recorridos documentados; Reddit online sigue aplazado.
 
@@ -1274,16 +1288,16 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-10** YouTube.
 - [x] ⚠️ **D-11** Instagram.
 - [x] ✅ **D-12** TikTok vídeo.
-- [x] ❌ **D-13** TikTok foto/carrusel.
+- [x] ✅ **D-13** TikTok foto/carrusel.
 - [x] ✅ **D-14** Pinterest.
-- [x] ❌ **D-15** X/Twitter.
+- [x] ✅ **D-15** X/Twitter.
 - [x] ✅ **D-16** Facebook.
 - [x] ⚠️ **D-17** Reddit.
 - [x] ✅ **D-18** Twitch con contenido ya publicado.
 - [x] ✅ **D-19** Vimeo.
 - [x] ✅ **D-20** Dailymotion.
-- [x] ❌ **D-21** SoundCloud.
-- [x] ❌ **D-22** Tumblr.
+- [x] ✅ **D-21** SoundCloud.
+- [x] ✅ **D-22** Tumblr.
 - [x] ❌ **D-23** Threads.
 - [x] ✅ **D-24** Snapchat público.
 - [x] ✅ **D-25** EroMe mediante enlace concreto, si se quiere probar esa compatibilidad.
@@ -1317,7 +1331,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-47** Seleccionar archivo Netscape funciona.
 - [x] ✅ **D-48** Importar expresamente desde un navegador compatible funciona.
 - [x] ✅ **D-49** «Recordar» conserva la sesión.
-- [x] ❌ **D-50** Reiniciar ZEUVE recupera la sesión recordada.
+- [x] ✅ **D-50** Reiniciar ZEUVE recupera la sesión recordada.
 - [x] ✅ **D-51** Restaurar ajustes globales elimina esa sesión recordada.
 
 ## Catálogos y selección

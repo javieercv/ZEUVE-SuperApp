@@ -249,6 +249,7 @@ public struct InstagramCatalogParser: Sendable {
              "session_not_validated",
              "session_load_failed",
              "request_blocked",
+             "session_request_blocked",
              "profile_lookup_failed":
             return true
         default:

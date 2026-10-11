@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlsplit
 
-VERSION = "4.15.3-zeuve.3"
+VERSION = "4.15.3-zeuve.4"
 
 
 def emit(value: dict[str, Any]) -> None:
@@ -39,11 +39,26 @@ def media_extension(url: str, fallback: str) -> str:
     return fallback
 
 
+def set_instagram_cookie(context: Any, name: str, value: str, domain: str, path: str) -> None:
+    host = domain.lstrip(".").lower()
+    if host != "instagram.com" and not host.endswith(".instagram.com"):
+        return
+    # Instaloader inicia cookies anónimas sin dominio (sessionid/csrftoken vacías).
+    # Requests enviaría ambas al añadir después las cookies de dominio del navegador.
+    jar = context._session.cookies
+    for cookie in list(jar):
+        if cookie.name == name and not cookie.domain:
+            jar.clear(cookie.domain, cookie.path, cookie.name)
+    jar.set(name, value, domain=domain, path=path)
+    if name == "csrftoken" and value:
+        context._session.headers["X-CSRFToken"] = value
+
+
 def load_netscape_cookies(context: Any, path: str) -> None:
     jar = http.cookiejar.MozillaCookieJar(path)
     jar.load(ignore_discard=True, ignore_expires=True)
     for cookie in jar:
-        context._session.cookies.set(cookie.name, cookie.value, domain=cookie.domain, path=cookie.path)
+        set_instagram_cookie(context, cookie.name, cookie.value, cookie.domain, cookie.path)
 
 
 def load_cookie_header(context: Any, path: str) -> None:
@@ -56,7 +71,7 @@ def load_cookie_header(context: Any, path: str) -> None:
         name, value = pair.split("=", 1)
         name, value = name.strip(), value.strip()
         if name:
-            context._session.cookies.set(name, value, domain=".instagram.com", path="/")
+            set_instagram_cookie(context, name, value, ".instagram.com", "/")
 
 
 def import_browser_cookies(context: Any, browser: str, cookiefile: str | None) -> None:
@@ -83,11 +98,17 @@ def import_browser_cookies(context: Any, browser: str, cookiefile: str | None) -
         kwargs["cookie_file"] = cookiefile
     jar = loader(**kwargs)
     for cookie in jar:
-        context._session.cookies.set(cookie.name, cookie.value, domain=cookie.domain, path=cookie.path)
+        set_instagram_cookie(context, cookie.name, cookie.value, cookie.domain, cookie.path)
+
+
+class SessionRequestBlocked(Exception):
+    """La validación recibió 429: se termina sin reintentar otra consulta."""
 
 
 def activate_session(loader: Any) -> str | None:
     username = loader.test_login()
+    if any("429" in str(message) for message in getattr(loader.context, "error_log", [])):
+        raise SessionRequestBlocked()
     if username:
         loader.context.username = username
     return username
@@ -269,6 +290,7 @@ def direct(args: argparse.Namespace) -> int:
         compress_json=False,
         quiet=True,
         max_connection_attempts=2,
+        fatal_status_codes=[429],
         request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
     )
     session_supplied = bool(args.cookies or args.cookie_header_file)
@@ -359,6 +381,7 @@ def catalog(args: argparse.Namespace) -> int:
         compress_json=False,
         quiet=True,
         max_connection_attempts=2,
+        fatal_status_codes=[429],
         request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
     )
     session_supplied = bool(args.cookies or args.cookie_header_file or args.browser)
@@ -391,6 +414,7 @@ def catalog(args: argparse.Namespace) -> int:
             compress_json=False,
             quiet=True,
             max_connection_attempts=2,
+            fatal_status_codes=[429],
             request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
         )
         session_validated = False
@@ -399,6 +423,16 @@ def catalog(args: argparse.Namespace) -> int:
         try:
             session_username = activate_session(loader)
             session_validated = True if session_username else None
+        except SessionRequestBlocked:
+            emit({
+                "record": "error",
+                "code": "session_request_blocked",
+                "message": "Instagram ha limitado temporalmente la validación de la sesión. Espera antes de volver a intentarlo; este rechazo no demuestra que la sesión sea inválida.",
+                "requires_authentication": False,
+                "session_supplied": True,
+                "session_validated": None,
+            })
+            return 21
         except Exception:
             # A failed validation request must not discard the cookies before the
             # actual profile lookup; Instagram may allow one endpoint and reject another.
@@ -418,6 +452,7 @@ def catalog(args: argparse.Namespace) -> int:
                 compress_json=False,
                 quiet=True,
                 max_connection_attempts=2,
+                fatal_status_codes=[429],
                 request_timeout=max(1, min(getattr(args, "request_timeout", 20), 300)),
             )
             try:
@@ -585,7 +620,9 @@ def export_cookies(args: argparse.Namespace) -> int:
         kwargs["cookie_file"] = args.browser_cookie_file
     source = loader(**kwargs)
     for cookie in source:
-        jar.set_cookie(cookie)
+        host = cookie.domain.lstrip(".").lower()
+        if host == "instagram.com" or host.endswith(".instagram.com"):
+            jar.set_cookie(cookie)
     jar.save(ignore_discard=True, ignore_expires=True)
     emit({"record": "cookie_export", "count": len(jar), "output": Path(args.output).name})
     return 0

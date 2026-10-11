@@ -11,7 +11,7 @@ Esta carpeta contiene los motores locales que ZEUVE puede empaquetar. `engines.j
 - FFmpeg `8.1.2`;
 - FFprobe `8.1.2`;
 - gallery-dl `1.32.9`;
-- instaloader-zeuve `4.15.3-zeuve.3`.
+- instaloader-zeuve `4.15.3-zeuve.4`.
 
 Pandoc continúa soportado por el Conversor como motor opcional cuando la preparación aprobada lo incorpora. La instantánea actual no contiene un ejecutable de Playwright; el helper de navegador no forma parte del routing efectivo del Descargador 0.7.4.
 

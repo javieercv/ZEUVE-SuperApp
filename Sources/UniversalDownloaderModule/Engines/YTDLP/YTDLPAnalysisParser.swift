@@ -27,7 +27,8 @@ public struct YTDLPAnalysisParser: Sendable {
             sourceURL: sourceURL,
             serviceName: serviceName(raw, sourceURL: sourceURL),
             extractor: raw.extractorKey ?? raw.extractor,
-            resolvedMedia: resolvedMediaReference(raw, fallbackURL: fallbackURL)
+            resolvedMedia: resolvedMediaReference(raw, fallbackURL: fallbackURL),
+            mediaKind: mediaKind(raw)
         )
     }
 
@@ -46,7 +47,8 @@ public struct YTDLPAnalysisParser: Sendable {
                 sourceURL: url,
                 serviceName: serviceName(entry, sourceURL: url),
                 extractor: entry.extractorKey ?? entry.extractor,
-                resolvedMedia: resolvedMediaReference(entry, fallbackURL: fallbackURL)
+                resolvedMedia: resolvedMediaReference(entry, fallbackURL: fallbackURL),
+                mediaKind: mediaKind(entry)
             )
         }
         let kind: DownloadContentKind = raw.type == "playlist" || raw.type == "multi_video" || !entries.isEmpty ? .playlist : .video
@@ -79,8 +81,21 @@ public struct YTDLPAnalysisParser: Sendable {
             sourceURL: resolvedURL,
             serviceName: serviceName(raw, sourceURL: resolvedURL),
             extractor: raw.extractorKey ?? raw.extractor,
-            resolvedMedia: resolvedMediaReference(raw, fallbackURL: fallbackURL)
+            resolvedMedia: resolvedMediaReference(raw, fallbackURL: fallbackURL),
+            mediaKind: kind == .playlist ? .gallery : mediaKind(raw)
         )
+    }
+
+    private func mediaKind(_ raw: RawInfo) -> UniversalMediaKind? {
+        let formats = (raw.formats ?? []) + (raw.requestedFormats ?? [])
+        if raw.videoCodec.map({ $0 != "none" }) == true || formats.contains(where: { $0.videoCodec.map { $0 != "none" } == true }) {
+            return .video
+        }
+        let hasAudio = raw.audioCodec.map { $0 != "none" } == true
+            || formats.contains { $0.audioCodec.map { $0 != "none" } == true }
+        let audioOnly = raw.videoCodec == "none"
+            || (!formats.isEmpty && formats.allSatisfy { $0.videoCodec == "none" })
+        return hasAudio && audioOnly ? .audio : nil
     }
 
     private func resolvedMediaReference(_ raw: RawInfo, fallbackURL: URL?) -> ResolvedMediaReference? {
@@ -358,6 +373,8 @@ private struct RawInfo: Decodable {
     let manifestURL: String?
     let protocolName: String?
     let extensionName: String?
+    let videoCodec: String?
+    let audioCodec: String?
     let httpHeaders: [String: String]?
     let urlExpiration: Double?
     let requestedFormats: [RawFormat]?
@@ -384,6 +401,8 @@ private struct RawInfo: Decodable {
         case manifestURL = "manifest_url"
         case protocolName = "protocol"
         case extensionName = "ext"
+        case videoCodec = "vcodec"
+        case audioCodec = "acodec"
         case httpHeaders = "http_headers"
         case urlExpiration = "url_expiration"
         case requestedFormats = "requested_formats"

@@ -310,7 +310,7 @@ public actor UniversalDownloadService {
                 onStderr: { stderr.append($0) }
             )
             let galleryError = String(decoding: stderr.data, as: UTF8.self)
-            let galleryCandidates = try DownloadOutputPublisher(fileManager: fileManager).candidateFiles(in: workspace)
+            var galleryCandidates = try DownloadOutputPublisher(fileManager: fileManager).candidateFiles(in: workspace)
             await logTiming(
                 "Descarga con gallery-dl",
                 startedAt: galleryStarted,
@@ -324,6 +324,9 @@ public actor UniversalDownloadService {
             var validGalleryOutput = false
             if result.succeeded {
                 do {
+                    if item.platform == .tiktok, item.mediaKind == .audio {
+                        galleryCandidates = try await outputValidator.normalizeGalleryAudioFiles(galleryCandidates, ffprobe: engines.ffprobe)
+                    }
                     try await outputValidator.verifyMediaFiles(galleryCandidates, ffprobe: engines.ffprobe, expectedKind: Self.expectedOutputKind(item, settings: settings))
                     validGalleryOutput = true
                 } catch is CancellationError { throw CancellationError() }

@@ -1,4 +1,4 @@
-# Descargador universal 0.7.4 — ZEUVE 0.20.8.0
+# Descargador universal 0.7.5 — ZEUVE 0.20.8.1
 
 ## Identidad
 
@@ -7,7 +7,7 @@
 - Tecnología: Swift 6 con motores locales incluidos u opcionales.
 - Versión mínima declarada en el manifest: ZEUVE 0.10.4.
 
-## Organización interna 0.7.4
+## Organización interna 0.7.5
 
 El target vigente es `UniversalDownloaderModule` y la UI vive en `Sources/ZEUVEApp/UniversalDownloader`. La organización vigente diferencia explícitamente:
 
@@ -32,7 +32,7 @@ El módulo no obliga a utilizar un único extractor. `UniversalEngineRouter` eli
 - `instaloader-zeuve`: resolución directa y catálogo progresivo de Instagram.
 - extractor HTML de ZEUVE: archivos directos, reproductores y manifiestos encontrados en páginas concretas.
 - FFmpeg/FFprobe: unión, remultiplexado y validación multimedia.
-- navegador opcional: reservado como compatibilidad futura; en 0.7.4 no existe una opción funcional de instalación/activación ni participa en el routing porque el contrato ejecutable anterior estaba incompleto. Ajustes conserva únicamente una sección informativa heredada sobre esta posibilidad.
+- navegador opcional: reservado como compatibilidad futura; en 0.7.5 no existe una opción funcional de instalación/activación ni participa en el routing porque el contrato ejecutable anterior estaba incompleto. Ajustes conserva únicamente una sección informativa heredada sobre esta posibilidad.
 
 El orden puede usar motores de respaldo aprobados. No se rastrea un sitio completo desde una página genérica.
 
@@ -82,9 +82,13 @@ La compatibilidad efectiva depende de que la plataforma continúe exponiendo el 
 
 ## Resultados, selección y errores
 
-El catálogo distingue recursos independientes y variantes del mismo vídeo. Las variantes conocidas de X se agrupan por identificador del recurso y se conserva la referencia de mayor resolución; elementos distintos de una publicación no se agrupan por título o duración. Los resultados genéricos de EroMe se complementan con imágenes originales de grupos multimedia del álbum, sin recoger avatares ni posters de vídeo.
+El catálogo distingue recursos independientes y variantes del mismo vídeo. Las variantes conocidas de X, incluidas las resueltas como genéricas por otro motor, se agrupan por identificador del recurso y se conserva la referencia de mayor resolución; elementos distintos de una publicación no se agrupan por título o duración. Los resultados genéricos de EroMe se complementan con imágenes originales de grupos multimedia del álbum, sin recoger avatares ni posters de vídeo.
 
 La selección de gallery-dl conserva un ordinal del motor independiente del número visible. Al descargar aplica un filtro de identidad del recurso y limita la salida a una coincidencia; una identidad que no se pueda verificar no permite sustituir el elemento por otro. El nombre usa la extensión real del motor. Subtítulos y metadatos son auxiliares, no contenido primario ni criterio de éxito.
+
+El tipo de yt-dlp se conserva desde los codecs anunciados: un MP4 con solo audio se clasifica como Audio. En TikTok, si gallery-dl anuncia MP3 pero FFprobe verifica audio MP4/M4A, se corrige a `.m4a` únicamente dentro del temporal propio, sin recodificar ni cambiar los bytes; imágenes y vídeo no se reclasifican como audio.
+
+Tumblr puede recuperar los bloques de la publicación concreta desde el estado JSON de su página pública cuando los motores no la resuelven. Selecciona la imagen de mayor resolución disponible de cada bloque, en orden; excluye avatar, recomendaciones y otras publicaciones. No añade una API, credenciales, rastreo ni solicitudes fuera del flujo HTML ya previsto. El MIME de la respuesta determina la extensión efectiva.
 
 Antes de publicar se valida formato y pistas reales de audio/vídeo con FFprobe y las firmas de imágenes. Una imagen renombrada a MP3 se rechaza; un MP4 con solo audio sigue siendo válido para audio. Un JSON de análisis vacío no detiene un fallback permitido. Las referencias explícitas de playlists planas siguen resolviéndose durante la descarga.
 
@@ -104,7 +108,7 @@ Se puede introducir:
 
 El perfil se cataloga progresivamente. Puede mostrar publicaciones, fotos, vídeos, reels, stories activas, highlights y foto de perfil actual. No incluye publicaciones etiquetadas ni directos.
 
-Las publicaciones y Reels directos públicos se resuelven primero con `instaloader-zeuve 4.15.3-zeuve.3`, sin cookies. El adaptador devuelve cada foto o vídeo del sidecar como un elemento independiente, conservando orden, tipo y formato. Si no puede resolverlo, ZEUVE continúa anónimamente con `gallery-dl`, `yt-dlp` y el descubrimiento genérico aprobado. Esta ruta conserva prioridad aunque exista una sesión guardada. Solo una señal explícita de contenido privado permite repetir con una sesión ya autorizada.
+Las publicaciones y Reels directos públicos se resuelven primero con `instaloader-zeuve 4.15.3-zeuve.4`, sin cookies. El adaptador devuelve cada foto o vídeo del sidecar como un elemento independiente, conservando orden, tipo y formato. Si no puede resolverlo, ZEUVE continúa anónimamente con `gallery-dl`, `yt-dlp` y el descubrimiento genérico aprobado. Esta ruta conserva prioridad aunque exista una sesión guardada. Solo una señal explícita de contenido privado permite repetir con una sesión ya autorizada.
 
 Los enlaces concretos de Stories y Destacadas se encaminan a gallery-dl con una sesión aportada expresamente; sin ella se muestra el panel de autenticación. No se envían como shortcodes de publicaciones al comando direct. Cada Story/Destacada conserva su necesidad de sesión al pasar a la descarga, incluso si el perfil es público.
 
@@ -114,9 +118,9 @@ El panel de sesión es opcional y accesible para perfiles y análisis no disponi
 
 Los archivos Netscape aceptan caducidad vacía para cookies de sesión, equivalente a 0 internamente. Acceso imposible, formato inválido y ausencia de cookies tienen errores distintos. Los originales seleccionados no se modifican.
 
-## Perfiles por plataforma 0.7.4
+## Perfiles por plataforma 0.7.5
 
-«Por defecto de la plataforma» se resuelve para cada elemento, no para el lote completo. Todos los perfiles incorporados son editables desde Ajustes y pueden restaurarse individualmente o en conjunto. En 0.7.4, sus valores de fábrica son los mismos para todas las plataformas, incluido YouTube:
+«Por defecto de la plataforma» se resuelve para cada elemento, no para el lote completo. Todos los perfiles incorporados son editables desde Ajustes y pueden restaurarse individualmente o en conjunto. En 0.7.5, sus valores de fábrica son los mismos para todas las plataformas, incluido YouTube:
 
 - contenido: «Original sin convertir»;
 - calidad: mejor disponible;
@@ -231,7 +235,7 @@ La versión incluida dentro de la aplicación no se modifica. Puede restaurarse 
 - Una respuesta ambigua, un límite temporal o un endpoint que pida inicio de sesión no convierten el perfil en privado ni abren automáticamente la tarjeta obligatoria de autenticación.
 - Si una sesión aportada es inválida, ZEUVE vuelve a intentar el perfil de forma anónima antes de declarar la consulta no disponible.
 - `gallery-dl` continúa como respaldo público cuando `instaloader-zeuve` no resuelve el perfil.
-- `instaloader-zeuve 4.15.3-zeuve.3` añade la resolución directa anónima de publicaciones, Reels y sidecars completos sobre Instaloader 4.15.3.
+- `instaloader-zeuve 4.15.3-zeuve.4` añade la resolución directa anónima de publicaciones, Reels y sidecars completos sobre Instaloader 4.15.3.
 - La sesión sigue siendo obligatoria para perfiles privados sin acceso, stories, destacadas y enlaces concretos que Instagram proteja expresamente.
 - Los registros indican solo si se aportó y validó una sesión, el motor, el fallback y las secciones restringidas; nunca guardan cookies, tokens ni el usuario de la cuenta iniciada.
 
@@ -251,3 +255,5 @@ El resultado de una descarga tiene prioridad sobre su entrada de historial. Si l
 - [Motores](../../Motores/UNIVERSAL_DOWNLOADER_ENGINES.md)
 - [Empaquetado de motores](../../Motores/UNIVERSAL_DOWNLOADER_ENGINE_PACKAGING.md)
 - [Gestión y overrides](../../Motores/ENGINE_MANAGEMENT.md)
+
+El control «Recordar en el Llavero» del panel persiste la misma preferencia centralizada que Ajustes y conserva también una sesión ya importada cuando se activa después de importarla. El adaptador de Instagram sustituye cookies anónimas sin dominio antes de cargar las cookies de Instagram y sincroniza CSRF; no envía dos sessionid por la importación ni acepta dominios ajenos. Un rechazo remoto no acredita sesión inválida ni perfil inexistente.

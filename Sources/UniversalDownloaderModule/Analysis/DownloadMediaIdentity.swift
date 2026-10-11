@@ -9,7 +9,7 @@ enum DownloadMediaIdentity {
     static func key(for entry: DownloadCatalogItem) -> String {
         if let url = entry.resolvedMedia?.mediaURL {
             let parts = url.path.split(separator: "/").map(String.init)
-            if entry.platform == .x, url.host?.lowercased() == "video.twimg.com",
+            if url.host?.lowercased() == "video.twimg.com",
                parts.count > 1, ["ext_tw_video", "amplify_video"].contains(parts[0]),
                parts[1].allSatisfy(\.isNumber) {
                 return "x:\(parts[0]):\(parts[1])"
@@ -20,7 +20,7 @@ enum DownloadMediaIdentity {
     }
 
     static func qualityRank(for entry: DownloadCatalogItem) -> Int {
-        if let url = entry.resolvedMedia?.mediaURL, entry.platform == .x, url.host == "video.twimg.com" {
+        if let url = entry.resolvedMedia?.mediaURL, url.host?.lowercased() == "video.twimg.com" {
             for part in url.path.split(separator: "/") {
                 let dimensions = part.split(separator: "x")
                 if dimensions.count == 2, let width = Int(dimensions[0]), let height = Int(dimensions[1]),

@@ -23,7 +23,7 @@ La disponibilidad pública del repositorio y este inventario de terceros no debe
 | **FFmpeg** | 8.1.2 | Procesamiento, conversión y edición multimedia | La licencia efectiva depende de la configuración de compilación. El registro actual referencia GPL v2 y ZEUVE conserva la documentación upstream correspondiente | [`COPYING.GPLv2`](Resources/Engines/licenses/ffmpeg/COPYING.GPLv2) · [`LICENSE.md`](Resources/Engines/licenses/ffmpeg/LICENSE.md) |
 | **FFprobe** | 8.1.2 | Inspección y validación multimedia | Forma parte de la misma compilación/licenciamiento de FFmpeg | [`COPYING.GPLv2`](Resources/Engines/licenses/ffmpeg/COPYING.GPLv2) · [`LICENSE.md`](Resources/Engines/licenses/ffmpeg/LICENSE.md) |
 | **gallery-dl** | 1.32.9 | Descarga de fotografías, vídeos, carruseles, álbumes y galerías compatibles | GNU GPL v2 | [`LICENSE`](Resources/Engines/licenses/gallery-dl/LICENSE) |
-| **instaloader-zeuve** | 4.15.3-zeuve.3 | Resolución de publicaciones y contenido compatible de Instagram | Basado en Instaloader; licencia MIT del proyecto upstream incluida | [`LICENSE`](Resources/Engines/licenses/instaloader/LICENSE) |
+| **instaloader-zeuve** | 4.15.3-zeuve.4 | Resolución de publicaciones y contenido compatible de Instagram | Basado en Instaloader; licencia MIT del proyecto upstream incluida | [`LICENSE`](Resources/Engines/licenses/instaloader/LICENSE) |
 
 Las versiones y rutas anteriores se corresponden con la instantánea registrada actualmente en `Resources/Engines/engines.json`. Si cambia el registro, este documento debe revisarse en la misma modificación documental.
 

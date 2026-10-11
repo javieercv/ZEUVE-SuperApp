@@ -191,8 +191,13 @@ final class UniversalDownloaderViewModel: ObservableObject {
         universalPreferences.useOptionalBrowserFallback = false
         do {
             try settingsStore?.savePreferences(universalPreferences)
-            if rememberInstagramSession, !instagramSessionText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                try instagramKeychain.save(try InstagramSessionMaterial.normalize(instagramSessionText))
+            if rememberInstagramSession {
+                let text = instagramSessionText.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !text.isEmpty {
+                    try instagramKeychain.save(try InstagramSessionMaterial.normalize(text))
+                } else if let file = temporaryInstagramCookiesFile {
+                    try instagramKeychain.save(try String(contentsOf: file, encoding: .utf8))
+                }
             } else if !rememberInstagramSession {
                 try instagramKeychain.delete()
             }

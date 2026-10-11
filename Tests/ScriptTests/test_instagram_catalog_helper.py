@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import importlib.util
 import io
+import http.cookiejar
 from pathlib import Path
 from types import SimpleNamespace
 import sys
 import unittest
+import tempfile
+import urllib.request
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,6 +28,54 @@ class LoginRequiredException(Exception):
 
 
 class InstagramCatalogHelperTests(unittest.TestCase):
+    def test_rate_limited_validation_stops_without_profile_or_anonymous_retry(self) -> None:
+        class Loader:
+            def __init__(self, **kwargs):
+                self.context = SimpleNamespace(error_log=[])
+                self.assert_fatal = kwargs["fatal_status_codes"]
+            def test_login(self):
+                self.context.error_log.append("HTTP 429 token=SYNTHETIC_CANARY")
+                return None
+        class Profile:
+            @staticmethod
+            def from_username(*args):
+                raise AssertionError("No profile query after 429")
+        args = SimpleNamespace(cookies=None, cookie_header_file="synthetic", browser=None, browser_cookie_file=None)
+        out = io.StringIO()
+        with patch.dict(sys.modules, {"instaloader": SimpleNamespace(Instaloader=Loader, Profile=Profile)}), patch.object(MODULE, "load_cookie_header", lambda *args: None), patch("sys.stdout", out):
+            self.assertEqual(MODULE.catalog(args), 21)
+        record = MODULE.json.loads(out.getvalue())
+        self.assertEqual(record["code"], "session_request_blocked")
+        self.assertIsNone(record["session_validated"])
+        self.assertNotIn("SYNTHETIC_CANARY", out.getvalue())
+
+    def test_imported_session_replaces_anonymous_cookie_without_foreign_domains(self) -> None:
+        class Jar(http.cookiejar.CookieJar):
+            def set(self, name, value, domain="", path="/"):
+                self.set_cookie(http.cookiejar.Cookie(0, name, value, None, False, domain,
+                    bool(domain), domain.startswith("."), path, True, False, None, True, None, None, {}, False))
+
+        for mode in ("header", "netscape"):
+            jar = Jar()
+            jar.set("sessionid", "")
+            jar.set("csrftoken", "")
+            context = SimpleNamespace(_session=SimpleNamespace(cookies=jar, headers={}))
+            with tempfile.TemporaryDirectory() as temp:
+                file = Path(temp) / "session.txt"
+                if mode == "header":
+                    file.write_text("Cookie: sessionid=SYNTHETIC_SESSION; csrftoken=SYNTHETIC_CSRF")
+                    MODULE.load_cookie_header(context, str(file))
+                else:
+                    file.write_text("# Netscape HTTP Cookie File\n.instagram.com\tTRUE\t/\tFALSE\t0\tsessionid\tSYNTHETIC_SESSION\n.instagram.com\tTRUE\t/\tFALSE\t0\tcsrftoken\tSYNTHETIC_CSRF\n.instagram.com.evil.example\tTRUE\t/\tFALSE\t0\tforeign\tFORBIDDEN\n")
+                    MODULE.load_netscape_cookies(context, str(file))
+            request = urllib.request.Request("https://www.instagram.com/")
+            jar.add_cookie_header(request)
+            header = request.get_header("Cookie")
+            self.assertEqual(header.count("sessionid="), 1)
+            self.assertIn("sessionid=SYNTHETIC_SESSION", header)
+            self.assertNotIn("foreign", str([(c.name, c.domain) for c in jar]))
+            self.assertEqual(context._session.headers["X-CSRFToken"], "SYNTHETIC_CSRF")
+
     def test_instaloader_not_found_response_is_inconclusive_without_session(self) -> None:
         result = MODULE.classify_profile_lookup_error(
             ProfileNotExistsException("Profile mar.rullan does not exist."),

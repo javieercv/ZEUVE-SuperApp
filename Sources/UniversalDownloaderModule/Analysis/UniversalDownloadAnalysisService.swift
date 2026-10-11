@@ -109,6 +109,11 @@ public actor UniversalDownloadAnalysisService {
                     onPlaylistEntry: onPlaylistEntry
                 )
                 catalogAttempt = result
+                if result.issueCode == "session_request_blocked" {
+                    // La validación ha recibido 429: no encadenamos otro motor
+                    // ni descartamos la sesión como inválida.
+                    return result.analysis
+                }
                 if result.issueCode == nil, result.analysis.hasUsableMedia {
                     for entry in result.analysis.playlistEntries { onPlaylistEntry(entry) }
                     onProgress(result.analysis.playlistEntries.count)
@@ -309,11 +314,12 @@ public actor UniversalDownloadAnalysisService {
                         continue
                     }
                     do {
-                        if input.platform == .erome, DownloadOutputValidator.imageExtensions.contains(candidate.url.pathExtension.lowercased()) {
+                        if (input.platform == .erome && DownloadOutputValidator.imageExtensions.contains(candidate.url.pathExtension.lowercased()))
+                            || (input.platform == .tumblr && candidate.mediaKind == .photo) {
                             let validated = try UniversalDownloadInputValidator().validate(candidate.url.absoluteString, allowInsecureLocalNetwork: input.allowInsecureLocalNetwork, allowAdultContent: true)
                             let entry = DownloadCatalogItem(
                                 canonicalID: "media:\(UniversalURLNormalizer.stableIdentifier(for: candidateKey))",
-                                title: candidate.url.deletingPathExtension().lastPathComponent,
+                                title: candidate.titleHint ?? candidate.url.deletingPathExtension().lastPathComponent,
                                 sourceURL: validated.canonicalURL,
                                 downloadSource: .pageDiscovered,
                                 pageOrigin: .init(pageURL: input.canonicalURL),
@@ -1056,7 +1062,7 @@ public actor UniversalDownloadAnalysisService {
             pageOrigin: analysis.pageOrigin,
             resolvedMedia: analysis.resolvedMedia,
             platform: input.platform,
-            mediaKind: analysis.kind == .video ? .video : .gallery,
+            mediaKind: analysis.mediaKind ?? (analysis.kind == .video ? .video : .gallery),
             engineKind: .ytDLP,
             profileUsername: input.profileUsername,
             isPrivateProfile: analysis.isPrivateProfile,

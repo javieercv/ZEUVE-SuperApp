@@ -1,5 +1,14 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.8.1 — 2026-10-11
+
+- Descargador 0.7.5: conserva clasificación Audio de yt-dlp; TikTok AAC en MP4 anunciado MP3 se publica M4A después de verificarlo, sin conversión.
+- Reúne variantes X entre motores por identidad CDN y calidad; Tumblr obtiene exclusivamente los recursos del post concreto desde su HTML público cuando el extractor no los resuelve.
+- Recordar en el panel persiste la preferencia y admite cookies importadas; reiniciar recupera la sesión del Llavero.
+- Adaptador propio 4.15.3-zeuve.4: elimina cookies anónimas duplicadas, mantiene CSRF coherente y detiene validación limitada por 429 sin largas esperas ni fallback en esa rama; upstream sin cambios.
+- Revisión personalizada incluida en Info.plist y versión del bundle contrastada con VERSION durante build. Marketing 0.20.8, revisión 1/build 75.
+- Verificación completa y QA nativa: cinco fallos resueltos, 14 archivos decodificados sin error. Checklist: 626 OK, 2 fallidas, 6 parciales y 5 pendientes. Instagram/Threads continúan sin aceptación remota; Reddit online aplazado. Sin ZIP.
+
 ## 0.20.8.0 — 2026-10-11
 
 - Descargador 0.7.4: selección de recursos gallery-dl por identidad, numeración independiente y extensión real; auxiliares fuera del catálogo y del criterio de éxito.

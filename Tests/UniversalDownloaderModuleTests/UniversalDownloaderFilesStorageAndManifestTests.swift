@@ -239,7 +239,7 @@ final class UniversalDownloaderFilesStorageAndManifestTests: XCTestCase {
     func testModuleManifestUsesOnlyApprovedPermissions() throws {
         let manifest = try UniversalDownloaderModuleDefinition.manifest()
         XCTAssertEqual(manifest.identifier, universalDownloaderModuleIdentifier)
-        XCTAssertEqual(manifest.version, "0.7.4")
+        XCTAssertEqual(manifest.version, "0.7.5")
         XCTAssertEqual(manifest.minimumZEUVEVersion, "0.10.4")
         XCTAssertTrue(manifest.permissions.contains(.browserCookies))
         XCTAssertTrue(manifest.permissions.contains(.networkAccess))
