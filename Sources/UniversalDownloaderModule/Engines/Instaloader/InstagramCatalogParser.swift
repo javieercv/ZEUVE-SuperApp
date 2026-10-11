@@ -74,11 +74,19 @@ public struct InstagramCatalogParser: Sendable {
                           ["posts", "reels", "stories", "highlights", "session"].contains(section) {
                     let code = object["code"] as? String ?? "section_failed"
                     if section != "session" { failedSections.insert(section) }
-                    warnings.append(code == "public_header_only"
-                        ? "Solo se ha recuperado el encabezado público y el avatar; las publicaciones y Reels no se han podido comprobar."
-                        : code == "section_request_blocked"
-                        ? "Instagram ha bloqueado o limitado una sección del catálogo."
-                        : "No se ha podido completar una sección del catálogo con el acceso actual.")
+                    switch code {
+                    case "public_embed_limited":
+                        let count = int(profile["public_embed_posts_count"]) ?? 0
+                        warnings.append("Muestra pública limitada a \(count) publicaciones de la inserción de Instagram; no es el catálogo completo del perfil.")
+                    case "public_embed_videos_unavailable":
+                        warnings.append("La inserción no ofrece URLs de reproducción para sus vídeos o Reels; sus miniaturas no se incluyen como fotos.")
+                    case "public_header_only":
+                        warnings.append("Solo se ha recuperado el encabezado público y el avatar; las publicaciones y Reels no se han podido comprobar.")
+                    case "section_request_blocked":
+                        warnings.append("Instagram ha bloqueado o limitado una sección del catálogo.")
+                    default:
+                        warnings.append("No se ha podido completar una sección del catálogo con el acceso actual.")
+                    }
                 }
             case "error":
                 hardError = object
@@ -114,7 +122,10 @@ public struct InstagramCatalogParser: Sendable {
         let profilePicture = url(profile["profile_picture_url"])
         let sections = Array(Set(entries.compactMap(\.catalogSection))).sorted { $0.rawValue < $1.rawValue }
         let knownTotal = int(page["known_total"]) ?? int(profile["media_count"])
-        let warningText = warnings.isEmpty ? nil : warnings.joined(separator: "\n")
+        var seenWarnings = Set<String>()
+        let uniqueWarnings = warnings.filter { seenWarnings.insert($0).inserted }
+        let description = ([nonEmpty(profile["biography"] as? String)].compactMap { $0 } + uniqueWarnings)
+            .joined(separator: "\n")
 
         let analysis = DownloadAnalysis(
             canonicalID: input.canonicalID,
@@ -123,14 +134,14 @@ public struct InstagramCatalogParser: Sendable {
             uploader: username,
             channelID: int(profile["userid"]).map(String.init),
             thumbnailURL: profilePicture,
-            description: warningText ?? nonEmpty(profile["biography"] as? String),
+            description: description.isEmpty ? nil : description,
             availability: requiresAuthentication ? "needs_auth" : (issueCode == "catalog_partial" ? "partial" : (isPrivate ? "private_accessible" : "public")),
             playlistTitle: username,
             playlistCount: knownTotal ?? entries.count,
             playlistEntries: entries,
             sourceURL: input.canonicalURL,
             serviceName: "Instagram",
-            extractor: "instaloader-zeuve",
+            extractor: profile["catalog_source"] as? String == "public_embed" ? "instagram-public-embed" : "instaloader-zeuve",
             platform: .instagram,
             mediaKind: .gallery,
             engineKind: .instagramCatalog,

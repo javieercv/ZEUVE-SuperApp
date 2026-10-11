@@ -92,6 +92,12 @@ public struct DownloadCatalogItem: Codable, Sendable, Equatable, Identifiable {
     }
 }
 
+public enum InstagramSessionPresentation: Sendable, Equatable {
+    case none
+    case optional
+    case required
+}
+
 public struct DownloadAnalysis: Codable, Sendable, Equatable, Identifiable {
     public let canonicalID: String
     public let kind: DownloadContentKind
@@ -129,6 +135,12 @@ public struct DownloadAnalysis: Codable, Sendable, Equatable, Identifiable {
     public let hasMoreEntries: Bool
     public let availableSections: [UniversalCatalogSection]
     public let authenticationRestrictedSections: [UniversalCatalogSection]?
+
+    public var instagramSessionPresentation: InstagramSessionPresentation {
+        guard platform == .instagram else { return .none }
+        if requiresAuthentication { return .required }
+        return kind == .profile || availability == "unavailable" ? .optional : .none
+    }
 
     public var downloadSource: DownloadSource { sourceKind ?? .directContent }
     public var id: String { "\(kind.rawValue):\(canonicalID):\(sourceURL?.absoluteString ?? "")" }

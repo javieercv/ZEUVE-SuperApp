@@ -1,6 +1,6 @@
 # Documentación de ZEUVE
 
-Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.8.2— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
+Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.8.3— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
 
 Si una afirmación histórica contradice una fuente vigente o el código actual, no se reescribe el histórico: se usa la fuente vigente y se corrige cualquier documentación viva desactualizada.
 
@@ -65,13 +65,17 @@ Compatibilidad histórica del antiguo módulo YouTube: [documento legacy](Modulo
 
 La instantánea empaquetable concreta se define en `../Resources/Engines/engines.json`.
 
-## Entrega actual — 0.20.8.2
+## Entrega actual — 0.20.8.3
 
-- [Investigación de fuentes y contraste remoto](Historico/Implementacion/INSTAGRAM_THREADS_RESEARCH_20261011.md).
-- [Correcciones de perfiles y Threads](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.2.md).
-- [Pruebas y verificación](Historico/Pruebas/TEST_RESULTS_0.20.8.2.md).
-- [QA nativa de Release](Historico/Pruebas/DOWNLOADER_QA_0.20.8.2_20261011.md).
-- [Entrega y límites](Historico/Entregas/DELIVERY_0.20.8.2.md).
+- [Investigación de fuentes y contraste remoto](Historico/Implementacion/INSTAGRAM_PUBLIC_ACCESS_RESEARCH_20261012.md).
+- [Acceso público y presentación de sesión](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.3.md).
+- [Pruebas y verificación](Historico/Pruebas/TEST_RESULTS_0.20.8.3.md).
+- [QA nativa de Release](Historico/Pruebas/DOWNLOADER_QA_0.20.8.3_20261012.md).
+- [Entrega y límites](Historico/Entregas/DELIVERY_0.20.8.3.md).
+
+## Entrega anterior — 0.20.8.2
+
+- [Implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.2.md), [pruebas](Historico/Pruebas/TEST_RESULTS_0.20.8.2.md), [QA nativa](Historico/Pruebas/DOWNLOADER_QA_0.20.8.2_20261011.md) y [entrega](Historico/Entregas/DELIVERY_0.20.8.2.md).
 
 ## Entrega anterior — 0.20.8.1
 

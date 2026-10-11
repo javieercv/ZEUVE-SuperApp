@@ -1,5 +1,13 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.8.3 — 2026-10-12
+
+- Descargador 0.7.7: sesión plegada/opcional para perfiles públicos y consultas bloqueadas; el contenido protegido conserva el panel desplegado. Biografía y advertencias únicas se conservan.
+- Respaldo público y anónimo de perfiles mediante `/USUARIO/embed/`, aprobado expresamente. Valida identidad/propietario, conserva fotos y orden del carrusel y excluye miniaturas de vídeo.
+- Muestra finita marcada como parcial; la paginación se limita a sus recursos y no reintenta otro feed tras recuperarla. No certifica catálogo completo ni vídeos/Reels sin URL.
+- Corregido bloqueo de composición al desplazarse por el catálogo mediante contenedor exterior estable, conservando la cuadrícula perezosa. QA nativa: 24→35 recursos únicos, dos JPEG válidos, D-40 pasa; checklist 635 OK, 0 fallidas, 3 parciales y 1 pendiente.
+- Adaptador propio 4.15.3-zeuve.6; misma base Instaloader 4.15.3, sin dependencias ni servicios terceros nuevos. Marketing 0.20.8, revisión 3/build 77.
+
 ## 0.20.8.2 — 2026-10-11
 
 - Descargador 0.7.6: perfiles autenticados por coincidencia exacta de búsqueda y metadata GraphQL; conserva destacadas autorizadas cuando falta metadata móvil auxiliar de la misma colección.

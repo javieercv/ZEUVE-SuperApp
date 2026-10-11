@@ -1,4 +1,4 @@
-# ZEUVE 0.20.8.2 — instrucciones para agentes
+# ZEUVE 0.20.8.3 — instrucciones para agentes
 
 ## Rol
 
@@ -80,7 +80,7 @@ Git forma parte del flujo operativo normal de ZEUVE: sincroniza antes de empezar
 
 ## Forma técnica actual
 
-ZEUVE 0.20.8.2 (marketing 0.20.8, build 76) es una app nativa para macOS 14+ Apple Silicon, Swift 6, SwiftUI/AppKit cuando procede, Hardened Runtime y sin App Sandbox en esta fase.
+ZEUVE 0.20.8.3 (marketing 0.20.8, build 77) es una app nativa para macOS 14+ Apple Silicon, Swift 6, SwiftUI/AppKit cuando procede, Hardened Runtime y sin App Sandbox en esta fase.
 
 Capas principales:
 

@@ -10,7 +10,7 @@ struct UniversalDownloaderView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 20) {
                     header
                     if let unavailable = model.unavailableMessage {
                         ContentUnavailableView("Descargador no disponible", systemImage: "wrench.and.screwdriver", description: Text(unavailable))
@@ -211,9 +211,13 @@ struct UniversalDownloaderView: View {
                                 Toggle("Seleccionar", isOn: selectionBinding(analysis: analysis)).toggleStyle(.checkbox).disabled(!analysis.isDownloadable)
                             }
                         }
-                        if analysis.platform == .instagram,
-                           analysis.requiresAuthentication || analysis.kind == .profile || analysis.availability == "unavailable" {
+                        if analysis.instagramSessionPresentation == .required {
                             instagramSessionCard(analysis)
+                        } else if analysis.instagramSessionPresentation == .optional {
+                            DisclosureGroup("Sesión de Instagram (opcional)") {
+                                instagramSessionCard(analysis)
+                            }
+                            .font(.callout)
                         }
                         if !analysis.requiresAuthentication, let description = analysis.description,
                            analysis.availability == "unavailable" || analysis.availability == "partial" {

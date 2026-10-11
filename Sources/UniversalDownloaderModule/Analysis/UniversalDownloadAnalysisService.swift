@@ -114,7 +114,7 @@ public actor UniversalDownloadAnalysisService {
                     // ni descartamos la sesión como inválida.
                     return result.analysis
                 }
-                if result.issueCode == nil, result.analysis.hasUsableMedia {
+                if (result.issueCode == nil || result.analysis.extractor == "instagram-public-embed"), result.analysis.hasUsableMedia {
                     for entry in result.analysis.playlistEntries { onPlaylistEntry(entry) }
                     onProgress(result.analysis.playlistEntries.count)
                     return result.analysis

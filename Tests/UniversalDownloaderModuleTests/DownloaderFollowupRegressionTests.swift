@@ -6,6 +6,85 @@ import ZEUVEEngines
 
 @MainActor
 final class DownloaderFollowupRegressionTests: XCTestCase {
+    func testPublicProfileOffersOptionalSessionWithoutChangingAvailability() throws {
+        let input = try UniversalDownloadInputValidator().validate("@zeuve", platform: .instagram)
+        let records = #"""
+        {"record":"profile","username":"zeuve","biography":"Biografía pública","is_private":null,"requires_authentication":false,"profile_picture_url":"https://cdn.example/avatar.jpg"}
+        {"record":"media","section":"profile","id":"profile-zeuve","kind":"profilePicture","media_url":"https://cdn.example/avatar.jpg"}
+        {"record":"warning","section":"posts","code":"public_header_only"}
+        {"record":"warning","section":"reels","code":"public_header_only"}
+        {"record":"warning","section":"stories","code":"section_requires_authentication"}
+        {"record":"warning","section":"highlights","code":"section_requires_authentication"}
+        """#
+        let parsed = try InstagramCatalogParser().parseResult(data: Data(records.utf8), input: input)
+        XCTAssertEqual(parsed.analysis.instagramSessionPresentation, .optional)
+        XCTAssertFalse(parsed.analysis.requiresAuthentication)
+        XCTAssertFalse(parsed.analysis.isPrivateProfile)
+        XCTAssertTrue(parsed.analysis.isDownloadable)
+        XCTAssertEqual(parsed.analysis.availability, "partial")
+        XCTAssertEqual(Set(parsed.analysis.authenticationRestrictedSections ?? []), [.stories, .highlights])
+        let description = try XCTUnwrap(parsed.analysis.description)
+        XCTAssertTrue(description.contains("Biografía pública"))
+        XCTAssertEqual(description.components(separatedBy: "Solo se ha recuperado").count - 1, 1)
+    }
+
+    func testSessionPresentationSeparatesProtectedContentFromUnverifiedPublicLookup() {
+        let protected = DownloadAnalysis(canonicalID: "story", kind: .gallery, title: "Story", platform: .instagram, requiresAuthentication: true)
+        XCTAssertEqual(protected.instagramSessionPresentation, .required)
+        let blocked = DownloadAnalysis(canonicalID: "profile", kind: .profile, title: "Perfil", availability: "unavailable", platform: .instagram)
+        XCTAssertEqual(blocked.instagramSessionPresentation, .optional)
+        let publicPost = DownloadAnalysis(canonicalID: "post", kind: .gallery, title: "Foto", platform: .instagram)
+        XCTAssertEqual(publicPost.instagramSessionPresentation, .none)
+        let otherPlatform = DownloadAnalysis(canonicalID: "video", kind: .video, title: "Vídeo", platform: .youtube, requiresAuthentication: true)
+        XCTAssertEqual(otherPlatform.instagramSessionPresentation, .none)
+    }
+
+    func testPublicEmbedIsPartialAndDoesNotRetryBlockedFeedThroughAnotherEngine() async throws {
+        #if os(macOS) && arch(arm64)
+        let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("zeuve-public-embed-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let records = #"""
+        {"record":"profile","username":"zeuve","userid":"123","biography":"Biografía pública","is_private":false,"requires_authentication":false,"catalog_source":"public_embed","public_embed_posts_count":6,"media_count":999}
+        {"record":"media","section":"posts","id":"1","kind":"photo","index":3,"media_url":"https://cdn.example/photo.jpg","extension":"jpg"}
+        {"record":"warning","section":"posts","code":"public_embed_limited"}
+        {"record":"warning","section":"reels","code":"public_embed_videos_unavailable"}
+        {"record":"warning","section":"stories","code":"section_requires_authentication"}
+        {"record":"page","known_total":35,"has_more":true,"next_cursor":"24"}
+        """#
+        let input = try UniversalDownloadInputValidator().validate("@zeuve", platform: .instagram)
+        let parsed = try InstagramCatalogParser().parseResult(data: Data(records.utf8), input: input)
+        XCTAssertEqual(parsed.issueCode, "catalog_partial")
+        XCTAssertEqual(parsed.analysis.availability, "partial")
+        XCTAssertEqual(parsed.analysis.extractor, "instagram-public-embed")
+        XCTAssertEqual(parsed.analysis.instagramSessionPresentation, .optional)
+        XCTAssertEqual(parsed.analysis.playlistCount, 35)
+        XCTAssertEqual(parsed.analysis.playlistEntries.first?.playlistIndex, 3)
+        XCTAssertTrue(parsed.analysis.description?.contains("Biografía pública") == true)
+        XCTAssertTrue(parsed.analysis.description?.contains("6 publicaciones") == true)
+        XCTAssertTrue(parsed.analysis.description?.contains("miniaturas no se incluyen") == true)
+        let helper = root.appendingPathComponent("catalog.py")
+        let literal = String(decoding: try JSONEncoder().encode(records), as: UTF8.self)
+        try Data("#!/usr/bin/env python3\nprint(\(literal))\n".utf8).write(to: helper)
+        let gallery = root.appendingPathComponent("gallery.py")
+        let marker = root.appendingPathComponent("unexpected-feed-retry")
+        try Data("#!/usr/bin/env python3\nfrom pathlib import Path\nPath(\(String(decoding: try JSONEncoder().encode(marker.path), as: UTF8.self))).touch()\n".utf8).write(to: gallery)
+        for file in [helper, gallery] { try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: file.path) }
+        let overrides = EngineOverrideManager(root: root.appendingPathComponent("overrides"))
+        try overrides.installLocalExecutable(named: "instaloader-zeuve", version: "fixture", source: helper, channel: .stable)
+        try overrides.installLocalExecutable(named: "gallery-dl", version: "fixture", source: gallery, channel: .stable)
+        let registry = try EngineRegistry(resourceRoot: repo.appendingPathComponent("Resources/Engines"))
+        let result = try await UniversalDownloadAnalysisService(locator: .init(registry: registry, overrideManager: overrides)).analyze(input)
+        XCTAssertTrue(result.hasUsableMedia)
+        XCTAssertEqual(result.extractor, "instagram-public-embed")
+        XCTAssertFalse(result.requiresAuthentication)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: marker.path))
+        #else
+        throw XCTSkip("Integración con motores incluidos requiere macOS ARM64")
+        #endif
+    }
+
     func testSessionRateLimitDoesNotStartAnotherEngine() async throws {
         #if os(macOS) && arch(arm64)
         let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()

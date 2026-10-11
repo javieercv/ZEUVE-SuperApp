@@ -1,12 +1,23 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-QA real autorizada y ejecutada el 11/10/2026 en Release 0.20.8.2/build 76. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.2_20261011.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
+QA real autorizada y ejecutada el 12/10/2026 en Release 0.20.8.3/build 77. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.3_20261012.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
 
-Estado acumulado al 11/10/2026 · ZEUVE 0.20.8.2 (marketing 0.20.8, build 76), incluida la QA real del Descargador en Release. Los IDs no repetidos conservan las evidencias anteriores de 0.20.5.0, 0.20.6.0 y 0.20.7.0.
+Estado acumulado al 12/10/2026 · ZEUVE 0.20.8.3 (marketing 0.20.8, build 77). Los IDs no repetidos conservan las evidencias anteriores.
 
-**639 pruebas: 634 ✅ OK · 0 ❌ fallidas · 3 ⚠️ parciales · 2 ➖ pendientes.** **637 probadas, incluidas las parciales; 2 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 635 ✅ OK · 0 ❌ fallidas · 3 ⚠️ parciales · 1 ➖ pendiente.** **638 probadas, incluidas las parciales; 1 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Perfiles públicos — QA de Release 0.20.8.3, 12/10/2026
+
+[Informe nativo](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.3_20261012.md) e [investigación](Docs/Historico/Implementacion/INSTAGRAM_PUBLIC_ACCESS_RESEARCH_20261012.md). Sin cookies ni sesión de navegador.
+
+- **D-40 — ✅:** publicaciones recuperadas desde el catálogo del perfil; muestra finita de seis publicaciones, avatar y 34 fotos, carga 24→35 con IDs únicos y orden/ordinales contrastados. Dos fotos de carruseles distintos descargadas, 2 correctos/0 fallidos; JPEG 1080×1440 y decodificación completa. No certifica todo el perfil ni vídeos ausentes.
+- **D-39 — ⚠️:** sesión opcional plegada y fotos disponibles sin autenticación; la muestra pública sigue parcial frente al catálogo completo.
+- **D-41 — ➖; D-11 — ⚠️:** no hay URLs de reproducción de vídeos/Reels en la muestra y no se descarga una Story activa. El contenido protegido mantiene panel requerido.
+- **D-17 — ⚠️:** Reddit online continúa aplazado.
+
+226.954 bytes publicados; cero URLs firmadas/privadas o hosts CDN en datos/logs/historial/stdout, Llavero ausente (44), reset QA realizado, cero `.part` y procesos propios cerrados. Un bloqueo de composición al desplazarse se corrige y el recorrido completo se repite desde Release. Datos del usuario y Brave conservados.
 
 ## Perfiles y Threads — QA de Release 0.20.8.2, 11/10/2026
 
@@ -1336,7 +1347,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-37** Vídeo/Reel funciona.
 - [x] ✅ **D-38** Carrusel muestra todos los elementos y en el orden correcto.
 - [x] ⚠️ **D-39** Un perfil público se analiza sin obligar a iniciar sesión.
-- [ ] ➖ **D-40** Muestra publicaciones.
+- [x] ✅ **D-40** Muestra publicaciones. Cobertura: muestra pública de inserción, no catálogo completo (QA 12/10/2026).
 - [ ] ➖ **D-41** Muestra Reels.
 - [x] ✅ **D-42** Muestra foto de perfil.
 - [x] ✅ **D-43** Sin sesión, Stories/Destacadas restringidas no bloquean el resto del perfil.

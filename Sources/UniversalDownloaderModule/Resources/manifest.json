@@ -3,7 +3,7 @@
   "identifier": "com.zeuve.universal-downloader",
   "name": "Descargador universal",
   "summary": "Analiza y descarga fotos, vídeos, audio, stories, galerías, perfiles de Instagram y contenido multimedia de redes sociales o páginas web.",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "minimumZEUVEVersion": "0.10.4",
   "moduleAPI": "1.0",
   "technology": "mixed",

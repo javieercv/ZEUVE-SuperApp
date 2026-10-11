@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import http.cookiejar
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -16,7 +17,7 @@ from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlsplit
 
-VERSION = "4.15.3-zeuve.5"
+VERSION = "4.15.3-zeuve.6"
 
 
 def emit(value: dict[str, Any]) -> None:
@@ -180,6 +181,138 @@ def public_profile_header(loader: Any, username: str, timeout: int) -> dict[str,
     return metadata
 
 
+def parse_public_profile_embed(html: str, username: str, expected_id: str | None = None) -> dict[str, Any] | None:
+    """Decode the published profile context as data; never execute the page's scripts."""
+    for match in re.finditer(r'"contextJSON"\s*:\s*', html):
+        try:
+            encoded, _ = json.JSONDecoder().raw_decode(html[match.end():])
+            context = json.loads(encoded).get("context") if isinstance(encoded, str) else None
+        except (ValueError, TypeError, AttributeError):
+            continue
+        if not isinstance(context, dict) or context.get("type") != "Profile":
+            continue
+        if str(context.get("username", "")).lower() != username.lower():
+            continue
+        identifier = str(context.get("owner_id", ""))
+        try:
+            link = urlsplit(str(context.get("profile_link", "")))
+        except ValueError:
+            return None
+        if (not identifier.isascii() or not identifier.isdigit()
+                or (expected_id is not None and identifier != str(expected_id))
+                or link.scheme != "https" or link.hostname not in ("instagram.com", "www.instagram.com")
+                or link.username is not None or link.path.strip("/").lower() != username.lower()
+                or context.get("is_private") is True):
+            return None
+        parents = context.get("graphql_media")
+        if not isinstance(parents, list) or not parents or len(parents) > 24:
+            return None
+        for parent in parents:
+            node = parent.get("shortcode_media") if isinstance(parent, dict) else None
+            owner = node.get("owner") if isinstance(node, dict) else None
+            if (not isinstance(owner, dict) or str(owner.get("id")) != identifier
+                    or str(owner.get("username", "")).lower() != username.lower()
+                    or owner.get("is_private") is not False):
+                return None
+        return context
+    return None
+
+
+def public_profile_embed(loader: Any, username: str, timeout: int, expected_id: str | None = None) -> dict[str, Any] | None:
+    if loader.context.username or any(c.name == "sessionid" and c.value for c in loader.context._session.cookies):
+        return None
+    url = f"https://www.instagram.com/{username}/embed/"
+    response = loader.context._session.get(url, timeout=timeout, headers={
+        "User-Agent": "Mozilla/5.0 (Macintosh; Apple Silicon Mac OS X 14_0) AppleWebKit/605.1.15 Safari/605.1.15 ZEUVE/0.20.8",
+        "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.1",
+    })
+    final = urlsplit(response.url)
+    if (response.status_code != 200 or len(response.content) > 16 * 1024 * 1024
+            or final.scheme != "https" or final.hostname not in ("instagram.com", "www.instagram.com")
+            or final.username is not None
+            or final.path.strip("/").lower() != f"{username.lower()}/embed"):
+        return None
+    return parse_public_profile_embed(response.text, username, expected_id)
+
+
+def public_embed_media(context: dict[str, Any], username: str) -> tuple[list[dict[str, Any]], int]:
+    records: list[dict[str, Any]] = []
+    unavailable_videos = 0
+    seen: set[str] = set()
+    for parent in context["graphql_media"]:
+        post = parent["shortcode_media"]
+        shortcode = str(post.get("shortcode", ""))
+        if re.fullmatch(r"[A-Za-z0-9_-]{3,64}", shortcode) is None:
+            continue
+        if post.get("__typename") == "GraphSidecar":
+            children = post.get("edge_sidecar_to_children")
+            edges = children.get("edges") if isinstance(children, dict) else None
+            nodes = [edge.get("node") if isinstance(edge, dict) else None for edge in edges] if isinstance(edges, list) else []
+        else:
+            nodes = [post]
+        for index, node in enumerate(nodes, start=1):
+            if not isinstance(node, dict):
+                continue
+            owner = node.get("owner")
+            if owner is not None and (not isinstance(owner, dict) or str(owner.get("id")) != str(context["owner_id"])):
+                continue
+            if node.get("is_video") is True or node.get("__typename") == "GraphVideo":
+                unavailable_videos += 1
+                continue
+            if node.get("is_video") is not False or node.get("__typename") != "GraphImage":
+                continue
+            identifier = str(node.get("id", ""))
+            if not identifier.isascii() or not identifier.isdigit() or identifier in seen:
+                continue
+            raw_resources = node.get("display_resources")
+            resources = [v for v in raw_resources if isinstance(v, dict)] if isinstance(raw_resources, list) else []
+            def area(resource: dict[str, Any]) -> int:
+                try:
+                    return min(16384, max(0, int(resource.get("config_width", 0)))) * min(16384, max(0, int(resource.get("config_height", 0))))
+                except (ValueError, TypeError, OverflowError):
+                    return 0
+            resources.sort(key=area, reverse=True)
+            raw = ""
+            extension = ""
+            for candidate in [v.get("src") for v in resources] + [node.get("display_url")]:
+                try:
+                    url = urlsplit(str(candidate or ""))
+                    extension = media_extension(str(candidate or ""), "")
+                except ValueError:
+                    continue
+                if url.scheme == "https" and url.hostname and url.username is None and extension in {"jpg", "png", "webp", "gif", "avif", "heic", "tiff"}:
+                    raw = str(candidate)
+                    break
+            if not raw:
+                continue
+            try:
+                date = iso(datetime.fromtimestamp(float(post["taken_at_timestamp"]), timezone.utc))
+            except (KeyError, ValueError, TypeError, OverflowError, OSError):
+                date = None
+            seen.add(identifier)
+            records.append({"record": "media", "section": "posts", "username": username,
+                            "id": identifier, "post_id": str(post.get("id", "")), "shortcode": shortcode,
+                            "index": index, "date": date, "kind": "photo", "media_url": raw,
+                            "thumbnail_url": raw, "extension": extension, "requires_authentication": False,
+                            "source_page": f"https://www.instagram.com/p/{shortcode}/"})
+    return records, unavailable_videos
+
+
+def emit_embed_warnings(context: dict[str, Any], unavailable_videos: int) -> None:
+    emit({"record": "warning", "section": "posts", "code": "public_embed_limited"})
+    if unavailable_videos:
+        emit({"record": "warning", "section": "reels", "code": "public_embed_videos_unavailable"})
+
+
+def embed_profile_record(context: dict[str, Any], username: str, biography: str | None, avatar: str) -> dict[str, Any]:
+    return {"record": "profile", "username": username, "userid": context["owner_id"],
+            "full_name": context.get("full_name") or username, "biography": biography,
+            "is_private": False, "requires_authentication": False, "session_supplied": False,
+            "session_validated": False, "profile_picture_url": avatar,
+            "catalog_source": "public_embed", "public_embed_posts_count": len(context["graphql_media"]),
+            "media_count": context.get("posts_count")}
+
+
 def emit_public_header(loader: Any, args: argparse.Namespace) -> bool:
     try:
         metadata = public_profile_header(loader, args.username, max(1, min(getattr(args, "request_timeout", 20), 300)))
@@ -188,23 +321,40 @@ def emit_public_header(loader: Any, args: argparse.Namespace) -> bool:
     if not metadata:
         return False
     avatar = metadata["og:image"]
-    emit({"record": "profile", "username": args.username,
+    timeout = max(1, min(getattr(args, "request_timeout", 20), 300))
+    try:
+        context = public_profile_embed(loader, args.username, timeout)
+    except Exception:
+        context = None
+    if context:
+        photos, videos = public_embed_media(context, args.username)
+        emit(embed_profile_record(context, args.username, metadata.get("description"), avatar))
+    else:
+        photos, videos = [], 0
+        emit({"record": "profile", "username": args.username,
           "full_name": metadata.get("og:title", args.username),
           "biography": metadata.get("description"), "is_private": None,
           "requires_authentication": False, "session_supplied": False,
-          "session_validated": False, "profile_picture_url": avatar})
-    if args.offset == 0:
-        emit({"record": "media", "section": "profile", "username": args.username,
+              "session_validated": False, "profile_picture_url": avatar})
+    records = [{"record": "media", "section": "profile", "username": args.username,
               "id": f"profile-{args.username.lower()}", "index": 1,
               "kind": "profilePicture", "media_url": avatar,
               "extension": media_extension(avatar, "jpg"),
-              "source_page": f"https://www.instagram.com/{args.username}/"})
-    for section in ("posts", "reels"):
-        emit({"record": "warning", "section": section, "code": "public_header_only"})
+               "source_page": f"https://www.instagram.com/{args.username}/"}] + photos
+    start = max(0, int(args.offset))
+    end = start + max(1, int(args.limit))
+    for record in records[start:end]:
+        emit(record)
+    if context:
+        emit_embed_warnings(context, videos)
+    else:
+        for section in ("posts", "reels"):
+            emit({"record": "warning", "section": section, "code": "public_header_only"})
     for section in ("stories", "highlights"):
         emit({"record": "warning", "section": section, "code": "section_requires_authentication"})
-    emit({"record": "page", "offset": args.offset, "returned": int(args.offset == 0),
-          "has_more": False, "next_cursor": None})
+    emit({"record": "page", "offset": start, "returned": len(records[start:end]),
+          "known_total": len(records), "has_more": end < len(records),
+          "next_cursor": str(end) if end < len(records) else None})
     return True
 
 
@@ -622,6 +772,8 @@ def catalog(args: argparse.Namespace) -> int:
 
     all_records: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
+    section_errors: dict[str, Exception] = {}
+    public_embed_attempted = False
 
     def append_record(record: dict[str, Any]) -> None:
         record["requires_authentication"] = bool(profile.is_private or record.get("section") in ("stories", "highlights"))
@@ -658,13 +810,37 @@ def catalog(args: argparse.Namespace) -> int:
                 if len(all_records) >= args.offset + args.limit + 1:
                     break
         except Exception as error:
-            emit(section_failure(error, section))
+            section_errors[section] = error
+
+    def recover_public_embed() -> bool:
+        nonlocal public_embed_attempted
+        if public_embed_attempted or session_supplied or profile.is_private or not section_errors or len(all_records) > 1:
+            return False
+        public_embed_attempted = True
+        try:
+            context = public_profile_embed(loader, args.username,
+                max(1, min(getattr(args, "request_timeout", 20), 300)), str(profile.userid))
+        except Exception:
+            return False
+        if context is None:
+            return False
+        photos, videos = public_embed_media(context, args.username)
+        emit(embed_profile_record(context, args.username, profile.biography, str(profile.profile_pic_url)))
+        for record in photos:
+            append_record(record)
+        emit_embed_warnings(context, videos)
+        return True
 
     # Un recuento confirmado de cero evita una consulta de feed innecesaria.
     if profile.mediacount > 0:
         add_posts(profile.get_posts, "posts")
-    if args.reels and len(all_records) <= args.offset + args.limit:
+    recovered_embed = recover_public_embed()
+    if not recovered_embed and args.reels and len(all_records) <= args.offset + args.limit:
         add_posts(profile.get_reels, "reels")
+        recovered_embed = recover_public_embed()
+    if not recovered_embed:
+        for section, error in section_errors.items():
+            emit(section_failure(error, section))
 
     if args.stories:
         if not session_validated:

@@ -13,7 +13,7 @@ Los motores se almacenan bajo `Resources/Engines` y se describen en `engines.jso
 | FFmpeg | 8.1.2 | ARM64 macOS | Compilación reproducible | Unión, remux, audio, metadatos y subtítulos |
 | FFprobe | 8.1.2 | ARM64 macOS | Misma compilación | Validación multimedia |
 | gallery-dl | 1.32.9 | ARM64 macOS | PyPI, binario reproducible | Redes sociales, galerías y fallbacks multimedia |
-| instaloader-zeuve | 4.15.3-zeuve.5 | ARM64 macOS | Instaloader con adaptador ZEUVE | Publicaciones directas y catálogo de Instagram |
+| instaloader-zeuve | 4.15.3-zeuve.6 | ARM64 macOS | Instaloader con adaptador ZEUVE | Publicaciones directas y catálogo de Instagram |
 | libmp3lame | 3.100 | ARM64 estático | Fuentes oficiales | Codificación MP3 |
 | libopus | 1.5.2 | ARM64 estático | Fuentes oficiales | Codificación Opus |
 

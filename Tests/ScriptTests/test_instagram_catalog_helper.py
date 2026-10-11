@@ -28,6 +28,129 @@ class LoginRequiredException(Exception):
 
 
 class InstagramCatalogHelperTests(unittest.TestCase):
+    @staticmethod
+    def embed_context(count=3):
+        owner = {"id": "123", "username": "zeuve", "is_private": False}
+        nodes = [{"id": str(1000+i), "__typename": "GraphImage", "is_video": False,
+                  "display_url": f"https://cdn.example/{i}.jpg", "display_resources": [
+                      {"src": f"https://cdn.example/small-{i}.jpg", "config_width": 150, "config_height": 150},
+                      {"src": f"https://cdn.example/large-{i}.jpg", "config_width": 1080, "config_height": 1440}]} for i in range(count)]
+        post = {"id": "900", "shortcode": "ABC123", "owner": owner, "__typename": "GraphSidecar",
+                "taken_at_timestamp": 1700000000,
+                "edge_sidecar_to_children": {"edges": [{"node": n} for n in nodes]}}
+        return {"type": "Profile", "username": "zeuve", "owner_id": "123",
+                "profile_link": "https://www.instagram.com/zeuve/", "posts_count": 999,
+                "graphql_media": [{"shortcode_media": post}]}
+
+    @staticmethod
+    def embed_html(context):
+        return '<script>doNotExecute();var data={"contextJSON":' + MODULE.json.dumps(MODULE.json.dumps({"context": context})) + '};</script>'
+
+    def test_public_embed_checks_user_owner_canonical_and_privacy(self):
+        import copy
+        context = self.embed_context()
+        self.assertEqual(MODULE.parse_public_profile_embed(self.embed_html(context), "ZEUVE", "123"), context)
+        self.assertIsNone(MODULE.parse_public_profile_embed(self.embed_html(context), "other"))
+        self.assertIsNone(MODULE.parse_public_profile_embed(self.embed_html(context), "zeuve", "999"))
+        mutations = [lambda c: c.update(profile_link="https://instagram.com.evil.example/zeuve/"),
+                     lambda c: c.update(profile_link="https://user@www.instagram.com/zeuve/"),
+                     lambda c: c.update(profile_link="https://www.instagram.com/other/"),
+                     lambda c: c.update(profile_link="https://[invalid"),
+                     lambda c: c.update(is_private=True),
+                     lambda c: c["graphql_media"][0]["shortcode_media"]["owner"].update(id="999"),
+                     lambda c: c["graphql_media"][0]["shortcode_media"]["owner"].update(username="recommendation"),
+                     lambda c: c["graphql_media"][0]["shortcode_media"]["owner"].update(is_private=True)]
+        for mutation in mutations:
+            invalid = copy.deepcopy(context); mutation(invalid)
+            self.assertIsNone(MODULE.parse_public_profile_embed(self.embed_html(invalid), "zeuve"))
+        self.assertIsNone(MODULE.parse_public_profile_embed('{"contextJSON":"invalid"}', "zeuve"))
+        self.assertIsNone(MODULE.parse_public_profile_embed('<script>contextJSON=fetch("private")</script>', "zeuve"))
+
+    def test_public_embed_keeps_original_carousel_indices_and_real_image_format(self):
+        context = self.embed_context()
+        edges = context["graphql_media"][0]["shortcode_media"]["edge_sidecar_to_children"]["edges"]
+        edges.insert(1, {"node": {"id": "video", "__typename": "GraphVideo", "is_video": True,
+                                 "display_url": "https://cdn.example/video-poster.jpg"}})
+        records, videos = MODULE.public_embed_media(context, "zeuve")
+        self.assertEqual(videos, 1)
+        self.assertEqual([r["index"] for r in records], [1, 3, 4])
+        self.assertEqual([r["id"] for r in records], ["1000", "1001", "1002"])
+        self.assertTrue(all("large-" in r["media_url"] and r["extension"] == "jpg" for r in records))
+        edges.extend([edges[0], {"node": None}, {"node": {"__typename": "GraphImage", "is_video": False,
+            "id": "2000", "display_resources": None, "display_url": "http://cdn.example/unsafe.jpg"}}])
+        edges[0]["node"]["display_resources"][1]["config_width"] = "malformed"
+        records, _ = MODULE.public_embed_media(context, "zeuve")
+        self.assertEqual(len(records), 3)
+        self.assertIn("small-", records[0]["media_url"])
+        edges.insert(1, None)
+        records, _ = MODULE.public_embed_media(context, "zeuve")
+        self.assertEqual([r["index"] for r in records], [1, 4, 5])
+
+    def test_public_embed_network_refuses_sessions_and_redirected_identity(self):
+        context = self.embed_context()
+        html = self.embed_html(context)
+        response = SimpleNamespace(status_code=200, url="https://www.instagram.com/zeuve/embed/", content=html.encode(), text=html)
+        from unittest.mock import Mock
+        get = Mock(return_value=response)
+        loader = SimpleNamespace(context=SimpleNamespace(username=None, _session=SimpleNamespace(cookies=[], get=get)))
+        self.assertEqual(MODULE.public_profile_embed(loader, "zeuve", 7, "123"), context)
+        self.assertEqual(get.call_args.kwargs["timeout"], 7)
+        loader.context._session.cookies = [SimpleNamespace(name="sessionid", value="SYNTHETIC_SESSION")]
+        self.assertIsNone(MODULE.public_profile_embed(loader, "zeuve", 7)); self.assertEqual(get.call_count, 1)
+        loader.context._session.cookies = []; loader.context.username = "viewer"
+        self.assertIsNone(MODULE.public_profile_embed(loader, "zeuve", 7)); self.assertEqual(get.call_count, 1)
+        loader.context.username = None; response.url = "https://www.instagram.com/other/embed/"
+        self.assertIsNone(MODULE.public_profile_embed(loader, "zeuve", 7))
+        response.url = "https://www.instagram.com/zeuve/embed/"; response.status_code = 429
+        self.assertIsNone(MODULE.public_profile_embed(loader, "zeuve", 7))
+
+    def test_public_header_embed_pagination_is_only_the_finite_sample(self):
+        context = self.embed_context(34)
+        pages = []
+        args = SimpleNamespace(username="zeuve", offset=0, limit=24)
+        for offset in [0, 24]:
+            args.offset = offset; out = io.StringIO()
+            with patch.object(MODULE, "public_profile_header", return_value={"og:image": "https://cdn.example/avatar.jpg", "description": "Biography"}), patch.object(MODULE, "public_profile_embed", return_value=context), patch("sys.stdout", out):
+                self.assertTrue(MODULE.emit_public_header(None, args))
+            pages.append([MODULE.json.loads(line) for line in out.getvalue().splitlines()])
+        media = [[r for r in page if r["record"] == "media"] for page in pages]
+        self.assertEqual([len(v) for v in media], [24, 11])
+        self.assertEqual(len({r["id"] for v in media for r in v}), 35)
+        for page in pages:
+            self.assertEqual(page[-1]["known_total"], 35)
+            self.assertFalse(next(r for r in page if r["record"] == "profile")["requires_authentication"])
+        self.assertEqual(pages[0][-1]["next_cursor"], "24")
+        self.assertIsNone(pages[1][-1]["next_cursor"])
+        self.assertFalse(pages[1][-1]["has_more"])
+
+    def test_anonymous_failed_feed_recovers_embed_without_another_feed_query(self):
+        from unittest.mock import Mock
+        profile = SimpleNamespace(username="zeuve", full_name="ZEUVE", biography="Biography", is_private=False,
+            followed_by_viewer=False, profile_pic_url="https://cdn.example/avatar.jpg",
+            profile_pic_url_no_iphone="https://cdn.example/avatar.jpg", mediacount=999, userid=123,
+            get_posts=Mock(side_effect=LoginRequiredException("requires_login")), get_reels=Mock(return_value=[]))
+        fake = SimpleNamespace(Instaloader=lambda **kwargs: SimpleNamespace(context=SimpleNamespace(username=None)),
+            Profile=SimpleNamespace(from_username=lambda *args: profile))
+        args = SimpleNamespace(username="zeuve", offset=0, limit=24, reels=True, stories=True, highlights=True,
+            cookies=None, cookie_header_file=None, browser=None, browser_cookie_file=None)
+        out = io.StringIO()
+        with patch.dict(sys.modules, {"instaloader": fake}), patch.object(MODULE, "public_profile_embed", return_value=self.embed_context()) as embed, patch("sys.stdout", out):
+            self.assertEqual(MODULE.catalog(args), 0)
+            self.assertEqual(embed.call_args.args[-1], "123")
+        profile.get_reels.assert_not_called()
+        records = [MODULE.json.loads(line) for line in out.getvalue().splitlines()]
+        self.assertEqual(len([r for r in records if r["record"] == "media"]), 4)
+        self.assertEqual([r for r in records if r["record"] == "profile"][-1]["catalog_source"], "public_embed")
+        self.assertFalse(any(r.get("code") == "section_requires_authentication" and r.get("section") == "posts" for r in records))
+        profile.mediacount = 0; profile.get_posts.reset_mock(); out = io.StringIO()
+        with patch.dict(sys.modules, {"instaloader": fake}), patch.object(MODULE, "public_profile_embed") as embed, patch("sys.stdout", out):
+            self.assertEqual(MODULE.catalog(args), 0); embed.assert_not_called()
+        profile.get_posts.assert_not_called()
+        profile.mediacount = 999
+        with patch.dict(sys.modules, {"instaloader": fake}), patch.object(MODULE, "public_profile_embed", return_value=None) as embed, patch("sys.stdout", io.StringIO()):
+            self.assertEqual(MODULE.catalog(args), 0)
+            self.assertEqual(embed.call_count, 1)
+
     def test_rate_limited_validation_stops_without_profile_or_anonymous_retry(self) -> None:
         class Loader:
             def __init__(self, **kwargs):

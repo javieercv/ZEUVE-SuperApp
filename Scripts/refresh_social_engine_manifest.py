@@ -24,7 +24,7 @@ SOCIAL_ENGINES = {
         "executable": "instaloader-zeuve",
         "relativePath": "instaloader/instaloader-zeuve",
         "licenseFile": "licenses/instaloader/LICENSE",
-        "version": "4.15.3-zeuve.5",
+        "version": "4.15.3-zeuve.6",
         "source": "https://pypi.org/project/instaloader/4.15.3/",
         "purpose": "Resolver publicaciones públicas y catalogar contenido de Instagram, con sesión solo cuando sea necesaria.",
     },
