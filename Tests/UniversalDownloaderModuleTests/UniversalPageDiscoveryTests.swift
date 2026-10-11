@@ -26,6 +26,51 @@ final class UniversalPageDiscoveryTests: XCTestCase {
         XCTAssertTrue(result.candidates.contains { $0.kind == .embeddedPlayer })
     }
 
+    func testThreadsEmbedVerifiesPostAndExcludesAvatarAndReplies() throws {
+        let html = #"""
+        <div class="LinkContainer"><a href="https://www.threads.com/&#064;author/post/TestCode123?xmt=tracking"></a></div>
+        <div class="OuterContainer">
+          <img class="img" src="https://cdn.example/avatar.jpg">
+          <div class="MediaScrollContainer"><div><img class="img" src="https://cdn.example/first.jpg?a=1&amp;b=2"></div>
+            <video poster="https://cdn.example/poster.jpg"><source src="https://cdn.example/second.mp4"></video>
+            <img class="favicon" src="https://cdn.example/icon.jpg">
+          </div><div class="PostDateContainer">Date</div>
+        </div>
+        <div class="OuterContainer"><div class="SoloMediaContainer"><img class="img" src="https://cdn.example/reply.jpg"></div><div class="PostDateContainer">Reply</div></div>
+        """#
+        let url = URL(string: "https://www.threads.com/t/TestCode123/embed")!
+        let parser = UniversalHTMLMediaParser()
+        let result = parser.parse(html: html, baseURL: url)
+        XCTAssertEqual(result.candidates.map(\.url.lastPathComponent), ["first.jpg", "second.mp4"])
+        XCTAssertEqual(result.candidates.map(\.mediaKind), [.photo, .video])
+        XCTAssertEqual(result.candidates[0].url.query, "a=1&b=2")
+        XCTAssertTrue(parser.parse(html: html.replacingOccurrences(of: "post/TestCode123", with: "post/WrongCode123"), baseURL: url).candidates.isEmpty)
+        XCTAssertTrue(parser.parse(html: html, baseURL: URL(string: "https://www.threads.com/@author/post/TestCode123")!).candidates.isEmpty)
+    }
+
+    func testThreadsEmbedRejectsReplyOnlyMediaAndUnsafeURL() {
+        let html = #"""
+        <div class="LinkContainer"><a href="https://www.threads.com/@author/post/TestCode123"></a></div>
+        <div class="OuterContainer"><div class="PostDateContainer">Parent without media</div></div>
+        <div class="OuterContainer"><div class="SoloMediaContainer"><img class="img" src="https://cdn.example/reply.jpg"></div><div class="PostDateContainer">Reply</div></div>
+        """#
+        let url = URL(string: "https://www.threads.com/t/TestCode123/embed")!
+        XCTAssertTrue(UniversalHTMLMediaParser().parse(html: html, baseURL: url).candidates.isEmpty)
+        XCTAssertEqual(UniversalHTMLMediaParser.threadsEmbedURL(for: URL(string: "https://www.threads.net/@author/post/TestCode123")!), url)
+        XCTAssertNil(UniversalHTMLMediaParser.threadsEmbedURL(for: URL(string: "https://www.threads.com/@author")!))
+        XCTAssertNil(UniversalHTMLMediaParser.threadsEmbedURL(for: URL(string: "https://evil.example/@author/post/TestCode123")!))
+    }
+
+    func testDiscoveryAlreadyCancelledStopsBeforeNetwork() async {
+        let task = Task {
+            while !Task.isCancelled { await Task.yield() }
+            return try await UniversalPageDiscoveryService().discover(pageURL: URL(string: "https://www.threads.com/@author/post/TestCode123")!)
+        }
+        task.cancel()
+        do { _ = try await task.value; XCTFail("Expected cancellation") }
+        catch { XCTAssertTrue(error is CancellationError) }
+    }
+
     func testURLNormalizerRemovesTrackingAndTransientTokensOnlyForDeduplication() throws {
         let first = URL(string: "https://cdn.example.com/video.mp4?token=abc&utm_source=x&quality=1080")!
         let second = URL(string: "https://cdn.example.com/video.mp4?token=def&quality=1080")!

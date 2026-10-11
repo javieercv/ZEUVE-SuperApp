@@ -11,11 +11,12 @@ import http.cookiejar
 import json
 import sys
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlsplit
 
-VERSION = "4.15.3-zeuve.4"
+VERSION = "4.15.3-zeuve.5"
 
 
 def emit(value: dict[str, Any]) -> None:
@@ -112,6 +113,99 @@ def activate_session(loader: Any) -> str | None:
     if username:
         loader.context.username = username
     return username
+
+
+def resolve_profile(loader: Any, username: str) -> Any:
+    """Resolve a validated session through the library's existing GraphQL metadata route."""
+    import instaloader  # type: ignore
+    context = loader.context
+    if not context.username:
+        return instaloader.Profile.from_username(context, username)
+    data = context.get_json("web/search/topsearch/", {
+        "context": "blended", "query": username, "include_reel": False,
+    })
+    identifiers = set()
+    for item in data.get("users", []):
+        user = item.get("user", {})
+        if str(user.get("username", "")).lower() != username.lower():
+            continue
+        identifier = str(user.get("pk") or user.get("id") or "")
+        if identifier.isascii() and identifier.isdigit():
+            identifiers.add(identifier)
+    if len(identifiers) != 1:
+        raise RuntimeError("No se ha podido verificar la identidad exacta del perfil.")
+    identifier = identifiers.pop()
+    profile = instaloader.Profile(context, {"id": identifier, "username": username})
+    profile._obtain_metadata()
+    if profile.username.lower() != username.lower() or str(profile.userid) != identifier:
+        raise RuntimeError("La respuesta no corresponde al perfil solicitado.")
+    return profile
+
+
+def public_profile_header(loader: Any, username: str, timeout: int) -> dict[str, str] | None:
+    """Read only the anonymous public page; never infer privacy or a complete catalogue."""
+    if loader.context.username:
+        return None
+    response = loader.context._session.get(
+        f"https://www.instagram.com/{username}/", timeout=timeout,
+        headers={"User-Agent": "Mozilla/5.0 (Macintosh; Apple Silicon Mac OS X 14_0) AppleWebKit/605.1.15 Safari/605.1.15 ZEUVE/0.20.8",
+                 "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.1"},
+    )
+    if response.status_code != 200 or len(response.content) > 16 * 1024 * 1024:
+        return None
+
+    class MetadataParser(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.metadata: dict[str, str] = {}
+
+        def handle_starttag(self, tag, attrs):
+            if tag.lower() == "meta":
+                attributes = dict(attrs)
+                key = attributes.get("property") or attributes.get("name")
+                if key and attributes.get("content"):
+                    self.metadata[key.lower()] = attributes["content"]
+
+    parser = MetadataParser()
+    parser.feed(response.text)
+    metadata = parser.metadata
+    canonical = urlsplit(metadata.get("og:url", ""))
+    avatar = urlsplit(metadata.get("og:image", ""))
+    if (metadata.get("og:type") != "profile"
+            or canonical.scheme != "https"
+            or canonical.hostname not in ("instagram.com", "www.instagram.com")
+            or canonical.path.strip("/").lower() != username.lower()
+            or avatar.scheme != "https" or not avatar.hostname):
+        return None
+    return metadata
+
+
+def emit_public_header(loader: Any, args: argparse.Namespace) -> bool:
+    try:
+        metadata = public_profile_header(loader, args.username, max(1, min(getattr(args, "request_timeout", 20), 300)))
+    except Exception:
+        return False
+    if not metadata:
+        return False
+    avatar = metadata["og:image"]
+    emit({"record": "profile", "username": args.username,
+          "full_name": metadata.get("og:title", args.username),
+          "biography": metadata.get("description"), "is_private": None,
+          "requires_authentication": False, "session_supplied": False,
+          "session_validated": False, "profile_picture_url": avatar})
+    if args.offset == 0:
+        emit({"record": "media", "section": "profile", "username": args.username,
+              "id": f"profile-{args.username.lower()}", "index": 1,
+              "kind": "profilePicture", "media_url": avatar,
+              "extension": media_extension(avatar, "jpg"),
+              "source_page": f"https://www.instagram.com/{args.username}/"})
+    for section in ("posts", "reels"):
+        emit({"record": "warning", "section": section, "code": "public_header_only"})
+    for section in ("stories", "highlights"):
+        emit({"record": "warning", "section": section, "code": "section_requires_authentication"})
+    emit({"record": "page", "offset": args.offset, "returned": int(args.offset == 0),
+          "has_more": False, "next_cursor": None})
+    return True
 
 
 def classify_profile_lookup_error(
@@ -364,6 +458,28 @@ def story_record(item: Any, section: str, highlight_title: str | None = None, in
     }
 
 
+def highlight_items(highlight: Any, context: Any) -> Iterable[Any]:
+    """Keep authorized GraphQL items if optional mobile quality metadata omits this reel."""
+    try:
+        yield from highlight.get_items()
+    except KeyError as error:
+        expected = f"highlight:{highlight.unique_id}"
+        nodes = getattr(highlight, "_items", None)
+        if error.args != (expected,) or not isinstance(nodes, list):
+            raise
+        import instaloader  # type: ignore
+        previous = context.iphone_support
+        try:
+            context.iphone_support = False
+            for node in nodes:
+                owner = node.get("owner", {})
+                if owner.get("id") is not None and str(owner["id"]) != str(highlight.owner_profile.userid):
+                    raise RuntimeError("La destacada no corresponde al perfil solicitado.")
+                yield instaloader.StoryItem(context, node, highlight.owner_profile)
+        finally:
+            context.iphone_support = previous
+
+
 def catalog(args: argparse.Namespace) -> int:
     try:
         import instaloader
@@ -439,7 +555,7 @@ def catalog(args: argparse.Namespace) -> int:
             session_validated = None
 
     try:
-        profile = instaloader.Profile.from_username(loader.context, args.username)
+        profile = resolve_profile(loader, args.username)
     except Exception as error:
         if session_supplied:
             anonymous_loader = instaloader.Instaloader(
@@ -476,6 +592,8 @@ def catalog(args: argparse.Namespace) -> int:
                 ))
                 return 21
         else:
+            if emit_public_header(loader, args):
+                return 0
             emit(classify_profile_lookup_error(
                 error,
                 session_supplied=session_supplied,
@@ -537,13 +655,15 @@ def catalog(args: argparse.Namespace) -> int:
                     if key not in seen_ids:
                         seen_ids.add(key)
                         append_record(record)
-                if len(all_records) >= args.offset + args.limit + 50:
+                if len(all_records) >= args.offset + args.limit + 1:
                     break
         except Exception as error:
             emit(section_failure(error, section))
 
-    add_posts(profile.get_posts, "posts")
-    if args.reels:
+    # Un recuento confirmado de cero evita una consulta de feed innecesaria.
+    if profile.mediacount > 0:
+        add_posts(profile.get_posts, "posts")
+    if args.reels and len(all_records) <= args.offset + args.limit:
         add_posts(profile.get_reels, "reels")
 
     if args.stories:
@@ -554,11 +674,15 @@ def catalog(args: argparse.Namespace) -> int:
                 "code": "section_requires_authentication",
                 "message": "Stories no disponibles sin una sesión de Instagram.",
             })
-        else:
+        elif len(all_records) <= args.offset + args.limit:
             try:
                 for story in loader.get_stories(userids=[profile.userid]):
                     for index, item in enumerate(story.get_items(), start=1):
                         append_record(story_record(item, "stories", index=index))
+                        if len(all_records) > args.offset + args.limit:
+                            break
+                    if len(all_records) > args.offset + args.limit:
+                        break
             except Exception as error:
                 emit(section_failure(error, "stories"))
 
@@ -570,11 +694,15 @@ def catalog(args: argparse.Namespace) -> int:
                 "code": "section_requires_authentication",
                 "message": "Destacadas no disponibles sin una sesión de Instagram.",
             })
-        else:
+        elif len(all_records) <= args.offset + args.limit:
             try:
                 for highlight in loader.get_highlights(profile):
-                    for index, item in enumerate(highlight.get_items(), start=1):
+                    for index, item in enumerate(highlight_items(highlight, loader.context), start=1):
                         append_record(story_record(item, "highlights", highlight.title, index))
+                        if len(all_records) > args.offset + args.limit:
+                            break
+                    if len(all_records) > args.offset + args.limit:
+                        break
             except Exception as error:
                 emit(section_failure(error, "highlights"))
 

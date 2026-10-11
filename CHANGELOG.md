@@ -1,5 +1,14 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.8.2 — 2026-10-11
+
+- Descargador 0.7.6: perfiles autenticados por coincidencia exacta de búsqueda y metadata GraphQL; conserva destacadas autorizadas cuando falta metadata móvil auxiliar de la misma colección.
+- Encabezado/avatar anónimo del perfil disponible como catálogo parcial si fallan publicaciones/Reels; no atribuye privacidad al rechazo.
+- Threads consulta la inserción pública del mismo código, sin cookies; valida permalink, excluye avatares/respuestas y conserva orden/tipo de los recursos.
+- Ventanas de Stories/destacadas acotadas; Cargar más probado 24→48 elementos distintos. Adaptador propio 4.15.3-zeuve.5; dependencias upstream sin cambios.
+- Marketing 0.20.8, revisión 2/build 76. Verificación completa, Release y QA nativa: ocho IDs pasan a OK, cuatro archivos íntegros, cero coincidencias de cookies/URLs privadas en la auditoría documentada.
+- Checklist: 634 OK, 0 fallidas, 3 parciales y 2 pendientes. Publicaciones/Reels públicos y Stories activas mantienen límites; Reddit online aplazado. Sin ZIP.
+
 ## 0.20.8.1 — 2026-10-11
 
 - Descargador 0.7.5: conserva clasificación Audio de yt-dlp; TikTok AAC en MP4 anunciado MP3 se publica M4A después de verificarlo, sin conversión.

@@ -8,7 +8,7 @@ Herramientas distintas, una sola aplicación, con especial cuidado por la privac
 
 <br>
 
-![Versión](https://img.shields.io/badge/ZEUVE-0.20.8.1-2f81f7?style=flat-square)
+![Versión](https://img.shields.io/badge/ZEUVE-0.20.8.2-2f81f7?style=flat-square)
 ![macOS](https://img.shields.io/badge/macOS-14%2B-000000?style=flat-square&logo=apple&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-nativo-000000?style=flat-square&logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/Swift-6-F05138?style=flat-square&logo=swift&logoColor=white)
@@ -139,9 +139,9 @@ Para consultar la evolución del proyecto:
 
 <div align="center">
 
-### ZEUVE 0.20.8.1
+### ZEUVE 0.20.8.2
 
-Marketing 0.20.8, revisión 1/build 75; Descargador 0.7.5; instaloader-zeuve 4.15.3-zeuve.4, con upstream sin cambios. Continuación autorizada tras la QA: audio TikTok/SoundCloud, identidad de variantes X, recursos Tumblr desde HTML público, recuperación de sesión y eliminación de cookies anónimas duplicadas. [Implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.1.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.20.8.1.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.20.8.1.md). [QA nativa](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.1_20261011.md): cinco fallos pasan a OK y 14 archivos se decodifican sin errores. Verificación completa y Release comprobadas. Checklist actual: 626 OK, 2 fallidas, 6 parciales y 5 pendientes de 639; Instagram/Threads siguen limitados y Reddit online aplazado; sin ZIP.
+Marketing 0.20.8, revisión 2/build 76; Descargador 0.7.6; instaloader-zeuve 4.15.3-zeuve.5, sin actualizar upstream. Correcciones de perfiles autenticados y destacadas de Instagram; encabezado/avatar público conservados como catálogo parcial; inserción pública de Threads con identidad comprobada. [Investigación](Docs/Historico/Implementacion/INSTAGRAM_THREADS_RESEARCH_20261011.md), [implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.2.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.20.8.2.md), [QA nativa](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.2_20261011.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.20.8.2.md). QA nativa: ocho IDs cerrados, cuatro archivos decodificados sin errores; checklist 634 OK, 0 fallidas, 3 parciales y 2 pendientes de 639. Publicaciones/Reels del perfil público y Stories activas siguen sin aceptación completa; Reddit online continúa aplazado. Sin ZIP.
 
 ### Entrega anterior — ZEUVE 0.20.8.0
 

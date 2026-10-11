@@ -1,4 +1,4 @@
-# Arquitectura de ZEUVE 0.20.8.1
+# Arquitectura de ZEUVE 0.20.8.2
 
 Este documento describe la arquitectura vigente. La evolución por versiones se conserva en `CHANGELOG.md` y `Docs/Historico/`.
 
@@ -57,7 +57,7 @@ Los manifests bajo `Sources/*Module/Resources/manifest.json` describen identidad
 
 Defaults actuales: Organizador ⌘1, Descargador ⌘2, Analizador ⌘3, Conversor ⌘4, Comparador ⌘5, Inspector ⌘6, Limpiador ⌘7 e Historial ⌘8.
 
-La validación rechaza duplicados, teclas de escritura sin modificador seguro y combinaciones reservadas fundamentales. No existe ocultación de módulos como preferencia de navegación en 0.20.8.1. El orden de secciones de Ajustes (`settingsOrder`) es independiente del orden de navegación.
+La validación rechaza duplicados, teclas de escritura sin modificador seguro y combinaciones reservadas fundamentales. No existe ocultación de módulos como preferencia de navegación en 0.20.8.2. El orden de secciones de Ajustes (`settingsOrder`) es independiente del orden de navegación.
 
 ## Ajustes
 
@@ -103,7 +103,7 @@ Los targets de módulo dependen de las capas compartidas que necesitan, no de ot
 
 ## Extensibilidad
 
-La API y manifests están diseñados para una arquitectura modular, pero 0.20.8.1 integra módulos built-in compilados con la app. No existe loader de plugins externos ni importación arbitraria de módulos de terceros.
+La API y manifests están diseñados para una arquitectura modular, pero 0.20.8.2 integra módulos built-in compilados con la app. No existe loader de plugins externos ni importación arbitraria de módulos de terceros.
 
 ## Fuentes de verdad
 

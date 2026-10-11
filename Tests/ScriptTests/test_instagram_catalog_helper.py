@@ -49,6 +49,76 @@ class InstagramCatalogHelperTests(unittest.TestCase):
         self.assertIsNone(record["session_validated"])
         self.assertNotIn("SYNTHETIC_CANARY", out.getvalue())
 
+    def test_authenticated_resolution_requires_exact_user_and_metadata_identity(self) -> None:
+        class Profile:
+            def __init__(self, context, node):
+                self.username = node["username"]
+                self.userid = int(node["id"])
+            def _obtain_metadata(self):
+                pass
+            @staticmethod
+            def from_username(*args):
+                raise AssertionError("Validated session must use GraphQL metadata")
+        context = SimpleNamespace(username="viewer", get_json=lambda *args: {"users": [
+            {"user": {"username": "zeuve_other", "pk": "9"}},
+            {"user": {"username": "ZEUVE", "pk": "123"}},
+        ]})
+        with patch.dict(sys.modules, {"instaloader": SimpleNamespace(Profile=Profile)}):
+            result = MODULE.resolve_profile(SimpleNamespace(context=context), "zeuve")
+            self.assertEqual(result.userid, 123)
+            context.get_json = lambda *args: {"users": [{"user": {"username": "zeuve_other", "pk": "9"}}]}
+            with self.assertRaises(RuntimeError):
+                MODULE.resolve_profile(SimpleNamespace(context=context), "zeuve")
+            context.get_json = lambda *args: {"users": [{"user": {"username": "zeuve", "pk": "123"}}]}
+            def wrong_metadata(profile):
+                profile.username = "different"
+            with patch.object(Profile, "_obtain_metadata", wrong_metadata), self.assertRaises(RuntimeError):
+                MODULE.resolve_profile(SimpleNamespace(context=context), "zeuve")
+
+    def test_public_header_requires_profile_canonical_identity_and_never_uses_session(self) -> None:
+        html = '<meta property="og:type" content="profile"><meta property="og:url" content="https://www.instagram.com/zeuve/"><meta property="og:image" content="https://cdn.example/avatar.jpg?a=1&amp;b=2">'
+        response = SimpleNamespace(status_code=200, content=html.encode(), text=html)
+        calls = []
+        def get(*args, **kwargs):
+            calls.append((args, kwargs))
+            return response
+        loader = SimpleNamespace(context=SimpleNamespace(username=None, _session=SimpleNamespace(get=get)))
+        result = MODULE.public_profile_header(loader, "zeuve", 7)
+        self.assertEqual(result["og:image"], "https://cdn.example/avatar.jpg?a=1&b=2")
+        self.assertEqual(calls[0][1]["timeout"], 7)
+        self.assertIsNone(MODULE.public_profile_header(loader, "different", 7))
+        loader.context.username = "viewer"
+        count = len(calls)
+        self.assertIsNone(MODULE.public_profile_header(loader, "zeuve", 7))
+        self.assertEqual(len(calls), count)
+        loader.context.username = None
+        response.status_code = 429
+        self.assertIsNone(MODULE.public_profile_header(loader, "zeuve", 7))
+
+    def test_highlight_mobile_metadata_absence_keeps_authorized_graphql_items(self) -> None:
+        context = SimpleNamespace(iphone_support=True)
+        class Highlight:
+            unique_id = 9
+            owner_profile = SimpleNamespace(userid=123)
+            _items = [{"id": "1", "owner": {"id": "123"}}, {"id": "2"}]
+            def get_items(self):
+                raise KeyError("highlight:9")
+        def story_item(ctx, node, owner):
+            self.assertFalse(ctx.iphone_support)
+            return node["id"]
+        with patch.dict(sys.modules, {"instaloader": SimpleNamespace(StoryItem=story_item)}):
+            self.assertEqual(list(MODULE.highlight_items(Highlight(), context)), ["1", "2"])
+            self.assertTrue(context.iphone_support)
+            iterator = iter(MODULE.highlight_items(Highlight(), context))
+            next(iterator)
+            iterator.close()
+            self.assertTrue(context.iphone_support)
+            with patch.object(Highlight, "_items", [{"id": "3", "owner": {"id": "999"}}]), self.assertRaises(RuntimeError):
+                list(MODULE.highlight_items(Highlight(), context))
+            self.assertTrue(context.iphone_support)
+            with patch.object(Highlight, "get_items", side_effect=RuntimeError("HTTP 429")), self.assertRaises(RuntimeError):
+                list(MODULE.highlight_items(Highlight(), context))
+
     def test_imported_session_replaces_anonymous_cookie_without_foreign_domains(self) -> None:
         class Jar(http.cookiejar.CookieJar):
             def set(self, name, value, domain="", path="/"):
@@ -163,6 +233,34 @@ class InstagramCatalogHelperTests(unittest.TestCase):
         self.assertIn(("highlights", "section_requires_authentication"), restricted)
         profile = next(item for item in records if item.get("record") == "profile")
         self.assertFalse(profile["requires_authentication"])
+
+    def test_full_anonymous_page_keeps_auth_restrictions_without_querying_them(self) -> None:
+        class Loader:
+            def __init__(self, **kwargs):
+                self.context = SimpleNamespace(username=None)
+            def get_stories(self, **kwargs):
+                raise AssertionError("No anonymous Stories query")
+            def get_highlights(self, profile):
+                raise AssertionError("No anonymous highlights query")
+        profile = SimpleNamespace(username="zeuve", full_name="ZEUVE", biography="", is_private=False,
+            followed_by_viewer=False, profile_pic_url="https://cdn.example/avatar.jpg",
+            profile_pic_url_no_iphone="https://cdn.example/avatar.jpg", mediacount=1, userid=123,
+            get_posts=lambda: [object()], get_reels=lambda: [])
+        args = SimpleNamespace(username="zeuve", limit=1, offset=0, cursor=None,
+            stories=True, highlights=True, reels=True, profile_picture=True,
+            cookies=None, cookie_header_file=None, browser=None, browser_cookie_file=None)
+        output = io.StringIO()
+        fake = SimpleNamespace(Instaloader=Loader, Profile=SimpleNamespace(from_username=lambda *args: profile))
+        post = {"record": "media", "section": "posts", "id": "1", "kind": "photo", "media_url": "https://cdn.example/photo.jpg"}
+        with patch.dict(sys.modules, {"instaloader": fake}), patch.object(MODULE, "post_records", return_value=[post]), patch("sys.stdout", output):
+            self.assertEqual(MODULE.catalog(args), 0)
+        records = [MODULE.json.loads(line) for line in output.getvalue().splitlines()]
+        restricted = {r.get("section") for r in records if r.get("code") == "section_requires_authentication"}
+        self.assertEqual(restricted, {"stories", "highlights"})
+        page = next(r for r in records if r.get("record") == "page")
+        self.assertTrue(page["has_more"])
+        self.assertEqual(page["next_cursor"], "1")
+        self.assertEqual(page["returned"], 1)
 
     def test_unknown_failure_remains_non_conclusive(self) -> None:
         result = MODULE.classify_profile_lookup_error(

@@ -125,7 +125,7 @@ checker = Path('Scripts/check_social_engines.py').read_text()
 helper = Path('Scripts/engine_helpers/instagram_catalog.py').read_text()
 full_prepare = Path('Scripts/prepare_engines_macos.sh').read_text()
 for source, label in [(checker, 'comprobador'), (prepare, 'preparador'), (helper, 'ayudante')]:
-    if '4.15.3-zeuve.4' not in source:
+    if '4.15.3-zeuve.5' not in source:
         raise SystemExit(f'La revisión social vigente no está fijada en el {label}.')
 if 'refresh_social_engine_manifest.py' not in prepare:
     raise SystemExit('La preparación social no actualiza hashes y tamaños reales.')

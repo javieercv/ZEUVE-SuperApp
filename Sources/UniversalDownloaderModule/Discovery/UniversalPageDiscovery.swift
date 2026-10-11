@@ -48,6 +48,14 @@ public struct UniversalHTMLMediaParser: Sendable {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 
         var values: [UniversalMediaCandidate] = []
+        if UniversalDownloadPlatform.detect(from: baseURL) == .threads {
+            // Una página de Threads también contiene avatares y otros posts.
+            // Solo la región multimedia de una inserción con identidad comprobada es utilizable.
+            values = threadsPostCandidates(html: html, baseURL: baseURL)
+            var seen = Set<String>()
+            let unique = values.filter { seen.insert($0.id).inserted }
+            return .init(pageTitle: pageTitle, candidates: unique, duplicateCount: values.count - unique.count)
+        }
         if UniversalDownloadPlatform.detect(from: baseURL) == .erome {
             values += eromeAlbumCandidates(html: html, baseURL: baseURL)
         }
@@ -77,6 +85,64 @@ public struct UniversalHTMLMediaParser: Sendable {
             }
         }
         return .init(pageTitle: pageTitle?.isEmpty == false ? pageTitle : nil, candidates: unique, duplicateCount: duplicates)
+    }
+
+    static func threadsEmbedURL(for url: URL) -> URL? {
+        guard UniversalDownloadPlatform.detect(from: url) == .threads else { return nil }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard parts.count == 3, parts[0].hasPrefix("@"), parts[1] == "post",
+              parts[2].range(of: #"^[A-Za-z0-9_-]{5,64}$"#, options: .regularExpression) != nil else { return nil }
+        return URL(string: "https://www.threads.com/t/\(parts[2])/embed")
+    }
+
+    private func threadsPostCandidates(html: String, baseURL: URL) -> [UniversalMediaCandidate] {
+        let parts = baseURL.path.split(separator: "/").map(String.init)
+        guard parts.count == 3, parts[0] == "t", parts[2] == "embed" else { return [] }
+        let code = parts[1]
+        let regionPattern = #"(?is)<div\b[^>]*class\s*=\s*["'][^"']*\b(?:SoloMediaContainer|MediaScrollContainer)\b[^"']*["'][^>]*>(.*?)(?=<div\b[^>]*class\s*=\s*["'][^"']*\bPostDateContainer\b)"#
+        guard let identity = firstContainerContents(html: html, className: "LinkContainer"),
+              let parent = firstContainerContents(html: html, className: "OuterContainer") else { return [] }
+        let regions = matches(in: parent, pattern: regionPattern, captureGroup: 1)
+        guard regions.count == 1 else { return [] }
+        let identityVerified = matches(in: identity, pattern: #"(?is)<a\b[^>]*>"#).contains { tag in
+            guard let url = resolve(parseAttributes(tag)["href"], relativeTo: baseURL),
+                  UniversalDownloadPlatform.detect(from: url) == .threads else { return false }
+            let path = url.path.split(separator: "/").map(String.init)
+            return path.count == 3 && path[0].hasPrefix("@") && path[1] == "post" && path[2] == code
+        }
+        guard identityVerified else { return [] }
+        return matches(in: regions[0], pattern: #"(?is)<(?:img|source|video)\b[^>]*>"#).compactMap { tag in
+            let attributes = parseAttributes(tag)
+            let image = tag.lowercased().hasPrefix("<img")
+            guard !image || (attributes["class"] ?? "").split(whereSeparator: \.isWhitespace).contains("img"),
+                  let url = resolve(attributes["src"], relativeTo: baseURL),
+                  url.scheme?.lowercased() == "https" else { return nil }
+            if image {
+                guard DownloadOutputValidator.imageExtensions.contains(url.pathExtension.lowercased()) else { return nil }
+                return .init(url: url, kind: .directMedia, mediaKind: .photo)
+            }
+            guard isCandidateURL(url, kind: .directMedia) else { return nil }
+            return .init(url: url, kind: inferredKind(for: url, fallback: .directMedia), mediaKind: .video)
+        }
+    }
+
+    private func firstContainerContents(html: String, className: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: #"(?is)</?div\b[^>]*>"#) else { return nil }
+        let text = html as NSString
+        var start: Int?
+        var depth = 0
+        for match in regex.matches(in: html, range: NSRange(location: 0, length: text.length)) {
+            let tag = text.substring(with: match.range)
+            let closing = tag.hasPrefix("</")
+            if let contentStart = start {
+                depth += closing ? -1 : 1
+                if depth == 0 { return text.substring(with: NSRange(location: contentStart, length: match.range.location - contentStart)) }
+            } else if !closing, (parseAttributes(tag)["class"] ?? "").split(whereSeparator: \.isWhitespace).contains(Substring(className)) {
+                start = NSMaxRange(match.range)
+                depth = 1
+            }
+        }
+        return nil
     }
 
     private func tumblrPostCandidates(html: String, baseURL: URL) -> [UniversalMediaCandidate] {
@@ -245,7 +311,18 @@ public struct UniversalHTMLMediaParser: Sendable {
     }
 
     private static func decodeHTMLEntities(_ value: String) -> String {
-        value
+        var decoded = value
+        if let regex = try? NSRegularExpression(pattern: #"&#(x[0-9a-fA-F]+|[0-9]+);"#) {
+            let text = decoded as NSString
+            for match in regex.matches(in: decoded, range: NSRange(location: 0, length: text.length)).reversed() {
+                let digits = text.substring(with: match.range(at: 1))
+                let number = digits.hasPrefix("x") ? UInt32(digits.dropFirst(), radix: 16) : UInt32(digits)
+                if let number, let scalar = UnicodeScalar(number), let range = Range(match.range, in: decoded) {
+                    decoded.replaceSubrange(range, with: String(scalar))
+                }
+            }
+        }
+        return decoded
             .replacingOccurrences(of: "&amp;", with: "&")
             .replacingOccurrences(of: "&quot;", with: "\"")
             .replacingOccurrences(of: "&#39;", with: "'")
@@ -270,6 +347,7 @@ public actor UniversalPageDiscoveryService {
         proxyCredentials: DownloadProxyCredentials? = nil,
         timeoutSeconds: Int = 30
     ) async throws -> UniversalPageDiscoveryResult {
+        try Task.checkCancellation()
         let configuration = URLSessionConfiguration.ephemeral
         configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         configuration.urlCache = nil
@@ -299,7 +377,14 @@ public actor UniversalPageDiscoveryService {
            let auth = "\(credentials.username):\(credentials.password)".data(using: .utf8)?.base64EncodedString() {
             request.setValue("Basic \(auth)", forHTTPHeaderField: "Proxy-Authorization")
         }
-        let (data, response) = try await session.data(for: request)
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            if Task.isCancelled { throw CancellationError() }
+            throw error
+        }
+        try Task.checkCancellation()
         guard let http = response as? HTTPURLResponse, (200...399).contains(http.statusCode) else {
             throw UniversalDownloaderError.analysisFailed("La página no ha respondido correctamente.")
         }
@@ -314,6 +399,11 @@ public actor UniversalPageDiscoveryService {
         guard let html = String(data: data, encoding: encoding) ?? String(data: data, encoding: .isoLatin1) else {
             throw UniversalDownloaderError.analysisFailed("La página utiliza una codificación no compatible.")
         }
-        return parser.parse(html: html, baseURL: pageURL)
+        let result = parser.parse(html: html, baseURL: pageURL)
+        if result.candidates.isEmpty, let embedURL = UniversalHTMLMediaParser.threadsEmbedURL(for: pageURL) {
+            // La inserción pública se consulta sin cookies ni importación del navegador.
+            return try await discover(pageURL: embedURL, proxy: proxy, proxyCredentials: proxyCredentials, timeoutSeconds: timeoutSeconds)
+        }
+        return result
     }
 }

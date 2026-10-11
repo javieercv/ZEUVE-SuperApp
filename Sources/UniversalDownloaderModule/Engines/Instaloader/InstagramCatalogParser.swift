@@ -74,7 +74,9 @@ public struct InstagramCatalogParser: Sendable {
                           ["posts", "reels", "stories", "highlights", "session"].contains(section) {
                     let code = object["code"] as? String ?? "section_failed"
                     if section != "session" { failedSections.insert(section) }
-                    warnings.append(code == "section_request_blocked"
+                    warnings.append(code == "public_header_only"
+                        ? "Solo se ha recuperado el encabezado público y el avatar; las publicaciones y Reels no se han podido comprobar."
+                        : code == "section_request_blocked"
                         ? "Instagram ha bloqueado o limitado una sección del catálogo."
                         : "No se ha podido completar una sección del catálogo con el acceso actual.")
                 }

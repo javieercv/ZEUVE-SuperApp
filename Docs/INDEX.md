@@ -1,6 +1,6 @@
 # Documentación de ZEUVE
 
-Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.8.1— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
+Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.8.2— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
 
 Si una afirmación histórica contradice una fuente vigente o el código actual, no se reescribe el histórico: se usa la fuente vigente y se corrige cualquier documentación viva desactualizada.
 
@@ -65,12 +65,18 @@ Compatibilidad histórica del antiguo módulo YouTube: [documento legacy](Modulo
 
 La instantánea empaquetable concreta se define en `../Resources/Engines/engines.json`.
 
-## Entrega actual — 0.20.8.1
+## Entrega actual — 0.20.8.2
 
-- [Continuación de correcciones](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.1.md).
-- [Pruebas y QA de la revisión](Historico/Pruebas/TEST_RESULTS_0.20.8.1.md).
-- [Entrega y límites](Historico/Entregas/DELIVERY_0.20.8.1.md).
-- [QA nativa de las correcciones](Historico/Pruebas/DOWNLOADER_QA_0.20.8.1_20261011.md): cinco fallos resueltos; 626 OK, 2 fallidas, 6 parciales y 5 pendientes de 639.
+- [Investigación de fuentes y contraste remoto](Historico/Implementacion/INSTAGRAM_THREADS_RESEARCH_20261011.md).
+- [Correcciones de perfiles y Threads](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.2.md).
+- [Pruebas y verificación](Historico/Pruebas/TEST_RESULTS_0.20.8.2.md).
+- [QA nativa de Release](Historico/Pruebas/DOWNLOADER_QA_0.20.8.2_20261011.md).
+- [Entrega y límites](Historico/Entregas/DELIVERY_0.20.8.2.md).
+
+## Entrega anterior — 0.20.8.1
+
+- [Implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.1.md), [pruebas](Historico/Pruebas/TEST_RESULTS_0.20.8.1.md) y [entrega](Historico/Entregas/DELIVERY_0.20.8.1.md).
+- [QA nativa](Historico/Pruebas/DOWNLOADER_QA_0.20.8.1_20261011.md): cinco fallos resueltos; 626 OK, 2 fallidas, 6 parciales y 5 pendientes de 639.
 
 ## Entrega anterior — 0.20.8.0
 

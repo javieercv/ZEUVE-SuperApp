@@ -54,3 +54,9 @@ Los registros aceptan metadata estructurada de fases, cantidades, motores, tiemp
 ## Organización interna
 
 La reorganización de nombres, carpetas y responsabilidades no modifica la política de red ni privacidad. Se conservan las restricciones DRM/CAPTCHA/paywall, la ausencia de telemetría y la prohibición de persistir URLs firmadas, cookies, tokens, cabeceras o credenciales. La selección por identidad y las rutas autenticadas explícitas se describen en la fuente funcional vigente.
+
+## Perfiles e inserciones públicas
+
+La búsqueda y GraphQL de Instagram con sesión se limitan al perfil solicitado y exigen identidad exacta. El encabezado público se consulta sin sesión y solo aporta los datos que la página expone; un fallo de catálogo no prueba privacidad. No se envían objetivos ni credenciales a visores de terceros.
+
+El fallback de Threads puede consultar `www.threads.com/t/CÓDIGO/embed` de forma anónima, con la sesión HTTP efímera existente y sin cookies del navegador. Solo incorpora recursos del post cuyo permalink coincide con el código solicitado. Respuestas y avatares no se incorporan al catálogo. No se añaden proxies, técnicas de evasión ni automatización de navegador.

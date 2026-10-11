@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.8.1
+# Alcance funcional vigente — ZEUVE 0.20.8.2
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 

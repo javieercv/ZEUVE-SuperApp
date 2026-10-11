@@ -1,12 +1,27 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-QA real autorizada y ejecutada el 11/10/2026 en Release 0.20.8.1/build 75. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.1_20261011.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
+QA real autorizada y ejecutada el 11/10/2026 en Release 0.20.8.2/build 76. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.2_20261011.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
 
-Estado acumulado al 11/10/2026 · ZEUVE 0.20.8.1 (marketing 0.20.8, build 75), incluida la QA real del Descargador en Release. Los IDs no repetidos conservan las evidencias anteriores de 0.20.5.0, 0.20.6.0 y 0.20.7.0.
+Estado acumulado al 11/10/2026 · ZEUVE 0.20.8.2 (marketing 0.20.8, build 76), incluida la QA real del Descargador en Release. Los IDs no repetidos conservan las evidencias anteriores de 0.20.5.0, 0.20.6.0 y 0.20.7.0.
 
-**639 pruebas: 626 ✅ OK · 2 ❌ fallidas · 6 ⚠️ parciales · 5 ➖ pendientes.** **634 probadas, incluidas las parciales; 5 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 634 ✅ OK · 0 ❌ fallidas · 3 ⚠️ parciales · 2 ➖ pendientes.** **637 probadas, incluidas las parciales; 2 sin probar.** Ninguna marcada como no aplicable.
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Perfiles y Threads — QA de Release 0.20.8.2, 11/10/2026
+
+[Informe nativo](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.2_20261011.md) y [contraste de fuentes](Docs/Historico/Implementacion/INSTAGRAM_THREADS_RESEARCH_20261011.md). No se amplía la sesión al perfil público adicional ni se prueba Reddit.
+
+- **D-23 — ✅:** inserción pública del mismo post Threads; una foto, sin avatares ni respuesta adjunta. Descarga nativa 1 correcto/0 fallidos, JPEG 4096×2731.
+- **D-33/D-34 — ✅:** URL del perfil autorizado y `@usuario` con Instagram seleccionado devuelven 24 elementos; sesión realmente validada. El recuento confirmado de publicaciones es cero. `@usuario` no se prueba como catálogo de Instagram en Automático, que exige URL.
+- **D-42/D-43 — ✅:** perfil público adicional sin cookies; avatar seleccionable y descargado (JPEG 100×100 ofrecido por la página), pese a Stories/Destacadas restringidas. No certifica publicaciones/Reels de ese perfil.
+- **D-44 — ✅:** acceso efectivo a destacadas visibles para la sesión autorizada y descarga de una foto y un vídeo, 2 correctos/0 fallidos. Sin publicaciones privadas ni Story activa nueva.
+- **D-56 — ✅:** Cargar más aumenta 24→48 elementos y se contrastan 48 títulos distintos desde la UI.
+- **D-60 — ✅:** foto y vídeo de destacadas en Instagram/perfil/Destacadas/nombre-de-colección; nombre real de colección contrastado en privado. Completa el tramo pendiente tras las cuatro combinaciones de carrusel aceptadas previamente.
+- **D-11/D-39 — ⚠️; D-40/D-41 — ➖:** no se acepta una Story activa en esta ronda y las consultas de catálogo público siguen rechazadas (401). El encabezado/avatar es cobertura parcial, no un perfil público completo.
+- **D-17 — ⚠️:** Reddit online aplazado por instrucción del usuario.
+
+Cuatro archivos, 12.767.658 bytes; decodificación íntegra sin errores. Auditoría final: siete valores de cookies/nueve variantes y 67 URLs privadas contrastadas frente a datos, historial y stdout; cero coincidencias. Reset QA realizado, Llavero sin item, dos copias propias de secretos eliminadas y PID 61630 cerrado. Originales y sesión de Brave conservados.
 
 ## Correcciones y QA de Release 0.20.8.1 — 11/10/2026
 
@@ -1298,7 +1313,7 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-20** Dailymotion.
 - [x] ✅ **D-21** SoundCloud.
 - [x] ✅ **D-22** Tumblr.
-- [x] ❌ **D-23** Threads.
+- [x] ✅ **D-23** Threads.
 - [x] ✅ **D-24** Snapchat público.
 - [x] ✅ **D-25** EroMe mediante enlace concreto, si se quiere probar esa compatibilidad.
 
@@ -1314,8 +1329,8 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 
 ## Instagram
 
-- [x] ⚠️ **D-33** `@usuario` funciona.
-- [x] ❌ **D-34** URL de perfil funciona.
+- [x] ✅ **D-33** `@usuario` funciona.
+- [x] ✅ **D-34** URL de perfil funciona.
 - [x] ✅ **D-35** Publicación individual funciona.
 - [x] ✅ **D-36** Foto funciona.
 - [x] ✅ **D-37** Vídeo/Reel funciona.
@@ -1323,9 +1338,9 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ⚠️ **D-39** Un perfil público se analiza sin obligar a iniciar sesión.
 - [ ] ➖ **D-40** Muestra publicaciones.
 - [ ] ➖ **D-41** Muestra Reels.
-- [ ] ➖ **D-42** Muestra foto de perfil.
-- [ ] ➖ **D-43** Sin sesión, Stories/Destacadas restringidas no bloquean el resto del perfil.
-- [x] ⚠️ **D-44** Con una sesión válida se puede acceder a las secciones que esa cuenta ya puede ver.
+- [x] ✅ **D-42** Muestra foto de perfil.
+- [x] ✅ **D-43** Sin sesión, Stories/Destacadas restringidas no bloquean el resto del perfil.
+- [x] ✅ **D-44** Con una sesión válida se puede acceder a las secciones que esa cuenta ya puede ver.
 - [x] ✅ **D-45** Pegar una cabecera Cookie funciona.
 - [x] ✅ **D-46** Importar `cookies.txt` funciona.
 - [x] ✅ **D-47** Seleccionar archivo Netscape funciona.
@@ -1340,11 +1355,11 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-53** Vista lista funciona.
 - [x] ✅ **D-54** Cambiar tamaño de miniaturas funciona.
 - [x] ✅ **D-55** Carga inicial del catálogo funciona.
-- [ ] ➖ **D-56** «Cargar más» funciona.
+- [x] ✅ **D-56** «Cargar más» funciona.
 - [x] ✅ **D-57** Selección individual funciona.
 - [x] ✅ **D-58** Selección múltiple funciona.
 - [x] ✅ **D-59** «Seleccionar solo contenido nuevo» funciona.
-- [x] ⚠️ **D-60** Organización en carpetas por plataforma/sección/publicación funciona según configuración.
+- [x] ✅ **D-60** Organización en carpetas por plataforma/sección/publicación funciona según configuración.
 
 ## Perfiles y presets
 

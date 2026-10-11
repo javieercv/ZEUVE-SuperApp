@@ -315,7 +315,7 @@ public actor UniversalDownloadAnalysisService {
                     }
                     do {
                         if (input.platform == .erome && DownloadOutputValidator.imageExtensions.contains(candidate.url.pathExtension.lowercased()))
-                            || (input.platform == .tumblr && candidate.mediaKind == .photo) {
+                            || ([.tumblr, .threads].contains(input.platform) && candidate.mediaKind == .photo) {
                             let validated = try UniversalDownloadInputValidator().validate(candidate.url.absoluteString, allowInsecureLocalNetwork: input.allowInsecureLocalNetwork, allowAdultContent: true)
                             let entry = DownloadCatalogItem(
                                 canonicalID: "media:\(UniversalURLNormalizer.stableIdentifier(for: candidateKey))",
