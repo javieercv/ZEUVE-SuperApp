@@ -53,6 +53,8 @@ Desde la raíz:
 
 El script exige macOS ARM64/Xcode, valida la preparación necesaria, genera/verifica el proyecto Xcode, construye la app, comprueba motores empaquetados y aplica la política de firma correspondiente. No debe sustituirse por comandos de shell ad hoc que eviten los verificadores.
 
+El target de app Debug usa `ENABLE_DEBUG_DYLIB = NO`: enlaza el código en el ejecutable principal para permitir Run desde Xcode con firma ad hoc y Hardened Runtime. La biblioteca auxiliar `ZEUVE.debug.dylib` provocaba un rechazo de firma al arrancar en este entorno. El script comprueba que el ejecutable Debug no dependa de ella; se conserva la validación de bibliotecas y no se añade ninguna excepción de seguridad. Esta configuración desactiva Previews en el target de app, según la [documentación de Apple](https://developer.apple.com/documentation/xcode/understanding-build-product-layout-changes); los paquetes mantienen su configuración.
+
 ## Firma de motores
 
 - yt-dlp conserva su firma oficial cuando la distribución aprobada ya la incluye.

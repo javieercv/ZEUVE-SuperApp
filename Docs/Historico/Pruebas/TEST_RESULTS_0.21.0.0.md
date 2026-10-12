@@ -44,3 +44,15 @@ Se actualizaron verificadores estructurales para comprobar la integración diná
 ## Matriz de plataformas
 
 14.0–14.1: APIs base estimadas, Process Taps no disponibles. 14.2+/15: compatibilidad API estimada dentro de los límites publicados, sin runtime probado aquí. 26: sólo evidencia de esta tabla. 27: SDK utilizado, runtime no probado.
+
+## Corrección de arranque desde Xcode — 12/10/2026
+
+Base remota sincronizada `7952ccfa9a0acaccdde42a1b6cd9acc12c9f56ef`. La comprobación Debug inicial cubrió compilación y firma, pero no Run desde Xcode. Tras el aviso del usuario se reprodujo un SIGABRT de dyld antes de ejecutar código de la app: `ZEUVE.debug.dylib` era rechazada por discrepancia de Team ID con firma ad hoc y Hardened Runtime.
+
+El generador y el proyecto fijan `ENABLE_DEBUG_DYLIB = NO` sólo para el target de app Debug. La app conserva Hardened Runtime y validación de bibliotecas; no se modifican entitlements ni lógica Swift. El script oficial incorpora una comprobación de dependencias del ejecutable Debug.
+
+- `./Scripts/build_macos.sh Debug`: exit 0, motores y firma estricta verificados; nueva comprobación de ausencia de la biblioteca auxiliar superada.
+- Suite Python: 134 tests, sin fallos. Coherencia Xcode: 12 productos coherentes.
+- Run real con el botón de Xcode: proceso en ejecución bajo LLDB y ventana Inicio visible con los siete módulos. El ejecutable de DerivedData de Xcode no depende de `ZEUVE.debug.dylib`; firma efectiva ad hoc con Hardened Runtime.
+
+Esta corrección cierra el fallo de arranque comunicado; las limitaciones de QA física, TCC y FaceTime anteriores siguen pendientes.

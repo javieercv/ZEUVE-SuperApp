@@ -47,6 +47,8 @@ Muestra Release de 15,18 s con AppModel ya abierto y nueve utilidades desactivad
 
 Las cuatro comprobaciones oficiales pasan: run_tests, verify_project, build_macos Debug y Release. Pase final: 565 Swift + 134 Python (699), incluidos 78 de utilidades. ARM64, versión/build, firma estricta, Hardened Runtime, entitlements y motores verificados. Versiones/contratos de siete módulos y seis motores requeridos conservados. Sin QA online nueva del Descargador.
 
+Corrección posterior del arranque desde Xcode, sobre base remota `7952ccf`: desactivada la biblioteca auxiliar Debug en el target de app para evitar el rechazo de firma ad hoc, conservando Hardened Runtime. Compilación oficial Debug, 134 tests Python y Run real con Inicio visible verificados. La compilación Debug inicial no había incluido esa prueba de Run; la [evidencia de corrección](../Pruebas/TEST_RESULTS_0.21.0.0.md) registra el fallo reproducido y su resolución.
+
 ## H. Problemas y pendientes
 
 Se corrigieron actualización del botón de creación y alerta, tamaño de Ajustes, propiedad/cancelación de tareas/callbacks, barreras de reset/parada/cierre y publicación segura por descriptor. En archivos sin clonación, creación exclusiva puede ser visible durante escritura; errores limpian sólo inode propio. Diagnóstico de llamada y mezclador tienen leases independientes y rechazan ganancias incompatibles.

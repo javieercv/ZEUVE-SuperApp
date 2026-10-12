@@ -31,7 +31,7 @@ xcodebuild \
   clean build
 
 APP_PATH="build/DerivedData/Build/Products/$CONFIGURATION/ZEUVE.app"
-python3 - "$APP_PATH" <<'PY'
+python3 - "$APP_PATH" "$CONFIGURATION" <<'PY'
 from pathlib import Path
 import plistlib
 import sys
@@ -54,6 +54,12 @@ if authorizations.get("com.apple.security.device.audio-input") is not True:
     raise SystemExit("Falta Audio Input en la firma efectiva de ZEUVE.")
 if authorizations.get("com.apple.security.app-sandbox"):
     raise SystemExit("No está aprobado activar App Sandbox.")
+if sys.argv[2] == "Debug":
+    executable = Path(sys.argv[1]) / "Contents/MacOS" / info["CFBundleExecutable"]
+    dependencies = subprocess.run(["/usr/bin/otool", "-L", str(executable)], capture_output=True, text=True, check=True).stdout
+    if "@rpath/ZEUVE.debug.dylib" in dependencies:
+        raise SystemExit("Debug depende de ZEUVE.debug.dylib, incompatible con esta firma ad hoc y Hardened Runtime.")
+    print("Debug enlazado en el ejecutable principal, sin biblioteca auxiliar de arranque.")
 print("Hardened Runtime y entitlements efectivos verificados.")
 print(f"Versión del bundle verificada: {'.'.join(version)} (build {info.get('CFBundleVersion')})")
 PY

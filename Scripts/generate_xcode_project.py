@@ -236,6 +236,10 @@ for config_id, name in [(target_debug, "Debug"), (target_release, "Release")]:
     a("\t\t\t\tCURRENT_PROJECT_VERSION = 79;")
     a("\t\t\t\tENABLE_HARDENED_RUNTIME = YES;")
     a("\t\t\t\tOTHER_CODE_SIGN_FLAGS = \"--options runtime\";")
+    if name == "Debug":
+        # Ad-hoc Hardened Runtime cannot load Xcode's separately signed debug dylib.
+        # Link the application code into the main executable instead.
+        a("\t\t\t\tENABLE_DEBUG_DYLIB = NO;")
     a("\t\t\t\tGENERATE_INFOPLIST_FILE = YES;")
     a("\t\t\t\tINFOPLIST_FILE = Resources/ZEUVE-Info.plist;")
     a("\t\t\t\tINFOPLIST_KEY_CFBundleDisplayName = ZEUVE;")

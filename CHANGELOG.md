@@ -9,6 +9,7 @@
 - Mezclador por aplicación con Process Taps/rutas propias, niveles y mute, fuentes elegidas y salida Float32 estéreo compatible sin streams de micrófono. macOS 14.2+; sin almacenamiento de audio ni cambio permanente de volumen maestro.
 - Protección durante llamadas pendiente de diagnóstico real y validación de eficacia; la función no se considera completada. No se reutiliza ElfiSariña.
 - Versión visible única 0.21.0.0; metadata Apple 0.21.0, revisión 0/build 79. Versiones de los siete módulos y motores conservadas; Descargador aplazado. No ZIP.
+- Corregido el aborto al ejecutar desde Xcode con firma ad hoc: Debug enlaza el código en el ejecutable principal, sin `ZEUVE.debug.dylib`, manteniendo Hardened Runtime y validación de bibliotecas. Compilación oficial y Run real verificados.
 - Pruebas, compilaciones, firma, QA física y publicación se registran con su evidencia real en los [resultados de entrega](Docs/Historico/Pruebas/TEST_RESULTS_0.21.0.0.md).
 
 ## 0.20.8.4 — 2026-10-12
