@@ -2,7 +2,7 @@
 
 ## A. Resumen
 
-**Desarrollo integrado y verificado; QA física y eficacia de protección pendientes.** 12/10/2026. Versión visible única de desarrollo y marketing 0.21.0.0; metadata Apple 0.21.0/revisión 0, build 79. Base remota sincronizada `744b1bf01e650ef34bf568c708e70cc8eeaeab03`, sin commits remotos nuevos al cerrar la integración. La publicación y su commit verificable se añaden tras el push. Sin ZIP ni carpeta versionada paralela.
+**Desarrollo integrado y verificado; QA física y eficacia de protección pendientes.** 12/10/2026. Versión visible única de desarrollo y marketing 0.21.0.0; metadata Apple 0.21.0/revisión 0, build 79. Base remota sincronizada `744b1bf01e650ef34bf568c708e70cc8eeaeab03`, sin commits remotos nuevos al cerrar la integración. Implementación publicada y verificada en el remoto: `526cac3fdf226a228b33d50211f4419ed7bce7d2`. Sin ZIP ni carpeta versionada paralela.
 
 ## B. Funcionalidades
 
@@ -55,4 +55,4 @@ Un test preexistente del Inspector falló por un fotograma en un pase bajo carga
 
 ## I. Publicación
 
-Se publica en el repositorio original, sin force-push ni sobrescrituras. El commit de implementación y la confirmación remota se registran tras el push; el último commit documental es consultable en Git. [Contrato funcional](../../Utilidades/QUICK_UTILITIES.md) y [implementación](../Implementacion/IMPLEMENTATION_REPORT_0.21.0.0.md).
+Se publica en el repositorio original, sin force-push ni sobrescrituras. Commit de implementación `526cac3fdf226a228b33d50211f4419ed7bce7d2` presente en `refs/heads/main`, comprobado con `git ls-remote` después del push. Este cierre documental se publica como commit posterior; el SHA final se indica en el informe al usuario y es consultable en Git. [Contrato funcional](../../Utilidades/QUICK_UTILITIES.md) y [implementación](../Implementacion/IMPLEMENTATION_REPORT_0.21.0.0.md).
