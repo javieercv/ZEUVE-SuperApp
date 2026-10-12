@@ -64,6 +64,7 @@ expected_directories = [
     Path('Docs/Modulos/Funcionales'),
     Path('Docs/Modulos/Ejemplos'),
     Path('Docs/Motores'),
+    Path('Docs/Utilidades'),
     Path('Docs/Historico/Entregas'),
     Path('Docs/Historico/Implementacion'),
     Path('Docs/Historico/Pruebas'),
@@ -97,6 +98,7 @@ current_sources = [
     'Docs/Fundamentos/FUNCTIONAL_SCOPE.md',
     'Docs/Fundamentos/SECURITY.md',
     'Docs/Fundamentos/TESTING.md',
+    'Docs/Utilidades/QUICK_UTILITIES.md',
 ]
 for name in current_sources:
     text = read(name)

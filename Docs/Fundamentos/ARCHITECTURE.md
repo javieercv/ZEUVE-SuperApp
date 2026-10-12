@@ -1,4 +1,4 @@
-# Arquitectura de ZEUVE 0.20.8.4
+# Arquitectura de ZEUVE 0.21.0.0
 
 Este documento describe la arquitectura vigente. La evolución por versiones se conserva en `CHANGELOG.md` y `Docs/Historico/`.
 
@@ -37,6 +37,18 @@ Registro, diagnóstico, verificación, overrides manuales y ejecución segura de
 
 `CZEUVEProcess`, `CSQLite` y `CLibArchive` aíslan APIs C/sistema necesarias para procesos, SQLite y archivos comprimidos.
 
+## Servicios residentes de utilidades rápidas
+
+`ZEUVEQuickUtilities` es un target propio dependiente de Core/Storage/Operations; no pertenece al catálogo de módulos. `QuickUtilitiesCatalog` mantiene nueve IDs estables. `QuickUtilitiesCoordinator` separa solicitud persistida, transición y estado efectivo; serializa activaciones por utilidad y coordina parada/restablecimiento.
+
+`ResidentRuntime` compone Storage, coordinadores y servicios ligeros desde el ciclo de aplicación. `AppModel` y los ViewModels de módulos se crean al abrir la interfaz principal, evitando su inicialización en un arranque residente sin ventana. Cerrar la ventana conserva el modelo cuando ya existe; no se presupone una reducción de memoria sin medición. Barra de menús y Ajustes funcionan sin crear ese modelo completo. La app conserva identidad y Dock normales.
+
+Los bloques propios son Audio, Input, Windows y Productivity. Audio comparte `AudioRoutingCoordinator` con leases por propietario `mixer`/`callDiagnostic`, ganancias compatibles y liberación individual; el diagnóstico fuerza reproducción a ganancia 1 sin declarar protección eficaz. El callback calcula RMS agregado únicamente cuando la prueba lo solicita, con lectura atómica en RAM. Sus tareas de apertura/refresco y el consumidor de eventos nativos tienen propietario y parada con cancelación/espera; Input comparte un tap de sesión en run loop propio sin observar teclado; Windows comparte un backend AX con propiedad por utilidad; Productivity usa publicación segura y Servicios. Los callbacks de UI y registro Carbon se mantienen en MainActor, mientras mensajes AX, publicación y trabajo nativo costoso se aíslan de él.
+
+`GlobalShortcutRegistry` registra combinaciones específicas mediante Carbon y libera registros/handler al detener. La validación cruza utilidades, navegación de ZEUVE y combinaciones públicas del sistema; no puede enumerar todos los atajos de aplicaciones externas. La persistencia sigue en `SettingsRepository`. Los servicios ligeros no reservan permanentemente `OperationCoordinator`.
+
+Contrato, recursos, permisos y límites reales: [Utilidades rápidas](../Utilidades/QUICK_UTILITIES.md).
+
 ## Módulos built-in
 
 | Módulo | Target | Versión | Ajustes |
@@ -57,7 +69,7 @@ Los manifests bajo `Sources/*Module/Resources/manifest.json` describen identidad
 
 Defaults actuales: Organizador ⌘1, Descargador ⌘2, Analizador ⌘3, Conversor ⌘4, Comparador ⌘5, Inspector ⌘6, Limpiador ⌘7 e Historial ⌘8.
 
-La validación rechaza duplicados, teclas de escritura sin modificador seguro y combinaciones reservadas fundamentales. No existe ocultación de módulos como preferencia de navegación en 0.20.8.4. El orden de secciones de Ajustes (`settingsOrder`) es independiente del orden de navegación.
+La validación rechaza duplicados, teclas de escritura sin modificador seguro y combinaciones reservadas fundamentales. No existe ocultación de módulos como preferencia de navegación en 0.21.0.0. El orden de secciones de Ajustes (`settingsOrder`) es independiente del orden de navegación.
 
 ## Ajustes
 
@@ -103,7 +115,7 @@ Los targets de módulo dependen de las capas compartidas que necesitan, no de ot
 
 ## Extensibilidad
 
-La API y manifests están diseñados para una arquitectura modular, pero 0.20.8.4 integra módulos built-in compilados con la app. No existe loader de plugins externos ni importación arbitraria de módulos de terceros.
+La API y manifests están diseñados para una arquitectura modular, pero 0.21.0.0 integra módulos built-in compilados con la app. No existe loader de plugins externos ni importación arbitraria de módulos de terceros.
 
 ## Fuentes de verdad
 

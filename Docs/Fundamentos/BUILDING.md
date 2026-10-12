@@ -1,11 +1,12 @@
-# Compilación y entrega — ZEUVE 0.20.8.4
+# Compilación y entrega — ZEUVE 0.21.0.0
 
 ## Estado de versión
 
-- ZEUVE: `0.20.8.4` (`VERSION`).
-- `MARKETING_VERSION`: `0.20.8`.
-- Revisión bundle: `4`.
-- Build: `78`.
+- ZEUVE: `0.21.0.0` (`VERSION`).
+- Versión visible de desarrollo y marketing: `0.21.0.0`.
+- `MARKETING_VERSION`/`CFBundleShortVersionString` internos Apple: `0.21.0`.
+- Revisión bundle: `0`.
+- Build: `79`.
 - Plataforma objetivo: macOS 14+ Apple Silicon.
 - Swift 6, SwiftUI/AppKit, Hardened Runtime, sin App Sandbox en esta fase.
 
@@ -77,3 +78,11 @@ No afirmar que una app “compila y abre” si solo se ha ejecutado SwiftPM o ve
 `python3 Scripts/package_release.py` se usa solo cuando se solicita preparar una entrega empaquetada. Mantén actualizada la carpeta activa `ZEUVE_*`; no crees una carpeta versionada paralela ni un ZIP por defecto.
 
 La limpieza del proyecto no debe borrar `Resources/Engines`, manifests, licencias ni recursos necesarios. Artefactos de `.build`, DerivedData, logs o resultados temporales sí deben distinguirse del código fuente.
+
+## Empaquetado de utilidades residentes
+
+`ZEUVEQuickUtilities` está integrado en SwiftPM y en el generador Xcode con sus tests. Usa frameworks del sistema AppKit, CoreGraphics, ApplicationServices, Carbon/HIToolbox, ServiceManagement y Core Audio. La app continúa con Hardened Runtime y sin App Sandbox. No se añade una app independiente, driver, KEXT, helper privilegiado ni extensión de Finder.
+
+`Resources/ZEUVE-Info.plist` conserva la revisión expandida y declara la explicación de captura de audio y los Servicios de creación/texto. La firma efectiva debe incluir Hardened Runtime y `com.apple.security.device.audio-input`, sin App Sandbox. `build_macos.sh` comprueba estos valores extraídos de la firma final; no habilitan TCC por sí solos. El generador conserva `--options runtime` también con firma ad hoc, que no sustituye una identidad Developer ID ni notarización. La verificación nativa usa `build/VerificationDerivedData` para preservar compilaciones abiertas desde DerivedData del usuario. Los Servicios deben registrarse y verificarse en aplicaciones host reales después de instalar/abrir la app. El inicio de sesión necesita comprobar el estado efectivo de `SMAppService`, nunca basta guardar una preferencia.
+
+La versión de desarrollo y marketing que se muestra al usuario es siempre `0.21.0.0`; el triple interno Apple no representa otra entrega. Las validaciones y limitaciones se registran en [TEST_RESULTS_0.21.0.0](../Historico/Pruebas/TEST_RESULTS_0.21.0.0.md).

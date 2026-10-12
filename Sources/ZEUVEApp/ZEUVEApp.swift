@@ -1,72 +1,96 @@
 import SwiftUI
 import AppKit
+import Carbon
 import ZEUVECore
+import ZEUVEQuickUtilities
 
 @main
 struct ZEUVEApp: App {
-    @StateObject private var model = AppModel()
+    @StateObject private var runtime: ResidentRuntime
     @NSApplicationDelegateAdaptor(AppLifecycleDelegate.self) private var lifecycleDelegate
 
+    init() {
+        let resident = ResidentRuntime()
+        _runtime = StateObject(wrappedValue: resident)
+        lifecycleDelegate.runtime = resident
+    }
     var body: some Scene {
-        WindowGroup {
-            RootView()
-                .environmentObject(model)
-                .preferredColorScheme(model.theme.colorScheme)
-                .task {
-                    lifecycleDelegate.model = model
-                    await model.start()
-                }
+        MenuBarExtra("ZEUVE", systemImage: "bolt.circle") {
+            Button("Abrir ZEUVE") { runtime.openMainWindow() }.disabled(!runtime.isReady)
+            Button("Utilidades rápidas") { runtime.openSettings(quickUtilities: true) }.disabled(!runtime.isReady)
+            Divider()
+            if runtime.audioProtection?.isDiagnosticRunning == true {
+                Text("Ruta de prueba de audio en ejecución; eficacia pendiente")
+            }
+            ForEach(runtime.utilities.snapshots) { snapshot in
+                let descriptor = QuickUtilitiesCatalog.descriptor(for: snapshot.id)
+                Toggle(isOn: Binding(get: { snapshot.requested }, set: { runtime.setUtilityEnabled($0, id: snapshot.id) })) {
+                    Text("\(descriptor.name) — \(snapshot.state.title)")
+                }.disabled(snapshot.state.isTransitioning || !runtime.isReady)
+            }
+            Divider()
+            Button("Ajustes…") { runtime.openSettings() }
+            Button("Detener todas las utilidades") { runtime.stopUtilities() }
+            Button("Salir de ZEUVE") { NSApp.terminate(nil) }.keyboardShortcut("q")
         }
-        .windowStyle(.automatic)
-        .defaultSize(width: 1_180, height: 780)
+        .menuBarExtraStyle(.menu)
         .commands {
             CommandGroup(replacing: .newItem) { }
-            CommandMenu("ZEUVE") {
-                ForEach(model.navigationModules) { module in
-                    if let shortcut = model.shortcut(for: module.id), let key = shortcut.keyEquivalent {
-                        Button(module.descriptor.commandTitle) { model.selectModule(module.id) }
-                            .keyboardShortcut(key, modifiers: shortcut.eventModifiers)
-                    } else {
-                        Button(module.descriptor.commandTitle) { model.selectModule(module.id) }
-                    }
-                }
-                if let shortcut = model.historyShortcut, let key = shortcut.keyEquivalent {
-                    Button("Ver historial") { model.selection = .history }
-                        .keyboardShortcut(key, modifiers: shortcut.eventModifiers)
-                } else {
-                    Button("Ver historial") { model.selection = .history }
-                }
+            CommandGroup(replacing: .appSettings) {
+                Button("Ajustes…") { runtime.openSettings() }.keyboardShortcut(",")
             }
-        }
-        Settings {
-            SettingsView().environmentObject(model).frame(width: 920, height: 680)
+            CommandMenu("ZEUVE") {
+                Button("Abrir ZEUVE") { runtime.openMainWindow() }
+                Button("Utilidades rápidas") { runtime.openSettings(quickUtilities: true) }
+                ForEach(runtime.navigationModules) { module in
+                    let shortcut = runtime.navigationPreferences.effectiveShortcut(for: module.descriptor.primaryIdentifier, defaults: BuiltInModuleCatalog.navigationDefaults)
+                    Button(module.descriptor.commandTitle) { runtime.openMainWindow(destination: .module(module.id)) }
+                        .keyboardShortcut(shortcut?.swiftUIShortcut)
+                }
+                let shortcut = runtime.navigationPreferences.effectiveShortcut(for: BuiltInModuleCatalog.historyTargetID, defaults: BuiltInModuleCatalog.navigationDefaults)
+                Button("Ver historial") { runtime.openMainWindow(destination: .history) }
+                    .keyboardShortcut(shortcut?.swiftUIShortcut)
+            }
         }
     }
 }
 
 @MainActor
 final class AppLifecycleDelegate: NSObject, NSApplicationDelegate {
-    weak var model: AppModel?
+    weak var runtime: ResidentRuntime?
+    private var terminationTask: Task<Void, Never>?
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        let event = NSAppleEventManager.shared().currentAppleEvent
+        let login = event?.paramDescriptor(forKeyword: AEKeyword(keyAELaunchedAsLogInItem)) != nil
+        let service = event?.paramDescriptor(forKeyword: AEKeyword(keyAELaunchedAsServiceItem)) != nil
+        runtime?.beginLaunch(showMainWindow: !login && !service)
+    }
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        runtime?.openMainWindow(); return false
+    }
+    func applicationDidBecomeActive(_ notification: Notification) { runtime?.refreshLoginStatus() }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        guard let model else { return .terminateNow }
-        Task {
-            // Se ejecuta incluso si el coordinador ya no muestra una operación: el diagnóstico
-            // de motores también puede tener un proceso auxiliar brevemente activo.
-            await model.terminateExternalProcesses()
-            await MainActor.run { sender.reply(toApplicationShouldTerminate: true) }
+        guard let runtime else { return .terminateNow }
+        guard terminationTask == nil else { return .terminateLater }
+        terminationTask = Task {
+            await runtime.shutdown()
+            sender.reply(toApplicationShouldTerminate: true)
         }
         return .terminateLater
     }
 }
 
-
 private extension KeyboardShortcutDescriptor {
+    var swiftUIShortcut: SwiftUI.KeyboardShortcut? {
+        keyEquivalent.map { SwiftUI.KeyboardShortcut($0, modifiers: eventModifiers) }
+    }
     var keyEquivalent: KeyEquivalent? {
         guard key.count == 1, let character = key.first else { return nil }
         return KeyEquivalent(character)
     }
-    var eventModifiers: EventModifiers {
-        var value: EventModifiers = []
+    var eventModifiers: SwiftUI.EventModifiers {
+        var value: SwiftUI.EventModifiers = []
         if command { value.insert(.command) }; if option { value.insert(.option) }; if control { value.insert(.control) }; if shift { value.insert(.shift) }
         return value
     }

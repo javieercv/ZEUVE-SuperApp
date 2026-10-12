@@ -16,4 +16,5 @@ xcodebuild \
   -scheme ZEUVE \
   -configuration Debug \
   -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath build/VerificationDerivedData \
   build

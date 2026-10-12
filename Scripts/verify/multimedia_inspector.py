@@ -73,8 +73,13 @@ for snippet in [
 ]:
     if snippet not in app_model:
         raise SystemExit("AppModel no integra completamente Inspector multimedia: " + snippet)
-if 'model.historyShortcut' not in app or 'Button("Ver historial") { model.selection = .history }' not in app:
-    raise SystemExit("Historial debe usar el atajo dinámico centralizado.")
+for snippet in [
+    "runtime.navigationPreferences.effectiveShortcut(for: BuiltInModuleCatalog.historyTargetID, defaults: BuiltInModuleCatalog.navigationDefaults)",
+    'Button("Ver historial") { runtime.openMainWindow(destination: .history) }',
+    ".keyboardShortcut(shortcut?.swiftUIShortcut)",
+]:
+    if snippet not in app:
+        raise SystemExit("Historial debe usar el atajo dinámico centralizado: " + snippet)
 
 for required in [
     "async throws -> [MultimediaBatchPreflightItem]",

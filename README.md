@@ -8,7 +8,7 @@ Herramientas distintas, una sola aplicación, con especial cuidado por la privac
 
 <br>
 
-![Versión](https://img.shields.io/badge/ZEUVE-0.20.8.4-2f81f7?style=flat-square)
+![Versión](https://img.shields.io/badge/ZEUVE-0.21.0.0-2f81f7?style=flat-square)
 ![macOS](https://img.shields.io/badge/macOS-14%2B-000000?style=flat-square&logo=apple&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-nativo-000000?style=flat-square&logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/Swift-6-F05138?style=flat-square&logo=swift&logoColor=white)
@@ -46,6 +46,8 @@ El proyecto está pensado para crecer por módulos sin perder una experiencia co
 | 🧹 | **Limpiador** | Inventario, residuos, limpieza segura y desinstalación asistida | [Ver](Docs/Modulos/Funcionales/CLEANER.md) |
 
 ZEUVE también dispone de **Historial**, ajustes centralizados y personalización del orden y los atajos de los módulos.
+
+Las [**Utilidades rápidas**](Docs/Utilidades/QUICK_UTILITIES.md) forman una familia residente independiente: barra de menús única, inicio de sesión opcional y funciones locales de audio, entrada, ventanas y productividad. Cerrar una ventana conserva la aplicación residente; Salir detiene sus servicios. Las limitaciones y permisos se muestran por utilidad.
 
 ---
 
@@ -139,7 +141,11 @@ Para consultar la evolución del proyecto:
 
 <div align="center">
 
-### ZEUVE 0.20.8.4
+### ZEUVE 0.21.0.0 — integración verificada, QA física pendiente
+
+Versión visible única de desarrollo y marketing 0.21.0.0; metadata Apple 0.21.0, revisión 0/build 79. Infraestructura residente y familia de utilidades rápidas integradas con Ajustes. La protección de audio en llamadas no se declara completada: dispone de una prueba integrada de ruta al 100 % con fuentes elegidas y niveles RMS sólo en RAM; la comparación real con FaceTime/altavoces y su eficacia siguen pendientes. [Funciones y límites](Docs/Utilidades/QUICK_UTILITIES.md), [implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.21.0.0.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.21.0.0.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.21.0.0.md). Pasan las cuatro verificaciones oficiales y 699 tests (78 de utilidades). QA nativa parcial: creación desde panel, bandeja, Servicio de TextEdit y ruta de audio; Accesibilidad efectiva, Finder completo y prueba FaceTime siguen pendientes. Sin ZIP.
+
+### Entrega anterior — ZEUVE 0.20.8.4
 
 **Pruebas cerradas por decisión del usuario el 12/10/2026.** Desarrollo del Descargador aplazado hasta que el usuario lo retome; resultados, parciales y límite del catálogo completo de Instagram conservados. [Decisión de cierre](PROJECT_DECISIONS.md#cierre-de-la-ronda-de-pruebas-y-aplazamiento-del-descargador--12102026).
 

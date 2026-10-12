@@ -1,5 +1,16 @@
 # Historial de cambios de ZEUVE
 
+## 0.21.0.0 — 2026-10-12 — EN VALIDACIÓN
+
+- Infraestructura residente común, catálogo/estados efectivos, barra de menús única, apertura diferida de la interfaz principal y configuración centralizada. Inicio de sesión opt-in y cierre completo con liberación de recursos.
+- Rueda discreta global: inversión vertical/horizontal sin transformar eventos continuos. Botones adicionales por índice, captura explícita y atajos configurables; primario, secundario y central protegidos. Sin perfiles físicos ficticios ni drivers.
+- Selector textual de ventanas con atajo global público, Accesibilidad y confirmación/cancelación explícitas. Distribuciones mediante geometría relativa y slots; reasociación tras reinicio, restauración parcial/cancelable y automática opt-in.
+- Crear archivos desde ZEUVE o Servicios con carpeta seleccionada, nombres/extensiones validados y publicación exclusiva sin seguir symlinks. Bandeja temporal de referencias en RAM y transformaciones de texto plano entregado mediante Servicios; RTF/RTFD rechazado.
+- Mezclador por aplicación con Process Taps/rutas propias, niveles y mute, fuentes elegidas y salida Float32 estéreo compatible sin streams de micrófono. macOS 14.2+; sin almacenamiento de audio ni cambio permanente de volumen maestro.
+- Protección durante llamadas pendiente de diagnóstico real y validación de eficacia; la función no se considera completada. No se reutiliza ElfiSariña.
+- Versión visible única 0.21.0.0; metadata Apple 0.21.0, revisión 0/build 79. Versiones de los siete módulos y motores conservadas; Descargador aplazado. No ZIP.
+- Pruebas, compilaciones, firma, QA física y publicación se registran con su evidencia real en los [resultados de entrega](Docs/Historico/Pruebas/TEST_RESULTS_0.21.0.0.md).
+
 ## 0.20.8.4 — 2026-10-12
 
 - Descargador 0.7.8: completa reproducción de vídeos/Reels de la muestra pública usando la resolución de publicaciones concretas ya incluida en Instaloader; mismo endpoint, sin sesiones personales ni nuevas dependencias.

@@ -1,6 +1,6 @@
 # Documentación de ZEUVE
 
-Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.20.8.4— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
+Esta carpeta separa la documentación **vigente** —la que se consulta para diseñar, desarrollar, validar y mantener ZEUVE 0.21.0.0— de las evidencias **históricas** de cada entrega. Empieza aquí para localizar la fuente adecuada sin recorrer el historial.
 
 Si una afirmación histórica contradice una fuente vigente o el código actual, no se reescribe el histórico: se usa la fuente vigente y se corrige cualquier documentación viva desactualizada.
 
@@ -65,7 +65,17 @@ Compatibilidad histórica del antiguo módulo YouTube: [documento legacy](Modulo
 
 La instantánea empaquetable concreta se define en `../Resources/Engines/engines.json`.
 
-## Entrega actual — 0.20.8.4
+## Utilidades rápidas
+
+- [Contrato, funciones y límites residentes](Utilidades/QUICK_UTILITIES.md).
+
+## Entrega actual — 0.21.0.0 — EN VALIDACIÓN
+
+- [Implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.21.0.0.md).
+- [Pruebas y aceptación pendiente](Historico/Pruebas/TEST_RESULTS_0.21.0.0.md).
+- [Entrega y límites](Historico/Entregas/DELIVERY_0.21.0.0.md).
+
+## Entrega anterior — 0.20.8.4
 
 - [Investigación de fuentes y contraste remoto](Historico/Implementacion/INSTAGRAM_PUBLIC_REELS_RESEARCH_20261012.md).
 - [Acceso público y presentación de sesión](Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.4.md).

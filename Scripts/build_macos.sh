@@ -35,6 +35,8 @@ python3 - "$APP_PATH" <<'PY'
 from pathlib import Path
 import plistlib
 import sys
+import re
+import subprocess
 version = Path("VERSION").read_text().strip().split(".")
 with (Path(sys.argv[1]) / "Contents/Info.plist").open("rb") as stream:
     info = plistlib.load(stream)
@@ -42,6 +44,17 @@ actual = [info.get("CFBundleShortVersionString"), info.get("ZEUVEReleaseRevision
 expected = [".".join(version[:3]), version[3]]
 if actual != expected:
     raise SystemExit(f"La versión del bundle no coincide con VERSION: {actual!r} != {expected!r}")
+signature = subprocess.run(["/usr/bin/codesign", "-d", "--verbose=4", sys.argv[1]], capture_output=True, text=True, check=True)
+flags = re.search(r"flags=0x([0-9a-fA-F]+)", signature.stderr)
+if not flags or int(flags.group(1), 16) & 0x10000 == 0:
+    raise SystemExit("La firma final no incluye Hardened Runtime.")
+entitlements = subprocess.run(["/usr/bin/codesign", "-d", "--entitlements", ":-", sys.argv[1]], capture_output=True, check=True)
+authorizations = plistlib.loads(entitlements.stdout)
+if authorizations.get("com.apple.security.device.audio-input") is not True:
+    raise SystemExit("Falta Audio Input en la firma efectiva de ZEUVE.")
+if authorizations.get("com.apple.security.app-sandbox"):
+    raise SystemExit("No está aprobado activar App Sandbox.")
+print("Hardened Runtime y entitlements efectivos verificados.")
 print(f"Versión del bundle verificada: {'.'.join(version)} (build {info.get('CFBundleVersion')})")
 PY
 Scripts/verify_packaged_engines_macos.sh "$APP_PATH"

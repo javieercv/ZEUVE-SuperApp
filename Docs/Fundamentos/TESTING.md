@@ -1,8 +1,12 @@
-# Pruebas y validación — ZEUVE 0.20.8.4
+# Pruebas y validación — ZEUVE 0.21.0.0
+
+La nueva familia residente está **EN VALIDACIÓN**. Sus [resultados actuales](../Historico/Pruebas/TEST_RESULTS_0.21.0.0.md) distinguen compilación, pruebas automáticas, integración y QA real. Un tap creado, un atajo enviado o una ventana enumerada no acredita eficacia del audio, identidad física del ratón ni comportamiento completo de aplicaciones externas. La protección durante llamadas permanece sin completar mientras falte un diagnóstico reproducible y una ruta eficaz comprobada.
+
+## Evidencia conservada del Descargador — 0.20.8.4
 
 La ronda de pruebas queda cerrada por decisión del usuario el 12/10/2026. El desarrollo y la QA del Descargador se aplazan hasta que el usuario los retome. Se conservan los resultados, exclusiones y límites descritos a continuación; este cierre documental no añade comprobaciones ni certifica el catálogo completo de Instagram.
 
-La entrega actual dispone de [regresiones y verificación](../Historico/Pruebas/TEST_RESULTS_0.20.8.4.md) y [QA nativa de perfiles públicos/Reels](../Historico/Pruebas/DOWNLOADER_QA_0.20.8.4_20261012.md). Estado acumulado: 637 OK, cero fallidas, dos parciales excluidas y cero pendientes de 639; D-39/D-41 pasan en sus criterios documentados. La aceptación se basa en el catálogo y descargas reales, sin sustituir el perfil por enlaces independientes ni las miniaturas por vídeos. La muestra finita sigue declarada parcial frente al feed global cuando este no permite la consulta anónima. Stories activas y cuentas privadas se excluyen por instrucción del usuario; Reddit online continúa aplazado. Los IDs no repetidos conservan su evidencia previa.
+La entrega anterior 0.20.8.4 dispone de [regresiones y verificación](../Historico/Pruebas/TEST_RESULTS_0.20.8.4.md) y [QA nativa de perfiles públicos/Reels](../Historico/Pruebas/DOWNLOADER_QA_0.20.8.4_20261012.md). Estado acumulado: 637 OK, cero fallidas, dos parciales excluidas y cero pendientes de 639; D-39/D-41 pasan en sus criterios documentados. La aceptación se basa en el catálogo y descargas reales, sin sustituir el perfil por enlaces independientes ni las miniaturas por vídeos. La muestra finita sigue declarada parcial frente al feed global cuando este no permite la consulta anónima. Stories activas y cuentas privadas se excluyen por instrucción del usuario; Reddit online continúa aplazado. Los IDs no repetidos conservan su evidencia previa.
 
 La evidencia técnica de los parciales corregidos está en [TEST_RESULTS_0.20.7.0.md](../Historico/Pruebas/TEST_RESULTS_0.20.7.0.md). Los nueve IDs locales pasan su [aceptación desde UI](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005.md); las pruebas de servicio complementan ese recorrido. La [revalidación manual de 04/10/2026](../Historico/Pruebas/MANUAL_QA_0.20.6.0_20261004.md) conserva los 22 IDs comprobados en la entrega anterior. El [cierre de I-29/I-35](../Historico/Pruebas/MANUAL_QA_0.20.7.0_20261005_AUDIO_VIDEO.md) mide la salida de audio capturada y los frames presentados, incluidos mute/ganancia, salto/reanudación y cambio de pista. La checklist acumulada al 10/10/2026 (`Cheklist Manual de aceptacion de ZEUVE.md`, en la raíz) registra 613 OK, 9 fallidas, 8 parciales y 9 pendientes: 630 pruebas ejecutadas, incluidas las parciales. Todo estado sin OK restante pertenece al Descargador o a su autenticación remota, incluido P-12; P-11 pasa en el alcance de análisis documentado.
 
@@ -72,3 +76,11 @@ No debe afirmarse que una prueba manual se realizó si solo se revisó código o
 ## Release
 
 Antes de considerar una entrega validada, ejecutar el máximo posible del flujo oficial. Si Xcode, firma, motores ARM64 o lanzamiento real no pueden comprobarse en el entorno actual, declararlo expresamente y mantener esa comprobación como pendiente de plataforma, no eliminarla del proceso.
+
+## Aceptación de utilidades rápidas
+
+Los tests de `ZEUVEQuickUtilitiesTests` cubren estados idempotentes, almacenamiento inválido, permisos denegados/revocados, atajos, transformaciones de rueda, pares de botones, rutas/ganancia de audio, geometría/identidades de ventanas y publicación/texto/referencias. Los backends inyectados pertenecen a tests; la app utiliza servicios nativos reales.
+
+QA física necesaria: cerrar/reabrir/salir, arranque de sesión autorizado, permisos reales, repetición de activaciones y reset, G305/receptor USB y trackpad, filtros de terceros, ventanas en Spaces/fullscreen y pantallas externas, Servicios en Finder/apps de texto y niveles reales de audio antes/durante/después de llamada. No dar por validada la protección hasta reproducir la atenuación y medir una ruta eficaz. No acceder a datos personales adicionales para forzar una prueba.
+
+Matriz obligatoria: macOS 14.0–14.1, 14.2+, 15, 26 y 27 cuando exista entorno. Registrar por separado disponibilidad API estimada, compilación y ensayo real; el mezclador no se activa en 14.0–14.1. Presupuestos y mediciones CPU/RSS/latencia deben proceder de la app real, con todas desactivadas y combinaciones activas. Conservar pendientes cuando falten hardware, autorización o reproducción.

@@ -43,8 +43,8 @@ class BuiltInModuleCatalogTests(unittest.TestCase):
         self.assertIn("BuiltInModuleViewRouter(moduleID: moduleID)", root)
         self.assertIn("ForEach(app.dashboardModules)", dashboard)
         self.assertIn("app.selectModule(module.id)", dashboard)
-        self.assertIn("ForEach(model.navigationModules)", app)
-        self.assertIn("model.selectModule(module.id)", app)
+        self.assertIn("ForEach(runtime.navigationModules)", app)
+        self.assertIn("runtime.openMainWindow(destination: .module(module.id))", app)
         self.assertNotIn("switch moduleID", dashboard)
         for literal in [
             'navigationRow(.organizer)',
@@ -78,7 +78,7 @@ class BuiltInModuleCatalogTests(unittest.TestCase):
         history = (APP / "History/GlobalHistoryView.swift").read_text()
         catalog = (APP / "BuiltInModules/BuiltInModuleCatalog.swift").read_text()
 
-        self.assertIn("ForEach(app.settingsModules)", settings)
+        self.assertIn("ForEach(runtime.settingsModules)", settings)
         self.assertIn("BuiltInModuleSettingsRouter(moduleID: moduleID)", settings)
         self.assertIn("case .instagramFollowers:", settings_router)
         self.assertIn("settingsOrder: nil", catalog)
@@ -108,8 +108,8 @@ class BuiltInModuleCatalogTests(unittest.TestCase):
 
     def test_commands_use_dynamic_shortcuts(self) -> None:
         app = (APP / "ZEUVEApp.swift").read_text()
-        self.assertIn("model.shortcut(for: module.id)", app)
-        self.assertIn("model.historyShortcut", app)
+        self.assertIn("module.descriptor.primaryIdentifier", app)
+        self.assertIn("BuiltInModuleCatalog.historyTargetID", app)
         self.assertNotIn('.keyboardShortcut("7", modifiers: [.command])', app)
 
 

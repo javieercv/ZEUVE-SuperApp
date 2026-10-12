@@ -4,6 +4,7 @@
 # Swift Package Manager / build products
 .build/
 DerivedData/
+build/VerificationDerivedData/
 *.dSYM/
 __pycache__/
 *.py[cod]

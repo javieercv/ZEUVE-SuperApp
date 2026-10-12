@@ -1,4 +1,4 @@
-# Contexto operativo para agentes — ZEUVE 0.20.8.4
+# Contexto operativo para agentes — ZEUVE 0.21.0.0
 
 Este documento es un mapa rápido. No sustituye a `SUPERAPP_PROJECT_RULES.md`, `PROJECT_DECISIONS.md` ni a la documentación funcional concreta.
 
@@ -24,9 +24,9 @@ No existe una dependencia de contexto en `../../.agents/skills/` ni debe suponer
 
 ## Estado de producto
 
-- ZEUVE: `0.20.8.4`.
-- Marketing: `0.20.8`.
-- Build: `78`.
+- ZEUVE: `0.21.0.0`.
+- Versión visible de desarrollo y marketing: `0.21.0.0`; metadata Apple: `0.21.0`.
+- Build: `79`.
 - Plataforma: macOS 14+ Apple Silicon.
 - Swift 6; SwiftUI + AppKit; Hardened Runtime; sin App Sandbox en esta fase.
 
@@ -57,3 +57,7 @@ Historial usa ⌘8 por defecto. `BuiltInModuleCatalog` conserva IDs/defaults; `N
 ## Cómo leer el histórico
 
 Una frase de un `IMPLEMENTATION_REPORT_*`, `DELIVERY_*` o `TEST_RESULTS_*` describe esa entrega, no necesariamente el presente. Si contradice una fuente viva o el código actual, conserva el documento histórico y corrige la documentación viva; no reescribas el pasado para que parezca actual.
+
+## Familia residente
+
+Consultar [Utilidades rápidas](../Utilidades/QUICK_UTILITIES.md) y sus servicios reales. `ResidentRuntime` inicia servicios sin necesitar la ventana; `AppModel` se crea al abrir módulos. Una única app/Dock/barra de menús, inicio de sesión opcional y desactivado por defecto. Entrada no garantiza dispositivo físico; distribuciones necesitan reasociación tras reinicio. Protección en llamadas pendiente de diagnóstico y eficacia, sin aceptar un tap como prueba. El Descargador conserva el cierre de su ronda de QA y no se reabre aquí.

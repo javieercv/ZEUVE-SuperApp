@@ -1,4 +1,4 @@
-# ZEUVE 0.20.8.4 — instrucciones para agentes
+# ZEUVE 0.21.0.0 — instrucciones para agentes
 
 ## Rol
 
@@ -80,7 +80,7 @@ Git forma parte del flujo operativo normal de ZEUVE: sincroniza antes de empezar
 
 ## Forma técnica actual
 
-ZEUVE 0.20.8.4 (marketing 0.20.8, build 78) es una app nativa para macOS 14+ Apple Silicon, Swift 6, SwiftUI/AppKit cuando procede, Hardened Runtime y sin App Sandbox en esta fase.
+ZEUVE 0.21.0.0 (única versión visible de desarrollo y marketing; metadata Apple 0.21.0, build 79) es una app nativa para macOS 14+ Apple Silicon, Swift 6, SwiftUI/AppKit cuando procede, Hardened Runtime y sin App Sandbox en esta fase.
 
 Capas principales:
 
@@ -89,10 +89,13 @@ Capas principales:
 - `Sources/ZEUVEStorage`: SQLite, ajustes, historial y migraciones.
 - `Sources/ZEUVEOperations`: coordinación global de operaciones pesadas.
 - `Sources/ZEUVEEngines`: registro, verificación y ejecución segura de motores.
+- `Sources/ZEUVEQuickUtilities`: servicios residentes de utilidades rápidas, estados, atajos globales y recursos nativos propios; UI en `Sources/ZEUVEApp/QuickUtilities`.
 - `Sources/CZEUVEProcess`, `CSQLite`, `CLibArchive`: puentes de bajo nivel.
 - Módulos: `OrganizerModule`, `UniversalDownloaderModule`, `ChatAnalyzerModule`, `UniversalConverterModule`, `InstagramFollowersModule`, `MultimediaInspectorModule`, `CleanerModule`.
 
 `BuiltInModuleCatalog` es la fuente de integración de los siete módulos. El orden de navegación y los atajos efectivos se personalizan mediante `NavigationPreferences`; los defaults son ⌘1…⌘7 y ⌘8 para Historial. El orden de secciones de Ajustes es independiente.
+
+Para utilidades residentes consulta `Docs/Utilidades/QUICK_UTILITIES.md`. Su catálogo es independiente de los módulos; mantener una preferencia activada no equivale a ejecución efectiva. La protección de audio durante llamadas sigue pendiente de diagnóstico y validación de eficacia; no está completada ni descartada. No reabrir el Descargador dentro de este trabajo.
 
 Calibre, Ghostscript y LibreOffice están retirados. No reintroduzcas soporte de ebook/EPS ni esos motores sin una nueva aprobación de alcance.
 

@@ -11,6 +11,7 @@ import UniversalConverterModule
 import InstagramFollowersModule
 import MultimediaInspectorModule
 import CleanerModule
+import ZEUVEQuickUtilities
 
 enum AppDestination: Identifiable, Hashable {
     case dashboard
@@ -93,19 +94,13 @@ final class AppModel: ObservableObject {
 
     private var operationObserver: Task<Void, Never>?
     private var didStart = false
+    private weak var runtime: ResidentRuntime?
 
-    init() {
-        let localCoordinator = OperationCoordinator()
+    init(runtime: ResidentRuntime) {
+        let localCoordinator = runtime.operations
         let localRegistry = ModuleRegistry()
-        let localLogger: LocalLogger?
-        let loggerInitializationFailed: Bool
-        do {
-            localLogger = try LocalLogger(directory: AppPaths.logs())
-            loggerInitializationFailed = false
-        } catch {
-            localLogger = nil
-            loggerInitializationFailed = true
-        }
+        let localLogger = runtime.logger
+        let loggerInitializationFailed = localLogger == nil
         let sharedEngineRegistry: EngineRegistry?
         let engineRegistryInitializationFailed: Bool
         do {
@@ -126,7 +121,7 @@ final class AppModel: ObservableObject {
         )
 
         do {
-            let container = try StorageContainer.live()
+            guard let container = runtime.storage else { throw CocoaError(.fileReadUnknown) }
             let loadedTheme = try container.settings.value(forKey: ZEUVEAppStorageKeys.theme, as: ThemePreference.self) ?? .system
             let rawNavigation = try container.settings.value(forKey: ZEUVEAppStorageKeys.navigationPreferences, as: NavigationPreferences.self) ?? NavigationPreferences()
             let loadedNavigation = KeyboardShortcutValidator.normalized(
@@ -191,14 +186,17 @@ final class AppModel: ObservableObject {
         if engineRegistryInitializationFailed {
             appendStartupIssue("ZEUVE se ha iniciado con disponibilidad degradada de motores. Revisa el diagnóstico del Descargador y del Conversor.")
         }
+        self.runtime = runtime
     }
 
     func start() async {
         guard !didStart else { return }
+        guard !Task.isCancelled else { return }
         didStart = true
 
         var registrationErrors: [String] = []
         for descriptor in BuiltInModuleCatalog.all {
+            guard !Task.isCancelled else { return }
             do {
                 let manifest = try descriptor.loadManifest()
                 guard manifest.identifier == descriptor.primaryIdentifier else {
@@ -218,9 +216,12 @@ final class AppModel: ObservableObject {
             appendStartupIssue("No se han podido registrar todos los módulos:\n" + registrationErrors.joined(separator: "\n"))
         }
         await organizer.loadHistory()
+        guard !Task.isCancelled else { return }
         await universalDownloader.start()
+        guard !Task.isCancelled else { return }
         universalConverter.start()
         globalHistory.load(manifests: modules)
+        guard !Task.isCancelled else { return }
         operationObserver?.cancel()
         operationObserver = Task { [weak self, coordinator] in
             for await snapshot in await coordinator.snapshots() {
@@ -292,7 +293,18 @@ final class AppModel: ObservableObject {
 
     private func applyNavigationPreferences(_ raw: NavigationPreferences) {
         let normalized = KeyboardShortcutValidator.normalized(raw, availableModuleIDs: BuiltInModuleCatalog.navigationDefaults.moduleOrder, defaults: BuiltInModuleCatalog.navigationDefaults)
+        if let runtime {
+            for target in normalized.moduleOrder + [BuiltInModuleCatalog.historyTargetID] {
+                if let shortcut = normalized.effectiveShortcut(for: target, defaults: BuiltInModuleCatalog.navigationDefaults),
+                   let code = GlobalShortcutRegistry.keyCode(for: shortcut.key),
+                   runtime.shortcuts.conflict(for: GlobalShortcut(keyCode: code, command: shortcut.command, option: shortcut.option, control: shortcut.control, shift: shortcut.shift)) != nil {
+                    settingsError = "La combinación está registrada por una utilidad rápida. Desactiva o cambia ese atajo antes de asignarlo aquí."
+                    return
+                }
+            }
+        }
         navigationPreferences = normalized
+        runtime?.refreshShortcutConflicts()
         do { try storage?.settings.set(normalized, forKey: ZEUVEAppStorageKeys.navigationPreferences) } catch { settingsError = "La navegación se ha actualizado para esta sesión, pero no se ha podido guardar: \(error.localizedDescription)" }
     }
 
@@ -311,6 +323,7 @@ final class AppModel: ObservableObject {
 
     func saveTheme(_ value: ThemePreference) {
         theme = value
+        runtime?.syncTheme(value)
         guard let storage else { return }
         do {
             try storage.settings.set(value, forKey: ZEUVEAppStorageKeys.theme)
@@ -340,6 +353,7 @@ final class AppModel: ObservableObject {
         var failures: [String] = []
 
         theme = .system
+        runtime?.syncTheme(.system)
         if let storage {
             do {
                 try storage.settings.set(ThemePreference.system, forKey: ZEUVEAppStorageKeys.theme)
@@ -388,6 +402,8 @@ final class AppModel: ObservableObject {
     }
 
     func terminateExternalProcesses() async {
+        operationObserver?.cancel()
+        operationObserver = nil
         organizer.cancel()
         universalDownloader.cancel()
         await chatAnalyzer.cancelAndWait()

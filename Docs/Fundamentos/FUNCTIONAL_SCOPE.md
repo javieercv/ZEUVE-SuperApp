@@ -1,4 +1,4 @@
-# Alcance funcional vigente — ZEUVE 0.20.8.4
+# Alcance funcional vigente — ZEUVE 0.21.0.0
 
 Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de cada módulo viven en `Docs/Modulos/Funcionales/`.
 
@@ -7,6 +7,18 @@ Este documento resume qué ofrece hoy la aplicación. Los detalles y límites de
 ZEUVE integra siete módulos built-in, Inicio, Historial y Ajustes centralizados. El orden de módulos es personalizable y se comparte entre Sidebar, Inicio y comandos; los atajos de módulos e Historial también pueden personalizarse o desactivarse. No existe carga dinámica de plugins externos.
 
 Las operaciones pesadas comparten `OperationCoordinator`; la aplicación evita ejecutar dos operaciones principales pesadas simultáneas. La privacidad, logs mínimos, protección de archivos y ejecución segura de motores son criterios transversales.
+
+## Utilidades rápidas residentes
+
+Familia independiente en Ajustes, sin duplicar la barra lateral de módulos. Un icono de barra de menús permite recuperar la ventana, abrir Ajustes, consultar/activar funciones compatibles, detenerlas y salir. Inicio con macOS opt-in mediante `SMAppService.mainApp` y estados efectivos del sistema.
+
+- Mezclador de aplicaciones compatibles en macOS 14.2+, con ruta de audio explícita y formatos/salidas limitados. Prueba explícita de reproducción privada al 100 % durante una llamada preparada por el usuario, con fuentes seguras elegidas y RMS agregado efímero. La prueba y el mezclador poseen sus rutas por separado. Protección durante llamadas pendiente de comparación real y eficacia, sin declaración de cumplimiento.
+- Inversión de ruedas discretas vertical/horizontal; eventos continuos y gestos intactos. Asignaciones globales por índice para botones adicionales mediante atajos; no se garantiza identidad física ni aislamiento de otro ratón.
+- Selector textual de ventanas con Accesibilidad, sin miniaturas ni permiso de pantalla. Perfiles de geometría con asociación explícita; después de reiniciar deben reasociarse las posiciones guardadas.
+- Crear archivos nuevos mediante panel y Servicios con carpeta seleccionada, plantillas y extensión permitida. No se promete un menú contextual universal de Finder.
+- Bandeja flotante con referencias temporales en RAM y transformaciones de texto plano a través de Servicios; no son movimientos de archivos ni monitorización del portapapeles. RTF/RTFD se rechaza para proteger el formato.
+
+Comportamiento, compatibilidad, restauración y aceptación: [Utilidades rápidas](../Utilidades/QUICK_UTILITIES.md). Quedan fuera brillo externo avanzado, capturas flotantes, reglas de reposo, drivers/KEXT, root/helpers privilegiados y plugins externos.
 
 ## Organizador de archivos 0.1.5
 

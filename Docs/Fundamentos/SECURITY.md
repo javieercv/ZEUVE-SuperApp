@@ -1,4 +1,4 @@
-# Seguridad y privacidad — ZEUVE 0.20.8.4
+# Seguridad y privacidad — ZEUVE 0.21.0.0
 
 ## Principio general
 
@@ -70,4 +70,16 @@ Las importaciones deben impedir path traversal, rutas absolutas, colisiones norm
 
 ## Plataforma
 
-La app usa Hardened Runtime. No está dentro de App Sandbox en 0.20.8.4; por ello las protecciones de alcance, validación, permisos internos y UI no pueden delegarse al sandbox.
+La app usa Hardened Runtime. No está dentro de App Sandbox en 0.21.0.0; por ello las protecciones de alcance, validación, permisos internos y UI no pueden delegarse al sandbox.
+
+## Utilidades rápidas residentes
+
+Permisos TCC solicitados por utilidad y acción concreta: Accesibilidad para modificar eventos/AX, captura del audio del sistema para Process Taps. El atajo Carbon no implica registrar pulsaciones. No se solicita pantalla para una lista textual ni micrófono para el mezclador. Denegación/revocación detiene el servicio afectado y no impide usar los módulos independientes.
+
+Entrada observa exclusivamente scroll y botones adicionales necesarios; el grabador de atajo es local y temporal. No hay keylogging ni persistencia de teclas, actividad o identificadores físicos del ratón. Los atajos emitidos llevan una marca propia y pares completos. Botones esenciales protegidos; acciones omitidas ante entrada segura. El índice global no se presenta como identidad física.
+
+Audio no conserva PCM, conversaciones o grabaciones. Excluye ZEUVE y aplicaciones de llamada/entrada. Las rutas admitidas comprueban Float32 estéreo y salida sin streams de entrada; si faltan garantías rechazan antes de enrutar. Se destruyen taps, dispositivos agregados e IOProc propios al parar; los fallos de limpieza permanecen visibles. El diagnóstico de llamadas utiliza selección expresa, reproducción privada a ganancia 1 y propietarios separados del mezclador; conflictos de ganancia se rechazan sin modificar la otra utilidad. No se persiste ni se autoactiva la prueba. Conserva sólo RMS agregado del último callback y contadores en RAM, sin muestras, historial o logs. Cero RMS no permite inferir permiso revocado. Crear la ruta o comparar sus niveles internos no prueba que la salida física evite atenuación: la protección y su QA real continúan pendientes.
+
+Los títulos de ventanas se usan sólo en memoria para seleccionar, no en perfiles ni logs. Los perfiles guardan geometría, aplicación y posiciones; tras reinicio la asociación debe ser explícita. La bandeja no persiste rutas ni copia originales. Servicios obtiene selección entregada por el host, sin portapapeles general ni campos protegidos; rechaza texto enriquecido. La publicación de archivos fija el directorio mediante descriptores, no sigue symlinks y exige creación exclusiva; limpia únicamente el temporal cuya identidad se verifica.
+
+No hay nuevas dependencias externas, red, telemetría, driver o componente root en esta familia. [Contrato y límites](../Utilidades/QUICK_UTILITIES.md).
