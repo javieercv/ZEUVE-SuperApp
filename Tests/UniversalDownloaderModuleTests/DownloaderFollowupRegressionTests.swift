@@ -85,6 +85,34 @@ final class DownloaderFollowupRegressionTests: XCTestCase {
         #endif
     }
 
+    func testEnrichedPublicCatalogPreservesReelsAndCarouselVideoWithoutSession() throws {
+        let input = try UniversalDownloadInputValidator().validate("@zeuve", platform: .instagram)
+        let records = #"""
+        {"record":"profile","username":"zeuve","userid":"123","is_private":false,"requires_authentication":false,"catalog_source":"public_embed","public_embed_posts_count":6}
+        {"record":"media","section":"reels","id":"901","post_id":"901","shortcode":"REEL123","kind":"reel","index":1,"media_url":"https://cdn.example/reel.mp4","source_page":"https://www.instagram.com/reel/REEL123/","requires_authentication":false,"extension":"mp4"}
+        {"record":"media","section":"posts","id":"1001","post_id":"900","shortcode":"POST123","kind":"video","index":6,"media_url":"https://cdn.example/child.mp4","source_page":"https://www.instagram.com/p/POST123/","requires_authentication":false,"extension":"mp4"}
+        {"record":"warning","section":"posts","code":"public_embed_limited"}
+        {"record":"page","known_total":42,"has_more":true,"next_cursor":"24"}
+        """#
+        let parsed = try InstagramCatalogParser().parseResult(data: Data(records.utf8), input: input)
+        XCTAssertEqual(parsed.analysis.instagramSessionPresentation, .optional)
+        XCTAssertFalse(parsed.analysis.requiresAuthentication)
+        XCTAssertEqual(parsed.analysis.availability, "partial")
+        XCTAssertEqual(Set(parsed.analysis.availableSections), [.reels, .videos])
+        let reel = try XCTUnwrap(parsed.analysis.playlistEntries.first)
+        XCTAssertEqual(reel.mediaKind, .reel)
+        XCTAssertEqual(reel.catalogSection, .reels)
+        XCTAssertEqual(reel.requiresAuthentication, false)
+        XCTAssertEqual(reel.resolvedMedia?.mediaURL?.pathExtension, "mp4")
+        XCTAssertEqual(reel.folderComponents, ["Instagram", "zeuve", "Reels"])
+        let child = try XCTUnwrap(parsed.analysis.playlistEntries.last)
+        XCTAssertEqual(child.canonicalID, "instagram:1001")
+        XCTAssertEqual(child.playlistIndex, 6)
+        XCTAssertEqual(child.mediaKind, .video)
+        XCTAssertEqual(child.catalogSection, .videos)
+        XCTAssertEqual(child.requiresAuthentication, false)
+    }
+
     func testSessionRateLimitDoesNotStartAnotherEngine() async throws {
         #if os(macOS) && arch(arm64)
         let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()

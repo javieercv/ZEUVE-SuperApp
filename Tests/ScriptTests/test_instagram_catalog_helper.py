@@ -151,6 +151,106 @@ class InstagramCatalogHelperTests(unittest.TestCase):
             self.assertEqual(MODULE.catalog(args), 0)
             self.assertEqual(embed.call_count, 1)
 
+    def test_embed_resolves_reels_with_existing_anonymous_query_and_exact_identity(self):
+        from unittest.mock import Mock
+        import copy
+        context = self.embed_context(1)
+        post = {"id": "901", "shortcode": "REEL123", "__typename": "GraphVideo", "is_video": True,
+                "owner": {"id": "123", "username": "zeuve", "is_private": False},
+                "display_url": "https://cdn.example/poster.jpg", "taken_at_timestamp": 1700000000}
+        context["graphql_media"].insert(0, {"shortcode_media": post})
+        item = {"code": "REEL123", "pk": "901", "media_type": 2, "product_type": "clips",
+                "user": {"pk": "123", "username": "zeuve", "is_private": False},
+                "video_versions": [{"url": "https://cdn.example/small.mp4", "width": 360, "height": 640},
+                                   {"url": "https://cdn.example/large.mp4", "width": 1080, "height": 1920}],
+                "video_duration": 12.5}
+        query = Mock(return_value={"data": {"xdt_api__v1__media__shortcode__web_info": {"items": [item]}}})
+        ctx = SimpleNamespace(username=None, _session=SimpleNamespace(cookies=[]), request_timeout=20,
+                              max_connection_attempts=2, doc_id_graphql_query=query)
+        loader = SimpleNamespace(context=ctx)
+        records, missing = MODULE.public_embed_media(context, "zeuve", loader)
+        self.assertEqual(missing, 0); self.assertEqual([r["kind"] for r in records], ["reel", "photo"])
+        self.assertEqual(records[0]["media_url"], "https://cdn.example/large.mp4")
+        self.assertEqual(records[0]["duration"], 12.5); self.assertEqual(records[0]["id"], "901")
+        self.assertFalse(records[0]["requires_authentication"])
+        self.assertEqual(query.call_args.args[0], "27128499623469141")
+        self.assertEqual(query.call_args.args[1]["shortcode"], "REEL123")
+        self.assertEqual(ctx.request_timeout, 20); self.assertEqual(ctx.max_connection_attempts, 2)
+        mutations = [lambda v: v.update(code="OTHER123"), lambda v: v.update(pk="902"),
+                     lambda v: v["user"].update(pk="999"), lambda v: v["user"].update(username="other"),
+                     lambda v: v["user"].update(is_private=True), lambda v: v.update(video_versions=[{"url": "http://cdn.example/unsafe.mp4"}])]
+        for mutation in mutations:
+            invalid = copy.deepcopy(item); mutation(invalid)
+            query.return_value = {"data": {"xdt_api__v1__media__shortcode__web_info": {"items": [invalid]}}}
+            records, missing = MODULE.public_embed_media(context, "zeuve", loader)
+            self.assertEqual([r["kind"] for r in records], ["photo"]); self.assertEqual(missing, 1)
+        query.reset_mock(); ctx._session.cookies = [SimpleNamespace(name="sessionid", value="SYNTHETIC_SESSION")]
+        MODULE.public_embed_media(context, "zeuve", loader); query.assert_not_called()
+
+    def test_embed_mixed_carousel_requires_child_identity_and_preserves_positions(self):
+        from unittest.mock import Mock
+        context = self.embed_context(3)
+        post = context["graphql_media"][0]["shortcode_media"]
+        post["edge_sidecar_to_children"]["edges"][1]["node"] = {
+            "id": "1001", "__typename": "GraphVideo", "is_video": True, "display_url": "https://cdn.example/poster.jpg"}
+        item = {"code": "ABC123", "pk": "900", "media_type": 8, "user": {"pk": "123", "username": "zeuve"},
+                "carousel_media": [{"pk": "1000", "media_type": 1},
+                    {"pk": "1001", "media_type": 2, "video_versions": [{"url": "https://cdn.example/child.mp4"}]},
+                    {"pk": "1002", "media_type": 1}]}
+        query = Mock(return_value={"data": {"xdt_api__v1__media__shortcode__web_info": {"items": [item]}}})
+        loader = SimpleNamespace(context=SimpleNamespace(username=None, _session=SimpleNamespace(cookies=[]),
+            request_timeout=20, max_connection_attempts=2, doc_id_graphql_query=query))
+        records, missing = MODULE.public_embed_media(context, "zeuve", loader)
+        self.assertEqual(missing, 0); self.assertEqual([r["kind"] for r in records], ["photo", "video", "photo"])
+        self.assertEqual([r["index"] for r in records], [1, 2, 3]); self.assertEqual([r["id"] for r in records], ["1000", "1001", "1002"])
+        item["carousel_media"][1]["pk"] = "unrelated"
+        records, missing = MODULE.public_embed_media(context, "zeuve", loader)
+        self.assertEqual(missing, 1); self.assertEqual([r["index"] for r in records], [1, 3])
+
+    def test_embed_video_enrichment_stops_after_access_block_or_budget(self):
+        from unittest.mock import Mock
+        import copy
+        context = self.embed_context(1)
+        post = {"id": "901", "shortcode": "REEL123", "__typename": "GraphVideo", "is_video": True,
+                "owner": {"id": "123", "username": "zeuve", "is_private": False}}
+        context["graphql_media"].insert(0, {"shortcode_media": post})
+        second = copy.deepcopy(post); second.update(id="902", shortcode="REEL456")
+        context["graphql_media"].insert(1, {"shortcode_media": second})
+        query = Mock(side_effect=RuntimeError("HTTP 429 SYNTHETIC_SECRET"))
+        loader = SimpleNamespace(context=SimpleNamespace(username=None, _session=SimpleNamespace(cookies=[]),
+            request_timeout=20, max_connection_attempts=2, doc_id_graphql_query=query))
+        records, missing = MODULE.public_embed_media(context, "zeuve", loader)
+        self.assertEqual(query.call_count, 1); self.assertEqual(missing, 2)
+        self.assertEqual([r["kind"] for r in records], ["photo"])
+        self.assertNotIn("SYNTHETIC_SECRET", str(records))
+        query.reset_mock()
+        with patch.object(MODULE.time, "monotonic", side_effect=[0, 51, 52, 53]):
+            records, missing = MODULE.public_embed_media(context, "zeuve", loader)
+        query.assert_not_called(); self.assertEqual(missing, 2)
+
+    def test_embed_pagination_does_not_skip_photos_when_video_resolution_fails(self):
+        from unittest.mock import Mock
+        context = self.embed_context(5)
+        post = {"id": "901", "shortcode": "REEL123", "__typename": "GraphVideo", "is_video": True,
+                "owner": {"id": "123", "username": "zeuve", "is_private": False}}
+        context["graphql_media"].insert(0, {"shortcode_media": post})
+        query = Mock(side_effect=RuntimeError("HTTP 401"))
+        loader = SimpleNamespace(context=SimpleNamespace(username=None, _session=SimpleNamespace(cookies=[]),
+            request_timeout=20, max_connection_attempts=2, doc_id_graphql_query=query))
+        pages = []
+        for offset in [0, 3, 6]:
+            out = io.StringIO(); args = SimpleNamespace(username="zeuve", offset=offset, limit=3, reels=True)
+            with patch.object(MODULE, "public_profile_header", return_value={"og:image": "https://cdn.example/avatar.jpg"}), patch.object(MODULE, "public_profile_embed", return_value=context), patch("sys.stdout", out):
+                self.assertTrue(MODULE.emit_public_header(loader, args))
+            pages.append([MODULE.json.loads(line) for line in out.getvalue().splitlines()])
+        self.assertEqual(query.call_count, 1)  # Later windows do not re-query an earlier Reel.
+        ids = [r["id"] for page in pages for r in page if r["record"] == "media"]
+        self.assertEqual(ids, ["profile-zeuve", "1000", "1001", "1002", "1003", "1004"])
+        self.assertEqual([page[-1]["returned"] for page in pages], [2, 3, 1])
+        self.assertTrue(all(page[-1]["known_total"] == 7 for page in pages))
+        self.assertIsNone(pages[-1][-1]["next_cursor"])
+        self.assertFalse(any("_sample_position" in r for page in pages for r in page))
+
     def test_rate_limited_validation_stops_without_profile_or_anonymous_retry(self) -> None:
         class Loader:
             def __init__(self, **kwargs):

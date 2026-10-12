@@ -1,5 +1,13 @@
 # Historial de cambios de ZEUVE
 
+## 0.20.8.4 — 2026-10-12
+
+- Descargador 0.7.8: completa reproducción de vídeos/Reels de la muestra pública usando la resolución de publicaciones concretas ya incluida en Instaloader; mismo endpoint, sin sesiones personales ni nuevas dependencias.
+- Identidad exacta de usuario, post e hijos del carrusel; formatos reales, orden y posiciones conservados. La mejor versión de vídeo compatible sustituye únicamente la ausencia de reproducción, nunca la identidad del recurso.
+- Resolución opcional acotada y detenida tras bloqueos/timeout; las fotos disponibles se conservan. La muestra sigue parcial frente al feed global que exige sesión.
+- Paginación por posiciones verificadas: un vídeo no resuelto no desplaza fotos, y ventanas posteriores no repiten consultas de Reels anteriores. QA nativa: 24→42 recursos, cuatro Reels y tres archivos válidos; D-39/D-41 pasan en el alcance documentado. Checklist 637 OK, cero fallidas, dos parciales excluidas y cero pendientes.
+- Marketing 0.20.8, revisión 4/build 78; adaptador propio 4.15.3-zeuve.7, mismo upstream 4.15.3. Stories activas, cuentas privadas y Reddit online fuera de esta ronda.
+
 ## 0.20.8.3 — 2026-10-12
 
 - Descargador 0.7.7: sesión plegada/opcional para perfiles públicos y consultas bloqueadas; el contenido protegido conserva el panel desplegado. Biografía y advertencias únicas se conservan.

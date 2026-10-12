@@ -11,13 +11,14 @@ import http.cookiejar
 import json
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlsplit
 
-VERSION = "4.15.3-zeuve.6"
+VERSION = "4.15.3-zeuve.7"
 
 
 def emit(value: dict[str, Any]) -> None:
@@ -235,10 +236,98 @@ def public_profile_embed(loader: Any, username: str, timeout: int, expected_id: 
     return parse_public_profile_embed(response.text, username, expected_id)
 
 
-def public_embed_media(context: dict[str, Any], username: str) -> tuple[list[dict[str, Any]], int]:
+def resolve_public_embed_post(loader: Any, post: dict[str, Any], context: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Use the same anonymous post query as the existing Instaloader direct route."""
+    session = loader.context
+    if session.username or any(c.name == "sessionid" and c.value for c in session._session.cookies):
+        return {}
+    response = session.doc_id_graphql_query("27128499623469141", {
+        "shortcode": post["shortcode"],
+        "__relay_internal__pv__PolarisAIGMMediaWebLabelEnabledrelayprovider": False,
+    })
+    info = (response.get("data") or {}).get("xdt_api__v1__media__shortcode__web_info") or {}
+    items = info.get("items")
+    if not isinstance(items, list) or len(items) != 1 or not isinstance(items[0], dict):
+        return {}
+    item = items[0]
+    owner = item.get("user")
+    if (str(item.get("code")) != str(post["shortcode"]) or str(item.get("pk")) != str(post["id"])
+            or not isinstance(owner, dict) or str(owner.get("pk")) != str(context["owner_id"])
+            or str(owner.get("username", "")).lower() != str(context["username"]).lower()
+            or owner.get("is_private") is True):
+        return {}
+    if post.get("__typename") == "GraphSidecar":
+        edges = post.get("edge_sidecar_to_children", {}).get("edges", [])
+        children = item.get("carousel_media")
+        if item.get("media_type") != 8 or not isinstance(children, list) or len(children) != len(edges):
+            return {}
+        for edge, child in zip(edges, children):
+            node = edge.get("node") if isinstance(edge, dict) else None
+            if (not isinstance(node, dict) or not isinstance(child, dict)
+                    or str(child.get("pk")) != str(node.get("id"))
+                    or (child.get("media_type") == 2) != (node.get("is_video") is True)):
+                return {}
+    else:
+        if item.get("media_type") != 2 or post.get("__typename") != "GraphVideo":
+            return {}
+        children = [item]
+    return {str(child["pk"]): child for child in children if child.get("media_type") == 2}
+
+
+def public_embed_video_resource(node: dict[str, Any]) -> str | None:
+    versions = node.get("video_versions")
+    candidates = [v for v in versions if isinstance(v, dict)] if isinstance(versions, list) else []
+    def area(value: dict[str, Any]) -> int:
+        try:
+            return min(16384, max(0, int(value.get("width", 0)))) * min(16384, max(0, int(value.get("height", 0))))
+        except (ValueError, TypeError, OverflowError):
+            return 0
+    for candidate in sorted(candidates, key=area, reverse=True):
+        raw = str(candidate.get("url") or "")
+        try:
+            url = urlsplit(raw)
+            extension = media_extension(raw, "")
+        except ValueError:
+            continue
+        if url.scheme == "https" and url.hostname and url.username is None and extension in {"mp4", "webm", "mov"}:
+            return raw
+    return None
+
+
+def public_embed_slots(context: dict[str, Any]) -> dict[str, int]:
+    slots: dict[str, int] = {}
+    for parent in context["graphql_media"]:
+        post = parent["shortcode_media"]
+        if re.fullmatch(r"[A-Za-z0-9_-]{3,64}", str(post.get("shortcode", ""))) is None:
+            continue
+        if post.get("__typename") == "GraphSidecar":
+            container = post.get("edge_sidecar_to_children")
+            edges = container.get("edges") if isinstance(container, dict) else None
+            nodes = [edge.get("node") if isinstance(edge, dict) else None for edge in edges] if isinstance(edges, list) else []
+        else:
+            nodes = [post]
+        for node in nodes:
+            if not isinstance(node, dict) or node.get("__typename") not in ("GraphImage", "GraphVideo"):
+                continue
+            owner = node.get("owner")
+            if owner is not None and (not isinstance(owner, dict) or str(owner.get("id")) != str(context["owner_id"])):
+                continue
+            identifier = str(node.get("id", ""))
+            if identifier.isascii() and identifier.isdigit() and identifier not in slots:
+                slots[identifier] = len(slots) + 1  # Slot zero is the avatar.
+    return slots
+
+
+def public_embed_media(context: dict[str, Any], username: str, loader: Any | None = None,
+                       offset: int = 0, limit: int | None = None) -> tuple[list[dict[str, Any]], int]:
     records: list[dict[str, Any]] = []
     unavailable_videos = 0
     seen: set[str] = set()
+    deadline = time.monotonic() + 50
+    network_stopped = False
+    slots = public_embed_slots(context)
+    start = max(0, offset)
+    end = start + max(1, limit) if limit is not None else len(slots) + 1
     for parent in context["graphql_media"]:
         post = parent["shortcode_media"]
         shortcode = str(post.get("shortcode", ""))
@@ -250,6 +339,24 @@ def public_embed_media(context: dict[str, Any], username: str) -> tuple[list[dic
             nodes = [edge.get("node") if isinstance(edge, dict) else None for edge in edges] if isinstance(edges, list) else []
         else:
             nodes = [post]
+        videos: dict[str, dict[str, Any]] = {}
+        remaining = deadline - time.monotonic()
+        if (loader is not None and not network_stopped and remaining >= 1
+                and any(isinstance(node, dict) and node.get("is_video") is True
+                        and start <= slots.get(str(node.get("id")), -1) < end for node in nodes)):
+            original_timeout = loader.context.request_timeout
+            original_attempts = loader.context.max_connection_attempts
+            try:
+                loader.context.request_timeout = min(10, original_timeout, remaining)
+                loader.context.max_connection_attempts = 1
+                videos = resolve_public_embed_post(loader, post, context)
+            except Exception as error:
+                lower = f"{type(error).__name__} {error}".lower()
+                network_stopped = any(value in lower for value in (
+                    "401", "403", "429", "forbidden", "unauthorized", "login", "checkpoint", "challenge", "timeout", "timed out"))
+            finally:
+                loader.context.request_timeout = original_timeout
+                loader.context.max_connection_attempts = original_attempts
         for index, node in enumerate(nodes, start=1):
             if not isinstance(node, dict):
                 continue
@@ -257,7 +364,32 @@ def public_embed_media(context: dict[str, Any], username: str) -> tuple[list[dic
             if owner is not None and (not isinstance(owner, dict) or str(owner.get("id")) != str(context["owner_id"])):
                 continue
             if node.get("is_video") is True or node.get("__typename") == "GraphVideo":
-                unavailable_videos += 1
+                if str(node.get("id")) in slots and not start <= slots[str(node["id"])] < end:
+                    continue
+                video = videos.get(str(node.get("id")), {})
+                raw = public_embed_video_resource(video)
+                if not raw:
+                    unavailable_videos += 1
+                    continue
+                identifier = str(node.get("id", ""))
+                if not identifier.isascii() or not identifier.isdigit() or identifier in seen:
+                    continue
+                seen.add(identifier)
+                is_reel = post.get("__typename") == "GraphVideo" and video.get("product_type") == "clips"
+                try:
+                    date = iso(datetime.fromtimestamp(float(post["taken_at_timestamp"]), timezone.utc))
+                except (KeyError, ValueError, TypeError, OverflowError, OSError):
+                    date = None
+                record = {"record": "media", "section": "reels" if is_reel else "posts", "username": username,
+                          "id": identifier, "post_id": str(post.get("id", "")), "shortcode": shortcode,
+                          "index": index, "date": date, "kind": "reel" if is_reel else "video", "media_url": raw,
+                          "thumbnail_url": node.get("display_url"), "extension": media_extension(raw, "mp4"),
+                          "requires_authentication": False,
+                          "source_page": f"https://www.instagram.com/{'reel' if is_reel else 'p'}/{shortcode}/"}
+                duration = video.get("video_duration")
+                if type(duration) in (int, float) and 0 < duration <= 604800:
+                    record["duration"] = duration
+                records.append(record)
                 continue
             if node.get("is_video") is not False or node.get("__typename") != "GraphImage":
                 continue
@@ -295,6 +427,8 @@ def public_embed_media(context: dict[str, Any], username: str) -> tuple[list[dic
                             "index": index, "date": date, "kind": "photo", "media_url": raw,
                             "thumbnail_url": raw, "extension": extension, "requires_authentication": False,
                             "source_page": f"https://www.instagram.com/p/{shortcode}/"})
+    for record in records:
+        record["_sample_position"] = slots[record["id"]]
     return records, unavailable_videos
 
 
@@ -327,7 +461,8 @@ def emit_public_header(loader: Any, args: argparse.Namespace) -> bool:
     except Exception:
         context = None
     if context:
-        photos, videos = public_embed_media(context, args.username)
+        photos, videos = public_embed_media(context, args.username, loader if getattr(args, "reels", False) else None,
+                                           max(0, int(args.offset)), max(1, int(args.limit)))
         emit(embed_profile_record(context, args.username, metadata.get("description"), avatar))
     else:
         photos, videos = [], 0
@@ -340,11 +475,12 @@ def emit_public_header(loader: Any, args: argparse.Namespace) -> bool:
               "id": f"profile-{args.username.lower()}", "index": 1,
               "kind": "profilePicture", "media_url": avatar,
               "extension": media_extension(avatar, "jpg"),
-               "source_page": f"https://www.instagram.com/{args.username}/"}] + photos
+               "source_page": f"https://www.instagram.com/{args.username}/", "_sample_position": 0}] + photos
     start = max(0, int(args.offset))
     end = start + max(1, int(args.limit))
-    for record in records[start:end]:
-        emit(record)
+    page = [record for record in records if start <= record["_sample_position"] < end]
+    for record in page:
+        emit({key: value for key, value in record.items() if key != "_sample_position"})
     if context:
         emit_embed_warnings(context, videos)
     else:
@@ -352,9 +488,10 @@ def emit_public_header(loader: Any, args: argparse.Namespace) -> bool:
             emit({"record": "warning", "section": section, "code": "public_header_only"})
     for section in ("stories", "highlights"):
         emit({"record": "warning", "section": section, "code": "section_requires_authentication"})
-    emit({"record": "page", "offset": start, "returned": len(records[start:end]),
-          "known_total": len(records), "has_more": end < len(records),
-          "next_cursor": str(end) if end < len(records) else None})
+    total = len(public_embed_slots(context)) + 1 if context else 1
+    emit({"record": "page", "offset": start, "returned": len(page),
+          "known_total": total, "has_more": end < total,
+          "next_cursor": str(end) if end < total else None})
     return True
 
 
@@ -774,14 +911,15 @@ def catalog(args: argparse.Namespace) -> int:
     seen_ids: set[str] = set()
     section_errors: dict[str, Exception] = {}
     public_embed_attempted = False
+    public_embed_total: int | None = None
 
     def append_record(record: dict[str, Any]) -> None:
         record["requires_authentication"] = bool(profile.is_private or record.get("section") in ("stories", "highlights"))
-        position = len(all_records)
+        position = record.get("_sample_position", len(all_records))
         all_records.append(record)
         start = max(0, int(args.offset))
         if start <= position < start + max(1, int(args.limit)):
-            emit(record)
+            emit({key: value for key, value in record.items() if key != "_sample_position"})
 
     # The current profile picture is always available as an independently selectable item.
     profile_picture = {
@@ -813,7 +951,7 @@ def catalog(args: argparse.Namespace) -> int:
             section_errors[section] = error
 
     def recover_public_embed() -> bool:
-        nonlocal public_embed_attempted
+        nonlocal public_embed_attempted, public_embed_total
         if public_embed_attempted or session_supplied or profile.is_private or not section_errors or len(all_records) > 1:
             return False
         public_embed_attempted = True
@@ -824,7 +962,9 @@ def catalog(args: argparse.Namespace) -> int:
             return False
         if context is None:
             return False
-        photos, videos = public_embed_media(context, args.username)
+        photos, videos = public_embed_media(context, args.username, loader if args.reels else None,
+                                           max(0, int(args.offset)), max(1, int(args.limit)))
+        public_embed_total = len(public_embed_slots(context)) + 1
         emit(embed_profile_record(context, args.username, profile.biography, str(profile.profile_pic_url)))
         for record in photos:
             append_record(record)
@@ -884,14 +1024,17 @@ def catalog(args: argparse.Namespace) -> int:
 
     start = max(0, int(args.offset))
     end = start + max(1, int(args.limit))
-    page = all_records[start:end]
+    page = ([record for index, record in enumerate(all_records)
+             if start <= record.get("_sample_position", index) < end]
+            if public_embed_total is not None else all_records[start:end])
+    total = public_embed_total if public_embed_total is not None else len(all_records)
     emit({
         "record": "page",
         "offset": start,
-        "next_cursor": str(end) if end < len(all_records) else None,
-        "has_more": end < len(all_records),
+        "next_cursor": str(end) if end < total else None,
+        "has_more": end < total,
         "returned": len(page),
-        "known_total": len(all_records),
+        "known_total": total,
     })
     return 0
 

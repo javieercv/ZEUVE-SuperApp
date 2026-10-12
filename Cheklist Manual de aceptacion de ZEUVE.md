@@ -1,12 +1,23 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
-QA real autorizada y ejecutada el 12/10/2026 en Release 0.20.8.3/build 77. [Informe de pruebas](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.3_20261012.md). Los estados se actualizan por evidencia nativa; no por pruebas automáticas.
+QA real autorizada y ejecutada el 12/10/2026 en Release 0.20.8.4/build 78. [Informe](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.4_20261012.md). Estados por recorrido nativo, no por tests sintéticos.
 
-Estado acumulado al 12/10/2026 · ZEUVE 0.20.8.3 (marketing 0.20.8, build 77). Los IDs no repetidos conservan las evidencias anteriores.
+Estado acumulado al 12/10/2026 · ZEUVE 0.20.8.4 (marketing 0.20.8, build 78). Los IDs no repetidos conservan su evidencia histórica.
 
-**639 pruebas: 635 ✅ OK · 0 ❌ fallidas · 3 ⚠️ parciales · 1 ➖ pendiente.** **638 probadas, incluidas las parciales; 1 sin probar.** Ninguna marcada como no aplicable.
+**639 pruebas: 637 ✅ OK · 0 ❌ fallidas · 2 ⚠️ parciales · 0 ➖ pendientes.** **639 probadas, incluidas las parciales.** Ninguna marcada como no aplicable. Las dos parciales quedan fuera del encargo actual: Stories activas/cuentas privadas (D-11) y Reddit aplazado (D-17).
 
 Leyenda: ✅ comprobación correcta en el alcance documentado; ❌ fallo observado; ⚠️ comprobación parcial; ➖ sin probar. Por instrucción del usuario del 09/10/2026, una casilla marcada indica prueba ejecutada, también cuando queda parcial; el símbolo indica su resultado. Solo los pendientes conservan casilla vacía. Probada no significa correcta ni certificada para distribución. La ronda inicial usó una copia Debug 0.20.5.0; los 22 IDs corregidos se revalidaron en una copia interna de Release 0.20.6.0. La ronda remota del 09/10 usa Debug 0.20.7.0 y enlaces públicos aportados por el usuario; sus resultados no se presentan como una repetición en Release. Los recorridos usan datos aislados; la cobertura no certifica toda la distribución ni cualquier entrada posible.
+
+## Cierre público — QA de Release 0.20.8.4, 12/10/2026
+
+[Informe nativo](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.4_20261012.md). Sin sesión personal ni navegador.
+
+- **D-39 — ✅:** URL y @usuario con Instagram seleccionado analizan sin obligar a iniciar sesión. Catálogo real 24→42 con avatar, 34 fotos, cuatro Reels y tres vídeos, con aviso explícito de muestra finita. Este criterio no certifica el catálogo global; el timeline anónimo sigue con 401.
+- **D-41 — ✅:** cuatro Reels desde el catálogo del perfil, uno seleccionado/descargado y decodificado completo; H.264 720×1280/AAC, 10,283583 s. No se acepta por miniaturas o un enlace independiente.
+- **D-40/D-56 revalidados:** además se descarga un vídeo de carrusel y una foto; tres correctos/0 fallidos, 42 IDs únicos y orden/ordinales coincidentes. La repetición final de @usuario conserva 24→42 y cierre de paginación.
+- **D-11/D-17 — ⚠️:** se mantienen por exclusiones del usuario. Sin nuevas pruebas de Stories activas, cuentas privadas ni Reddit.
+
+Tres archivos, 3.497.127 bytes, decodificación íntegra y cero `.part`. Auditoría sin URLs firmadas/hosts CDN persistidos; Llavero ausente (44), resets y PIDs propios cerrados. La muestra no equivale a las 788 publicaciones del perfil.
 
 ## Perfiles públicos — QA de Release 0.20.8.3, 12/10/2026
 
@@ -1346,9 +1357,9 @@ App QA PID 41759 en pantalla inicial del Inspector, sin análisis/preview/motore
 - [x] ✅ **D-36** Foto funciona.
 - [x] ✅ **D-37** Vídeo/Reel funciona.
 - [x] ✅ **D-38** Carrusel muestra todos los elementos y en el orden correcto.
-- [x] ⚠️ **D-39** Un perfil público se analiza sin obligar a iniciar sesión.
+- [x] ✅ **D-39** Un perfil público se analiza sin obligar a iniciar sesión. URL/@usuario y muestra pública comprobados; no certifica catálogo global (12/10/2026).
 - [x] ✅ **D-40** Muestra publicaciones. Cobertura: muestra pública de inserción, no catálogo completo (QA 12/10/2026).
-- [ ] ➖ **D-41** Muestra Reels.
+- [x] ✅ **D-41** Muestra Reels. Cuatro en el catálogo público, uno descargado y verificado (12/10/2026).
 - [x] ✅ **D-42** Muestra foto de perfil.
 - [x] ✅ **D-43** Sin sesión, Stories/Destacadas restringidas no bloquean el resto del perfil.
 - [x] ✅ **D-44** Con una sesión válida se puede acceder a las secciones que esa cuenta ya puede ver.

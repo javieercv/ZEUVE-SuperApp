@@ -8,7 +8,7 @@ from pathlib import Path
 
 EXPECTED_VERSIONS = {
     "gallery-dl": "1.32.9",
-    "instaloader-zeuve": "4.15.3-zeuve.6",
+    "instaloader-zeuve": "4.15.3-zeuve.7",
 }
 
 

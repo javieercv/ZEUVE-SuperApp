@@ -79,7 +79,7 @@ public struct InstagramCatalogParser: Sendable {
                         let count = int(profile["public_embed_posts_count"]) ?? 0
                         warnings.append("Muestra pública limitada a \(count) publicaciones de la inserción de Instagram; no es el catálogo completo del perfil.")
                     case "public_embed_videos_unavailable":
-                        warnings.append("La inserción no ofrece URLs de reproducción para sus vídeos o Reels; sus miniaturas no se incluyen como fotos.")
+                        warnings.append("No se han podido resolver algunos vídeos o Reels de la muestra pública; sus miniaturas no se incluyen como fotos.")
                     case "public_header_only":
                         warnings.append("Solo se ha recuperado el encabezado público y el avatar; las publicaciones y Reels no se han podido comprobar.")
                     case "section_request_blocked":

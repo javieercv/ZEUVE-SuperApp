@@ -8,7 +8,7 @@ Herramientas distintas, una sola aplicación, con especial cuidado por la privac
 
 <br>
 
-![Versión](https://img.shields.io/badge/ZEUVE-0.20.8.3-2f81f7?style=flat-square)
+![Versión](https://img.shields.io/badge/ZEUVE-0.20.8.4-2f81f7?style=flat-square)
 ![macOS](https://img.shields.io/badge/macOS-14%2B-000000?style=flat-square&logo=apple&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-nativo-000000?style=flat-square&logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/Swift-6-F05138?style=flat-square&logo=swift&logoColor=white)
@@ -139,9 +139,9 @@ Para consultar la evolución del proyecto:
 
 <div align="center">
 
-### ZEUVE 0.20.8.3
+### ZEUVE 0.20.8.4
 
-Marketing 0.20.8, revisión 3/build 77; Descargador 0.7.7; instaloader-zeuve 4.15.3-zeuve.6, mismo upstream. Sesión opcional plegada en perfiles públicos; respaldo anónimo de inserción con muestra limitada, identidad comprobada y fotos de carruseles sin miniaturas de vídeo. [Investigación](Docs/Historico/Implementacion/INSTAGRAM_PUBLIC_ACCESS_RESEARCH_20261012.md), [implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.3.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.20.8.3.md), [QA nativa](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.3_20261012.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.20.8.3.md). QA nativa: 24→35 elementos únicos sin sesión, dos fotos JPEG descargadas y verificadas. Checklist: 635 OK, 0 fallidas, 3 parciales y 1 pendiente de 639. La muestra no certifica el catálogo completo ni vídeos/Reels sin URL. Reddit online continúa aplazado. Sin ZIP.
+Marketing 0.20.8, revisión 4/build 78; Descargador 0.7.8; instaloader-zeuve 4.15.3-zeuve.7, mismo upstream. El catálogo público conserva sesión opcional y completa vídeos/Reels de la muestra mediante la resolución anónima de publicaciones ya incluida. [Implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.4.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.20.8.4.md), [QA nativa](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.4_20261012.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.20.8.4.md). QA real: 24→42 elementos, cuatro Reels y tres archivos descargados/verificados; checklist 637 OK, cero fallidas, dos parciales excluidas y cero pendientes. La muestra se declara parcial cuando Instagram no permite consultar el feed global. Stories activas y cuentas privadas fuera de esta ronda; Reddit online aplazado. Sin ZIP.
 
 ### Entrega anterior — ZEUVE 0.20.8.0
 

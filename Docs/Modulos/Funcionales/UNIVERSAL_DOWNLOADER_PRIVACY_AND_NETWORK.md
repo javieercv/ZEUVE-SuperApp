@@ -1,4 +1,4 @@
-# Privacidad y red del Descargador universal 0.7.7
+# Privacidad y red del Descargador universal 0.7.8
 
 ## Reglas personalizadas por dominio
 
@@ -62,3 +62,5 @@ La búsqueda y GraphQL de Instagram con sesión se limitan al perfil solicitado 
 El fallback de Threads puede consultar `www.threads.com/t/CÓDIGO/embed` de forma anónima, con la sesión HTTP efímera existente y sin cookies del navegador. Solo incorpora recursos del post cuyo permalink coincide con el código solicitado. Respuestas y avatares no se incorporan al catálogo. No se añaden proxies, técnicas de evasión ni automatización de navegador.
 
 El respaldo público aprobado de Instagram consulta `/USUARIO/embed/` solo sin sesión personal y sin cookies importadas. Valida la identidad y propietarios públicos del contexto antes de incorporar recursos. La página se analiza como datos; no se ejecutan scripts, no se contacta con visores terceros y no se añaden técnicas de evasión. Los recursos firmados de la muestra siguen en memoria y no se escriben en registros ni historial. El fallo de acceso no prueba privacidad y la muestra no certifica acceso al perfil completo.
+
+Los vídeos/Reels presentes en esa muestra se completan mediante la misma consulta anónima de publicación concreta ya usada por Instaloader (`www.instagram.com/graphql/query`, documento PolarisPostRootQuery). Solo se consultan los códigos verificados del perfil; se comprueban de nuevo usuario, ID de post y cada hijo del carrusel. No se emplea la sesión personal ni se consulta el feed rechazado para obtener métricas auxiliares. Tras bloqueo, desafío o timeout se detiene la resolución opcional posterior. No añade endpoints, terceros, proxies ni dependencias.
