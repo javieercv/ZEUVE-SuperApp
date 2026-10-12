@@ -141,6 +141,8 @@ Para consultar la evolución del proyecto:
 
 ### ZEUVE 0.20.8.4
 
+**Pruebas cerradas por decisión del usuario el 12/10/2026.** Desarrollo del Descargador aplazado hasta que el usuario lo retome; resultados, parciales y límite del catálogo completo de Instagram conservados. [Decisión de cierre](PROJECT_DECISIONS.md#cierre-de-la-ronda-de-pruebas-y-aplazamiento-del-descargador--12102026).
+
 Marketing 0.20.8, revisión 4/build 78; Descargador 0.7.8; instaloader-zeuve 4.15.3-zeuve.7, mismo upstream. El catálogo público conserva sesión opcional y completa vídeos/Reels de la muestra mediante la resolución anónima de publicaciones ya incluida. [Implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.20.8.4.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.20.8.4.md), [QA nativa](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.4_20261012.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.20.8.4.md). QA real: 24→42 elementos, cuatro Reels y tres archivos descargados/verificados; checklist 637 OK, cero fallidas, dos parciales excluidas y cero pendientes. La muestra se declara parcial cuando Instagram no permite consultar el feed global. Stories activas y cuentas privadas fuera de esta ronda; Reddit online aplazado. Sin ZIP.
 
 ### Entrega anterior — ZEUVE 0.20.8.0

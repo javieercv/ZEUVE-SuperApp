@@ -4,6 +4,12 @@ Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.2
 
 > **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
 
+## Cierre de la ronda de pruebas y aplazamiento del Descargador — 12/10/2026
+
+El usuario da por cerradas las pruebas y aplaza el desarrollo del Descargador para avanzar en el proyecto. Se conserva ZEUVE 0.20.8.4/build 78 y la evidencia acumulada: 637 OK, cero fallidas, dos parciales y cero pendientes de 639. El cierre no transforma las parciales en OK ni certifica el catálogo completo de Instagram: la muestra pública sigue limitada y el feed global anónimo permanece bloqueado en la última prueba. Stories activas/cuentas privadas y Reddit conservan sus exclusiones.
+
+No se continúan las pruebas, investigaciones ni correcciones del Descargador hasta que el usuario retome ese trabajo. Este cierre solo actualiza documentación; no cambia código, versiones ni comportamiento.
+
 ## Cierre del alcance público — 0.20.8.4
 
 El 12/10/2026 el usuario pide terminar lo pendiente excluyendo Stories activas y cuentas privadas. Reddit online conserva su aplazamiento. Se completan vídeos/Reels de la muestra pública utilizando la misma consulta de publicación concreta ya aprobada e incluida en Instaloader; no se añade un endpoint. La inserción valida los posts y el resolver confirma código, ID, usuario, propietario y cada hijo del carrusel antes de incorporar reproducción. No se usan sesiones personales ni se amplía la autorización previa de Brave.

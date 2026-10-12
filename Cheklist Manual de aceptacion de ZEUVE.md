@@ -1,5 +1,7 @@
 # CHECKLIST MANUAL DE ACEPTACIÓN DE ZEUVE
 
+**Ronda de pruebas cerrada por decisión del usuario el 12/10/2026.** El desarrollo del Descargador queda aplazado hasta que el usuario lo retome. Se conservan los resultados y límites documentados: el cierre no convierte las dos parciales en OK ni certifica el catálogo completo de Instagram. No se han realizado nuevas pruebas para este cierre.
+
 QA real autorizada y ejecutada el 12/10/2026 en Release 0.20.8.4/build 78. [Informe](Docs/Historico/Pruebas/DOWNLOADER_QA_0.20.8.4_20261012.md). Estados por recorrido nativo, no por tests sintéticos.
 
 Estado acumulado al 12/10/2026 · ZEUVE 0.20.8.4 (marketing 0.20.8, build 78). Los IDs no repetidos conservan su evidencia histórica.
