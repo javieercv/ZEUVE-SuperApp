@@ -58,3 +58,9 @@ Un test preexistente del Inspector falló por un fotograma en un pase bajo carga
 ## I. Publicación
 
 Se publica en el repositorio original, sin force-push ni sobrescrituras. Commit de implementación `526cac3fdf226a228b33d50211f4419ed7bce7d2` presente en `refs/heads/main`, comprobado con `git ls-remote` después del push. Este cierre documental se publica como commit posterior; el SHA final se indica en el informe al usuario y es consultable en Git. [Contrato funcional](../../Utilidades/QUICK_UTILITIES.md) y [implementación](../Implementacion/IMPLEMENTATION_REPORT_0.21.0.0.md).
+
+## J. Continuación — 13/10/2026
+
+Base remota `d37afc8`. Correcciones localizadas de ciclo de vida/cancelación y propiedad de recursos en Audio, Input y Windows, motivo nativo de inicio y visibilidad de la bandeja. Las cuatro comprobaciones oficiales pasan; 29 regresiones nuevas: 728 tests totales, 107 de utilidades, sin fallos; builds oficiales Debug y Release con firma/motores efectivos comprobados. Versión/build, siete módulos, red, permisos, dependencias externas y políticas de archivos conservados.
+
+Publicación completa desde Finder comprobada, cerrando el parcial de la tabla B. TextEdit amplía QA a espacios y saltos Unicode. Release arranca sin ventanas con eventos login/Servicios; muestra residente de 15,01 s y 73,08 MiB RSS, sin incremento de CPU a la resolución de `ps`, sin certificar un inicio de sesión físico. macOS bloqueado interrumpe la repetición de Run/arrastre final; se solicita desbloqueo directo sin evasión. Accesibilidad efectiva, G305/trackpad, monitores/Spaces y FaceTime/AirPods mantienen pendientes según la [evidencia actualizada](../Pruebas/TEST_RESULTS_0.21.0.0.md); la llamada se aplaza por indicación del usuario.

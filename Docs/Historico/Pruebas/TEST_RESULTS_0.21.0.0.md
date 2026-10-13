@@ -56,3 +56,20 @@ El generador y el proyecto fijan `ENABLE_DEBUG_DYLIB = NO` sólo para el target 
 - Run real con el botón de Xcode: proceso en ejecución bajo LLDB y ventana Inicio visible con los siete módulos. El ejecutable de DerivedData de Xcode no depende de `ZEUVE.debug.dylib`; firma efectiva ad hoc con Hardened Runtime.
 
 Esta corrección cierra el fallo de arranque comunicado; las limitaciones de QA física, TCC y FaceTime anteriores siguen pendientes.
+
+## Continuación de desarrollo y pruebas — 13/10/2026
+
+Base remota sincronizada `d37afc8c785ab05f3c5a5253eb181b2119459e52`. El usuario solicita acabar el desarrollo y las pruebas pendientes; vuelve a aplazar la llamada real de FaceTime.
+
+Se corrigen capturas de botón canceladas/tardías, apertura y cierre compartidos de audio, lecturas/errores RMS de sesiones retiradas, tareas e inventarios AX pendientes, cancelación del selector, restauraciones y validación de geometría. El motivo de inicio residente se obtiene de `keyAEPropData` del evento nativo; el panel de bandeja conserva su visibilidad al activar otras aplicaciones.
+
+- `./Scripts/run_tests.sh`: exit 0; **594 tests Swift** (391 XCTest + 203 Swift Testing) y **134 Python**, total **728**. Las utilidades rápidas tienen **107 tests**: Audio 40, Input 22, Windows 22, infraestructura 8, productividad 12 y arranque 3. Son 29 regresiones nuevas, sin rebajar pruebas anteriores.
+- `./Scripts/build_macos.sh Debug` y `Release`: exit 0. Motores, versión/build, firma estricta y Hardened Runtime efectivos verificados; Debug sin dependencia de `ZEUVE.debug.dylib`.
+- `./Scripts/verify_project.sh`: exit 0; repite las pruebas, compila SwiftPM Release, ejecuta verificadores de arquitectura, documentación, motores y módulos, y completa Debug nativo en `build/VerificationDerivedData`. Las advertencias preexistentes de Vision permanecen. La propiedad fuerte de la tarea de arranque AX se hace explícita para evitar una nueva advertencia de captura implícita, conservando la misma semántica.
+- Tras esa anotación explícita, el filtro Windows vuelve a pasar sus **22 tests**, y `./Scripts/build_macos.sh Release` final vuelve a terminar con exit 0. No se introducen nuevas advertencias de captura en Windows.
+- Release con eventos públicos de inicio login y Servicios, enviados por `NSWorkspace.OpenConfiguration`: ambos arrancan el proceso sin ventanas. No se registra un ítem nuevo de inicio ni se reinicia la sesión del usuario; esa aceptación física sigue pendiente.
+- Rendimiento Release con evento login, sin ventanas y todas las utilidades desactivadas: **15,01 s**, **73,08 MiB RSS**, sin incremento del tiempo de CPU a la resolución de `ps`. No equivale a CPU cero ni mide audio/entrada simultáneos.
+- Finder, Debug de base con publicador y Servicios sin cambios: invocación real sobre carpeta sintética, panel con destino correcto, publicación completa de `desde-finder.txt` vacío y original de control intacto. Destino normalizado a `/tmp` rechazado por componente symlink, sin publicación; repetición en carpeta física completa. Se cierra la aceptación parcial anterior de publicación desde Finder.
+- TextEdit, Debug de base con Servicio sin cambios: normalización de espacios y unión de líneas, incluido U+2028, con resultado guardado/comprobado; original de control intacto.
+
+La QA del arrastre identificó que el panel se ocultaba al activar Finder; corregido con `hidesOnDeactivate = false`. Su repetición en Release y Run final de Xcode necesitan la interfaz disponible. macOS volvió a bloquearse durante esa continuación, y se solicitó al usuario desbloqueo directo, sin eludirlo. Accesibilidad muestra ZEUVE autorizado, pero el ensayo Debug obtiene falta de confianza efectiva: no se declara tap ni AX reales activos. G305/trackpad, monitores externos, Spaces/fullscreen, suspensión/revocación y eficacia FaceTime/AirPods conservan sus pendientes físicos.

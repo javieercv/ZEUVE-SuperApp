@@ -10,6 +10,8 @@ ZEUVE conserva una sola aplicación y proceso, presencia normal en Dock y un ico
 
 El inicio con macOS utiliza `SMAppService.mainApp`, es opcional y está desactivado por defecto. La UI distingue preferencia solicitada, estado de registro y aprobación del sistema. Un fallo de registro/almacenamiento se muestra. No se cambia silenciosamente a una app sólo de barra de menús.
 
+El motivo de inicio se lee del valor `keyAEPropData` del evento público `kAEOpenApplication`: login y Servicios mantienen el residente sin abrir la principal; un inicio ordinario o un motivo desconocido conserva su apertura normal.
+
 ## Contrato y persistencia
 
 `QuickUtilitiesCatalog` y `QuickUtilityID` definen nueve identificadores estables, independientes de `BuiltInModuleCatalog`. `QuickUtilityService` posee sus recursos y ofrece start/stop/reset async. `QuickUtilitiesCoordinator` mantiene solicitud persistida y estado efectivo separado: desactivada, activando, activa, desactivando, requiere permiso, no disponible o error.
@@ -37,6 +39,8 @@ Compatibilidad concreta: macOS 14.2+, PCM Float32 estéreo y una única ruta de 
 Cambios de salida/proceso, suspensión o errores detectados retiran las rutas afectadas; se revalida identidad antes de crear una nueva. Stop destruye los IOProc, agregados y taps que pertenecen a la utilidad detenida. Un fallo de destrucción conserva estado de error y recursos bajo propiedad para reintentar, sin declarar éxito. La denegación de captura se muestra cuando Core Audio la devuelve; la revocación real del permiso necesita QA y no se deduce de una señal silenciosa.
 
 `AudioRoutingCoordinator` distingue propietarios `mixer` y `callDiagnostic`. Detener el mezclador no retira una ruta de diagnóstico; detener la prueba no cambia el volumen ni las rutas del mezclador. Una fuente con ganancias incompatibles entre propietarios se rechaza antes de alterar preferencias o audio. Volver al 100 % libera la ruta propia del mezclador, pero conserva una reproducción al 100 % solicitada por el diagnóstico. La parada global y Salir retiran los recursos de ambos propietarios y esperan las tareas de control propias.
+
+La apertura compartida conserva a los propietarios que siguen esperando si se cancela otro. El cierre tiene una tarea propia compartida que continúa aunque se cancele quien lo pidió; mientras se limpia, una nueva apertura o modificación devuelve ocupado. Lecturas y errores RMS de una sesión retirada no pueden alterar una prueba nueva.
 
 ## Audio: protección durante llamadas
 
@@ -94,7 +98,7 @@ Formatos iniciales: txt, Markdown, JSON con `{}` visible, CSV o vacío de extens
 
 ## Productividad: bandeja y selección de texto
 
-La bandeja flotante conserva únicamente URLs locales en RAM. Incorporar/retirar referencias no copia, mueve ni elimina archivos. Deduplica, admite hasta 500 referencias y comprueba existencia; al desactivar/salir se vacía. El arrastre de salida entrega referencias al destino externo, que decide copiar/mover según su comportamiento; ZEUVE no valida ni atribuye esa operación a su propio publicador.
+La bandeja flotante permanece visible al activar otras aplicaciones para permitir arrastrar desde Finder y hacia destinos externos. Conserva únicamente URLs locales en RAM. Incorporar/retirar referencias no copia, mueve ni elimina archivos. Deduplica, admite hasta 500 referencias y comprueba existencia; al desactivar/salir se vacía. El arrastre de salida entrega referencias al destino externo, que decide copiar/mover según su comportamiento; ZEUVE no valida ni atribuye esa operación a su propio publicador.
 
 `TextActionsUtilityService` ofrece mayúsculas/minúsculas, espacios, unión de líneas y limpieza acotada de invisibles. `QuickUtilitiesServicesProvider` opera sobre el pasteboard de Servicios entregado explícitamente por la aplicación host, devuelve texto plano y deja al host reemplazar la selección si lo permite. Rechaza RTF/RTFD/HTML suministrados por el host antes de devolver contenido; no aplana documentos, vigila el portapapeles general o fuerza campos protegidos. No guarda selección en logs/historial.
 
@@ -114,6 +118,7 @@ No se certifica toda la matriz por compilar con un SDK. Las mediciones CPU/RSS/l
 
 - [Apple: Process Taps](https://developer.apple.com/documentation/CoreAudio/capturing-system-audio-with-core-audio-taps): creación/captura y autorización desde macOS 14.2; no afirma protección universal frente a ducking.
 - [Apple: SMAppService](https://developer.apple.com/documentation/servicemanagement/smappservice): registro y aprobación efectiva de inicio.
+- [Apple: motivos de arranque](https://developer.apple.com/documentation/coreservices/apple_events/1556410-launch_apple_event_constants): login y Servicios se identifican por el valor de `keyAEPropData`.
 - [Apple: CGEvent](https://developer.apple.com/documentation/coregraphics/cgevent) y [resolución continua](https://developer.apple.com/documentation/coregraphics/cgeventfield/scrollwheeleventiscontinuous): eventos y datos, sin identidad física universal de ratón.
 - [Apple: IOHIDElementGetDevice](https://developer.apple.com/documentation/iokit/1564139-iohidelementgetdevice): dispositivo del elemento HID; no vínculo garantizado a un evento Quartz.
 - [Apple: Mission Control](https://support.apple.com/guide/mac-help/view-open-windows-spaces-mission-control-mh35798/mac): atajos configurables por el usuario.

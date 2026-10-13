@@ -24,9 +24,29 @@ public protocol WindowAccessBackend: Sendable {
 }
 
 #if os(macOS)
-private final class AXWindowObserverContext: @unchecked Sendable {
-    let notify: @Sendable () -> Void
-    init(notify: @escaping @Sendable () -> Void) { self.notify = notify }
+/// One owned, coalesced operation per AX observer prevents a burst of native
+/// notifications from leaving untracked work behind after source removal.
+final class AXWindowObserverContext: @unchecked Sendable {
+    private let operation: @Sendable () async -> Void
+    private let lock = NSLock()
+    private var task: Task<Void, Never>?
+    init(operation: @escaping @Sendable () async -> Void) { self.operation = operation }
+    func notify() {
+        lock.withLock {
+            guard task == nil else { return }
+            task = Task { [weak self] in
+                guard let self else { return }
+                if !Task.isCancelled { await operation() }
+                lock.withLock { task = nil }
+            }
+        }
+    }
+    func cancelAndWait() async {
+        let pending = lock.withLock { task }
+        pending?.cancel()
+        await pending?.value
+        lock.withLock { task = nil }
+    }
 }
 private let zeuveWindowObserverCallback: AXObserverCallback = { _, _, _, context in
     guard let context else { return }
@@ -69,6 +89,7 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
         await MainActor.run {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observation.observer), .commonModes)
         }
+        await observation.context.cancelAndWait()
         for name in [kAXFocusedWindowChangedNotification, kAXWindowCreatedNotification, kAXUIElementDestroyedNotification] {
             AXObserverRemoveNotification(observation.observer, observation.element, name as CFString)
         }
@@ -106,7 +127,7 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
         var observer: AXObserver?
         guard AXObserverCreate(application.pid, zeuveWindowObserverCallback, &observer) == .success, let observer else { return }
         let context = AXWindowObserverContext { [weak self] in
-            Task { await self?.observedChange(application.pid) }
+            await self?.observedChange(application.pid)
         }
         let opaque = Unmanaged.passUnretained(context).toOpaque()
         for name in [kAXFocusedWindowChangedNotification, kAXWindowCreatedNotification, kAXUIElementDestroyedNotification] {
@@ -116,7 +137,7 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
         CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
     }
     private func observedChange(_ pid: Int32) {
-        guard monitoring else { return }
+        guard monitoring, !Task.isCancelled else { return }
         noteFocus(processIdentifier: pid)
         changed?()
     }
@@ -141,6 +162,8 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
             guard monitoring else { throw CancellationError() }
             guard let windows = attribute(appElement, kAXWindowsAttribute) as? [AXUIElement] else { continue }
             for window in windows.prefix(100) {
+                try Task.checkCancellation()
+                guard monitoring else { throw CancellationError() }
                 AXUIElementSetMessagingTimeout(window, 0.12)
                 guard attribute(window, kAXRoleAttribute) as? String == kAXWindowRole,
                       let subrole = attribute(window, kAXSubroleAttribute) as? String,
@@ -208,12 +231,14 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
         throw QuickUtilityError.failure("No se pudo confirmar el foco de la ventana. Spaces o la aplicación pueden impedirlo.")
     }
     private func verifiedEntry(_ id: UUID) async throws -> Entry {
+        guard monitoring else { throw CancellationError() }
         guard let entry = entries[id] else { throw QuickUtilityError.failure("La ventana ya no está disponible.") }
         let pid = entry.application.pid, launchDate = entry.application.launchDate
         let stillSameApplication = await MainActor.run {
             guard let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated else { return false }
             return app.launchDate == launchDate
         }
+        guard monitoring else { throw CancellationError() }
         guard stillSameApplication else { entries[id] = nil; throw QuickUtilityError.failure("La aplicación se ha cerrado o se ha reiniciado; reasocia la ventana.") }
         return entry
     }
@@ -231,7 +256,7 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
               AXUIElementSetAttributeValue(entry.element, kAXSizeAttribute as CFString, sizeValue) == .success,
               AXUIElementSetAttributeValue(entry.element, kAXPositionAttribute as CFString, positionValue) == .success,
               let actual = geometry(entry.element) else { throw QuickUtilityError.failure("La aplicación no ha completado el cambio de geometría.") }
-        guard abs(actual.x - frame.x) <= 4, abs(actual.y - frame.y) <= 4, abs(actual.width - frame.width) <= 4, abs(actual.height - frame.height) <= 4 else {
+        guard actual.approximatelyEquals(frame) else {
             throw QuickUtilityError.failure("La aplicación ha aplicado una geometría diferente a la solicitada.")
         }
         return actual
@@ -246,17 +271,38 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
     private var workspaceObservers: [NSObjectProtocol] = []
     private var permissionTimer: Timer?
     private var eventTasks: [UUID: Task<Void, Never>] = [:]
+    private var lifecycleTask: Task<Void, Never>?
     private let trusted: @MainActor () -> Bool
     public init(access: any WindowAccessBackend = NativeWindowAccessBackend(), trusted: @escaping @MainActor () -> Bool = { AXIsProcessTrusted() }) {
         self.access = access; self.trusted = trusted
     }
     public var isTrusted: Bool { trusted() }
     public func requestPermission() { QuickUtilityPermissions.request(.accessibility) }
+    private func waitForLifecycle() async {
+        while let pending = lifecycleTask {
+            await pending.value
+            await Task.yield()
+        }
+    }
     public func acquire(_ id: QuickUtilityID) async throws {
+        await waitForLifecycle()
+        try Task.checkCancellation()
         guard isTrusted else { throw QuickUtilityError.requiresPermission(.accessibility) }
         guard clients.insert(id).inserted else { return }
         guard clients.count == 1 else { return }
-        await access.startMonitoring { [weak self] in Task { @MainActor in self?.notifyChanged() } }
+        let pending = Task { @MainActor [self] in
+            await access.startMonitoring { [weak self] in Task { @MainActor in self?.notifyChanged() } }
+            installWorkspaceObservers()
+        }
+        lifecycleTask = pending
+        await pending.value
+        lifecycleTask = nil
+        do {
+            try Task.checkCancellation()
+            guard isTrusted else { throw QuickUtilityError.requiresPermission(.accessibility) }
+        } catch { await release(id); throw error }
+    }
+    private func installWorkspaceObservers() {
         let center = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.didActivateApplicationNotification, NSWorkspace.didLaunchApplicationNotification, NSWorkspace.didTerminateApplicationNotification] {
             workspaceObservers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
@@ -271,6 +317,7 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
         }
     }
     public func release(_ id: QuickUtilityID) async {
+        await waitForLifecycle()
         let existed = clients.remove(id) != nil
         changeHandlers[id] = nil; permissionHandlers[id] = nil
         guard existed else { return }
@@ -278,10 +325,15 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
         permissionTimer?.invalidate(); permissionTimer = nil
         let center = NSWorkspace.shared.notificationCenter
         workspaceObservers.forEach { center.removeObserver($0) }; workspaceObservers.removeAll()
-        let tasks = Array(eventTasks.values); tasks.forEach { $0.cancel() }
-        for task in tasks { await task.value }
-        eventTasks.removeAll()
-        await access.stopMonitoring()
+        let pending = Task { @MainActor in
+            let tasks = Array(eventTasks.values); tasks.forEach { $0.cancel() }
+            for task in tasks { await task.value }
+            eventTasks.removeAll()
+            await access.stopMonitoring()
+        }
+        lifecycleTask = pending
+        await pending.value
+        lifecycleTask = nil
     }
     private func workspaceChanged() {
         guard !clients.isEmpty else { return }
@@ -296,13 +348,20 @@ public actor NativeWindowAccessBackend: WindowAccessBackend {
     }
     private func notifyChanged() { for handler in Array(changeHandlers.values) { handler() } }
     public func snapshots() async throws -> [WindowSnapshot] {
+        await waitForLifecycle()
+        try Task.checkCancellation()
         guard isTrusted else { throw QuickUtilityError.requiresPermission(.accessibility) }
+        guard !clients.isEmpty else { throw QuickUtilityError.failure("Las utilidades de ventanas están detenidas.") }
         let applications = NSWorkspace.shared.runningApplications.compactMap { app -> WindowApplication? in
             guard !app.isTerminated, app.processIdentifier != ProcessInfo.processInfo.processIdentifier,
                   app.activationPolicy == .regular, let bundle = app.bundleIdentifier else { return nil }
             return .init(pid: app.processIdentifier, name: app.localizedName ?? "Aplicación", bundleIdentifier: bundle, launchDate: app.launchDate)
         }
-        return try await access.snapshots(applications: applications, frontmostPID: NSWorkspace.shared.frontmostApplication?.processIdentifier)
+        let result = try await access.snapshots(applications: applications, frontmostPID: NSWorkspace.shared.frontmostApplication?.processIdentifier)
+        guard Set(result.map(\.id)).count == result.count, result.allSatisfy({ $0.frame.isValid }) else {
+            throw QuickUtilityError.failure("El inventario de ventanas contiene identidades o geometrías incompatibles.")
+        }
+        return result
     }
     public static func displays() -> [WindowDisplayGeometry] {
         let screens = NSScreen.screens

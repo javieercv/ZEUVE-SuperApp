@@ -36,6 +36,8 @@ public struct WindowSwitcherPreferences: Codable, Sendable, Equatable {
     private var presentationTask: Task<Void, Never>?
     private var selectionTask: Task<Void, Never>?
     private var permissionTask: Task<Void, Never>?
+    private var presentationGeneration: UInt64 = 0
+    private var failedCleanupTask: Task<Void, Never>?
 
     public init(backend: WindowServicesBackend, settings: SettingsRepository?, shortcuts: any WindowShortcutRegistering) {
         self.backend = backend; self.settings = settings; self.shortcuts = shortcuts
@@ -46,6 +48,8 @@ public struct WindowSwitcherPreferences: Codable, Sendable, Equatable {
     }
     private func transition(_ state: QuickUtilityState) { self.state = state; stateDidChange?(state) }
     public func start() async throws {
+        await failedCleanupTask?.value
+        try Task.checkCancellation()
         guard state != .active else { return }
         transition(.activating)
         do {
@@ -65,6 +69,10 @@ public struct WindowSwitcherPreferences: Codable, Sendable, Equatable {
         }
     }
     public func stop() async throws {
+        await failedCleanupTask?.value
+        await stopResources()
+    }
+    private func stopResources() async {
         transition(.deactivating)
         shortcuts.unregister(id: id.id)
         presentationTask?.cancel(); selectionTask?.cancel()
@@ -87,7 +95,16 @@ public struct WindowSwitcherPreferences: Codable, Sendable, Equatable {
             do { try settings.set(updated, forKey: Self.settingsKey) }
             catch {
                 do { try shortcuts.register(id: id.id, shortcut: preferences.shortcut) { [weak self] in self?.show() } }
-                catch { shortcuts.unregister(id: id.id); transition(.failed("El atajo se ha detenido porque no pudo restaurarse su registro.")) }
+                catch {
+                    shortcuts.unregister(id: id.id)
+                    transition(.deactivating)
+                    failedCleanupTask = Task { [weak self] in
+                        guard let self else { return }
+                        await stopResources()
+                        transition(.failed("El atajo se ha detenido porque no pudo restaurarse su registro."))
+                        failedCleanupTask = nil
+                    }
+                }
                 throw QuickUtilityError.failure("No se pudo guardar el nuevo atajo.")
             }
         } else { try settings.set(updated, forKey: Self.settingsKey) }
@@ -96,35 +113,49 @@ public struct WindowSwitcherPreferences: Codable, Sendable, Equatable {
     public func show() {
         guard state == .active else { return }
         if isPresented { onShowSwitcher?(); return }
-        presentationTask?.cancel()
+        let previous = presentationTask
+        previous?.cancel()
+        presentationGeneration &+= 1
+        let generation = presentationGeneration
         presentationTask = Task { [weak self] in
             guard let self else { return }
+            defer { if presentationGeneration == generation { presentationTask = nil } }
+            await previous?.value
             do {
+                try Task.checkCancellation()
+                guard state == .active, presentationGeneration == generation else { return }
                 let snapshots = try await backend.snapshots(); try Task.checkCancellation()
+                guard state == .active, presentationGeneration == generation else { return }
                 windows = snapshots; message = snapshots.isEmpty ? "No hay ventanas compatibles disponibles." : nil
                 isPresented = true; onShowSwitcher?()
             } catch is CancellationError {} catch {
+                guard !Task.isCancelled, state == .active, presentationGeneration == generation else { return }
                 message = error.localizedDescription
                 if (error as? QuickUtilityError) == .requiresPermission(.accessibility) { permissionRevoked() }
                 else { isPresented = true; onShowSwitcher?() }
             }
-            presentationTask = nil
         }
     }
     private func refreshPresented() {
         guard presentationTask == nil, isPresented else { return }
+        let generation = presentationGeneration
         presentationTask = Task { [weak self] in
             guard let self else { return }
+            defer { if presentationGeneration == generation { presentationTask = nil } }
             do {
                 let updated = try await backend.snapshots()
-                if !Task.isCancelled && isPresented { windows = updated }
-            } catch { if !Task.isCancelled { message = error.localizedDescription } }
-            presentationTask = nil
+                if !Task.isCancelled && isPresented && state == .active && presentationGeneration == generation { windows = updated }
+            } catch {
+                if !Task.isCancelled && state == .active && presentationGeneration == generation { message = error.localizedDescription }
+            }
         }
     }
-    public func cancel() { isPresented = false; onCloseSwitcher?() }
+    public func cancel() {
+        presentationGeneration &+= 1; presentationTask?.cancel()
+        isPresented = false; onCloseSwitcher?()
+    }
     public func choose(_ windowID: UUID) {
-        guard state == .active, selectionTask == nil, windows.contains(where: { $0.id == windowID }) else { return }
+        guard state == .active, isPresented, selectionTask == nil, windows.contains(where: { $0.id == windowID }) else { return }
         cancel()
         selectionTask = Task { [weak self] in
             guard let self else { return }

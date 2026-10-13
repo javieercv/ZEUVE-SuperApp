@@ -29,3 +29,9 @@ Sin drivers, root, helpers privilegiados, nuevas dependencias externas o red. AP
 Las cuatro comprobaciones oficiales pasan. El pase final reúne 565 tests Swift y 134 Python, incluidos 78 de utilidades. Release ARM64 tiene Hardened Runtime y Audio Input efectivos, firma ad hoc validada y motores verificados. Sin Developer ID/notarización en este entorno.
 
 QA nativa confirma panel de creación, integración Servicios de TextEdit, bandeja por referencias, apertura de ruta de mezclador, parada y reinicio. Accesibilidad efectiva, hardware G305/monitores, publicación final del Servicio de Finder y protección durante FaceTime conservan los límites detallados en [pruebas](../Pruebas/TEST_RESULTS_0.21.0.0.md).
+
+## Continuación autorizada — 13/10/2026
+
+Sobre remoto `d37afc8`, se corrigen los fallos de callbacks de captura cancelada, habilitación efectiva del tap, tareas AX compartidas, inventarios y geometrías, apertura/cierre de audio y resultados RMS retirados. Se conserva el cierre de Xcode Debug del 12/10. El arranque lee el motivo nativo correcto y la bandeja mantiene visibilidad cuando Finder está activo. Sin cambios de versión, dependencias externas, permisos, formatos persistidos válidos o siete módulos.
+
+Se añaden 29 regresiones; el pase oficial suma 594 Swift + 134 Python (728), incluidos 107 de utilidades. Las cuatro comprobaciones oficiales pasan, con firmas/motores verificados en Debug/Release. Los eventos nativos de login y Servicios arrancan Release sin ventanas; la prueba de inicio de sesión físico conserva su limitación. La publicación desde el Servicio Finder y las transformaciones de espacios/líneas Unicode de TextEdit pasan sobre código de productividad sin cambios. La repetición final de arrastre y Run requiere desbloqueo de macOS; la [evidencia](../Pruebas/TEST_RESULTS_0.21.0.0.md) distingue los ensayos y los pendientes, incluido FaceTime aplazado de nuevo por el usuario.

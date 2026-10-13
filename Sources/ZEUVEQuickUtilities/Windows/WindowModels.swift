@@ -11,6 +11,11 @@ public struct WindowFrame: Codable, Equatable, Sendable {
     public var isValid: Bool {
         [x, y, width, height].allSatisfy { $0.isFinite && abs($0) < 100_000 } && width > 0 && height > 0
     }
+    public func approximatelyEquals(_ other: WindowFrame, tolerance: Double = 4) -> Bool {
+        isValid && other.isValid && tolerance.isFinite && tolerance >= 0 &&
+        abs(x - other.x) <= tolerance && abs(y - other.y) <= tolerance &&
+        abs(width - other.width) <= tolerance && abs(height - other.height) <= tolerance
+    }
 }
 
 /// Runtime identity and display text never enter the persisted profile model.
@@ -36,6 +41,11 @@ public struct WindowDisplayGeometry: Codable, Equatable, Sendable {
     public var frame: WindowFrame
     public var visibleFrame: WindowFrame
     public init(frame: WindowFrame, visibleFrame: WindowFrame) { self.frame = frame; self.visibleFrame = visibleFrame }
+    public var isValid: Bool {
+        frame.isValid && visibleFrame.isValid && visibleFrame.x >= frame.x - 1 && visibleFrame.y >= frame.y - 1 &&
+        visibleFrame.x + visibleFrame.width <= frame.x + frame.width + 1 &&
+        visibleFrame.y + visibleFrame.height <= frame.y + frame.height + 1
+    }
 }
 
 public struct WindowLayoutSlot: Codable, Equatable, Sendable, Identifiable {
@@ -59,7 +69,7 @@ public struct WindowLayoutProfile: Codable, Equatable, Sendable, Identifiable {
     }
     public func validate() throws {
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, name.count <= 80,
-              !displays.isEmpty, displays.count <= 16, displays.allSatisfy({ $0.frame.isValid && $0.visibleFrame.isValid }),
+              !displays.isEmpty, displays.count <= 16, displays.allSatisfy(\.isValid),
               !slots.isEmpty, slots.count <= 100, Set(slots.map(\.id)).count == slots.count,
               slots.allSatisfy({ !$0.bundleIdentifier.isEmpty && $0.bundleIdentifier.count <= 256 && displays.indices.contains($0.displayIndex) && $0.relativeFrame.isValid }) else {
             throw QuickUtilityError.failure("La distribución de ventanas no es válida.")
@@ -74,7 +84,9 @@ public struct WindowLayoutsPreferences: Codable, Equatable, Sendable {
     public var automaticProfileID: UUID?
     public init() {}
     public func validate() throws {
+        let slotIDs = profiles.flatMap(\.slots).map(\.id)
         guard schemaVersion == 1, profiles.count <= 50, Set(profiles.map(\.id)).count == profiles.count,
+              Set(slotIDs).count == slotIDs.count,
               automaticProfileID == nil || profiles.contains(where: { $0.id == automaticProfileID }) else {
             throw QuickUtilityError.failure("La configuración de distribuciones es incompatible o está dañada.")
         }
@@ -116,7 +128,8 @@ public enum WindowGeometryPlanner {
     /// topology; explicit restore can adapt equal-count displays by their roles.
     public static func topologyMatches(_ saved: [WindowDisplayGeometry], _ current: [WindowDisplayGeometry]) -> Bool {
         saved.count == current.count && zip(saved, current).allSatisfy { a, b in
-            abs(a.frame.x - b.frame.x) < 1 && abs(a.frame.y - b.frame.y) < 1 && abs(a.frame.width - b.frame.width) < 1 && abs(a.frame.height - b.frame.height) < 1
+            a.isValid && b.isValid && a.frame.approximatelyEquals(b.frame, tolerance: 0.5) &&
+            a.visibleFrame.approximatelyEquals(b.visibleFrame, tolerance: 0.5)
         }
     }
 }

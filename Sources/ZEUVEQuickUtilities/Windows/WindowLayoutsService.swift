@@ -79,7 +79,7 @@ import ZEUVEStorage
         try settings.set(updated, forKey: Self.settingsKey); preferences = updated
     }
     public func refreshWindows() {
-        guard state == .active, refreshTask == nil else { return }
+        guard state == .active, !isRestoring, refreshTask == nil else { return }
         refreshTask = Task { [weak self] in
             guard let self else { return }
             do {
@@ -97,11 +97,12 @@ import ZEUVEStorage
     public func saveProfile(name: String, windowIDs: Set<UUID>) async throws {
         guard state == .active, !isRestoring else { throw QuickUtilityError.failure("Activa la utilidad antes de guardar una distribución.") }
         let currentGeneration = generation
+        let displays = displayProvider()
         let current = try await backend.snapshots(); try Task.checkCancellation()
-        guard state == .active, generation == currentGeneration else { throw CancellationError() }
+        guard state == .active, generation == currentGeneration, !isRestoring else { throw CancellationError() }
+        guard displayProvider() == displays else { throw QuickUtilityError.failure("Las pantallas cambiaron mientras se guardaba la distribución. Vuelve a actualizar las ventanas.") }
         let selected = current.filter { windowIDs.contains($0.id) && $0.canRestoreGeometry }
         guard !selected.isEmpty, selected.count == windowIDs.count else { throw QuickUtilityError.failure("Alguna ventana elegida ya no está disponible o no admite restauración.") }
-        let displays = displayProvider()
         var bindings: [UUID: UUID] = [:]
         let slots = try selected.map { window -> WindowLayoutSlot in
             guard let index = WindowGeometryPlanner.displayIndex(for: window.frame, displays: displays) else { throw QuickUtilityError.failure("No hay pantallas disponibles.") }
@@ -146,11 +147,18 @@ import ZEUVEStorage
         guard state == .active, !isRestoring, let profile = preferences.profiles.first(where: { $0.id == profileID }) else { return }
         let displays = displayProvider()
         if automatic && !WindowGeometryPlanner.topologyMatches(profile.displays, displays) { return }
+        // A capture that started before this restore must not publish geometry
+        // measured while the same windows are being changed.
+        generation &+= 1
+        let previousRefresh = refreshTask
+        previousRefresh?.cancel()
         isRestoring = true; cancellationRequested = false; message = nil
         restorationTask = Task { [weak self] in
             guard let self else { return }
             var result = WindowLayoutResult()
             do {
+                await previousRefresh?.value
+                try Task.checkCancellation()
                 let current = try await backend.snapshots()
                 windows = current
                 let live = Dictionary(uniqueKeysWithValues: current.map { ($0.id, $0) })
@@ -159,13 +167,18 @@ import ZEUVEStorage
                     // Display changes mid-operation invalidate the plan, rather than
                     // pushing windows using stale coordinates.
                     guard displayProvider() == displays else { result.cancelled = true; message = "La configuración de pantallas cambió durante la restauración."; break }
-                    guard let identity = associations[slot.id], let window = live[identity], window.bundleIdentifier == slot.bundleIdentifier, window.canRestoreGeometry else { result.omitted += 1; associations[slot.id] = nil; continue }
+                    guard let identity = associations[slot.id], let window = live[identity], window.bundleIdentifier == slot.bundleIdentifier else { result.omitted += 1; associations[slot.id] = nil; continue }
+                    guard window.canRestoreGeometry else { result.omitted += 1; continue }
                     let targetIndex: Int
                     if displays.indices.contains(slot.displayIndex), profile.displays.count == displays.count { targetIndex = slot.displayIndex }
                     else if !automatic, !displays.isEmpty { targetIndex = 0 }
                     else { result.omitted += 1; continue }
                     let target = WindowGeometryPlanner.restored(slot.relativeFrame, on: displays[targetIndex])
-                    do { _ = try await backend.access.restoreWindow(identity, frame: target); result.restored += 1 }
+                    do {
+                        let actual = try await backend.access.restoreWindow(identity, frame: target)
+                        if actual.approximatelyEquals(target) { result.restored += 1 }
+                        else { result.failed += 1 }
+                    }
                     catch is CancellationError { result.cancelled = true; break }
                     catch let failure as QuickUtilityError {
                         if failure == .requiresPermission(.accessibility) { throw failure }

@@ -151,6 +151,70 @@ final class InputTransformationTests: XCTestCase {
         do { try await service.start(); XCTFail() } catch { }
         XCTAssertEqual(service.state, .requiresPermission(.accessibility))
     }
+    func testCancelledCaptureIgnoresDelayedButtonCallback() async throws {
+        let broker = TestInputBroker(), service = AdditionalMouseButtonsService(settings: try store(), broker: broker)
+        try await service.captureButton()
+        let delayed = try XCTUnwrap(broker.captureHandler)
+        try await service.cancelCapture()
+        delayed(3)
+        XCTAssertNil(service.lastCapturedButton)
+        XCTAssertFalse(service.isCapturing)
+    }
+    func testPreviousCaptureCannotCompleteNewCapture() async throws {
+        let broker = TestInputBroker(), service = AdditionalMouseButtonsService(settings: try store(), broker: broker)
+        try await service.captureButton()
+        let old = try XCTUnwrap(broker.captureHandler)
+        try await service.captureButton()
+        let current = try XCTUnwrap(broker.captureHandler)
+        old(3)
+        XCTAssertNil(service.lastCapturedButton)
+        XCTAssertTrue(service.isCapturing)
+        current(4)
+        XCTAssertEqual(service.lastCapturedButton, 4)
+        XCTAssertFalse(service.isCapturing)
+        try await service.stop()
+    }
+    func testStoppedOrFailedCaptureDoesNotAcceptDelayedCallback() async throws {
+        let broker = TestInputBroker(), service = AdditionalMouseButtonsService(settings: try store(), broker: broker)
+        try await service.captureButton()
+        let beforeStop = try XCTUnwrap(broker.captureHandler)
+        try await service.stop()
+        beforeStop(3)
+        XCTAssertNil(service.lastCapturedButton)
+        XCTAssertEqual(service.state, .disabled)
+        try await service.captureButton()
+        let beforeFailure = try XCTUnwrap(broker.captureHandler)
+        broker.failureHandlers[.mouseButtons]?(.requiresPermission(.accessibility))
+        beforeFailure(4)
+        XCTAssertNil(service.lastCapturedButton)
+        XCTAssertFalse(service.isCapturing)
+        XCTAssertEqual(service.state, .requiresPermission(.accessibility))
+    }
+    func testStopDuringCaptureStartupInvalidatesPendingCapture() async throws {
+        let broker = TestInputBroker(), service = AdditionalMouseButtonsService(settings: try store(), broker: broker)
+        broker.suspendCaptureStartup = true
+        let pending = Task { @MainActor in try await service.captureButton() }
+        await broker.waitForCaptureStartup()
+        try await service.stop()
+        broker.completeCaptureStartup()
+        do { try await pending.value; XCTFail("Expected cancelled startup") }
+        catch { XCTAssertTrue(error is CancellationError) }
+        XCTAssertFalse(service.isCapturing)
+        XCTAssertEqual(service.state, .disabled)
+    }
+    func testCancelledCaptureTaskReleasesItsPendingRegistration() async throws {
+        let broker = TestInputBroker(), service = AdditionalMouseButtonsService(settings: try store(), broker: broker)
+        broker.suspendCaptureStartup = true
+        let pending = Task { @MainActor in try await service.captureButton() }
+        await broker.waitForCaptureStartup()
+        pending.cancel()
+        broker.completeCaptureStartup()
+        do { try await pending.value; XCTFail("Expected cancelled task") }
+        catch { XCTAssertTrue(error is CancellationError) }
+        XCTAssertFalse(service.isCapturing)
+        XCTAssertNil(broker.captureHandler)
+        XCTAssertEqual(broker.captureCancels, 1)
+    }
 }
 
 @MainActor private final class TestInputBroker: InputEventTapControlling {
@@ -158,11 +222,28 @@ final class InputTransformationTests: XCTestCase {
     var scrollStarts = 0, scrollStops = 0, buttonStarts = 0, buttonStops = 0, captureCancels = 0
     var failureHandlers: [QuickUtilityID: @MainActor (QuickUtilityError) -> Void] = [:]
     var captureHandler: (@MainActor (Int) -> Void)?
+    var suspendCaptureStartup = false
+    private var captureStartupStarted = false
+    private var captureStartup: CheckedContinuation<Void, Never>?
+    private var captureStartupObserver: CheckedContinuation<Void, Never>?
     func setFailureHandler(for id: QuickUtilityID, handler: (@MainActor (QuickUtilityError) -> Void)?) { failureHandlers[id] = handler }
     func startScroll(_ options: ScrollDirectionOptions) async throws { if let error { throw error }; scrollStarts += 1 }
     func stopScroll() async throws { scrollStops += 1 }
     func startButtons(_ options: AdditionalMouseButtonsOptions) async throws { if let error { throw error }; buttonStarts += 1 }
     func stopButtons() async throws { buttonStops += 1; captureHandler = nil }
-    func captureNextButton(_ handler: @escaping @MainActor (Int) -> Void) async throws { if let error { throw error }; captureHandler = handler }
+    func captureNextButton(_ handler: @escaping @MainActor (Int) -> Void) async throws {
+        if let error { throw error }; captureHandler = handler
+        if suspendCaptureStartup {
+            await withCheckedContinuation { continuation in
+                captureStartup = continuation; captureStartupStarted = true
+                captureStartupObserver?.resume(); captureStartupObserver = nil
+            }
+        }
+    }
     func cancelButtonCapture() async throws { captureCancels += 1; captureHandler = nil }
+    func waitForCaptureStartup() async {
+        if captureStartupStarted { return }
+        await withCheckedContinuation { captureStartupObserver = $0 }
+    }
+    func completeCaptureStartup() { captureStartup?.resume(); captureStartup = nil }
 }

@@ -10,6 +10,7 @@
 - Protección durante llamadas pendiente de diagnóstico real y validación de eficacia; la función no se considera completada. No se reutiliza ElfiSariña.
 - Versión visible única 0.21.0.0; metadata Apple 0.21.0, revisión 0/build 79. Versiones de los siete módulos y motores conservadas; Descargador aplazado. No ZIP.
 - Corregido el aborto al ejecutar desde Xcode con firma ad hoc: Debug enlaza el código en el ejecutable principal, sin `ZEUVE.debug.dylib`, manteniendo Hardened Runtime y validación de bibliotecas. Compilación oficial y Run real verificados.
+- Continuación del 13/10: corregidas capturas de botón tardías, cancelación/apertura/cierre compartidos y RMS de sesiones retiradas, inventarios y tareas AX pendientes, restauración y validación de geometría. Login/Servicios reconocen el motivo nativo de arranque y la bandeja permanece visible al activar Finder. 29 regresiones nuevas; protección FaceTime sigue pendiente de la prueba aplazada por el usuario.
 - Pruebas, compilaciones, firma, QA física y publicación se registran con su evidencia real en los [resultados de entrega](Docs/Historico/Pruebas/TEST_RESULTS_0.21.0.0.md).
 
 ## 0.20.8.4 — 2026-10-12

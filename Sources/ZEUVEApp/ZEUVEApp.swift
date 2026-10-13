@@ -61,9 +61,7 @@ final class AppLifecycleDelegate: NSObject, NSApplicationDelegate {
     private var terminationTask: Task<Void, Never>?
     func applicationDidFinishLaunching(_ notification: Notification) {
         let event = NSAppleEventManager.shared().currentAppleEvent
-        let login = event?.paramDescriptor(forKeyword: AEKeyword(keyAELaunchedAsLogInItem)) != nil
-        let service = event?.paramDescriptor(forKeyword: AEKeyword(keyAELaunchedAsServiceItem)) != nil
-        runtime?.beginLaunch(showMainWindow: !login && !service)
+        runtime?.beginLaunch(showMainWindow: ResidentLaunchPolicy.opensMainWindow(for: event))
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

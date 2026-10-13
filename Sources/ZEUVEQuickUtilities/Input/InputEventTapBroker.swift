@@ -111,7 +111,13 @@ private struct InputTapConfiguration: Sendable {
         tail = Task { _ = await task.result }
         try await task.value
     }
-    private func reconcile() async throws {
+    private func serializedCallback(_ operation: @escaping @MainActor () async -> Void) async {
+        let previous = tail
+        let task = Task { @MainActor in await previous?.value; await operation() }
+        tail = task
+        await task.value
+    }
+    private func reconcile(failureOwner: QuickUtilityID? = nil) async throws {
         let mask = configuration.eventMask
         if mask == 0 {
             generation &+= 1
@@ -120,7 +126,7 @@ private struct InputTapConfiguration: Sendable {
             return
         }
         guard Self.accessibilityAuthorized else {
-            await fail(.requiresPermission(.accessibility))
+            await fail(.requiresPermission(.accessibility), additionalOwner: failureOwner)
             throw QuickUtilityError.requiresPermission(.accessibility)
         }
         if let engine, engine.eventMask == mask, engine.isRunning {
@@ -133,15 +139,15 @@ private struct InputTapConfiguration: Sendable {
         await old?.stop()
         let native = NativeInputTap(configuration: configuration, fault: { [weak self] error in
             Task { @MainActor in
-                guard let self, self.generation == currentGeneration else { return }
-                await self.fail(error)
+                guard let self else { return }
+                await self.serializedCallback {
+                    guard self.generation == currentGeneration else { return }
+                    await self.fail(error)
+                }
             }
-        }, captured: { [weak self] button in
+        }, captured: { [weak self] button, captureID in
             Task { @MainActor in
-                guard let self, self.generation == currentGeneration, self.configuration.capturing else { return }
-                let handler = self.captureHandler
-                do { try await self.cancelButtonCapture(); handler?(button) }
-                catch { await self.fail(.failure(error.localizedDescription)) }
+                await self?.completeCapture(button: button, captureID: captureID, generation: currentGeneration)
             }
         })
         engine = native
@@ -152,15 +158,35 @@ private struct InputTapConfiguration: Sendable {
             }
         }
         catch {
-            await fail((error as? QuickUtilityError) ?? .failure(error.localizedDescription))
+            await fail((error as? QuickUtilityError) ?? .failure(error.localizedDescription), additionalOwner: failureOwner)
             throw error
         }
     }
-    private func fail(_ error: QuickUtilityError) async {
+    private func completeCapture(button: Int, captureID: UUID, generation expectedGeneration: UInt64) async {
+        await serializedCallback {
+            // Check after preceding configuration operations have completed, not before
+            // enqueueing: a delayed A callback must never cancel a newer B capture.
+            guard self.generation == expectedGeneration, self.configuration.capturing,
+                  self.configuration.captureID == captureID else { return }
+            let handler = self.captureHandler
+            self.configuration.capturing = false; self.captureHandler = nil
+            do { try await self.reconcile(failureOwner: .mouseButtons) }
+            catch {
+                // Every throwing reconcile path calls fail, including the capture owner
+                // whose temporary request was just removed. Do not deliver a success.
+                return
+            }
+            handler?(button)
+        }
+    }
+    private func fail(_ error: QuickUtilityError, additionalOwner: QuickUtilityID? = nil) async {
         generation &+= 1
         let old = engine; engine = nil
         await old?.stop()
-        let affected: [QuickUtilityID] = (configuration.scroll != nil ? [.scroll] : []) + (configuration.buttons != nil || configuration.capturing ? [.mouseButtons] : [])
+        var affected: Set<QuickUtilityID> = []
+        if configuration.scroll != nil { affected.insert(.scroll) }
+        if configuration.buttons != nil || configuration.capturing { affected.insert(.mouseButtons) }
+        if let additionalOwner { affected.insert(additionalOwner) }
         configuration = .init(); captureHandler = nil
         for id in affected { failureHandlers[id]?(error) }
     }
@@ -180,9 +206,9 @@ private final class NativeInputTap: @unchecked Sendable {
     private var pairs = MouseButtonPairTracker()
     private var deliveredCaptureID: UUID?
     private let fault: @Sendable (QuickUtilityError) -> Void
-    private let captured: @Sendable (Int) -> Void
+    private let captured: @Sendable (Int, UUID) -> Void
 
-    init(configuration: InputTapConfiguration, fault: @escaping @Sendable (QuickUtilityError) -> Void, captured: @escaping @Sendable (Int) -> Void) {
+    init(configuration: InputTapConfiguration, fault: @escaping @Sendable (QuickUtilityError) -> Void, captured: @escaping @Sendable (Int, UUID) -> Void) {
         self.configuration = configuration; eventMask = configuration.eventMask
         self.fault = fault; self.captured = captured
     }
@@ -227,15 +253,23 @@ private final class NativeInputTap: @unchecked Sendable {
         // Permission changes do not have a universal public notification. While the tap is
         // running this spaced timer verifies access even when no pointer events arrive.
         let timer = CFRunLoopTimerCreateWithHandler(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent() + 2, 2, 0, 0) { [weak self] _ in
-            guard let self, !AXIsProcessTrusted() else { return }
-            self.fault(.requiresPermission(.accessibility))
+            guard let self else { return }
+            let problem: QuickUtilityError
+            if !AXIsProcessTrusted() { problem = .requiresPermission(.accessibility) }
+            else if !CFMachPortIsValid(tap) || !CGEvent.tapIsEnabled(tap: tap) {
+                problem = .failure("macOS ha detenido el filtro de entrada. Reactiva la utilidad para volver a intentarlo.")
+            } else { return }
+            self.fault(problem)
             CFRunLoopStop(currentLoop)
         }!
         CFRunLoopAddTimer(currentLoop, timer, .commonModes)
         let shouldRun = lock.withLock { loop = currentLoop; return !stopRequested }
         CGEvent.tapEnable(tap: tap, enable: shouldRun)
-        continuation.resume()
-        if shouldRun { CFRunLoopRun() }
+        let enabled = shouldRun && CGEvent.tapIsEnabled(tap: tap)
+        if shouldRun && !enabled {
+            continuation.resume(throwing: AXIsProcessTrusted() ? QuickUtilityError.failure("macOS no permitió habilitar el filtro de entrada.") : .requiresPermission(.accessibility))
+        } else { continuation.resume() }
+        if enabled { CFRunLoopRun() }
         CGEvent.tapEnable(tap: tap, enable: false)
         CFRunLoopTimerInvalidate(timer)
         CFRunLoopRemoveTimer(currentLoop, timer, .commonModes)
@@ -278,7 +312,7 @@ private final class NativeInputTap: @unchecked Sendable {
         if type == .otherMouseDragged, pairs.dragging(button) { return nil }
         if snapshot.0.capturing {
             if type == .otherMouseDown, deliveredCaptureID != snapshot.0.captureID {
-                deliveredCaptureID = snapshot.0.captureID; captured(button)
+                deliveredCaptureID = snapshot.0.captureID; captured(button, snapshot.0.captureID)
             }
             // Capture observes, it does not consume a button or execute its assignment.
             return Unmanaged.passUnretained(event)

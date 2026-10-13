@@ -73,6 +73,7 @@ import ZEUVEStorage
     private let broker: any InputEventTapControlling
     private var loadFailure: String?
     private var captureTimeout: Task<Void, Never>?
+    private var captureGeneration: UInt64 = 0
 
     public init(settings: SettingsRepository?, broker: any InputEventTapControlling) {
         self.settings = settings; self.broker = broker
@@ -82,6 +83,7 @@ import ZEUVEStorage
             try options.validate()
         } catch { loadFailure = error.localizedDescription; settingsError = error.localizedDescription; state = .failed(error.localizedDescription) }
         broker.setFailureHandler(for: id) { [weak self] error in
+            self?.captureGeneration &+= 1
             self?.captureTimeout?.cancel(); self?.captureTimeout = nil; self?.isCapturing = false; self?.state = error.state
         }
     }
@@ -101,6 +103,7 @@ import ZEUVEStorage
     }
     public func stop() async throws {
         guard state != .disabled || isCapturing else { return }
+        captureGeneration &+= 1
         captureTimeout?.cancel(); captureTimeout = nil; isCapturing = false
         state = .deactivating
         do { try await broker.stopButtons(); state = .disabled }
@@ -129,21 +132,37 @@ import ZEUVEStorage
     public func captureButton() async throws {
         try await cancelCapture()
         lastCapturedButton = nil
+        let currentCapture = captureGeneration
         do {
             isCapturing = true
             try await broker.captureNextButton { [weak self] button in
-                guard let self else { return }
+                guard let self, self.isCapturing, self.captureGeneration == currentCapture else { return }
                 self.captureTimeout?.cancel(); self.captureTimeout = nil
                 self.lastCapturedButton = button; self.isCapturing = false
             }
+            guard captureGeneration == currentCapture else { throw CancellationError() }
+            if Task.isCancelled { try await cancelCapture(); throw CancellationError() }
+            // A very fast click may complete capture while native startup is still returning.
+            guard isCapturing else { return }
             captureTimeout = Task { @MainActor [weak self] in
-                do { try await Task.sleep(for: .seconds(15)); try await self?.cancelCapture() }
+                do {
+                    try await Task.sleep(for: .seconds(15))
+                    guard let self, self.captureGeneration == currentCapture else { return }
+                    try await self.cancelCapture()
+                }
                 catch is CancellationError { }
                 catch { self?.settingsError = error.localizedDescription }
             }
-        } catch { isCapturing = false; settingsError = error.localizedDescription; throw error }
+        } catch {
+            if captureGeneration == currentCapture {
+                isCapturing = false
+                if !(error is CancellationError) { settingsError = error.localizedDescription }
+            }
+            throw error
+        }
     }
     public func cancelCapture() async throws {
+        captureGeneration &+= 1
         captureTimeout?.cancel(); captureTimeout = nil
         guard isCapturing else { return }
         isCapturing = false

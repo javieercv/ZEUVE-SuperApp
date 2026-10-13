@@ -67,7 +67,9 @@ import ZEUVEQuickUtilities
     func show() {
         if panel == nil {
             let panel = NSPanel(contentRect: .init(x: 0, y: 0, width: 440, height: 380), styleMask: [.titled, .closable, .resizable, .utilityWindow], backing: .buffered, defer: false)
-            panel.title = "Bandeja temporal de ZEUVE"; panel.isReleasedWhenClosed = false; panel.isFloatingPanel = true; panel.center()
+            panel.title = "Bandeja temporal de ZEUVE"; panel.isReleasedWhenClosed = false; panel.isFloatingPanel = true
+            // Keep the destination visible while Finder or a drag destination is active.
+            panel.hidesOnDeactivate = false; panel.center()
             panel.contentViewController = NSHostingController(rootView: FileShelfPanelView(controller: self))
             self.panel = panel
         }

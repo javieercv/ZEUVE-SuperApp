@@ -1,4 +1,31 @@
 import Foundation
+#if os(macOS)
+import os
+#else
+import Synchronization
+#endif
+
+/// Control-path cancellation only; this lock is never acquired by the audio callback.
+private final class AudioOpeningWaiters: Sendable {
+    #if os(macOS)
+    private let state = OSAllocatedUnfairLock(initialState: Set<UUID>())
+    #else
+    private let state = Mutex(Set<UUID>())
+    #endif
+    func insert(_ id: UUID) { _ = state.withLock { $0.insert(id) } }
+    func remove(_ id: UUID) -> Bool {
+        state.withLock { value in value.remove(id); return value.isEmpty }
+    }
+}
+private struct AudioOpeningSession: Sendable {
+    let id: UUID
+    let task: Task<Void, any Error>
+    let waiters: AudioOpeningWaiters
+}
+private struct AudioClosingSession: Sendable {
+    let id: UUID
+    let task: Task<Void, any Error>
+}
 #if SWIFT_PACKAGE
 import ZEUVEStorage
 #endif
@@ -29,7 +56,9 @@ public enum AudioRouteLeaseError: LocalizedError, Equatable, Sendable {
     private var generation: UInt64 = 0
     private var ownerGeneration: [AudioRouteOwner: UInt64] = [:]
     private var reservations: Set<String> = []
-    private var openingTask: Task<Void, any Error>?
+    private var openingSession: AudioOpeningSession?
+    private var closingSession: AudioClosingSession?
+    private var closingUsers = 0
     private var acquiringOwners: Set<AudioRouteOwner> = []
     private var refreshTask: Task<Void, Never>?
     private var pendingFailure: String?
@@ -57,24 +86,38 @@ public enum AudioRouteLeaseError: LocalizedError, Equatable, Sendable {
     public func stop() async throws { try await release(.mixer) }
     public func acquire(_ owner: AudioRouteOwner) async throws {
         try Task.checkCancellation()
+        guard closingUsers == 0 else { throw AudioRouteLeaseError.busy }
         if running { clients.insert(owner); notifyChange(); return }
         let version = generation, ownerVersion = ownerGeneration[owner, default: 0]
         acquiringOwners.insert(owner); defer { acquiringOwners.remove(owner) }
-        let task: Task<Void, any Error>
-        if let openingTask { task = openingTask }
-        else {
-            task = Task { @MainActor in try await self.openRuntime() }
-            openingTask = task
+        // A new request must not join an opening already cancelled by its last waiter.
+        // Join its cleanup first; keep this owner's request separate from that retired task.
+        while let retired = openingSession, retired.task.isCancelled {
+            _ = await retired.task.result
+            if openingSession?.id == retired.id { openingSession = nil }
+            try Task.checkCancellation()
+            guard closingUsers == 0 else { throw AudioRouteLeaseError.busy }
         }
+        let opening: AudioOpeningSession
+        if let openingSession { opening = openingSession }
+        else {
+            opening = AudioOpeningSession(id: UUID(), task: Task { @MainActor in try await self.openRuntime() }, waiters: AudioOpeningWaiters())
+            openingSession = opening
+        }
+        let ticket = UUID(); opening.waiters.insert(ticket)
+        defer { _ = opening.waiters.remove(ticket) }
         do {
-            try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
-            openingTask = nil
+            try await withTaskCancellationHandler { try await opening.task.value } onCancel: {
+                // A cancelled owner cannot cancel discovery still needed by another owner.
+                if opening.waiters.remove(ticket) { opening.task.cancel() }
+            }
+            if openingSession?.id == opening.id { openingSession = nil }
             try Task.checkCancellation()
             guard generation == version, ownerGeneration[owner, default: 0] == ownerVersion, running else { throw CancellationError() }
             clients.insert(owner); notifyChange()
         } catch {
-            openingTask = nil
-            if clients.isEmpty && acquiringOwners.subtracting([owner]).isEmpty {
+            if openingSession?.id == opening.id { openingSession = nil }
+            if generation == version && clients.isEmpty && acquiringOwners.subtracting([owner]).isEmpty {
                 do { try await closeRuntime() } catch { throw Self.problem(error) }
             }
             throw error
@@ -127,6 +170,15 @@ public enum AudioRouteLeaseError: LocalizedError, Equatable, Sendable {
     }
     public func release(_ owner: AudioRouteOwner) async throws {
         ownerGeneration[owner, default: 0] &+= 1
+        // Reserve the closing barrier before the first suspension when this is the last client.
+        var reservedClosing = clients.subtracting([owner]).isEmpty && acquiringOwners.subtracting([owner]).isEmpty
+        if reservedClosing { closingUsers += 1 }
+        defer { if reservedClosing { closingUsers -= 1 } }
+        if reservedClosing {
+            try await closeRuntime()
+            await joinRefreshTask()
+            return
+        }
         var first: Error?
         for id in Array(routedSources(for: owner)) {
             do { try await removeLease(sourceID: id, owner: owner) } catch { if first == nil { first = error } }
@@ -134,26 +186,35 @@ public enum AudioRouteLeaseError: LocalizedError, Equatable, Sendable {
         if let first { throw Self.problem(first) }
         clients.remove(owner)
         if clients.isEmpty && acquiringOwners.subtracting([owner]).isEmpty {
-            running = false
-            let pending = openingTask; pending?.cancel()
-            if let pending { _ = await pending.result }
-            openingTask = nil
-            await joinRefreshTask()
+            closingUsers += 1; reservedClosing = true
             try await closeRuntime()
+            await joinRefreshTask()
         }
         notifyChange()
     }
     /// Explicit global stop for shutdown/reset or an invalid shared physical route.
     public func stopAll() async throws {
-        running = false; generation &+= 1
-        let pending = openingTask; pending?.cancel()
-        if let pending { _ = await pending.result }
-        openingTask = nil
-        await joinRefreshTask()
+        closingUsers += 1; defer { closingUsers -= 1 }
         try await closeRuntime()
+        await joinRefreshTask()
     }
     private func closeRuntime() async throws {
+        closingUsers += 1; defer { closingUsers -= 1 }
+        let closing: AudioClosingSession
+        if let closingSession { closing = closingSession }
+        else {
+            closing = AudioClosingSession(id: UUID(), task: Task { @MainActor in try await self.performCloseRuntime() })
+            closingSession = closing
+        }
+        defer { if closingSession?.id == closing.id { closingSession = nil } }
+        // Cleanup is owned independently of callers and must finish even if a stop caller cancels.
+        try await closing.task.value
+    }
+    private func performCloseRuntime() async throws {
         running = false; generation &+= 1
+        let pending = openingSession; pending?.task.cancel()
+        if let pending { _ = await pending.task.result }
+        if openingSession?.id == pending?.id { openingSession = nil }
         var first: Error?
         do { try await backend.observeChanges(nil) } catch { first = error }
         do { try await backend.stopAll() } catch { if first == nil { first = error } }
@@ -161,6 +222,7 @@ public enum AudioRouteLeaseError: LocalizedError, Equatable, Sendable {
         clients.removeAll(); leases.removeAll(); routedSourceIDs.removeAll(); sources.removeAll(); notifyChange()
     }
     public func setLevel(sourceID: String, level: AudioApplicationLevel) async throws {
+        guard closingUsers == 0 else { throw AudioRouteLeaseError.busy }
         guard running, clients.contains(.mixer), let source = sources.first(where: { $0.id == sourceID }), source.supportsRouting else {
             throw QuickUtilityError.unavailable("Esta fuente de audio no se puede controlar.")
         }
@@ -209,7 +271,20 @@ public enum AudioRouteLeaseError: LocalizedError, Equatable, Sendable {
     public func diagnosticMeters() async throws -> [AudioRouteMeter] {
         let ids = routedSources(for: .callDiagnostic)
         guard !ids.isEmpty else { return [] }
-        return try await backend.readMeters().filter { ids.contains($0.id) }
+        let version = generation, ownerVersion = ownerGeneration[.callDiagnostic, default: 0]
+        func sessionIsCurrent() -> Bool {
+            isAcquired(.callDiagnostic) && generation == version && ownerGeneration[.callDiagnostic, default: 0] == ownerVersion && routedSources(for: .callDiagnostic) == ids
+        }
+        do {
+            let snapshot = try await backend.readMeters()
+            guard sessionIsCurrent() else { return [] }
+            try Task.checkCancellation()
+            return snapshot.filter { ids.contains($0.id) }
+        } catch {
+            // Neither a result nor an error from a retired session may affect its replacement.
+            guard sessionIsCurrent() else { return [] }
+            throw error
+        }
     }
     public func restoreDefaults() async throws {
         try await release(.mixer)
@@ -217,6 +292,7 @@ public enum AudioRouteLeaseError: LocalizedError, Equatable, Sendable {
         preferences = AudioMixerPreferences(); notifyChange()
     }
     private func applyLease(source: AudioApplicationSource, owner: AudioRouteOwner, gain: Float) async throws {
+        guard closingUsers == 0 else { throw AudioRouteLeaseError.busy }
         guard running, clients.contains(owner) else { throw CancellationError() }
         let version = generation, ownerVersion = ownerGeneration[owner, default: 0]
         let previous = leases[source.id] ?? [:]
@@ -353,6 +429,7 @@ public enum CallAudioDiagnosticState: Equatable, Sendable {
     public private(set) var meters: [AudioRouteMeter] = []
     public let routing: AudioRoutingCoordinator
     private var operation: Task<Void, any Error>?
+    private var diagnosticGeneration: UInt64 = 0
     public var isDiagnosticRunning: Bool { !routing.routedSources(for: .callDiagnostic).isEmpty }
     public var diagnosticSources: [AudioApplicationSource] { routing.sources.filter(\.supportsRouting) }
     public init(routing: AudioRoutingCoordinator) {
@@ -360,6 +437,7 @@ public enum CallAudioDiagnosticState: Equatable, Sendable {
         routing.observe(owner: .callDiagnostic, changed: { [weak self] in
             guard let self else { return }
             if self.diagnosticState == .running && !self.isDiagnosticRunning {
+                self.diagnosticGeneration &+= 1
                 self.diagnosticState = self.routing.isAcquired(.callDiagnostic) ? .ready : .idle; self.meters.removeAll()
             }
             self.contentDidChange?(); self.diagnosticDidChange?()
@@ -383,6 +461,7 @@ public enum CallAudioDiagnosticState: Equatable, Sendable {
     }
     public func beginDiagnostic(sourceIDs: Set<String>) async throws {
         guard operation == nil, !isDiagnosticRunning else { throw QuickUtilityError.failure("Detén la prueba actual antes de comenzar otra.") }
+        diagnosticGeneration &+= 1
         diagnosticState = .starting; meters.removeAll()
         let task = Task { @MainActor in try await routing.beginCallDiagnostic(sourceIDs: sourceIDs); try Task.checkCancellation() }
         operation = task; defer { operation = nil }
@@ -396,14 +475,20 @@ public enum CallAudioDiagnosticState: Equatable, Sendable {
     }
     public func refreshDiagnosticMeters() async throws {
         guard isDiagnosticRunning else { meters.removeAll(); return }
-        do { meters = try await routing.diagnosticMeters(); contentDidChange?() }
-        catch {
+        let version = diagnosticGeneration
+        do {
+            let snapshot = try await routing.diagnosticMeters()
+            guard version == diagnosticGeneration, isDiagnosticRunning else { return }
+            meters = snapshot; contentDidChange?()
+        } catch {
+            guard version == diagnosticGeneration, isDiagnosticRunning else { return }
             let original = error
             try await stopDiagnostic()
             diagnosticState = .failed(original.localizedDescription); throw original
         }
     }
     public func stopDiagnostic() async throws {
+        diagnosticGeneration &+= 1
         diagnosticState = .stopping
         operation?.cancel(); if let operation { _ = await operation.result }
         do { try await routing.release(.callDiagnostic); meters.removeAll(); diagnosticState = .idle }
