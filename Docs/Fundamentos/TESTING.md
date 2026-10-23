@@ -1,6 +1,10 @@
 # Pruebas y validación — ZEUVE 0.21.0.0
 
-La nueva familia residente está **EN VALIDACIÓN**. Sus [resultados actuales](../Historico/Pruebas/TEST_RESULTS_0.21.0.0.md) distinguen compilación, pruebas automáticas, integración y QA real. Un tap creado, un atajo enviado o una ventana enumerada no acredita eficacia del audio, identidad física del ratón ni comportamiento completo de aplicaciones externas. La protección durante llamadas permanece sin completar mientras falte un diagnóstico reproducible y una ruta eficaz comprobada.
+La familia residente fue **RETIRADA el 23/10/2026** por decisión del usuario. Su QA pendiente deja de ser alcance vigente. El siguiente párrafo conserva el estado del intento anterior a su retirada.
+
+La nueva familia residente estaba **EN VALIDACIÓN**. Sus [resultados actuales](../Historico/Pruebas/TEST_RESULTS_0.21.0.0.md) distinguen compilación, pruebas automáticas, integración y QA real. Un tap creado, un atajo enviado o una ventana enumerada no acredita eficacia del audio, identidad física del ratón ni comportamiento completo de aplicaciones externas. La protección durante llamadas permanece sin completar mientras falte un diagnóstico reproducible y una ruta eficaz comprobada.
+
+La verificación de la retirada cubre la ausencia de referencias en código/configuración, coherencia SwiftPM/Xcode, tests restantes, builds y recorrido nativo de arranque, navegación, Ajustes y cierre. Resultados en el [registro de retirada](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
 ## Evidencia conservada del Descargador — 0.20.8.4
 
@@ -77,7 +81,9 @@ No debe afirmarse que una prueba manual se realizó si solo se revisó código o
 
 Antes de considerar una entrega validada, ejecutar el máximo posible del flujo oficial. Si Xcode, firma, motores ARM64 o lanzamiento real no pueden comprobarse en el entorno actual, declararlo expresamente y mantener esa comprobación como pendiente de plataforma, no eliminarla del proceso.
 
-## Aceptación de utilidades rápidas
+## Aceptación de utilidades rápidas — registro retirado
+
+> Retirado del código el 23/10/2026 por decisión del usuario. Este apartado conserva el diseño y los límites del intento, no describe funciones actuales ni QA pendiente. Véase el [registro de retirada](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
 Los tests de `ZEUVEQuickUtilitiesTests` cubren estados idempotentes, almacenamiento inválido, permisos denegados/revocados, atajos, transformaciones de rueda, pares de botones, rutas/ganancia de audio, geometría/identidades de ventanas y publicación/texto/referencias. Los backends inyectados pertenecen a tests; la app utiliza servicios nativos reales.
 

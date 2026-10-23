@@ -6,7 +6,6 @@ var products: [Product] = [
     .library(name: "ZEUVEStorage", targets: ["ZEUVEStorage"]),
     .library(name: "ZEUVEOperations", targets: ["ZEUVEOperations"]),
     .library(name: "ZEUVEEngines", targets: ["ZEUVEEngines"]),
-    .library(name: "ZEUVEQuickUtilities", targets: ["ZEUVEQuickUtilities"]),
     .library(name: "OrganizerModule", targets: ["OrganizerModule"]),
     .library(name: "UniversalDownloaderModule", targets: ["UniversalDownloaderModule"]),
     .library(name: "ChatAnalyzerModule", targets: ["ChatAnalyzerModule"]),
@@ -25,7 +24,6 @@ var targets: [Target] = [
         publicHeadersPath: "include"
     ),
     .target(name: "ZEUVECore", path: "Sources/ZEUVECore"),
-    .target(name: "ZEUVEQuickUtilities", dependencies: ["ZEUVECore", "ZEUVEStorage", "ZEUVEOperations"], path: "Sources/ZEUVEQuickUtilities"),
     .target(
         name: "ZEUVEStorage",
         dependencies: ["ZEUVECore", "CSQLite"],
@@ -84,7 +82,6 @@ var targets: [Target] = [
         resources: [.process("Resources")]
     ),
     .testTarget(name: "ZEUVECoreTests", dependencies: ["ZEUVECore"], path: "Tests/ZEUVECoreTests"),
-    .testTarget(name: "ZEUVEQuickUtilitiesTests", dependencies: ["ZEUVEQuickUtilities", "ZEUVEStorage"], path: "Tests/ZEUVEQuickUtilitiesTests"),
     .testTarget(name: "ZEUVEStorageTests", dependencies: ["ZEUVEStorage", "ZEUVECore"], path: "Tests/ZEUVEStorageTests"),
     .testTarget(name: "ZEUVEOperationsTests", dependencies: ["ZEUVEOperations", "ZEUVECore"], path: "Tests/ZEUVEOperationsTests"),
     .testTarget(name: "ZEUVEEnginesTests", dependencies: ["ZEUVEEngines"], path: "Tests/ZEUVEEnginesTests"),

@@ -72,7 +72,13 @@ Las importaciones deben impedir path traversal, rutas absolutas, colisiones norm
 
 La app usa Hardened Runtime. No está dentro de App Sandbox en 0.21.0.0; por ello las protecciones de alcance, validación, permisos internos y UI no pueden delegarse al sandbox.
 
-## Utilidades rápidas residentes
+## Estado de permisos tras la retirada
+
+Desde el 23/10/2026 no se incluyen los proveedores de Servicios ni la declaración de captura de audio o el entitlement Audio Input exclusivos de las microutilidades. No hay taps de audio/eventos, atajos globales ni backend AX de esa familia. Se conservan Hardened Runtime y las protecciones de los módulos. No se modifican permisos TCC, registros de inicio de sesión o preferencias personales ya existentes en macOS.
+
+## Utilidades rápidas residentes — registro retirado
+
+> Retirado del código el 23/10/2026 por decisión del usuario. Este apartado conserva el diseño y los límites del intento, no describe funciones actuales ni QA pendiente. Véase el [registro de retirada](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
 Permisos TCC solicitados por utilidad y acción concreta: Accesibilidad para modificar eventos/AX, captura del audio del sistema para Process Taps. El atajo Carbon no implica registrar pulsaciones. No se solicita pantalla para una lista textual ni micrófono para el mezclador. Denegación/revocación detiene el servicio afectado y no impide usar los módulos independientes.
 

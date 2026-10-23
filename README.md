@@ -47,9 +47,11 @@ El proyecto está pensado para crecer por módulos sin perder una experiencia co
 
 ZEUVE también dispone de **Historial**, ajustes centralizados y personalización del orden y los atajos de los módulos.
 
-Las [**Utilidades rápidas**](Docs/Utilidades/QUICK_UTILITIES.md) forman una familia residente independiente: barra de menús única, inicio de sesión opcional y funciones locales de audio, entrada, ventanas y productividad. Cerrar una ventana conserva la aplicación residente; Salir detiene sus servicios. Las limitaciones y permisos se muestran por utilidad.
+**Registro del intento, retirado el 23/10/2026:** las [**Utilidades rápidas**](Docs/Utilidades/QUICK_UTILITIES.md) forman una familia residente independiente: barra de menús única, inicio de sesión opcional y funciones locales de audio, entrada, ventanas y productividad. Cerrar una ventana conserva la aplicación residente; Salir detiene sus servicios. Las limitaciones y permisos se muestran por utilidad.
 
 ---
+
+Las microutilidades descritas en el párrafo anterior ya no forman parte del código ni de la aplicación. Se conserva su documentación y el histórico. [Retirada y verificación](Docs/Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
 ## Principios
 
@@ -141,7 +143,9 @@ Para consultar la evolución del proyecto:
 
 <div align="center">
 
-### ZEUVE 0.21.0.0 — integración verificada, QA física pendiente
+### ZEUVE 0.21.0.0 — microutilidades retiradas
+
+El 23/10/2026 se retira del código la familia de microutilidades por decisión del usuario. ZEUVE conserva sus siete módulos y recupera las ventanas/Ajustes anteriores. El siguiente registro describe el intento previo, no el producto actual ni trabajo pendiente:
 
 Versión visible única de desarrollo y marketing 0.21.0.0; metadata Apple 0.21.0, revisión 0/build 79. Infraestructura residente y familia de utilidades rápidas integradas con Ajustes. La protección de audio en llamadas no se declara completada: dispone de una prueba integrada de ruta al 100 % con fuentes elegidas y niveles RMS sólo en RAM; la comparación real con FaceTime/altavoces y su eficacia siguen pendientes. [Funciones y límites](Docs/Utilidades/QUICK_UTILITIES.md), [implementación](Docs/Historico/Implementacion/IMPLEMENTATION_REPORT_0.21.0.0.md), [pruebas](Docs/Historico/Pruebas/TEST_RESULTS_0.21.0.0.md) y [entrega](Docs/Historico/Entregas/DELIVERY_0.21.0.0.md). La continuación del 13/10 pasa 728 tests (107 de utilidades) y builds oficiales Debug/Release. QA nativa parcial: publicación completa desde Finder, Servicios de TextEdit, ruta de audio y eventos de arranque residente sin ventanas; Accesibilidad efectiva, arrastre final, hardware y prueba FaceTime conservan sus pendientes documentados. Sin ZIP.
 

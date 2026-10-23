@@ -1,6 +1,8 @@
 # Utilidades rápidas — ZEUVE 0.21.0.0
 
-Fuente funcional vigente de los servicios residentes. La aceptación de esta entrega está **EN VALIDACIÓN**; código integrado y tests automáticos no certifican hardware o aplicaciones externas. La [evidencia de pruebas](../Historico/Pruebas/TEST_RESULTS_0.21.0.0.md) registra exclusivamente lo ejecutado.
+> **RETIRADO — 23/10/2026.** El usuario descarta toda la familia de microutilidades, incluida la infraestructura residente y la protección durante llamadas. Su código, UI, tests exclusivos e integración se han eliminado. Este documento conserva íntegro el diseño intentado y sus límites como registro; ninguna función o QA pendiente descrita debajo forma parte del alcance vigente. [Decisión](../../PROJECT_DECISIONS.md#retirada-de-las-microutilidades--23102026) · [Retirada y verificación](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
+
+Fuente funcional del intento de servicios residentes. La aceptación de esta entrega está **EN VALIDACIÓN**; código integrado y tests automáticos no certifican hardware o aplicaciones externas. La [evidencia de pruebas](../Historico/Pruebas/TEST_RESULTS_0.21.0.0.md) registra exclusivamente lo ejecutado.
 
 ## Aplicación residente
 

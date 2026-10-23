@@ -65,15 +65,6 @@
 		168A98E38909340296AFD59E /* OrganizerPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D4D408A8CD43603353DF76 /* OrganizerPlanView.swift */; };
 		403FFD158F8A1734E62A1198 /* OrganizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F3BCF1C20BBA11DA887F40 /* OrganizerView.swift */; };
 		D6BD1BFB3E56F89075549ABA /* OrganizerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8E51415A3637D96801E267 /* OrganizerViewModel.swift */; };
-		CC15324CA442FCF62C7A45EC /* AudioMixerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CF10226FDB9966FEB1F8B92 /* AudioMixerSettingsView.swift */; };
-		9D091D7A7F6A227544D1BC6B /* InputSettingsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E858FE52C15142C7234E92F9 /* InputSettingsViews.swift */; };
-		18AA6BA43E6F6AAEA124864A /* NewFileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375DB6B2023DD60EAFD2AD8E /* NewFileSettingsView.swift */; };
-		792BB1601D406BA2C7DAE3F5 /* ProductivityControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 707D305045FBF57C9005BE38 /* ProductivityControllers.swift */; };
-		93230BE451CC720AB88C4F98 /* QuickUtilitiesHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2191B3D55B1662F02EF7FA90 /* QuickUtilitiesHelp.swift */; };
-		A8A36AB54144365A5A99DFFB /* QuickUtilitiesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F5280226D8C0AFEB4C0E9E /* QuickUtilitiesSettingsView.swift */; };
-		967DC0657DA2D7E7E3995E62 /* ResidentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FBFBD2C74F3F55118A48C97 /* ResidentRuntime.swift */; };
-		F511786A9C39D8F6AF34017A /* WindowSwitcherPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425F32F087B223B2300D055B /* WindowSwitcherPanel.swift */; };
-		68717F34DF28DBC497C9C02F /* WindowUtilitiesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D15DB30AA10615CBA5CDFA4 /* WindowUtilitiesSettingsView.swift */; };
 		9C459C6DB287F097138E0C7E /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E6A48249857C83329C14CB /* RootView.swift */; };
 		DA28470E8ED148872728E123 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4E5B163B8AFCDE871BADED /* SettingsView.swift */; };
 		88F81196AB76F5625792E719 /* UniversalConverterHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F875420C4F7EAD56E33375 /* UniversalConverterHelp.swift */; };
@@ -100,7 +91,6 @@
 		477129AAF615C6DD899BE031 /* ZEUVEStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7091E7C58F7EEFDE86B70B83 /* ZEUVEStorage */; };
 		D9D7F6686A4A480C943741F4 /* ZEUVEOperations in Frameworks */ = {isa = PBXBuildFile; productRef = ED80ED4EC2B0B0AB582FE05F /* ZEUVEOperations */; };
 		A31FB53252ADC6A6A6399AA9 /* ZEUVEEngines in Frameworks */ = {isa = PBXBuildFile; productRef = 6D8C9527002E0D943BD80F7C /* ZEUVEEngines */; };
-		2D8A42CE30E510FC21F9D423 /* ZEUVEQuickUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = C4317E32E4868F6D41B320FE /* ZEUVEQuickUtilities */; };
 		DFA297719D4EBE9B26719F7E /* OrganizerModule in Frameworks */ = {isa = PBXBuildFile; productRef = 9C40C395B65675CF2A76A7F4 /* OrganizerModule */; };
 		1A34E16A5BC51BD644D77269 /* UniversalDownloaderModule in Frameworks */ = {isa = PBXBuildFile; productRef = 289CFEE2140D37B91B133F92 /* UniversalDownloaderModule */; };
 		61676469858611245E80E90F /* ChatAnalyzerModule in Frameworks */ = {isa = PBXBuildFile; productRef = CD79C3A5B5C0E3E71B8DDCA5 /* ChatAnalyzerModule */; };
@@ -169,15 +159,6 @@
 		46D4D408A8CD43603353DF76 /* OrganizerPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Organizer/OrganizerPlanView.swift"; sourceTree = "<group>"; };
 		C3F3BCF1C20BBA11DA887F40 /* OrganizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Organizer/OrganizerView.swift"; sourceTree = "<group>"; };
 		1E8E51415A3637D96801E267 /* OrganizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Organizer/OrganizerViewModel.swift"; sourceTree = "<group>"; };
-		1CF10226FDB9966FEB1F8B92 /* AudioMixerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/Audio/AudioMixerSettingsView.swift"; sourceTree = "<group>"; };
-		E858FE52C15142C7234E92F9 /* InputSettingsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/Input/InputSettingsViews.swift"; sourceTree = "<group>"; };
-		375DB6B2023DD60EAFD2AD8E /* NewFileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/Productivity/NewFileSettingsView.swift"; sourceTree = "<group>"; };
-		707D305045FBF57C9005BE38 /* ProductivityControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/Productivity/ProductivityControllers.swift"; sourceTree = "<group>"; };
-		2191B3D55B1662F02EF7FA90 /* QuickUtilitiesHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/QuickUtilitiesHelp.swift"; sourceTree = "<group>"; };
-		D3F5280226D8C0AFEB4C0E9E /* QuickUtilitiesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/QuickUtilitiesSettingsView.swift"; sourceTree = "<group>"; };
-		8FBFBD2C74F3F55118A48C97 /* ResidentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/ResidentRuntime.swift"; sourceTree = "<group>"; };
-		425F32F087B223B2300D055B /* WindowSwitcherPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/Windows/WindowSwitcherPanel.swift"; sourceTree = "<group>"; };
-		6D15DB30AA10615CBA5CDFA4 /* WindowUtilitiesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuickUtilities/Windows/WindowUtilitiesSettingsView.swift"; sourceTree = "<group>"; };
 		11E6A48249857C83329C14CB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RootView.swift"; sourceTree = "<group>"; };
 		9C4E5B163B8AFCDE871BADED /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
 		76F875420C4F7EAD56E33375 /* UniversalConverterHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniversalConverter/UniversalConverterHelp.swift"; sourceTree = "<group>"; };
@@ -213,7 +194,6 @@
 				477129AAF615C6DD899BE031 /* ZEUVEStorage in Frameworks */,
 				D9D7F6686A4A480C943741F4 /* ZEUVEOperations in Frameworks */,
 				A31FB53252ADC6A6A6399AA9 /* ZEUVEEngines in Frameworks */,
-				2D8A42CE30E510FC21F9D423 /* ZEUVEQuickUtilities in Frameworks */,
 				DFA297719D4EBE9B26719F7E /* OrganizerModule in Frameworks */,
 				1A34E16A5BC51BD644D77269 /* UniversalDownloaderModule in Frameworks */,
 				61676469858611245E80E90F /* ChatAnalyzerModule in Frameworks */,
@@ -297,15 +277,6 @@
 				46D4D408A8CD43603353DF76 /* OrganizerPlanView.swift */,
 				C3F3BCF1C20BBA11DA887F40 /* OrganizerView.swift */,
 				1E8E51415A3637D96801E267 /* OrganizerViewModel.swift */,
-				1CF10226FDB9966FEB1F8B92 /* AudioMixerSettingsView.swift */,
-				E858FE52C15142C7234E92F9 /* InputSettingsViews.swift */,
-				375DB6B2023DD60EAFD2AD8E /* NewFileSettingsView.swift */,
-				707D305045FBF57C9005BE38 /* ProductivityControllers.swift */,
-				2191B3D55B1662F02EF7FA90 /* QuickUtilitiesHelp.swift */,
-				D3F5280226D8C0AFEB4C0E9E /* QuickUtilitiesSettingsView.swift */,
-				8FBFBD2C74F3F55118A48C97 /* ResidentRuntime.swift */,
-				425F32F087B223B2300D055B /* WindowSwitcherPanel.swift */,
-				6D15DB30AA10615CBA5CDFA4 /* WindowUtilitiesSettingsView.swift */,
 				11E6A48249857C83329C14CB /* RootView.swift */,
 				9C4E5B163B8AFCDE871BADED /* SettingsView.swift */,
 				76F875420C4F7EAD56E33375 /* UniversalConverterHelp.swift */,
@@ -362,7 +333,6 @@
 				7091E7C58F7EEFDE86B70B83 /* ZEUVEStorage */,
 				ED80ED4EC2B0B0AB582FE05F /* ZEUVEOperations */,
 				6D8C9527002E0D943BD80F7C /* ZEUVEEngines */,
-				C4317E32E4868F6D41B320FE /* ZEUVEQuickUtilities */,
 				9C40C395B65675CF2A76A7F4 /* OrganizerModule */,
 				289CFEE2140D37B91B133F92 /* UniversalDownloaderModule */,
 				CD79C3A5B5C0E3E71B8DDCA5 /* ChatAnalyzerModule */,
@@ -505,15 +475,6 @@
 				168A98E38909340296AFD59E /* OrganizerPlanView.swift in Sources */,
 				403FFD158F8A1734E62A1198 /* OrganizerView.swift in Sources */,
 				D6BD1BFB3E56F89075549ABA /* OrganizerViewModel.swift in Sources */,
-				CC15324CA442FCF62C7A45EC /* AudioMixerSettingsView.swift in Sources */,
-				9D091D7A7F6A227544D1BC6B /* InputSettingsViews.swift in Sources */,
-				18AA6BA43E6F6AAEA124864A /* NewFileSettingsView.swift in Sources */,
-				792BB1601D406BA2C7DAE3F5 /* ProductivityControllers.swift in Sources */,
-				93230BE451CC720AB88C4F98 /* QuickUtilitiesHelp.swift in Sources */,
-				A8A36AB54144365A5A99DFFB /* QuickUtilitiesSettingsView.swift in Sources */,
-				967DC0657DA2D7E7E3995E62 /* ResidentRuntime.swift in Sources */,
-				F511786A9C39D8F6AF34017A /* WindowSwitcherPanel.swift in Sources */,
-				68717F34DF28DBC497C9C02F /* WindowUtilitiesSettingsView.swift in Sources */,
 				9C459C6DB287F097138E0C7E /* RootView.swift in Sources */,
 				DA28470E8ED148872728E123 /* SettingsView.swift in Sources */,
 				88F81196AB76F5625792E719 /* UniversalConverterHelp.swift in Sources */,
@@ -569,7 +530,6 @@
 			buildSettings = {
 				ARCHS = arm64;
 				CODE_SIGN_STYLE = Automatic;
-				CODE_SIGN_ENTITLEMENTS = Resources/ZEUVE.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 79;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -597,7 +557,6 @@
 			buildSettings = {
 				ARCHS = arm64;
 				CODE_SIGN_STYLE = Automatic;
-				CODE_SIGN_ENTITLEMENTS = Resources/ZEUVE.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 79;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -659,10 +618,6 @@
 		6D8C9527002E0D943BD80F7C /* ZEUVEEngines */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ZEUVEEngines;
-		};
-		C4317E32E4868F6D41B320FE /* ZEUVEQuickUtilities */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ZEUVEQuickUtilities;
 		};
 		9C40C395B65675CF2A76A7F4 /* OrganizerModule */ = {
 			isa = XCSwiftPackageProductDependency;

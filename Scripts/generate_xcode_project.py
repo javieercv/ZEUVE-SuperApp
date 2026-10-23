@@ -35,7 +35,7 @@ target_debug = uid("target-debug")
 target_release = uid("target-release")
 package_ref = uid("package-ref")
 
-products = ["ZEUVECore", "ZEUVEStorage", "ZEUVEOperations", "ZEUVEEngines", "ZEUVEQuickUtilities", "OrganizerModule", "UniversalDownloaderModule", "ChatAnalyzerModule", "UniversalConverterModule", "InstagramFollowersModule", "MultimediaInspectorModule", "CleanerModule"]
+products = ["ZEUVECore", "ZEUVEStorage", "ZEUVEOperations", "ZEUVEEngines", "OrganizerModule", "UniversalDownloaderModule", "ChatAnalyzerModule", "UniversalConverterModule", "InstagramFollowersModule", "MultimediaInspectorModule", "CleanerModule"]
 product_deps = {name: uid(f"product-dep-{name}") for name in products}
 framework_builds = {name: uid(f"framework-build-{name}") for name in products}
 file_refs = {path: uid(f"file-ref-{path}") for path in source_files}
@@ -231,7 +231,6 @@ for config_id, name in [(target_debug, "Debug"), (target_release, "Release")]:
     a("\t\t\tbuildSettings = {")
     a("\t\t\t\tARCHS = arm64;")
     a("\t\t\t\tCODE_SIGN_STYLE = Automatic;")
-    a("\t\t\t\tCODE_SIGN_ENTITLEMENTS = Resources/ZEUVE.entitlements;")
     a("\t\t\t\tCOMBINE_HIDPI_IMAGES = YES;")
     a("\t\t\t\tCURRENT_PROJECT_VERSION = 79;")
     a("\t\t\t\tENABLE_HARDENED_RUNTIME = YES;")

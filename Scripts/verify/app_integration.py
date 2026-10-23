@@ -20,8 +20,7 @@ for relative in [
 from pathlib import Path
 text = Path('Sources/ZEUVEApp/AppModel.swift').read_text()
 required = [
-    'let localCoordinator = runtime.operations',
-    'guard let container = runtime.storage',
+    'let localCoordinator = OperationCoordinator()',
     'let localRegistry = ModuleRegistry()',
     'let initialState:',
     'initialState = (',
@@ -70,7 +69,7 @@ downloader_model = Path('Sources/ZEUVEApp/UniversalDownloader/UniversalDownloade
 organizer_model = Path('Sources/ZEUVEApp/Organizer/OrganizerViewModel.swift').read_text()
 organizer_keys = Path('Sources/OrganizerModule/OrganizerStorageKeys.swift').read_text()
 for required in [
-    'case general', 'case module(BuiltInModuleID)', 'ForEach(runtime.settingsModules)',
+    'case general', 'case module(BuiltInModuleID)', 'ForEach(app.settingsModules)',
     'settingsOrder: 10', 'settingsOrder: 20', 'settingsOrder: 30', 'settingsOrder: 40', 'settingsOrder: nil',
     'UniversalDownloaderSettingsSection', 'case defaults', 'case presets', 'case diagnostics',
     'OrganizerModuleSettingsView', 'UniversalDownloaderSettingsView', 'ChatAnalyzerModuleSettingsView', 'UniversalConverterSettingsView',

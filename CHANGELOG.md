@@ -1,6 +1,13 @@
 # Historial de cambios de ZEUVE
 
-## 0.21.0.0 — 2026-10-12 — EN VALIDACIÓN
+## Retirada de microutilidades — 2026-10-23 — sobre 0.21.0.0
+
+- Decisión y plan aprobados por el usuario: eliminación completa del código, UI, target y pruebas exclusivas de utilidades rápidas, incluida la protección de audio durante llamadas.
+- Recuperados `WindowGroup`/`Settings`, inicialización propia de `AppModel` y Ajustes generales/por módulo. Retirados barra de menús, inicio con macOS, Servicios y permisos exclusivos de audio; actualizados SwiftPM, generador Xcode y verificadores.
+- Conservadas las mejoras independientes de firma Hardened Runtime, arranque Debug y cancelación/cierre de operaciones. Los siete módulos, motores y datos personales no cambian; preferencias antiguas inertes, sin migración destructiva.
+- Documentación e histórico del intento conservados y señalados como retirados. Versión visible 0.21.0.0 y metadata Apple/build sin cambio; no se crea una nueva entrega versionada ni ZIP. [Alcance y pruebas](Docs/Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
+
+## 0.21.0.0 — 2026-10-12 — registro del intento posteriormente retirado
 
 - Infraestructura residente común, catálogo/estados efectivos, barra de menús única, apertura diferida de la interfaz principal y configuración centralizada. Inicio de sesión opt-in y cierre completo con liberación de recursos.
 - Rueda discreta global: inversión vertical/horizontal sin transformar eventos continuos. Botones adicionales por índice, captura explícita y atajos configurables; primario, secundario y central protegidos. Sin perfiles físicos ficticios ni drivers.

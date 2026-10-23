@@ -81,7 +81,13 @@ No afirmar que una app “compila y abre” si solo se ha ejecutado SwiftPM o ve
 
 La limpieza del proyecto no debe borrar `Resources/Engines`, manifests, licencias ni recursos necesarios. Artefactos de `.build`, DerivedData, logs o resultados temporales sí deben distinguirse del código fuente.
 
-## Empaquetado de utilidades residentes
+## Composición tras la retirada
+
+Desde el 23/10/2026 SwiftPM y el proyecto Xcode generado enlazan once bibliotecas: cuatro capas compartidas y siete módulos. No se incluye `ZEUVEQuickUtilities`, su UI ni sus tests; se retiran las declaraciones de Servicios/captura de audio y el fichero de entitlements exclusivo de la app. La firma sigue usando Hardened Runtime; el script admite una firma sin entitlements y continúa rechazando App Sandbox. Se conservan `ENABLE_DEBUG_DYLIB = NO` y el directorio de verificación separado.
+
+## Empaquetado de utilidades residentes — registro retirado
+
+> Retirado del código el 23/10/2026 por decisión del usuario. Este apartado conserva el diseño y los límites del intento, no describe funciones actuales ni QA pendiente. Véase el [registro de retirada](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
 `ZEUVEQuickUtilities` está integrado en SwiftPM y en el generador Xcode con sus tests. Usa frameworks del sistema AppKit, CoreGraphics, ApplicationServices, Carbon/HIToolbox, ServiceManagement y Core Audio. La app continúa con Hardened Runtime y sin App Sandbox. No se añade una app independiente, driver, KEXT, helper privilegiado ni extensión de Finder.
 

@@ -4,7 +4,15 @@ Fecha de consolidación inicial: 6 de agosto de 2026. Actualizado para ZEUVE 0.2
 
 > **Cómo leer este documento:** las secciones con número de versión conservan la decisión aprobada en el momento en que se tomó. Cuando una decisión histórica fue sustituida, manda la decisión posterior y la documentación viva de `Docs/Fundamentos/`, `Docs/Modulos/` o `Docs/Motores/`. Este archivo no debe usarse como descripción cronológica del estado actual sin contrastar esas fuentes.
 
-## Utilidades rápidas residentes y versión visible única — 0.21.0.0
+## Retirada de las microutilidades — 23/10/2026
+
+El usuario decide descartar toda la familia de utilidades rápidas y aprueba su retirada completa del código, incluida la infraestructura residente exclusiva. Se eliminan target, UI, servicios, pruebas exclusivas, barra de menús, inicio con macOS y declaraciones/permisos exclusivos. Se recupera la composición de ventanas y Ajustes anterior; los siete módulos, las mejoras independientes de firma/compilación y las protecciones de cancelación se conservan. El Descargador continúa aplazado.
+
+La documentación del intento y las evidencias anteriores permanecen como registro. La protección de audio durante llamadas también queda descartada por esta decisión; su validación pendiente ya no es trabajo vigente. No se borran archivos ni ajustes personales; las claves antiguas carecen de consumidores. Esta retirada no crea ZIP ni altera las versiones de los módulos o la versión visible 0.21.0.0. [Alcance y verificación](Docs/Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
+
+## Utilidades rápidas residentes y versión visible única — 0.21.0.0 — decisión de utilidades sustituida
+
+> Registro del intento aprobado el 12/10/2026. El alcance de utilidades descrito a continuación fue retirado el 23/10/2026; la versión visible única se conserva.
 
 El 12/10/2026 el usuario aprueba el plan de infraestructura residente y desarrollo paralelo: un proceso, un icono de barra de menús, presencia normal en Dock, cierre de ventana distinto de Salir e inicio con macOS opcional/desactivado por defecto. Ajustes y almacenamiento permanecen centralizados; no se sustituyen los siete módulos ni se reabre el Descargador.
 
@@ -58,6 +66,7 @@ La checklist conservó 613 OK, nueve fallidas, ocho parciales y nueve pendientes
 
 Este bloque resume las decisiones actualmente efectivas que más fácilmente pueden confundirse con registros antiguos. No sustituye los detalles de cada sección ni las fuentes vivas.
 
+- Utilidades rápidas: retiradas del código el 23/10/2026, incluida la protección durante llamadas y su infraestructura residente. Documentación y evidencia conservadas.
 - Built-ins: Organizador 0.1.5, Descargador 0.7.8, Analizador de chats 0.1.6, Conversor 0.3.2, Comparador de seguidores 0.1.0, Inspector multimedia 0.7.5 y Limpiador 0.1.4.
 - Navegación: un orden personalizable compartido por Sidebar/Inicio/comandos; atajos personalizables o desactivables. Defaults ⌘1…⌘7 y ⌘8 para Historial. No hay preferencia de ocultación de módulos en 0.21.0.0.
 - Ajustes: centralizados. Orden de secciones: Organizador 10, Descargador 20, Analizador 30, Conversor 40, Inspector 50 y Limpiador 60; el Comparador no tiene sección propia.

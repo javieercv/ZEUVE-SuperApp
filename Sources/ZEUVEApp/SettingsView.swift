@@ -7,25 +7,21 @@ import ZEUVEEngines
 import ChatAnalyzerModule
 import UniversalConverterModule
 
-enum SettingsArea: Identifiable, Hashable {
+private enum SettingsArea: Identifiable, Hashable {
     case general
-    case quickUtilities
     case module(BuiltInModuleID)
 
     var id: String {
         switch self {
         case .general: return "general"
-        case .quickUtilities: return "quickUtilities"
         case .module(let moduleID): return "module.\(moduleID.rawValue)"
         }
     }
 }
 
 struct SettingsView: View {
-    @EnvironmentObject private var runtime: ResidentRuntime
-    @State private var selectedArea: SettingsArea?
-    init(initialArea: SettingsArea = .general) { _selectedArea = State(initialValue: initialArea) }
-    private var app: AppModel { runtime.requireAppModel() }
+    @EnvironmentObject private var app: AppModel
+    @State private var selectedArea: SettingsArea? = .general
 
     var body: some View {
         HStack(spacing: 0) {
@@ -33,8 +29,7 @@ struct SettingsView: View {
                 Label("General", systemImage: "gearshape")
                     .tag(SettingsArea.general)
                     .padding(.vertical, 3)
-                Label("Utilidades rápidas", systemImage: "bolt.circle").tag(SettingsArea.quickUtilities)
-                ForEach(runtime.settingsModules) { module in
+                ForEach(app.settingsModules) { module in
                     Label(
                         module.descriptor.settingsTitle ?? module.manifest.name,
                         systemImage: module.manifest.presentation.systemImage
@@ -52,40 +47,26 @@ struct SettingsView: View {
                 switch selectedArea ?? .general {
                 case .general:
                     GeneralSettingsContent(app: app)
-                case .quickUtilities:
-                    QuickUtilitiesSettingsView().environmentObject(runtime)
                 case .module(let moduleID):
-                    BuiltInModuleSettingsRouter(moduleID: moduleID).environmentObject(app)
+                    BuiltInModuleSettingsRouter(moduleID: moduleID)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .navigationTitle("Ajustes")
-        .preferredColorScheme(runtime.theme.colorScheme)
-        .overlay {
-            if let model = runtime.appModel { SettingsErrorPresenter(model: model) }
+        .alert("No se ha podido guardar el ajuste", isPresented: Binding(
+            get: { app.settingsError != nil },
+            set: { if !$0 { app.settingsError = nil } }
+        )) {
+            Button("Aceptar", role: .cancel) { app.settingsError = nil }
+        } message: {
+            Text(app.settingsError ?? "Error desconocido")
         }
-    }
-}
-
-private struct SettingsErrorPresenter: View {
-    @ObservedObject var model: AppModel
-    var body: some View {
-        Color.clear.frame(width: 0, height: 0)
-            .alert("No se ha podido guardar el ajuste", isPresented: Binding(
-                get: { model.settingsError != nil },
-                set: { if !$0 { model.settingsError = nil } }
-            )) {
-                Button("Aceptar", role: .cancel) { model.settingsError = nil }
-            } message: {
-                Text(model.settingsError ?? "Error desconocido")
-            }
     }
 }
 
 private struct GeneralSettingsContent: View {
     @ObservedObject var app: AppModel
-    @EnvironmentObject private var runtime: ResidentRuntime
     @State private var confirmRestoreAll = false
 
     var body: some View {
@@ -180,7 +161,7 @@ private struct GeneralSettingsContent: View {
                 Button("Restaurar todos los ajustes predeterminados", role: .destructive) {
                     confirmRestoreAll = true
                 }
-                .disabled(!app.canRestoreAllSettings || runtime.isRestoringDefaults)
+                .disabled(!app.canRestoreAllSettings)
             } header: {
                 Text("Restablecer")
             } footer: {
@@ -209,7 +190,7 @@ private struct GeneralSettingsContent: View {
             titleVisibility: .visible
         ) {
             Button("Restaurar todos los ajustes", role: .destructive) {
-                runtime.restoreUtilitiesDefaults(includeModules: true)
+                app.restoreAllSettingsToDefaults()
             }
             Button("Cancelar", role: .cancel) { }
         } message: {

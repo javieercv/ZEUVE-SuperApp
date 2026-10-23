@@ -9,7 +9,7 @@ class GlobalSettingsResetPolicyTests(unittest.TestCase):
         text = (ROOT / "Sources/ZEUVEApp/SettingsView.swift").read_text()
         self.assertIn('Button("Restaurar todos los ajustes predeterminados", role: .destructive)', text)
         self.assertIn('"¿Restaurar todos los ajustes de ZEUVE?"', text)
-        self.assertIn('.disabled(!app.canRestoreAllSettings || runtime.isRestoringDefaults)', text)
+        self.assertIn('.disabled(!app.canRestoreAllSettings)', text)
         for preserved in [
             "historial",
             "preajustes",

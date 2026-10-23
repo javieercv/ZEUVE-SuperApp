@@ -8,7 +8,9 @@ ZEUVE integra siete módulos built-in, Inicio, Historial y Ajustes centralizados
 
 Las operaciones pesadas comparten `OperationCoordinator`; la aplicación evita ejecutar dos operaciones principales pesadas simultáneas. La privacidad, logs mínimos, protección de archivos y ejecución segura de motores son criterios transversales.
 
-## Utilidades rápidas residentes
+## Utilidades rápidas residentes — registro retirado
+
+> Retirado del código el 23/10/2026 por decisión del usuario. Este apartado conserva el diseño y los límites del intento, no describe funciones actuales ni QA pendiente. Véase el [registro de retirada](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
 Familia independiente en Ajustes, sin duplicar la barra lateral de módulos. Un icono de barra de menús permite recuperar la ventana, abrir Ajustes, consultar/activar funciones compatibles, detenerlas y salir. Inicio con macOS opt-in mediante `SMAppService.mainApp` y estados efectivos del sistema.
 
@@ -19,6 +21,10 @@ Familia independiente en Ajustes, sin duplicar la barra lateral de módulos. Un 
 - Bandeja flotante con referencias temporales en RAM y transformaciones de texto plano a través de Servicios; no son movimientos de archivos ni monitorización del portapapeles. RTF/RTFD se rechaza para proteger el formato.
 
 Comportamiento, compatibilidad, restauración y aceptación: [Utilidades rápidas](../Utilidades/QUICK_UTILITIES.md). Quedan fuera brillo externo avanzado, capturas flotantes, reglas de reposo, drivers/KEXT, root/helpers privilegiados y plugins externos.
+
+## Estado tras la retirada
+
+Desde el 23/10/2026, ZEUVE conserva los siete módulos, Inicio, Historial y Ajustes. Las microutilidades descritas arriba ya no están disponibles. No se registra inicio de sesión ni se ofrecen Servicios o controles residentes.
 
 ## Organizador de archivos 0.1.5
 

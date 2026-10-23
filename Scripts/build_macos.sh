@@ -49,9 +49,7 @@ flags = re.search(r"flags=0x([0-9a-fA-F]+)", signature.stderr)
 if not flags or int(flags.group(1), 16) & 0x10000 == 0:
     raise SystemExit("La firma final no incluye Hardened Runtime.")
 entitlements = subprocess.run(["/usr/bin/codesign", "-d", "--entitlements", ":-", sys.argv[1]], capture_output=True, check=True)
-authorizations = plistlib.loads(entitlements.stdout)
-if authorizations.get("com.apple.security.device.audio-input") is not True:
-    raise SystemExit("Falta Audio Input en la firma efectiva de ZEUVE.")
+authorizations = plistlib.loads(entitlements.stdout) if entitlements.stdout.strip() else {}
 if authorizations.get("com.apple.security.app-sandbox"):
     raise SystemExit("No está aprobado activar App Sandbox.")
 if sys.argv[2] == "Debug":

@@ -37,7 +37,9 @@ Registro, diagnóstico, verificación, overrides manuales y ejecución segura de
 
 `CZEUVEProcess`, `CSQLite` y `CLibArchive` aíslan APIs C/sistema necesarias para procesos, SQLite y archivos comprimidos.
 
-## Servicios residentes de utilidades rápidas
+## Servicios residentes de utilidades rápidas — registro retirado
+
+> Retirado del código el 23/10/2026 por decisión del usuario. Este apartado conserva el diseño y los límites del intento, no describe funciones actuales ni QA pendiente. Véase el [registro de retirada](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
 `ZEUVEQuickUtilities` es un target propio dependiente de Core/Storage/Operations; no pertenece al catálogo de módulos. `QuickUtilitiesCatalog` mantiene nueve IDs estables. `QuickUtilitiesCoordinator` separa solicitud persistida, transición y estado efectivo; serializa activaciones por utilidad y coordina parada/restablecimiento.
 
@@ -48,6 +50,10 @@ Los bloques propios son Audio, Input, Windows y Productivity. Audio comparte `Au
 `GlobalShortcutRegistry` registra combinaciones específicas mediante Carbon y libera registros/handler al detener. La validación cruza utilidades, navegación de ZEUVE y combinaciones públicas del sistema; no puede enumerar todos los atajos de aplicaciones externas. La persistencia sigue en `SettingsRepository`. Los servicios ligeros no reservan permanentemente `OperationCoordinator`.
 
 Contrato, recursos, permisos y límites reales: [Utilidades rápidas](../Utilidades/QUICK_UTILITIES.md).
+
+## Composición actual de la aplicación
+
+Tras la retirada del 23/10/2026, `ZEUVEApp` usa `WindowGroup` y `Settings` con un `AppModel` compartido que inicializa Storage, logger, registro y `OperationCoordinator`. Los atajos de navegación se resuelven desde ese modelo. Al salir se cancelan las operaciones y terminan los procesos externos propios. No existe runtime de microutilidades, barra de menús, registro de inicio con macOS ni proveedor de Servicios.
 
 ## Módulos built-in
 

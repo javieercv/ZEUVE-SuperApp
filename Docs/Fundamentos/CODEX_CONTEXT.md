@@ -58,6 +58,8 @@ Historial usa ⌘8 por defecto. `BuiltInModuleCatalog` conserva IDs/defaults; `N
 
 Una frase de un `IMPLEMENTATION_REPORT_*`, `DELIVERY_*` o `TEST_RESULTS_*` describe esa entrega, no necesariamente el presente. Si contradice una fuente viva o el código actual, conserva el documento histórico y corrige la documentación viva; no reescribas el pasado para que parezca actual.
 
-## Familia residente
+## Familia residente retirada
 
-Consultar [Utilidades rápidas](../Utilidades/QUICK_UTILITIES.md) y sus servicios reales. `ResidentRuntime` inicia servicios sin necesitar la ventana; `AppModel` se crea al abrir módulos. Una única app/Dock/barra de menús, inicio de sesión opcional y desactivado por defecto. Entrada no garantiza dispositivo físico; distribuciones necesitan reasociación tras reinicio. Protección en llamadas pendiente de diagnóstico y eficacia, sin aceptar un tap como prueba. El Descargador conserva el cierre de su ronda de QA y no se reabre aquí.
+El usuario descarta las microutilidades el 23/10/2026. Se retiran su código, target, pruebas exclusivas, infraestructura residente, barra de menús, inicio con macOS, Servicios y permisos exclusivos de audio. La app recupera `WindowGroup` y `Settings`, con almacenamiento/coordinador propios en `AppModel`. Las mejoras independientes de firma/compilación y cancelación se conservan. Las claves de preferencias antiguas quedan sin consumidores; no se borran datos personales.
+
+[Utilidades rápidas](../Utilidades/QUICK_UTILITIES.md) conserva el diseño intentado y sus límites, incluidas las pruebas de audio que no llegaron a aceptarse. No reactivar ese trabajo ni interpretar sus pendientes como alcance vigente. [Registro de retirada](../Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md). El Descargador conserva el cierre de su ronda de QA y no se reabre aquí.

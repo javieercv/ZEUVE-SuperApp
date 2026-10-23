@@ -49,8 +49,7 @@ class VerificationArchitectureTests(unittest.TestCase):
     def test_swiftpm_generator_and_pbx_are_currently_coherent(self) -> None:
         verifier = load_xcode_verifier()
         products = verifier.verify(ROOT)
-        self.assertEqual(len(products), 12)
-        self.assertIn("ZEUVEQuickUtilities", products)
+        self.assertEqual(len(products), 11)
         self.assertIn("UniversalDownloaderModule", products)
         self.assertIn("InstagramFollowersModule", products)
         self.assertIn("MultimediaInspectorModule", products)

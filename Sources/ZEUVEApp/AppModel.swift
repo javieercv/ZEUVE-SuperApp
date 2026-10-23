@@ -11,7 +11,6 @@ import UniversalConverterModule
 import InstagramFollowersModule
 import MultimediaInspectorModule
 import CleanerModule
-import ZEUVEQuickUtilities
 
 enum AppDestination: Identifiable, Hashable {
     case dashboard
@@ -94,13 +93,19 @@ final class AppModel: ObservableObject {
 
     private var operationObserver: Task<Void, Never>?
     private var didStart = false
-    private weak var runtime: ResidentRuntime?
 
-    init(runtime: ResidentRuntime) {
-        let localCoordinator = runtime.operations
+    init() {
+        let localCoordinator = OperationCoordinator()
         let localRegistry = ModuleRegistry()
-        let localLogger = runtime.logger
-        let loggerInitializationFailed = localLogger == nil
+        let localLogger: LocalLogger?
+        let loggerInitializationFailed: Bool
+        do {
+            localLogger = try LocalLogger(directory: AppPaths.logs())
+            loggerInitializationFailed = false
+        } catch {
+            localLogger = nil
+            loggerInitializationFailed = true
+        }
         let sharedEngineRegistry: EngineRegistry?
         let engineRegistryInitializationFailed: Bool
         do {
@@ -121,7 +126,7 @@ final class AppModel: ObservableObject {
         )
 
         do {
-            guard let container = runtime.storage else { throw CocoaError(.fileReadUnknown) }
+            let container = try StorageContainer.live()
             let loadedTheme = try container.settings.value(forKey: ZEUVEAppStorageKeys.theme, as: ThemePreference.self) ?? .system
             let rawNavigation = try container.settings.value(forKey: ZEUVEAppStorageKeys.navigationPreferences, as: NavigationPreferences.self) ?? NavigationPreferences()
             let loadedNavigation = KeyboardShortcutValidator.normalized(
@@ -186,7 +191,6 @@ final class AppModel: ObservableObject {
         if engineRegistryInitializationFailed {
             appendStartupIssue("ZEUVE se ha iniciado con disponibilidad degradada de motores. Revisa el diagnóstico del Descargador y del Conversor.")
         }
-        self.runtime = runtime
     }
 
     func start() async {
@@ -293,18 +297,7 @@ final class AppModel: ObservableObject {
 
     private func applyNavigationPreferences(_ raw: NavigationPreferences) {
         let normalized = KeyboardShortcutValidator.normalized(raw, availableModuleIDs: BuiltInModuleCatalog.navigationDefaults.moduleOrder, defaults: BuiltInModuleCatalog.navigationDefaults)
-        if let runtime {
-            for target in normalized.moduleOrder + [BuiltInModuleCatalog.historyTargetID] {
-                if let shortcut = normalized.effectiveShortcut(for: target, defaults: BuiltInModuleCatalog.navigationDefaults),
-                   let code = GlobalShortcutRegistry.keyCode(for: shortcut.key),
-                   runtime.shortcuts.conflict(for: GlobalShortcut(keyCode: code, command: shortcut.command, option: shortcut.option, control: shortcut.control, shift: shortcut.shift)) != nil {
-                    settingsError = "La combinación está registrada por una utilidad rápida. Desactiva o cambia ese atajo antes de asignarlo aquí."
-                    return
-                }
-            }
-        }
         navigationPreferences = normalized
-        runtime?.refreshShortcutConflicts()
         do { try storage?.settings.set(normalized, forKey: ZEUVEAppStorageKeys.navigationPreferences) } catch { settingsError = "La navegación se ha actualizado para esta sesión, pero no se ha podido guardar: \(error.localizedDescription)" }
     }
 
@@ -323,7 +316,6 @@ final class AppModel: ObservableObject {
 
     func saveTheme(_ value: ThemePreference) {
         theme = value
-        runtime?.syncTheme(value)
         guard let storage else { return }
         do {
             try storage.settings.set(value, forKey: ZEUVEAppStorageKeys.theme)
@@ -353,7 +345,6 @@ final class AppModel: ObservableObject {
         var failures: [String] = []
 
         theme = .system
-        runtime?.syncTheme(.system)
         if let storage {
             do {
                 try storage.settings.set(ThemePreference.system, forKey: ZEUVEAppStorageKeys.theme)

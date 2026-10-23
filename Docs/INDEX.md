@@ -65,11 +65,14 @@ Compatibilidad histórica del antiguo módulo YouTube: [documento legacy](Modulo
 
 La instantánea empaquetable concreta se define en `../Resources/Engines/engines.json`.
 
-## Utilidades rápidas
+## Utilidades rápidas — intento retirado
 
-- [Contrato, funciones y límites residentes](Utilidades/QUICK_UTILITIES.md).
+- [Contrato, funciones y límites residentes conservados como registro](Utilidades/QUICK_UTILITIES.md). Retiradas del código por decisión del usuario el 23/10/2026; no son alcance vigente.
+- [Retirada del código y verificación — 23/10/2026](Historico/Implementacion/QUICK_UTILITIES_RETIREMENT_20261023.md).
 
-## Entrega actual — 0.21.0.0 — EN VALIDACIÓN
+## Referencia actual — 0.21.0.0 — microutilidades retiradas
+
+La retirada del 23/10/2026 conserva los documentos siguientes como evidencia del intento anterior. Sus pendientes de microutilidades no son trabajo vigente.
 
 - [Implementación](Historico/Implementacion/IMPLEMENTATION_REPORT_0.21.0.0.md).
 - [Pruebas y aceptación pendiente](Historico/Pruebas/TEST_RESULTS_0.21.0.0.md).
